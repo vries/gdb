@@ -2249,6 +2249,20 @@ dwarf2_evaluate_loc_desc_full (struct type *type, struct frame_info *frame,
   ctx.per_cu = per_cu;
   ctx.obj_address = 0;
 
+frame_id old_frame_id (get_frame_id (deprecated_safe_get_selected_frame ()));
+class RestoreCall {
+private:
+  const std::function<void ()> func;
+public:
+  RestoreCall(std::function<void ()> func_):func(func_) {}
+  ~RestoreCall() { func(); }
+} restore_frame([=]() {
+  frame_info *old_frame (frame_find_by_id (old_frame_id));
+  if (old_frame != NULL)
+    select_frame (old_frame);
+});
+if (frame != NULL) select_frame (frame);
+
   scoped_value_mark free_values;
 
   ctx.gdbarch = per_objfile->objfile->arch ();
