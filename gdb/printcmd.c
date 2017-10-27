@@ -1210,6 +1210,10 @@ print_command_1 (const char *args, int voidprint)
 
   if (exp != nullptr && *exp)
     {
+      /* '*((int *(*) (void)) __errno_location) ()' is incompatible with
+	 function descriptors.  */
+      if (target_has_execution && strcmp (exp, "errno") == 0)
+	exp = "*(*(int *(*)(void)) __errno_location) ()";
       expression_up expr = parse_expression (exp);
       val = evaluate_expression (expr.get ());
     }
