@@ -1977,7 +1977,8 @@ is_dynamic_type_internal (struct type *type, int top_level)
   type = check_typedef (type);
 
   /* We only want to recognize references at the outermost level.  */
-  if (top_level && type->code () == TYPE_CODE_REF)
+  if (top_level &&
+      (type->code () == TYPE_CODE_REF || type-> code() == TYPE_CODE_PTR))
     type = check_typedef (TYPE_TARGET_TYPE (type));
 
   /* Types that have a dynamic TYPE_DATA_LOCATION are considered
@@ -2017,10 +2018,10 @@ is_dynamic_type_internal (struct type *type, int top_level)
 		|| is_dynamic_type_internal (TYPE_TARGET_TYPE (type), 0));
       }
 
-    case TYPE_CODE_STRING:
       /* Strings are very much like an array of characters, and can be
 	 treated as one here.  */
     case TYPE_CODE_ARRAY:
+    case TYPE_CODE_STRING:
       {
 	gdb_assert (type->num_fields () == 1);
 
@@ -2183,10 +2184,14 @@ resolve_dynamic_array_or_string (struct type *type,
 
   ary_dim = check_typedef (TYPE_TARGET_TYPE (elt_type));
 
-  if (ary_dim != NULL && ary_dim->code () == TYPE_CODE_ARRAY)
+  if (ary_dim != NULL && (ary_dim->code () == TYPE_CODE_ARRAY
+      || ary_dim->code () == TYPE_CODE_STRING))
     elt_type = resolve_dynamic_array_or_string (ary_dim, addr_stack);
   else
     elt_type = TYPE_TARGET_TYPE (type);
+
+  if (type->code () == TYPE_CODE_STRING)
+    return create_string_type (type, elt_type, range_type);
 
   prop = type->dyn_prop (DYN_PROP_BYTE_STRIDE);
   if (prop != NULL)
@@ -2533,6 +2538,25 @@ resolve_dynamic_struct (struct type *type,
   return resolved_type;
 }
 
+/* Worker for pointer types.  */
+
+static struct type *
+resolve_dynamic_pointer (struct type *type,
+			 struct property_addr_info *addr_stack)
+{
+  struct dynamic_prop *prop;
+  CORE_ADDR value;
+
+  type = copy_type (type);
+
+  /* Resolve associated property.  */
+  prop = TYPE_ASSOCIATED_PROP (type);
+  if (prop != NULL && dwarf2_evaluate_property (prop, NULL, addr_stack, &value))
+    prop->set_const_val (value);
+
+  return type;
+}
+
 /* Worker for resolved_dynamic_type.  */
 
 static struct type *
@@ -2594,6 +2618,9 @@ resolve_dynamic_type_internal (struct type *type,
 	case TYPE_CODE_ARRAY:
 	  resolved_type = resolve_dynamic_array_or_string (type, addr_stack);
 	  break;
+        case TYPE_CODE_PTR:
+ 	  resolved_type = resolve_dynamic_pointer (type, addr_stack);
+ 	  break;
 
 	case TYPE_CODE_RANGE:
 	  resolved_type = resolve_dynamic_range (type, addr_stack);

@@ -217,8 +217,9 @@ f_type_print_varspec_suffix (struct type *type, struct ui_file *stream,
       else
 	{
 	  LONGEST lower_bound = f77_get_lowerbound (type);
+
 	  if (lower_bound != 1)	/* Not the default.  */
-            fprintf_filtered (stream, "%s:", plongest (lower_bound));
+	    fprintf_filtered (stream, "%s:", plongest (lower_bound));
 
 	  /* Make sure that, if we have an assumed size array, we
 	       print out a warning and print the upperbound as '*'.  */
@@ -229,7 +230,7 @@ f_type_print_varspec_suffix (struct type *type, struct ui_file *stream,
 	    {
 	      LONGEST upper_bound = f77_get_upperbound (type);
 
-              fputs_filtered (plongest (upper_bound), stream);
+	      fprintf_filtered (stream, "%s", plongest (upper_bound));
 	    }
 	}
 
@@ -249,7 +250,7 @@ f_type_print_varspec_suffix (struct type *type, struct ui_file *stream,
     case TYPE_CODE_REF:
       f_type_print_varspec_suffix (TYPE_TARGET_TYPE (type), stream, 0, 1, 0,
 				   arrayprint_recurse_level, false);
-      fprintf_filtered (stream, " )");
+      fprintf_filtered (stream, ")");
       break;
 
     case TYPE_CODE_FUNC:
