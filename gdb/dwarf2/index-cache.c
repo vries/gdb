@@ -95,7 +95,7 @@ index_cache::store (dwarf2_per_objfile *per_objfile)
     return;
 
   /* Get build id of objfile.  */
-  const bfd_build_id *build_id = build_id_bfd_get (obj->obfd);
+  const bfd_build_id *build_id = build_id_bfd_shdr_get (obj->obfd);
   if (build_id == nullptr)
     {
       if (debug_index_cache)
@@ -113,7 +113,8 @@ index_cache::store (dwarf2_per_objfile *per_objfile)
 
   if (dwz != nullptr)
     {
-      const bfd_build_id *dwz_build_id = build_id_bfd_get (dwz->dwz_bfd.get ());
+      const bfd_build_id *dwz_build_id
+	= build_id_bfd_shdr_get (dwz->dwz_bfd.get ());
 
       if (dwz_build_id == nullptr)
 	{
