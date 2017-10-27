@@ -1691,6 +1691,9 @@ extern const char *ep_parse_optional_if_clause (const char **arg);
    UIOUT iff debugging multiple threads.  */
 extern void maybe_print_thread_hit_breakpoint (struct ui_out *uiout);
 
+extern void breakpoints_relocate (struct objfile *objfile,
+				  section_offsets &delta);
+
 /* Print the specified breakpoint.  */
 extern void print_breakpoint (breakpoint *bp);
 
