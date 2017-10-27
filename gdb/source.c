@@ -1167,7 +1167,7 @@ open_source_file (struct symtab *s)
 	    }
 
 	  const struct bfd_build_id *build_id
-	    = build_id_bfd_get (ofp->obfd.get ());
+	    = build_id_bfd_shdr_get (ofp->obfd.get ());
 
 	  /* Query debuginfod for the source file.  */
 	  if (build_id != nullptr && !srcpath.empty ())
