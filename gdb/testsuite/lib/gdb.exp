@@ -141,7 +141,8 @@ if ![info exists INTERNAL_GDBFLAGS] {
 		   "-nx" \
 		   "-data-directory $BUILD_DATA_DIRECTORY" \
 		   {-iex "set height 0"} \
-		   {-iex "set width 0"}]]
+		   {-iex "set width 0"} \
+		   {-iex "set build-id-verbose 0"}]]
 }
 
 # The variable gdb_prompt is a regexp which matches the gdb prompt.
@@ -2197,6 +2198,17 @@ proc default_gdb_start { } {
 	}
 	timeout {
 	    warning "Couldn't set the width to 0."
+	}
+    }
+
+    # Turn off the missing warnings as the testsuite does not expect it.
+    send_gdb "set build-id-verbose 0\n"
+    gdb_expect 10 {
+	-re "$gdb_prompt $" {
+	    verbose "Disabled the missing debug infos warnings." 2
+	}
+	timeout {
+	    warning "Could not disable the missing debug infos warnings.."
 	}
     }
 
