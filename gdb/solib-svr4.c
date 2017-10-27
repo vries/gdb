@@ -44,6 +44,7 @@
 #include "auxv.h"
 #include "gdb_bfd.h"
 #include "probe.h"
+#include "build-id.h"
 
 #include <map>
 
@@ -1260,6 +1261,46 @@ svr4_read_so_list (svr4_info *info, CORE_ADDR lm, CORE_ADDR prev_lm,
 	  if (first_l_name == 0 || li->l_name != first_l_name)
 	    warning (_("Can't read pathname for load map."));
 	  continue;
+	}
+
+	{
+	  struct bfd_build_id *build_id;
+
+	  build_id = build_id_addr_get (li->l_ld);
+	  if (build_id != NULL)
+	    {
+	      char *bid_name, *build_id_filename;
+
+	      /* Missing the build-id matching separate debug info file
+		 would be handled while SO_NAME gets loaded.  */
+	      bid_name = build_id_to_filename (build_id, &build_id_filename);
+	      if (bid_name != NULL)
+		{
+		  name = make_unique_xstrdup (bid_name);
+		  xfree (bid_name);
+		}
+	      else
+		{
+		  debug_print_missing (name.get (), build_id_filename);
+
+		  /* In the case the main executable was found according to
+		     its build-id (from a core file) prevent loading
+		     a different build of a library with accidentally the
+		     same SO_NAME.
+
+		     It suppresses bogus backtraces (and prints "??" there
+		     instead) if the on-disk files no longer match the
+		     running program version.  */
+
+		  if (current_program_space->symfile_object_file != NULL
+		      && (current_program_space->symfile_object_file->flags
+			  & OBJF_BUILD_ID_CORE_LOADED) != 0)
+		    name = make_unique_xstrdup ("");
+		}
+
+	      xfree (build_id_filename);
+	      xfree (build_id);
+	    }
 	}
 
       /* If this entry has no name, or its name matches the name
