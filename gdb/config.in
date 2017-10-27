@@ -39,6 +39,9 @@
 /* Handle .ctf type-info sections */
 #undef ENABLE_LIBCTF
 
+/* librpm version specific library name to dlopen. */
+#undef DLOPEN_LIBRPM
+
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 #undef ENABLE_NLS
@@ -246,6 +249,9 @@
 
 /* Define if you have the mpfr library. */
 #undef HAVE_LIBMPFR
+
+/* Define if librpm library is being used. */
+#undef HAVE_LIBRPM
 
 /* Define to 1 if you have the <libunwind-ia64.h> header file. */
 #undef HAVE_LIBUNWIND_IA64_H
