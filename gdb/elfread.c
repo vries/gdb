@@ -1213,7 +1213,9 @@ elf_symfile_read_dwarf2 (struct objfile *objfile,
 	   && objfile->separate_debug_objfile == NULL
 	   && objfile->separate_debug_objfile_backlink == NULL)
     {
-      std::string debugfile = find_separate_debug_file_by_buildid (objfile);
+      gdb::unique_xmalloc_ptr<char> build_id_filename;
+      std::string debugfile
+	= find_separate_debug_file_by_buildid (objfile, &build_id_filename);
 
       if (debugfile.empty ())
 	debugfile = find_separate_debug_file_by_debuglink (objfile);
@@ -1229,7 +1231,7 @@ elf_symfile_read_dwarf2 (struct objfile *objfile,
 	{
 	  has_dwarf2 = false;
 	  const struct bfd_build_id *build_id
-	    = build_id_bfd_get (objfile->obfd.get ());
+	    = build_id_bfd_shdr_get (objfile->obfd.get ());
 	  const char *filename = bfd_get_filename (objfile->obfd.get ());
 
 	  if (build_id != nullptr)
@@ -1256,6 +1258,11 @@ elf_symfile_read_dwarf2 (struct objfile *objfile,
 		      has_dwarf2 = true;
 		    }
 		}
+		/* Check if any separate debug info has been extracted out.  */
+		else if (bfd_get_section_by_name (objfile->obfd.get (),
+		                                  ".gnu_debuglink")
+			 != NULL)
+		  debug_print_missing (objfile_name (objfile), build_id_filename.get ());
 	    }
 	}
     }
