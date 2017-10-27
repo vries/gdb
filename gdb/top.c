@@ -1770,7 +1770,13 @@ quit_force (int *exit_arg, int from_tty)
   else if (return_child_result)
     exit_code = return_child_result_value;
 
+#ifndef NEED_DETACH_SIGSTOP
   /* We want to handle any quit errors and exit regardless.  */
+#else
+  /* We want to handle any quit errors and exit regardless but we should never
+     get user-interrupted to properly detach the inferior.  */
+  quit_flag_cleanup = 1;
+#endif
 
   /* Get out of tfind mode, and kill or detach all inferiors.  */
   try
