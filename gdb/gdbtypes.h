@@ -649,6 +649,7 @@ enum field_loc_kind
   {
     FIELD_LOC_KIND_BITPOS,	/**< bitpos */
     FIELD_LOC_KIND_ENUMVAL,	/**< enumval */
+    /* This address is unrelocated by the objfile's ANOFFSET.  */
     FIELD_LOC_KIND_PHYSADDR,	/**< physaddr */
     FIELD_LOC_KIND_PHYSNAME,	/**< physname */
     FIELD_LOC_KIND_DWARF_BLOCK	/**< dwarf_block */
@@ -699,6 +700,7 @@ union field_location
      field.  Otherwise, physname is the mangled label of the
      static field.  */
 
+  /* This address is unrelocated by the objfile's ANOFFSET.  */
   CORE_ADDR physaddr;
   const char *physname;
 
