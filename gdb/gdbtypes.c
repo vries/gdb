@@ -1006,7 +1006,8 @@ create_static_range_type (struct type *result_type, struct type *index_type,
   low.set_const_val (low_bound);
   high.set_const_val (high_bound);
 
-  result_type = create_range_type (result_type, index_type, &low, &high, 0);
+  result_type = create_range_type (result_type, index_type,
+                                   &low, &high, 0);
 
   return result_type;
 }

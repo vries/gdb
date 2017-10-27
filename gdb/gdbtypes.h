@@ -1615,6 +1615,15 @@ extern unsigned type_align (struct type *);
    space in struct type.  */
 extern bool set_type_align (struct type *, ULONGEST);
 
+#define TYPE_BYTE_STRIDE(range_type) \
+  TYPE_RANGE_DATA(range_type)->stride.data.const_val
+#define TYPE_BYTE_STRIDE_BLOCK(range_type) \
+  TYPE_RANGE_DATA(range_type)->stride.data.locexpr
+#define TYPE_BYTE_STRIDE_LOCLIST(range_type) \
+  TYPE_RANGE_DATA(range_type)->stride.data.loclist
+#define TYPE_BYTE_STRIDE_KIND(range_type) \
+  TYPE_RANGE_DATA(range_type)->stride.kind
+
 /* Property accessors for the type data location.  */
 #define TYPE_DATA_LOCATION(thistype) \
   ((thistype)->dyn_prop (DYN_PROP_DATA_LOCATION))
@@ -1632,6 +1641,26 @@ extern bool set_type_align (struct type *, ULONGEST);
   ((thistype)->dyn_prop (DYN_PROP_ALLOCATED))
 #define TYPE_ASSOCIATED_PROP(thistype) \
   ((thistype)->dyn_prop (DYN_PROP_ASSOCIATED))
+
+/* Accessors for struct range_bounds data attached to an array type's
+   index type.  */
+
+#define TYPE_ARRAY_UPPER_BOUND_IS_UNDEFINED(arraytype) \
+   ((arraytype)->index_type ()->bounds ()->high.kind () == PROP_UNDEFINED)
+#define TYPE_ARRAY_LOWER_BOUND_IS_UNDEFINED(arraytype) \
+   (arraytype->index_type ()->bounds ().low.kind () == PROP_UNDEFINED)
+#define TYPE_ARRAY_STRIDE_IS_UNDEFINED(arraytype) \
+   (TYPE_BYTE_STRIDE(arraytype->index_type ()) == 0)
+
+
+#define TYPE_ARRAY_UPPER_BOUND_VALUE(arraytype) \
+   (TYPE_HIGH_BOUND((arraytype)->index_type ()))
+
+#define TYPE_ARRAY_LOWER_BOUND_VALUE(arraytype) \
+   (TYPE_LOW_BOUND((arraytype)->index_type ()))
+
+#define TYPE_ARRAY_BIT_STRIDE(arraytype) \
+  (TYPE_BIT_STRIDE((arraytype)->index_type ()))
 
 /* C++ */
 
