@@ -1199,7 +1199,10 @@ captured_main_1 (struct captured_main_args *context)
 	{
 	  ret = catch_command_errors (attach_command, pid_or_core_arg,
 				      !batch_flag);
-	  if (ret == 0)
+	  if (ret == 0
+	      /* attach_command could succeed partially and core_file_command
+		 would try to kill it.  */
+	      && !have_inferiors ())
 	    ret = catch_command_errors (core_file_command,
 					pid_or_core_arg,
 					!batch_flag);
