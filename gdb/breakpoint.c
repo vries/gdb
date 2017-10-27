@@ -11948,6 +11948,8 @@ update_global_location_list (enum ugll_insert_mode insert_mode)
 		  = 3 * (thread_count (proc_target) + 1);
 	      else
 		old_loc->events_till_retirement = 1;
+	      /* Red Hat Bug 590623.  */
+	      old_loc->events_till_retirement *= 10;
 	      old_loc->owner = NULL;
 
 	      moribund_locations.push_back (old_loc);
