@@ -347,11 +347,13 @@ lm_addr_check (const solib &so, bfd *abfd)
 
 struct svr4_so
 {
-  svr4_so (const char *name, lm_info_svr4_up lm_info)
-    : name (name), lm_info (std::move (lm_info))
+  svr4_so (const char *name, lm_info_svr4_up lm_info, const char *orig_name = nullptr)
+    : name (name), original_name (orig_name == nullptr ? name : orig_name),
+    lm_info (std::move (lm_info))
   {}
 
   std::string name;
+  std::string original_name;
   lm_info_svr4_up lm_info;
 };
 
@@ -1002,6 +1004,7 @@ so_list_from_svr4_sos (const std::vector<svr4_so> &sos)
 
       newobj->so_name = so.name;
       newobj->so_original_name = so.name;
+      newobj->so_original_name = so.original_name;
       newobj->lm_info = std::make_unique<lm_info_svr4> (*so.lm_info);
 
       dst.push_back (*newobj);
@@ -1263,11 +1266,28 @@ svr4_read_so_list (svr4_info *info, CORE_ADDR lm, CORE_ADDR prev_lm,
 	  continue;
 	}
 
+      /* Preserve original name since name may be changed below.  */
+      gdb::unique_xmalloc_ptr<char> original_name = make_unique_xstrdup (name.get ());
 	{
-	  struct bfd_build_id *build_id;
+	  struct bfd_build_id *build_id = nullptr;
 
-	  build_id = build_id_addr_get (li->l_ld);
-	  if (build_id != NULL)
+	  /* In the case the main executable was found according to its build-id
+	     (from a core file) prevent loading a different build of a library
+	     with accidentally the same SO_NAME.
+
+	     It suppresses bogus backtraces (and prints "??" there instead) if
+	     the on-disk files no longer match the running program version.
+	     If the main executable was not loaded according to its build-id do
+	     not do any build-id checking of the libraries.  There may be missing
+	     build-ids dumped in the core file and we would map all the libraries
+	     to the only existing file loaded that time - the executable.  */
+	  if (current_program_space->symfile_object_file != NULL
+	      && (current_program_space->symfile_object_file->flags
+		  & OBJF_BUILD_ID_CORE_LOADED) != 0)
+	    build_id = build_id_addr_get (li->l_ld);
+
+
+	  if (build_id != nullptr)
 	    {
 	      char *bid_name, *build_id_filename;
 
@@ -1280,23 +1300,7 @@ svr4_read_so_list (svr4_info *info, CORE_ADDR lm, CORE_ADDR prev_lm,
 		  xfree (bid_name);
 		}
 	      else
-		{
-		  debug_print_missing (name.get (), build_id_filename);
-
-		  /* In the case the main executable was found according to
-		     its build-id (from a core file) prevent loading
-		     a different build of a library with accidentally the
-		     same SO_NAME.
-
-		     It suppresses bogus backtraces (and prints "??" there
-		     instead) if the on-disk files no longer match the
-		     running program version.  */
-
-		  if (current_program_space->symfile_object_file != NULL
-		      && (current_program_space->symfile_object_file->flags
-			  & OBJF_BUILD_ID_CORE_LOADED) != 0)
-		    name = make_unique_xstrdup ("");
-		}
+		debug_print_missing (name.get (), build_id_filename);
 
 	      xfree (build_id_filename);
 	      xfree (build_id);
