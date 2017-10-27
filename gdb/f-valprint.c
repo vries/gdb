@@ -129,6 +129,11 @@ f77_print_array_1 (int nss, int ndimensions, struct type *type,
 	byte_stride = dim_size;
       size_t offs = 0;
 
+      if (byte_stride)
+        dim_size = byte_stride;
+      else
+        dim_size = TYPE_LENGTH (TYPE_TARGET_TYPE (type));
+
       for (i = lowerbound;
 	   (i < upperbound + 1 && (*elts) < options->print_max);
 	   i++)
