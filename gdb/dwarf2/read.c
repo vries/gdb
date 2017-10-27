@@ -2218,7 +2218,7 @@ dwarf2_get_dwz_file (dwarf2_per_bfd *per_bfd)
     }
 
   if (dwz_bfd == NULL)
-    dwz_bfd = build_id_to_debug_bfd (buildid_len, buildid);
+    dwz_bfd = build_id_to_debug_bfd (buildid_len, buildid, NULL);
 
   if (dwz_bfd == nullptr)
     {
@@ -5980,7 +5980,7 @@ get_gdb_index_contents_from_section (objfile *obj, T *section_owner)
 static gdb::array_view<const gdb_byte>
 get_gdb_index_contents_from_cache (objfile *obj, dwarf2_per_bfd *dwarf2_per_bfd)
 {
-  const bfd_build_id *build_id = build_id_bfd_get (obj->obfd);
+  const bfd_build_id *build_id = build_id_bfd_shdr_get (obj->obfd);
   if (build_id == nullptr)
     return {};
 
@@ -5993,7 +5993,7 @@ get_gdb_index_contents_from_cache (objfile *obj, dwarf2_per_bfd *dwarf2_per_bfd)
 static gdb::array_view<const gdb_byte>
 get_gdb_index_contents_from_cache_dwz (objfile *obj, dwz_file *dwz)
 {
-  const bfd_build_id *build_id = build_id_bfd_get (dwz->dwz_bfd.get ());
+  const bfd_build_id *build_id = build_id_bfd_shdr_get (dwz->dwz_bfd.get ());
   if (build_id == nullptr)
     return {};
 

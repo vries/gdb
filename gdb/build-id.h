@@ -23,9 +23,10 @@
 #include "gdb_bfd.h"
 #include "gdbsupport/rsp-low.h"
 
-/* Locate NT_GNU_BUILD_ID from ABFD and return its content.  */
+/* Separate debuginfo files have corrupted PHDR but SHDR is correct there.
+   Locate NT_GNU_BUILD_ID from ABFD and return its content.  */
 
-extern const struct bfd_build_id *build_id_bfd_get (bfd *abfd);
+extern const struct bfd_build_id *build_id_bfd_shdr_get (bfd *abfd);
 
 /* Return true if ABFD has NT_GNU_BUILD_ID matching the CHECK value.
    Otherwise, issue a warning and return false.  */
@@ -38,21 +39,26 @@ extern int build_id_verify (bfd *abfd,
    can be found, return NULL.  */
 
 extern gdb_bfd_ref_ptr build_id_to_debug_bfd (size_t build_id_len,
-					      const bfd_byte *build_id);
+					      const bfd_byte *build_id,
+					      char **link_return);
+
+extern char *build_id_to_filename (const struct bfd_build_id *build_id,
+				   char **link_return);
 
 /* Find and open a BFD for an executable file given a build-id.  If no BFD
    can be found, return NULL.  The returned reference to the BFD must be
    released by the caller.  */
 
 extern gdb_bfd_ref_ptr build_id_to_exec_bfd (size_t build_id_len,
-					     const bfd_byte *build_id);
+					     const bfd_byte *build_id,
+					     char **link_return);
 
 /* Find the separate debug file for OBJFILE, by using the build-id
    associated with OBJFILE's BFD.  If successful, returns the file name for the
    separate debug file, otherwise, return an empty string.  */
 
-extern std::string find_separate_debug_file_by_buildid
-  (struct objfile *objfile);
+extern std::string find_separate_debug_file_by_buildid (struct objfile *objfile,
+		       gdb::unique_xmalloc_ptr<char> *build_id_filename_return);
 
 /* Return an hex-string representation of BUILD_ID.  */
 
