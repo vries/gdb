@@ -1300,6 +1300,10 @@ process_print_command_args (const char *args, value_print_options *print_opts,
 
   if (exp != nullptr && *exp)
     {
+      /* '*((int *(*) (void)) __errno_location) ()' is incompatible with
+	 function descriptors.  */
+      if (target_has_execution () && strcmp (exp, "errno") == 0)
+	exp = "*(*(int *(*)(void)) __errno_location) ()";
       /* VOIDPRINT is true to indicate that we do want to print a void
 	 value, so invert it for parse_expression.  */
       expression_up expr = parse_expression (exp, nullptr, !voidprint);
