@@ -96,7 +96,7 @@ index_cache_store_context::index_cache_store_context (const index_cache &ic,
     return;
 
   /* Get build id of objfile.  */
-  const bfd_build_id *build_id = build_id_bfd_get (per_bfd->obfd);
+  const bfd_build_id *build_id = build_id_bfd_shdr_get (per_bfd->obfd);
   if (build_id == nullptr)
     {
       index_cache_debug ("objfile %s has no build id",
@@ -111,7 +111,8 @@ index_cache_store_context::index_cache_store_context (const index_cache &ic,
 
   if (dwz != nullptr)
     {
-      const bfd_build_id *dwz_build_id = build_id_bfd_get (dwz->dwz_bfd.get ());
+      const bfd_build_id *dwz_build_id
+	= build_id_bfd_shdr_get (dwz->dwz_bfd.get ());
 
       if (dwz_build_id == nullptr)
 	{
