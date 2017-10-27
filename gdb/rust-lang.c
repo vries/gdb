@@ -1082,13 +1082,11 @@ rust_range (struct expression *exp, int *pos, enum noside noside)
   kind = (enum range_type) longest_to_int (exp->elts[*pos + 1].longconst);
   *pos += 3;
 
-  if (kind == HIGH_BOUND_DEFAULT || kind == NONE_BOUND_DEFAULT
-      || kind == NONE_BOUND_DEFAULT_EXCLUSIVE)
+  if ((kind & SUBARRAY_LOW_BOUND) == SUBARRAY_LOW_BOUND)
     low = evaluate_subexp (nullptr, exp, pos, noside);
-  if (kind == LOW_BOUND_DEFAULT || kind == LOW_BOUND_DEFAULT_EXCLUSIVE
-      || kind == NONE_BOUND_DEFAULT || kind == NONE_BOUND_DEFAULT_EXCLUSIVE)
+  if ((kind & SUBARRAY_HIGH_BOUND) == SUBARRAY_HIGH_BOUND)
     high = evaluate_subexp (nullptr, exp, pos, noside);
-  bool inclusive = (kind == NONE_BOUND_DEFAULT || kind == LOW_BOUND_DEFAULT);
+  bool inclusive = (!((kind & SUBARRAY_HIGH_BOUND_EXCLUSIVE) == SUBARRAY_HIGH_BOUND_EXCLUSIVE));
 
   if (noside == EVAL_SKIP)
     return value_from_longest (builtin_type (exp->gdbarch)->builtin_int, 1);
@@ -1177,7 +1175,7 @@ rust_compute_range (struct type *type, struct value *range,
 
   *low = 0;
   *high = 0;
-  *kind = BOTH_BOUND_DEFAULT;
+  *kind = SUBARRAY_NONE_BOUND;
 
   if (type->num_fields () == 0)
     return;
@@ -1185,15 +1183,14 @@ rust_compute_range (struct type *type, struct value *range,
   i = 0;
   if (strcmp (TYPE_FIELD_NAME (type, 0), "start") == 0)
     {
-      *kind = HIGH_BOUND_DEFAULT;
+      *kind = SUBARRAY_LOW_BOUND;
       *low = value_as_long (value_field (range, 0));
       ++i;
     }
   if (type->num_fields () > i
       && strcmp (TYPE_FIELD_NAME (type, i), "end") == 0)
     {
-      *kind = (*kind == BOTH_BOUND_DEFAULT
-	       ? LOW_BOUND_DEFAULT : NONE_BOUND_DEFAULT);
+      *kind = (range_type) (*kind | SUBARRAY_HIGH_BOUND);
       *high = value_as_long (value_field (range, i));
 
       if (rust_inclusive_range_type_p (type))
@@ -1211,7 +1208,7 @@ rust_subscript (struct expression *exp, int *pos, enum noside noside,
   struct type *rhstype;
   LONGEST low, high_bound;
   /* Initialized to appease the compiler.  */
-  enum range_type kind = BOTH_BOUND_DEFAULT;
+  enum range_type kind = SUBARRAY_NONE_BOUND;
   LONGEST high = 0;
   int want_slice = 0;
 
@@ -1309,7 +1306,7 @@ rust_subscript (struct expression *exp, int *pos, enum noside noside,
 	error (_("Cannot subscript non-array type"));
 
       if (want_slice
-	  && (kind == BOTH_BOUND_DEFAULT || kind == LOW_BOUND_DEFAULT))
+	  && ((kind & SUBARRAY_LOW_BOUND) != SUBARRAY_LOW_BOUND))
 	low = low_bound;
       if (low < 0)
 	error (_("Index less than zero"));
@@ -1327,7 +1324,7 @@ rust_subscript (struct expression *exp, int *pos, enum noside noside,
 	  CORE_ADDR addr;
 	  struct value *addrval, *tem;
 
-	  if (kind == BOTH_BOUND_DEFAULT || kind == HIGH_BOUND_DEFAULT)
+	  if ((kind & SUBARRAY_HIGH_BOUND) != SUBARRAY_HIGH_BOUND)
 	    high = high_bound;
 	  if (high < 0)
 	    error (_("High index less than zero"));
