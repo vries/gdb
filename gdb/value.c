@@ -2850,7 +2850,8 @@ value_static_field (struct type *type, int fieldno)
     {
     case FIELD_LOC_KIND_PHYSADDR:
       retval = value_at_lazy (type->field (fieldno).type (),
-			      TYPE_FIELD_STATIC_PHYSADDR (type, fieldno));
+			      TYPE_FIELD_STATIC_PHYSADDR (type, fieldno)
+			      + (TYPE_OBJFILE (type) == NULL ? 0 : TYPE_OBJFILE (type)->section_offsets[SECT_OFF_TEXT (TYPE_OBJFILE (type))]));
       break;
     case FIELD_LOC_KIND_PHYSNAME:
     {
