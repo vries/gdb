@@ -264,7 +264,7 @@ validate_exec_file (int from_tty)
   reopen_exec_file ();
   current_exec_file = get_exec_file (0);
 
-  const bfd_build_id *exec_file_build_id = build_id_bfd_get (exec_bfd);
+  const bfd_build_id *exec_file_build_id = build_id_bfd_shdr_get (exec_bfd);
   if (exec_file_build_id != nullptr)
     {
       /* Prepend the target prefix, to force gdb_bfd_open to open the
@@ -277,7 +277,7 @@ validate_exec_file (int from_tty)
       if (abfd != nullptr)
 	{
 	  const bfd_build_id *target_exec_file_build_id
-	    = build_id_bfd_get (abfd.get ());
+	    = build_id_bfd_shdr_get (abfd.get ());
 
 	  if (target_exec_file_build_id != nullptr)
 	    {
