@@ -310,7 +310,21 @@ f_value_print_inner (struct value *val, struct ui_file *stream, int recurse,
 	  value_print_scalar_formatted (val, &opts, 0, stream);
 	}
       else
-	value_print_scalar_formatted (val, options, 0, stream);
+	{
+	  value_print_scalar_formatted (val, options, 0, stream);
+	  /* C and C++ has no single byte int type, char is used instead.
+	     Since we don't know whether the value is really intended to
+	     be used as an integer or a character, print the character
+	     equivalent as well.  */
+	  if (TYPE_LENGTH (type) == 1)
+	    {
+	      LONGEST c;
+
+	      fputs_filtered (" ", stream);
+	      c = unpack_long (type, valaddr);
+	      LA_PRINT_CHAR ((unsigned char) c, type, stream);
+	    }
+	}
       break;
 
     case TYPE_CODE_STRUCT:
