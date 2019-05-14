@@ -199,6 +199,53 @@ proc_with_prefix test-thread-apply {} {
     }
 }
 
+# Basic option-machinery + "frame apply" command integration tests.
+proc_with_prefix test-backtrace {} {
+    clean_restart
+
+    test_gdb_complete_unique "backtrace" "backtrace"
+    test_gdb_complete_none "backtrace "
+
+    test_gdb_complete_multiple "backtrace " "-" "" {
+	"-entry-values"
+	"-frame-arguments"
+	"-full"
+	"-hide"
+	"-limit"
+	"-no-filters"
+	"-past-entry"
+	"-past-main"
+	"-raw-frame-arguments"
+    }
+
+    global binfile
+    clean_restart $binfile
+
+    if ![runto_main] {
+	fail "cannot run to main"
+	return
+    }
+
+    # COUNT in "backtrace COUNT" is parsed as an expression.  Check
+    # that we complete expressions.
+
+    test_gdb_complete_unique \
+	"backtrace xxx" \
+	"backtrace xxx1"
+
+    test_gdb_complete_unique \
+	"backtrace -xxx" \
+	"backtrace -xxx1"
+
+    test_gdb_complete_unique \
+	"backtrace 1 + xxx" \
+	"backtrace 1 + xxx1"
+
+    test_gdb_complete_unique \
+	"backtrace (1 + xxx" \
+	"backtrace (1 + xxx1"
+}
+
 # Miscelaneous tests.
 proc_with_prefix test-misc {require_dash} {
     set cmd [make_cmd $require_dash]
@@ -542,3 +589,6 @@ foreach cmd {
 
 # Basic "thread apply" integration tests.
 test-thread-apply
+
+# Basic "backtrace" integration tests.
+test-backtrace
