@@ -20,6 +20,9 @@
 #ifndef VALPRINT_H
 #define VALPRINT_H
 
+#include <string>
+#include "cli/cli-option.h"
+
 /* This is used to pass formatting options to various value-printing
    functions.  */
 struct value_print_options
@@ -93,6 +96,11 @@ struct value_print_options
      points, if any.  */
   int symbol_print;
 };
+
+/* Create an option_def_group for the value_print options, with OPTS
+   as context.  */
+extern gdb::option::option_def_group make_value_print_options_def_group
+  (value_print_options *opts);
 
 /* The global print options set by the user.  In general this should
    not be directly accessed, except by set/show commands.  Ordinary
@@ -227,8 +235,17 @@ struct format_data
   };
 
 extern void print_command_parse_format (const char **expp, const char *cmdname,
-					struct format_data *fmtp);
-extern void print_value (struct value *val, const struct format_data *fmtp);
+					value_print_options *opts);
+
+/* Completer for the "print", "call", and "compile print"
+   commands.  */
+extern void print_command_completer (struct cmd_list_element *ignore,
+				     completion_tracker &tracker,
+				     const char *text, const char *word);
+
+/* Print VAL to console according to OPTS, including recording it to
+   the history.  */
+extern void print_value (value *val, const value_print_options &opts);
 
 /* Given an address ADDR return all the elements needed to print the
    address in a symbolic form.  NAME can be mangled or not depending

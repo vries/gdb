@@ -1,0 +1,532 @@
+# This testcase is part of GDB, the GNU debugger.
+
+# Copyright 2019 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Test the gdb::options framework.  The test uses the "maintenance
+# test-options" subcommands to exercise TAB-completion and option
+# processing.
+
+load_lib completion-support.exp
+
+standard_testfile .c
+
+if {[build_executable "failed to prepare" $testfile $srcfile debug]} {
+    return -1
+}
+
+clean_restart
+
+if { ![readline_is_used] } {
+    untested "no tab completion support without readline"
+    return -1
+}
+
+# Check the completion result, as returned by the "maintenance show
+# test-options-completion-result" command.  TEST is used as test name.
+proc check_completion_result {expected test} {
+    gdb_test "maintenance show test-options-completion-result" \
+	"$expected" \
+	"$test: res=$expected"
+}
+
+# Like test_gdb_complete_unique, but the expected output is expected
+# to be the input line.  I.e., the line is already complete.  We're
+# just checking whether GDB recognizes the option and auto-appends a
+# space.
+proc test_completer_recognizes {res input_line} {
+    set expected_re [string_to_regexp $input_line]
+    test_gdb_complete_unique $input_line $expected_re
+    check_completion_result $res $input_line
+}
+
+# Check that completion of INPUT_LINE results in GDB completing on all
+# command names.
+proc test_completion_offers_commands {input_line} {
+    gdb_test_no_output "set max-completions 2" ""
+
+    test_gdb_complete_multiple $input_line "" "" {
+	"!"
+	"+"
+    } "" "" 1
+
+    gdb_test_no_output "set max-completions 200" ""
+}
+
+# Wrapper around test_gdb_complete_multiple that also checks the
+# completion result is RES.
+proc res_test_gdb_complete_multiple {res cmd_prefix completion_word args} {
+    test_gdb_complete_multiple $cmd_prefix $completion_word {*}$args
+    check_completion_result $res "$cmd_prefix$completion_word"
+}
+
+# Wrapper around test_gdb_complete_none that also checks the
+# completion result is RES.
+proc res_test_gdb_complete_none { res input_line } {
+    test_gdb_complete_none $input_line
+    check_completion_result $res "$input_line"
+}
+
+# Wrapper around test_gdb_complete_unique that also checks the
+# completion result is RES.
+proc res_test_gdb_complete_unique { res input_line args} {
+    test_gdb_complete_unique $input_line {*}$args
+    check_completion_result $res "$input_line"
+}
+
+# Make a full command name from REQUIRE_DASH.  REQUIRE_DASH is either
+# "require-dash", or "no-require-dash".
+proc make_cmd {require_dash} {
+    return "maint test-options $require_dash"
+}
+
+# Basic option-machinery + "print" command integration tests.
+proc_with_prefix test-print {{prefix ""}} {
+    clean_restart
+
+    # Completing "print" with no argument completes on symbols only,
+    # no options are offered.  Since we haven't loaded any symbols,
+    # the match list should be empty.
+    test_gdb_complete_none "${prefix}print "
+
+    # OTOH, completing at "-" should list all options.
+    test_gdb_complete_multiple "${prefix}print " "-" "" {
+	"-address"
+	"-array"
+	"-array-indexes"
+	"-elements"
+	"-null-stop"
+	"-object"
+	"-pretty"
+	"-repeats"
+	"-static-members"
+	"-symbol"
+	"-union"
+	"-vtbl"
+    }
+
+    global binfile
+    clean_restart $binfile
+
+    if ![runto_main] {
+	fail "cannot run to main"
+	return
+    }
+
+    # Mix options and format.
+    gdb_test "${prefix}print -pretty -- /x 1" " = 0x1"
+
+    test_gdb_complete_unique \
+	"${prefix}print xxx" \
+	"${prefix}print xxx1"
+    test_gdb_complete_unique \
+	"${prefix}print -- xxx" \
+	"${prefix}print -- xxx1"
+
+    # Check that '-XXX' without a "--" is handled as an expression.
+    gdb_test "${prefix}print -1" " = -1"
+    gdb_test "${prefix}print --1" "Left operand of assignment is not an lvalue\\."
+    gdb_test "${prefix}print -object" "No symbol \"object\".*"
+    gdb_test "${prefix}print -object --" " = -1"
+
+    # Check that everything after "-- " is treated as an expression,
+    # not confused with an option.
+    gdb_test "${prefix}print -- -address" "No symbol.*"
+    gdb_test "${prefix}print -- -1" " = -1"
+    gdb_test "${prefix}print -- --1" "Left operand of assignment is not an lvalue\\."
+}
+
+# Basic option-machinery + "frame apply" command integration tests.
+proc_with_prefix test-frame-apply {cmd} {
+    test_completion_offers_commands "$cmd "
+
+    test_gdb_complete_multiple "$cmd " "-" "" {
+	"-c"
+	"-limit"
+	"-past-entry"
+	"-past-main"
+	"-q"
+	"-s"
+    }
+
+    test_completion_offers_commands "$cmd -limit 1 "
+}
+
+# Basic option-machinery + "thread apply" command integration tests.
+proc_with_prefix test-thread-apply {cmd} {
+    test_completion_offers_commands "$cmd "
+
+    test_gdb_complete_multiple "$cmd " "-" "" {
+	"-ascending"
+	"-c"
+	"-q"
+	"-s"
+    }
+
+    test_completion_offers_commands "$cmd -c "
+}
+
+# Miscelaneous tests.
+proc_with_prefix test-misc {require_dash} {
+    set cmd [make_cmd $require_dash]
+
+    # Call test command with no arguments at all.
+    gdb_test "$cmd" \
+	"-flag 0 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- "
+
+    # Completing at "-" should list all options.
+    res_test_gdb_complete_multiple "1" "$cmd " "-" "" {
+	"-bool"
+	"-enum"
+	"-flag"
+	"-uinteger"
+	"-xx1"
+	"-xx2"
+    }
+
+    # Completing an unambiguous option just appends an empty space.
+    test_completer_recognizes 1 "$cmd -flag"
+
+    # "--" is recognized, gdb auto-appends a space.
+    test_completer_recognizes 1 "$cmd --"
+
+    # Try running an ambiguous option.
+    if {$require_dash == "require-dash"} {
+	gdb_test "$cmd -xx" \
+	    "-flag 0 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- -xx"
+    } else {
+	gdb_test "$cmd -xx" "Ambiguous option at: -xx"
+    }
+
+    # Check that options are not case insensitive.
+    gdb_test "$cmd -flag --" \
+	"-flag 1 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- "
+
+    gdb_test "$cmd -FLAG --" \
+	"Unrecognized option at: -FLAG --"
+
+    gdb_test "$cmd -1 --" \
+	"Unrecognized option at: -1 --"
+}
+
+# Boolean option tests.
+proc_with_prefix test-flag {require_dash} {
+    set cmd [make_cmd $require_dash]
+
+    # Completing a flag just appends a space.
+    test_completer_recognizes 1 "$cmd -flag"
+
+    # Add a dash, and all options should be shown.
+    test_gdb_complete_multiple "$cmd  -flag " "-" "" {
+	"-bool"
+	"-enum"
+	"-flag"
+	"-uinteger"
+	"-xx1"
+	"-xx2"
+    }
+
+    # Basic smoke tests of accepted / not accepted values.
+
+    # Check all the different variants a bool option may be specified.
+    if {$require_dash == "require-dash"} {
+	gdb_test "$cmd -flag 999" \
+	    "-flag 0 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- -flag 999"
+    } else {
+	gdb_test "$cmd -flag 999" \
+	    "-flag 1 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- 999"
+    }
+    gdb_test "$cmd -flag -- 999" \
+	"-flag 1 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- 999"
+
+    # If the "--" separator is present, then GDB errors out if the
+    # flag option is passed some value -- check that too.
+    gdb_test "$cmd -flag xxx 999 --" "Unrecognized option at: xxx 999 --"
+    gdb_test "$cmd -flag o 999 --" "Unrecognized option at: o 999 --"
+    gdb_test "$cmd -flag 1 999 --" "Unrecognized option at: 1 999 --"
+
+    # Make sure the completer don't confuse a flag option with a
+    # boolean option.  Specifically, "o" should not complete to
+    # "on/off".
+
+    if {$require_dash == "require-dash"} {
+	res_test_gdb_complete_none "1" "$cmd -flag o"
+
+	gdb_test "$cmd -flag o" \
+	"-flag 0 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- -flag o"
+    } else {
+	res_test_gdb_complete_none "0 o" "$cmd -flag o"
+
+	gdb_test "$cmd -flag o" \
+	"-flag 1 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- o"
+    }
+}
+
+# Boolean option tests.
+proc_with_prefix test-boolean {require_dash} {
+    set cmd [make_cmd $require_dash]
+
+    # Boolean option's values are optional -- "on" is implied.  Check
+    # that:
+    #
+    # - For require-dash commands, completing after a boolean option
+    # lists all other options, plus "on/off".  This is because
+    # operands won't be processed until we see a "--" delimiter.
+    #
+    # - For norequire-dash commands, completing after a boolean option
+    # completes as an operand, since that will tend to be more common
+    # than typing "on/off".  E.g., "frame apply all -past-main
+    # COMMAND".
+
+    if {$require_dash == "require-dash"} {
+	res_test_gdb_complete_multiple 1 "$cmd -bool " "" "" {
+	    "-bool"
+	    "-enum"
+	    "-flag"
+	    "-uinteger"
+	    "-xx1"
+	    "-xx2"
+	    "off"
+	    "on"
+	}
+    } else {
+	res_test_gdb_complete_none "0 " "$cmd -bool "
+    }
+
+    # Add another dash, and "on/off" are no longer offered:
+    res_test_gdb_complete_multiple 1 "$cmd -bool " "-" "" {
+	"-bool"
+	"-enum"
+	"-flag"
+	"-uinteger"
+	"-xx1"
+	"-xx2"
+    }
+
+    # Basic smoke tests of accepted / not accepted values.
+
+    foreach value {"0" "1" "on" "off" "yes" "no"} {
+	test_completer_recognizes 1 "$cmd -bool $value"
+    }
+    if {$require_dash == "require-dash"} {
+	res_test_gdb_complete_none "1" "$cmd -bool xxx"
+    } else {
+	res_test_gdb_complete_none "0 xxx" "$cmd -bool xxx"
+    }
+
+    # Check all the different variants a bool option may be specified.
+    if {$require_dash == "require-dash"} {
+	gdb_test "$cmd -bool 999" \
+	    "-flag 0 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- -bool 999"
+    } else {
+	gdb_test "$cmd -bool 999" \
+	    "-flag 0 -xx1 0 -xx2 0 -bool 1 -enum xxx -uint 0 -- 999"
+    }
+    gdb_test "$cmd -bool -- 999" \
+	"-flag 0 -xx1 0 -xx2 0 -bool 1 -enum xxx -uint 0 -- 999"
+
+    gdb_test "$cmd -bool 1 -- 999" \
+	"-flag 0 -xx1 0 -xx2 0 -bool 1 -enum xxx -uint 0 -- 999"
+    gdb_test "$cmd -bool 0 -- 999" \
+	"-flag 0 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- 999"
+
+    gdb_test "$cmd -bool on -- 999" \
+	"-flag 0 -xx1 0 -xx2 0 -bool 1 -enum xxx -uint 0 -- 999"
+    gdb_test "$cmd -bool off -- 999" \
+	"-flag 0 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- 999"
+
+    gdb_test "$cmd -bool yes -- 999" \
+	"-flag 0 -xx1 0 -xx2 0 -bool 1 -enum xxx -uint 0 -- 999"
+    gdb_test "$cmd -bool no -- 999" \
+	"-flag 0 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- 999"
+
+    # Since "on" is implied after a boolean option, anything that is
+    # not yes/no/1/0/on/off should be considered as the raw input
+    # after the last option.  Also check "o", which might look like
+    # "on" or "off", but it's treated the same.
+
+    foreach arg {"-1 999" "xxx 999" "o 999"} {
+	if {$require_dash == "require-dash"} {
+	    gdb_test "$cmd -bool $arg" \
+		"-flag 0 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 0 -- -bool $arg"
+	} else {
+	    gdb_test "$cmd -bool $arg" \
+		"-flag 0 -xx1 0 -xx2 0 -bool 1 -enum xxx -uint 0 -- $arg"
+	}
+    }
+
+    # OTOH, if the "--" separator is present, then GDB errors out if
+    # the boolean option is passed an invalid value -- check that too.
+    gdb_test "$cmd -bool -1 999 --" \
+	"Unrecognized option at: -1 999 --"
+    gdb_test "$cmd -bool xxx 999 --" \
+	"Value given for `-bool' is not a boolean: xxx"
+    gdb_test "$cmd -bool o 999 --" \
+	"Value given for `-bool' is not a boolean: o"
+
+    # Completing after a boolean option + "o" does list "on/off",
+    # though.
+    if {$require_dash == "require-dash"} {
+	res_test_gdb_complete_multiple 1 "$cmd -bool " "o" "" {
+	    "off"
+	    "on"
+	}
+    } else {
+	res_test_gdb_complete_multiple "0 o" "$cmd -bool " "o" "" {
+	    "off"
+	    "on"
+	}
+    }
+}
+
+# Uinteger option tests.
+proc_with_prefix test-uinteger {require_dash} {
+    set cmd [make_cmd $require_dash]
+
+    # Test completing an uinteger option:
+    res_test_gdb_complete_multiple 1 "$cmd -uinteger " "" "" {
+	"NUMBER"
+	"unlimited"
+    }
+
+    # NUMBER above is just a placeholder, make sure we don't complete
+    # it as a valid option.
+    res_test_gdb_complete_none 1 "$cmd -uinteger NU"
+
+    # "unlimited" is valid though.
+    res_test_gdb_complete_unique 1 \
+	"$cmd -uinteger u" \
+	"$cmd -uinteger unlimited"
+
+    res_test_gdb_complete_none 1 "frame apply all -entry 1"
+
+    # Basic smoke test of accepted / not accepted values.
+    gdb_test "$cmd -uinteger 1 -- 999" \
+	"-flag 0 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint 1 -- 999"
+    gdb_test "$cmd -uinteger unlimited -- 999" \
+	"-flag 0 -xx1 0 -xx2 0 -bool 0 -enum xxx -uint unlimited -- 999"
+    gdb_test "$cmd -uinteger -1 --" \
+	"integer -1 out of range"
+    gdb_test "$cmd -uinteger xxx --" \
+	"Expected integer at: xxx --"
+    gdb_test "$cmd -uinteger unlimitedx --" \
+	"Expected integer at: unlimitedx --"
+
+    # A number of invalid values.
+    foreach value {"x" "x " "1a" "1a " "1-" "1- " "-1" "-1 " "unlimitedx"} {
+	res_test_gdb_complete_none 1 "$cmd -uinteger $value"
+    }
+
+    # Check that after a fully parsed option:
+    #
+    #  - for require-dash commands, completion offers all options.
+    #
+    #  - for no-require-dash commands, completion offers nothing and
+    #    returns false.
+    if {$require_dash == "require-dash"} {
+	res_test_gdb_complete_multiple 1 "$cmd -uinteger 1 " "" "-" {
+	    "-bool"
+	    "-enum"
+	    "-flag"
+	    "-uinteger"
+	    "-xx1"
+	    "-xx2"
+	}
+    } else {
+	res_test_gdb_complete_none "0 " "$cmd -uinteger 1 "
+    }
+
+    foreach operand {"x" "x " "1a" "1a " "1-" "1- " "-1" "-1 "} {
+	if {$require_dash == "require-dash"} {
+	    res_test_gdb_complete_none 1 "$cmd -uinteger 1 $operand"
+	} else {
+	    res_test_gdb_complete_none "0 $operand" "$cmd -uinteger 1 $operand"
+	}
+    }
+}
+
+# Enum option tests.
+proc_with_prefix test-enum {require_dash} {
+    set cmd [make_cmd $require_dash]
+
+    res_test_gdb_complete_multiple 1 "$cmd -enum " "" "" {
+	"xxx"
+	"yyy"
+	"zzz"
+    }
+
+    # Check that "-" where a value is expected does not show the
+    # command's options.  I.e., an enum's value is not optional.
+    # Check both completion and running the command.
+    res_test_gdb_complete_none 1 "$cmd -enum -"
+    gdb_test "$cmd -enum --"\
+	"Requires an argument. Valid arguments are xxx, yyy, zzz\\."
+
+    # Try passing an undefined item to an enum option.
+    gdb_test "$cmd -enum www --" "Undefined item: \"www\"."
+}
+
+# Run the options framework tests first.
+foreach_with_prefix cmd {
+    "require-dash"
+    "no-require-dash"
+} {
+    test-misc $cmd
+    test-flag $cmd
+    test-boolean $cmd
+    test-uinteger $cmd
+    test-enum $cmd
+}
+
+# Run the print integration tests, both as "standalone", and under
+# "frame/thread apply".  The latter checks that the "frame/thread
+# apply ... COMMAND" commands recurse the completion machinery for
+# COMMAND completion correctly.
+foreach prefix {
+    ""
+    "frame apply all "
+    "frame apply 1 "
+    "frame apply level 0 "
+    "thread apply all "
+    "thread apply 1 "
+    "thread apply 1 frame apply 1 "
+} {
+    test-print $prefix
+}
+
+# Basic "frame apply" integration tests.
+
+test_gdb_complete_unique "frame apply all" "frame apply all"
+
+foreach cmd {
+    "frame apply all"
+    "frame apply 1"
+    "frame apply level 0"
+    "tfaas"
+} {
+    test-frame-apply $cmd
+}
+
+# Basic "frame apply" integration tests.
+
+test_gdb_complete_unique "thread apply all" "thread apply all"
+
+foreach cmd {
+    "thread apply all"
+    "thread apply 1"
+    "taas"
+} {
+    test-thread-apply $cmd
+}

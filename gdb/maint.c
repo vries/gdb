@@ -41,6 +41,7 @@
 #include "common/selftest.h"
 
 #include "cli/cli-decode.h"
+#include "cli/cli-option.h"
 #include "cli/cli-utils.h"
 #include "cli/cli-setshow.h"
 
@@ -960,6 +961,228 @@ Selftests have been disabled for this build.\n"));
 #endif
 }
 
+/* Enum values for the "maintenance test-options" commands.  */
+const char test_options_enum_values_xxx[] = "xxx";
+const char test_options_enum_values_yyy[] = "yyy";
+const char test_options_enum_values_zzz[] = "zzz";
+static const char *const test_options_enum_values_choices[] =
+{
+  test_options_enum_values_xxx,
+  test_options_enum_values_yyy,
+  test_options_enum_values_zzz,
+  NULL
+};
+
+/* Option data for the "maintenance test-options" commands.  */
+
+struct test_options_opts
+{
+  int flag_opt = 0;
+  int xx1_opt = 0;
+  int xx2_opt = 0;
+  int boolean_opt = 0;
+  const char *enum_opt = test_options_enum_values_xxx;
+  unsigned int uint_opt = 0;
+};
+
+/* Option definitions for the "maintenance test-options" commands.  */
+
+static const gdb::option::option_def test_options_option_defs[] = {
+
+  /* A flag option.  */
+  gdb::option::switch_option_def<test_options_opts> {
+    "flag",
+    [] (test_options_opts *opts) { return &opts->flag_opt; },
+    N_("set doc"),
+  },
+
+  /* A couple flags with similar names, for "ambiguous option names"
+     testing.  */
+  gdb::option::switch_option_def<test_options_opts> {
+    "xx1",
+    [] (test_options_opts *opts) { return &opts->xx1_opt; },
+    N_("set doc"),
+  },
+  gdb::option::switch_option_def<test_options_opts> {
+    "xx2",
+    [] (test_options_opts *opts) { return &opts->xx2_opt; },
+    N_("set doc"),
+  },
+
+  /* A boolean option.  */
+  gdb::option::boolean_option_def<test_options_opts> {
+    "bool",
+    [] (test_options_opts *opts) { return &opts->boolean_opt; },
+    NULL, /* show_cmd_cb */
+    N_("set doc"),
+    N_("show doc"),
+    N_("help doc"),
+  },
+
+  /* An enum option.  */
+  gdb::option::enum_option_def<test_options_opts> {
+    "enum",
+    test_options_enum_values_choices,
+    [] (test_options_opts *opts) { return &opts->enum_opt; },
+    NULL, /* show_cmd_cb */
+    N_("set doc"),
+    N_("show doc"),
+    N_("help doc"),
+  },
+
+  /* A uinteger option.  */
+  gdb::option::uinteger_option_def<test_options_opts> {
+    "uinteger",
+    [] (test_options_opts *opts) { return &opts->uint_opt; },
+    NULL, /* show_cmd_cb */
+    N_("set doc"),
+    N_("show doc"),
+    N_("help doc"),
+  },
+};
+
+/* Create an option_def_group for the test_options_opts options, with
+   OPTS as context.  */
+
+static inline gdb::option::option_def_group
+make_test_options_options_def_group (test_options_opts *opts)
+{
+  return {{test_options_option_defs}, opts};
+}
+
+/* Implementation of the "maintenance test-options require-dash" and
+   "maintenance test-options no-require-dash" commands.  The only
+   difference between both commands is that "require-dash" processes
+   commands with REQUIRE_DASH set (like the "print" command), while
+   "no-require-dash" does not.
+
+   The test strategy is simply processing the options, and printing
+   back the result.  */
+
+static void
+maintenance_test_options_command_1 (const char *args, bool require_dash)
+{
+  test_options_opts opts;
+
+  gdb::option::process_options (&args, require_dash,
+				make_test_options_options_def_group (&opts));
+
+  if (args == nullptr)
+    args = "";
+  else
+    args = skip_spaces (args);
+
+  printf_unfiltered (_("-flag %d -xx1 %d -xx2 %d -bool %d "
+		       "-enum %s -uint %s -- %s\n"),
+		     opts.flag_opt,
+		     opts.xx1_opt,
+		     opts.xx2_opt,
+		     opts.boolean_opt,
+		     opts.enum_opt,
+		     (opts.uint_opt == UINT_MAX
+		      ? "unlimited"
+		      : pulongest (opts.uint_opt)),
+		     args);
+}
+
+static int maintenance_test_options_command_completion_result;
+static std::string maintenance_test_options_command_completion_text;
+
+static void
+maintenance_show_test_options_completion_result
+  (struct ui_file *file, int from_tty,
+   struct cmd_list_element *c, const char *value)
+{
+  if (maintenance_test_options_command_completion_result)
+    fprintf_filtered (file, "1\n");
+  else
+    fprintf_filtered
+      (file, _("0 %s\n"),
+       maintenance_test_options_command_completion_text.c_str ());
+}
+
+/* Implementation of completer for the "maintenance test-options
+   require-dash" and "maintenance test-options no-require-dash"
+   commands.  The only difference between both commands is that
+   "require-dash" processes commands with REQUIRE_DASH set (like the
+   "print" command), while "no-require-dash" does not.  */
+
+static void
+maintenance_test_options_completer_1 (completion_tracker &tracker,
+				      const char *text,
+				      bool require_dash)
+{
+  try
+    {
+      maintenance_test_options_command_completion_result
+	= gdb::option::complete_options
+	   (tracker, &text, require_dash,
+	    make_test_options_options_def_group (nullptr));
+      maintenance_test_options_command_completion_text = text;
+    }
+  catch (const gdb_exception_error &ex)
+    {
+      maintenance_test_options_command_completion_result = 1;
+      throw;
+    }
+}
+
+/* Implementation of the "maintenance test-options require-dash"
+   command.  */
+
+static void
+maintenance_test_options_require_dash_command (const char *args, int from_tty)
+{
+  maintenance_test_options_command_1 (args, true);
+}
+
+/* Implementation of the "maintenance test-options no-require-dash"
+   command.  */
+
+static void
+maintenance_test_options_no_require_dash_command (const char *args,
+						  int from_tty)
+{
+  maintenance_test_options_command_1 (args, false);
+}
+
+/* Completer for the "maintenance test-options require-dash"
+   command.  */
+
+static void
+maintenance_test_options_require_dash_command_completer
+  (cmd_list_element *ignore, completion_tracker &tracker,
+   const char *text, const char *word)
+{
+  maintenance_test_options_completer_1 (tracker, text, true);
+}
+
+/* Completer for the "maintenance test-options no-require-dash"
+   command.  */
+
+static void
+maintenance_test_options_no_require_dash_command_completer
+  (cmd_list_element *ignore, completion_tracker &tracker,
+   const char *text, const char *word)
+{
+  maintenance_test_options_completer_1 (tracker, text, false);
+}
+
+/* Command list for maint test-options.  */
+struct cmd_list_element *maintenance_test_options_list;
+
+/* The "maintenance test-options" prefix command.  */
+
+static void
+maintenance_test_options_command (const char *arg, int from_tty)
+{
+  printf_unfiltered
+    (_("\"maintenance test-options\" must be followed "
+       "by the name of a subcommand.\n"));
+  help_list (maintenance_test_options_list, "maintenance test-options ",
+	     all_commands, gdb_stdout);
+}
+
 
 void
 _initialize_maint_cmds (void)
@@ -1147,6 +1370,40 @@ If a filter is given, only the tests with that value in their name will ran."),
 
   add_cmd ("selftests", class_maintenance, maintenance_info_selftests,
 	 _("List the registered selftests."), &maintenanceinfolist);
+
+  add_prefix_cmd ("test-options", no_class, maintenance_test_options_command,
+		  _("\
+Generic command for testing the options infrastructure."),
+		  &maintenance_test_options_list,
+		  "maintenance test-options ", 0,
+		  &maintenancelist);
+
+  cmd = add_cmd ("require-dash", class_maintenance,
+		 maintenance_test_options_require_dash_command,
+		 _("command used for internal testing"),
+		 &maintenance_test_options_list);
+  set_cmd_completer_handle_brkchars
+    (cmd, maintenance_test_options_require_dash_command_completer);
+
+  cmd = add_cmd ("no-require-dash", class_maintenance,
+		 maintenance_test_options_no_require_dash_command,
+		 _("command used for internal testing"),
+		 &maintenance_test_options_list);
+  set_cmd_completer_handle_brkchars
+    (cmd, maintenance_test_options_no_require_dash_command_completer);
+
+  add_setshow_zinteger_cmd ("test-options-completion-result", class_maintenance,
+			    &maintenance_test_options_command_completion_result,
+			    _("\
+Set maintenance test-options completion result."), _("\
+Show maintenance test-options completion result."), _("\
+When non-zero, this timeout is used instead of waiting forever for a target\n\
+to finish a low-level step or continue operation.  If the specified amount\n\
+of time passes without a response from the target, an error occurs."),
+			    NULL,
+			    maintenance_show_test_options_completion_result,
+			    &maintenance_set_cmdlist,
+			    &maintenance_show_cmdlist);
 
   add_setshow_zinteger_cmd ("watchdog", class_maintenance, &watchdog, _("\
 Set watchdog timer."), _("\

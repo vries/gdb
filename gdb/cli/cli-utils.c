@@ -19,11 +19,63 @@
 
 #include "defs.h"
 #include "cli/cli-utils.h"
+#include "cli/cli-option.h"
 #include "value.h"
 
 #include <ctype.h>
 
 static std::string extract_arg_maybe_quoted (const char **arg);
+
+/* See documentation in cli-utils.h.  */
+
+ULONGEST
+get_ulongest (const char **pp, int trailer)
+{
+  LONGEST retval = 0;	/* default */
+  const char *p = *pp;
+
+  if (*p == '$')
+    {
+      value *val = value_from_history_ref (p, &p);
+
+      if (val != NULL)	/* Value history reference */
+	{
+	  if (TYPE_CODE (value_type (val)) == TYPE_CODE_INT)
+	    retval = value_as_long (val);
+	  else
+	    error (_("History value must have integer type."));
+	}
+      else	/* Convenience variable */
+	{
+	  /* Internal variable.  Make a copy of the name, so we can
+	     null-terminate it to pass to lookup_internalvar().  */
+	  const char *start = ++p;
+	  while (isalnum (*p) || *p == '_')
+	    p++;
+	  std::string varname (start, p - start);
+	  if (!get_internalvar_integer (lookup_internalvar (varname.c_str ()),
+				       &retval))
+	    error (_("Convenience variable $%s does not have integer value."),
+		   varname.c_str ());
+	}
+    }
+  else
+    {
+      retval = strtoulst (p, pp, 0);
+      if (p == *pp)
+	{
+	  /* There is no number here.  (e.g. "cond a == b").  */
+	  error (_("Expected integer at: %s"), p);
+	}
+      p = *pp;
+    }
+
+  if (!(isspace (*p) || *p == '\0' || *p == trailer))
+    error (_("Trailing junk at: %s"), p);
+  p = skip_spaces (p);
+  *pp = p;
+  return retval;
+}
 
 /* See documentation in cli-utils.h.  */
 
@@ -468,32 +520,35 @@ check_for_argument (const char **str, const char *arg, int arg_len)
   return 0;
 }
 
+/* The qcs command line switches / flags.  */
+
+using qcs_switch_option_def
+  = gdb::option::switch_option_def<qcs_flags>;
+
+const gdb::option::option_def qcs_flags_option_defs[] = {
+  qcs_switch_option_def {
+    "q", [] (qcs_flags *opt) { return &opt->quiet; },
+    N_("Disables printing the frame location information."),
+  },
+
+  qcs_switch_option_def {
+    "c", [] (qcs_flags *opt) { return &opt->cont; },
+    N_("Print the error and continue."),
+  },
+
+  qcs_switch_option_def {
+    "s", [] (qcs_flags *opt) { return &opt->silent; },
+    N_("Silently ignore a COMMAND that raises an error or produces no output."),
+  },
+};
+
 /* See documentation in cli-utils.h.  */
 
-int
-parse_flags (const char **str, const char *flags)
+void
+validate_flags_qcs (const char *which_command, qcs_flags *flags)
 {
-  const char *p = skip_spaces (*str);
-
-  if (p[0] == '-'
-      && isalpha (p[1])
-      && (p[2] == '\0' || isspace (p[2])))
-    {
-      const char pf = p[1];
-      const char *f = flags;
-
-      while (*f != '\0')
-	{
-	  if (*f == pf)
-	    {
-	      *str = skip_spaces (p + 2);
-	      return f - flags + 1;
-	    }
-	  f++;
-	}
-    }
-
-  return 0;
+  if (flags->cont && flags->silent)
+    error (_("%s: -c and -s are mutually exclusive"), which_command);
 }
 
 /* See documentation in cli-utils.h.  */
@@ -502,25 +557,14 @@ bool
 parse_flags_qcs (const char *which_command, const char **str,
 		 qcs_flags *flags)
 {
-  switch (parse_flags (str, "qcs"))
-    {
-    case 0:
-      return false;
-    case 1:
-      flags->quiet = true;
-      break;
-    case 2:
-      flags->cont = true;
-      break;
-    case 3:
-      flags->silent = true;
-      break;
-    default:
-      gdb_assert_not_reached ("int qcs flag out of bound");
-    }
+  const gdb::option::option_def_group grp[] = {
+    { {qcs_flags_option_defs}, flags },
+  };
 
-  if (flags->cont && flags->silent)
-    error (_("%s: -c and -s are mutually exclusive"), which_command);
+  if (!gdb::option::process_options (str, false, grp))
+    return false;
+
+  validate_flags_qcs (which_command, flags);
 
   return true;
 }

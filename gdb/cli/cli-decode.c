@@ -171,6 +171,27 @@ set_cmd_completer_handle_brkchars (struct cmd_list_element *cmd,
   cmd->completer_handle_brkchars = func;
 }
 
+
+/* Insert element C in LIST.  */
+
+static void
+insert_cmd (cmd_list_element *c, cmd_list_element **list)
+{
+  if (*list == NULL || strcmp ((*list)->name, c->name) >= 0)
+    {
+      c->next = *list;
+      *list = c;
+    }
+  else
+    {
+      cmd_list_element *p = *list;
+      while (p->next && strcmp (p->next->name, c->name) <= 0)
+	p = p->next;
+      c->next = p->next;
+      p->next = c;
+    }
+}
+
 /* Add element named NAME.
    Space for NAME and DOC must be allocated by the caller.
    CLASS is the top level category into which commands are broken down
@@ -195,13 +216,12 @@ do_add_cmd (const char *name, enum command_class theclass,
 {
   struct cmd_list_element *c = new struct cmd_list_element (name, theclass,
 							    doc);
-  struct cmd_list_element *p, *iter;
 
   /* Turn each alias of the old command into an alias of the new
      command.  */
   c->aliases = delete_cmd (name, list, &c->hook_pre, &c->hookee_pre,
 			   &c->hook_post, &c->hookee_post);
-  for (iter = c->aliases; iter; iter = iter->alias_chain)
+  for (cmd_list_element *iter = c->aliases; iter; iter = iter->alias_chain)
     iter->cmd_pointer = c;
   if (c->hook_pre)
     c->hook_pre->hookee_pre = c;
@@ -212,22 +232,7 @@ do_add_cmd (const char *name, enum command_class theclass,
   if (c->hookee_post)
     c->hookee_post->hook_post = c;
 
-  if (*list == NULL || strcmp ((*list)->name, name) >= 0)
-    {
-      c->next = *list;
-      *list = c;
-    }
-  else
-    {
-      p = *list;
-      while (p->next && strcmp (p->next->name, name) <= 0)
-	{
-	  p = p->next;
-	}
-      c->next = p->next;
-      p->next = c;
-    }
-
+  insert_cmd (c, list);
   return c;
 }
 
@@ -578,6 +583,8 @@ add_setshow_auto_boolean_cmd (const char *name,
   set_cmd_completer (show, nullptr);
 }
 
+const char * const boolean_enums[] = { "on", "off", NULL };
+
 /* Add element named NAME to both the set and show command LISTs (the
    list for set/show or some sublist thereof).  CLASS is as in
    add_cmd.  VAR is address of the variable which will contain the
@@ -591,7 +598,6 @@ add_setshow_boolean_cmd (const char *name, enum command_class theclass, int *var
 			 struct cmd_list_element **set_list,
 			 struct cmd_list_element **show_list)
 {
-  static const char *boolean_enums[] = { "on", "off", NULL };
   cmd_list_element *set, *show;
 
   add_setshow_cmd_full (name, theclass, var_boolean, var,
@@ -848,15 +854,13 @@ add_setshow_zuinteger_cmd (const char *name, enum command_class theclass,
   set_cmd_completer (show, nullptr);
 }
 
-/* Remove the command named NAME from the command list.  Return the
-   list commands which were aliased to the deleted command.  If the
-   command had no aliases, return NULL.  The various *HOOKs are set to
-   the pre- and post-hook commands for the deleted command.  If the
-   command does not have a hook, the corresponding out parameter is
-   set to NULL.  */
+/* Remove the command named NAME from the command list, and return it.
+   The various *HOOKs are set to the pre- and post-hook commands for
+   the removed command.  If the command does not have a hook, the
+   corresponding out parameter is set to NULL.  */
 
-static struct cmd_list_element *
-delete_cmd (const char *name, struct cmd_list_element **list,
+static cmd_list_element *
+unlink_cmd (const char *name, struct cmd_list_element **list,
 	    struct cmd_list_element **prehook,
 	    struct cmd_list_element **prehookee,
 	    struct cmd_list_element **posthook,
@@ -864,7 +868,6 @@ delete_cmd (const char *name, struct cmd_list_element **list,
 {
   struct cmd_list_element *iter;
   struct cmd_list_element **previous_chain_ptr;
-  struct cmd_list_element *aliases = NULL;
 
   *prehook = NULL;
   *prehookee = NULL;
@@ -890,8 +893,6 @@ delete_cmd (const char *name, struct cmd_list_element **list,
 	  /* Update the link.  */
 	  *previous_chain_ptr = iter->next;
 
-	  aliases = iter->aliases;
-
 	  /* If this command was an alias, remove it from the list of
 	     aliases.  */
 	  if (iter->cmd_pointer)
@@ -907,17 +908,57 @@ delete_cmd (const char *name, struct cmd_list_element **list,
 	      *prevp = iter->alias_chain;
 	    }
 
-	  delete iter;
-
 	  /* We won't see another command with the same name.  */
-	  break;
+	  return iter;
 	}
       else
 	previous_chain_ptr = &iter->next;
     }
 
+  return nullptr;
+}
+
+/* Remove the command named NAME from the command list and delete it.
+   Return the list commands which were aliased to the deleted command.
+   If the command had no aliases, return NULL.  The various *HOOKs are
+   set to the pre- and post-hook commands for the deleted command.  If
+   the command does not have a hook, the corresponding out parameter
+   is set to NULL.  */
+
+static cmd_list_element *
+delete_cmd (const char *name, cmd_list_element **list,
+	    cmd_list_element **prehook,
+	    cmd_list_element **prehookee,
+	    cmd_list_element **posthook,
+	    cmd_list_element **posthookee)
+{
+  cmd_list_element *cmd = unlink_cmd (name, list,
+				      prehook, prehookee,
+				      posthook, posthookee);
+  if (cmd == nullptr)
+    return nullptr;
+
+  cmd_list_element *aliases = cmd->aliases;
+  delete cmd;
   return aliases;
 }
+
+/* See command.h.  */
+
+void
+rename_cmd (const char *old_name, cmd_list_element **old_list,
+	    const char *new_name, cmd_list_element **new_list)
+{
+  cmd_list_element *prehook, *prehookee, *posthook, *posthookee;
+  cmd_list_element *c = unlink_cmd (old_name, old_list,
+				    &prehook, &prehookee,
+				    &posthook, &posthookee);
+
+  c->name = new_name;
+  insert_cmd (c, new_list);
+  set_cmd_prefix (c, new_list);
+}
+
 
 /* Shorthands to the commands above.  */
 

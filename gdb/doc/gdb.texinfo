@@ -1491,6 +1491,21 @@ name, if that abbreviation is unambiguous; and you can repeat certain
 key to get @value{GDBN} to fill out the rest of a word in a command (or to
 show you the alternatives available, if there is more than one possibility).
 
+Some commands, accept options starting with a leading dash.  For
+example, @code{print -object}.  Similarly to command names, you can
+abbreviate a @value{GDBN} option to the first few letters of the
+option name, if that abbreviation is unambiguous, and you can also use
+the @key{TAB} key to get @value{GDBN} to fill out the rest of a word
+in an option (or to show you the alternatives available, if there is
+more than one possibility).
+
+Some commands process raw input as argument.  For example, the print
+command processes arbitrary expressions in any of the languages
+supported by @value{GDBN}.  With such commands, because such raw input
+may start with a leading dash, e.g.@: @code{print -myvar}, if you
+specify any command option, then you must use a double dash
+(@code{--}) to mark the end of argument processing.
+
 @menu
 * Command Syntax::              How to give commands to @value{GDBN}
 * Completion::                  Command completion
@@ -7473,10 +7488,11 @@ printed.  You can stop the backtrace at any time by typing the system
 interrupt character, normally @kbd{Ctrl-c}.
 
 @table @code
-@item backtrace [@var{args}@dots{}]
-@itemx bt [@var{args}@dots{}]
-Print the backtrace of the entire stack.  The optional @var{args} can
-be one of the following:
+@item backtrace [@var{option}]@dots{} [@var{qualifier}]@dots{} [@var{count}]
+@itemx bt [@var{option}]@dots{} [@var{qualifier}]@dots{} [@var{count}]
+Print the backtrace of the entire stack.
+
+The optional @var{count} can be one of the following:
 
 @table @code
 @item @var{n}
@@ -7488,7 +7504,12 @@ number.
 @itemx -@var{n}
 Print only the outermost @var{n} frames, where @var{n} is a positive
 number.
+@end table
 
+The optional @var{qualifier} is kept for backward compatibility with
+older versions of @value{GDBN}.  It can be one of the following:
+
+@table @code
 @item full
 Print the values of the local variables also.  This can be combined
 with a number to limit the number of frames shown.
@@ -7505,6 +7526,56 @@ A Python frame filter might decide to ``elide'' some frames.  Normally
 such elided frames are still printed, but they are indented relative
 to the filtered frames that cause them to be elided.  The @code{hide}
 option causes elided frames to not be printed at all.
+@end table
+
+Each of the qualifiers may also be specified as a standard option
+instead, with a leading dash.  Here is the mapping:
+
+@table @code
+@item -full
+Equivalent to the @code{full} qualifier.
+
+@item -no-filters
+Equivalent to the @code{no-filters} qualifier.
+
+@item -hide
+Equivalent to the @code{hide} qualifier.
+
+@end table
+
+The @code{backtrace} command also supports a number of options which
+allow overriding relevant global print settings as set by @code{set
+backtrace} and @code{set print} subcommands.  The following table maps
+each @code{backtrace} option to the corresponding command.  See
+further below for the full description of the @code{set backtrace}
+settings and @ref{Print Settings} for a full description of the
+@code{set print} settings.
+
+@table @code
+@item -past-main [@code{on}|@code{off}]
+Set whether backtraces should continue past "main".  Related setting:
+@ref{set backtrace past-main}
+
+@item -past-entry [@code{on}|@code{off}]
+Set whether backtraces should continue past the entry point of a program.
+Related setting: @ref{set backtrace past-entry}
+
+@item -limit @var{number-of-levels}|@code{unlimited}
+Set an upper bound on the number of backtrace levels.
+Related setting: @ref{set backtrace limit}
+
+@item -entry-values @code{no}|@code{only}|@code{preferred}|@code{if-needed}|@code{both}|@code{compact}|@code{default}
+Set printing of array indexes.
+Related setting: @ref{set print entry-values}
+
+@item -frame-arguments @code{all}|@code{scalars}|@code{none}
+Set printing of non-scalar frame arguments.
+Related setting: @ref{set print frame-arguments}
+
+@item -raw-frame-arguments [@code{on}|@code{off}]
+Set whether to print frame arguments in raw form.
+Related setting: @ref{set print raw frame-arguments}
+
 @end table
 @end table
 
@@ -7603,6 +7674,7 @@ in a backtrace, you can change this behavior:
 @table @code
 @item set backtrace past-main
 @itemx set backtrace past-main on
+@anchor{set backtrace past-main}
 @kindex set backtrace
 Backtraces will continue past the user entry point.
 
@@ -7616,6 +7688,7 @@ Display the current user entry point backtrace policy.
 
 @item set backtrace past-entry
 @itemx set backtrace past-entry on
+@anchor{set backtrace past-entry}
 Backtraces will continue past the internal entry point of an application.
 This entry point is encoded by the linker when the application is built,
 and is likely before the user entry point @code{main} (or equivalent) is called.
@@ -7630,6 +7703,7 @@ Display the current internal entry point backtrace policy.
 @item set backtrace limit @var{n}
 @itemx set backtrace limit 0
 @itemx set backtrace limit unlimited
+@anchor{set backtrace limit}
 @cindex backtrace limit
 Limit the backtrace to @var{n} levels.  A value of @code{unlimited}
 or zero means unlimited levels.
@@ -7926,7 +8000,7 @@ tfaas i lo -q -t lock_something_t
 @kindex frame apply
 @cindex apply command to several frames
 @table @code
-@item frame apply [all | @var{count} | @var{-count} | level @var{level}@dots{}] [@var{flag}]@dots{} @var{command}
+@item frame apply [all | @var{count} | @var{-count} | level @var{level}@dots{}] [@var{option}]@dots{} @var{command}
 The @code{frame apply} command allows you to apply the named
 @var{command} to one or more frames.
 
@@ -7952,23 +8026,34 @@ at levels 2, 3, 4, 6, 7, 8, and then again on frame at level 3.
 
 @end table
 
-@end table
-
 Note that the frames on which @code{frame apply} applies a command are
 also influenced by the @code{set backtrace} settings such as @code{set
-backtrace past-main} and @code{set backtrace limit N}.  See
+backtrace past-main} and @code{set backtrace limit N}.
 @xref{Backtrace,,Backtraces}.
 
-The @var{flag} arguments control what output to produce and how to handle
-errors raised when applying @var{command} to a frame.  @var{flag}
-must start with a @code{-} directly followed by one letter in
-@code{qcs}.  If several flags are provided, they must be given
-individually, such as @code{-c -q}.
+The @code{frame apply} command also supports a number of options which
+allow overriding the @code{set backtrace} settings.  The following
+table maps each @code{backtrace} option to the corresponding @code{set
+backtrace} command.
+
+@table @code
+@item -past-main [@code{on}|@code{off}]
+Whether backtraces should continue past "main".
+Related setting: @ref{set backtrace past-main}
+
+@item -past-entry [@code{on}|@code{off}]
+Whether backtraces should continue past the entry point of a program.
+Related setting: @ref{set backtrace past-entry}
+
+@item -limit @var{number-of-levels}|@code{unlimited}
+Set an upper bound on the number of backtrace levels.  Related
+setting: @ref{set backtrace limit}.
+@end table
 
 By default, @value{GDBN} displays some frame information before the
 output produced by @var{command}, and an error raised during the
 execution of a @var{command} will abort @code{frame apply}.  The
-following flags can be used to fine-tune this behavior:
+following options can be used to fine-tune these behaviors:
 
 @table @code
 @item -c
@@ -8021,7 +8106,7 @@ $5 = (void *) 0xffffd1f0
 @end group
 @end smallexample
 
-If flag @code{-q} is given, no frame information is printed:
+If the flag @code{-q} is given, no frame information is printed:
 @smallexample
 @group
 (gdb) frame apply all -q p $sp
@@ -8030,6 +8115,8 @@ $13 = (void *) 0xffffd1f0
 (gdb)
 @end group
 @end smallexample
+
+@end table
 
 @table @code
 
@@ -9158,20 +9245,93 @@ Different Languages}).  It may also print the expression using a
 Python-based pretty-printer (@pxref{Pretty Printing}).
 
 @table @code
-@item print @var{expr}
-@itemx print /@var{f} @var{expr}
+@item print [@var{options}] @var{expr}
+@itemx print [@var{options}] /@var{f} @var{expr}
 @var{expr} is an expression (in the source language).  By default the
 value of @var{expr} is printed in a format appropriate to its data type;
 you can choose a different format by specifying @samp{/@var{f}}, where
 @var{f} is a letter specifying the format; see @ref{Output Formats,,Output
 Formats}.
 
-@item print
-@itemx print /@var{f}
+The @code{print} command supports a number of options which allow
+overriding relevant global print settings as set by @code{set print}
+subcommands.  The following table maps each @code{print} option to the
+corresponding @code{set print} setting.  See @ref{Print Settings} for
+a full description of each of the settings.
+
+@multitable @columnfractions 0.28 0.32 0.25
+@item Print option
+@tab Related setting
+@tab Description
+
+@item -address [@code{on}|@code{off}]
+@tab set print address
+@tab Set printing of addresses.
+
+@item -array [@code{on}|@code{off}]
+@tab set print array
+@tab Pretty formatting of arrays.
+
+@item -array-indexes [@code{on}|@code{off}]
+@tab set print array-indexes
+@tab Set printing of array indexes.
+
+@item -elements @var{number-of-elements}|@code{unlimited}
+@tab set print elements
+@tab Set limit on string chars or array elements to print. "unlimited" causes there to be no limit.
+
+@item -null-stop [@code{on}|@code{off}]
+@tab set print null-stop
+@tab Set printing of char arrays to stop at first null char.
+
+@item -object [@code{on}|@code{off}]
+@tab set print object
+@tab Set printing C++ virtual function tables.
+
+@item -pretty [@code{on}|@code{off}]
+@tab set print pretty
+@tab Set pretty formatting of structures.
+
+@item -repeats @var{number-of-repeats}|@code{unlimited}
+@tab set print repeats
+@tab Set threshold for repeated print elements. "unlimited" causes all elements to be individually printed.
+
+@item -static-members [@code{on}|@code{off}]
+@tab set print static-members
+@tab Set printing C++ static members.
+
+@item -symbol [@code{on}|@code{off}]
+@tab set print symbol
+@tab Set printing of symbol names when printing pointers.
+
+@item -union [@code{on}|@code{off}]
+@tab set print union
+@tab Set printing of unions interior to structures.
+
+@item -vtbl [@code{on}|@code{off}]
+@tab set print vtbl
+@tab Set printing of C++ virtual function tables.
+@end multitable
+
+Because the @code{print} command accepts arbitrary expressions, if you
+specify any command option, then you must use a double dash
+(@code{--}) to mark the end of argument processing.
+
+@c FIXME, move this to the Commands node when it applies to a
+@c sufficiently large number of commands.
+You can abbreviate a @value{GDBN} option to the first few letters of
+the option name, if that abbreviation is unambiguous.  You can also
+use the @key{TAB} key to get @value{GDBN} to fill out the rest of a
+word in an option (or to show you the alternatives available, if there
+is more than one possibility).
+
+@item print [@var{options}]
+@itemx print [@var{options}] /@var{f}
 @cindex reprint the last value
-If you omit @var{expr}, @value{GDBN} displays the last value again (from the
-@dfn{value history}; @pxref{Value History, ,Value History}).  This allows you to
-conveniently inspect the same value in an alternative format.
+If you omit @var{expr}, @value{GDBN} displays the last value again
+(from the @dfn{value history}; @pxref{Value History, ,Value History}).
+This allows you to conveniently inspect the same value in an
+alternative format.
 @end table
 
 A more low-level way of examining data is with the @code{x} command.
@@ -10380,6 +10540,7 @@ that the number of elements to print is unlimited.
 Display the number of elements of a large array that @value{GDBN} will print.
 If the number is 0, then the printing is unlimited.
 
+@anchor{set print frame-arguments}
 @item set print frame-arguments @var{value}
 @kindex set print frame-arguments
 @cindex printing frame argument values
@@ -10429,6 +10590,7 @@ thus speeding up the display of each Ada frame.
 @item show print frame-arguments
 Show how the value of arguments should be displayed when printing a frame.
 
+@anchor{set print raw frame-arguments}
 @item set print raw frame-arguments on
 Print frame arguments in raw, non pretty-printed, form.
 
