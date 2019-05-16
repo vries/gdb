@@ -579,6 +579,27 @@ get_val_type_str (const option_def &opt, std::string &buffer)
     }
 }
 
+/* Helper for build_help.  Appends an indended version of DOC into
+   HELP.  */
+
+static void
+append_indended_doc (const char *doc, std::string &help)
+{
+  const char *p = doc;
+  const char *n = strchr (p, '\n');
+
+  while (n != nullptr)
+    {
+      help += "    ";
+      help.append (p, n - p + 1);
+      p = n + 1;
+      n = strchr (p, '\n');
+    }
+  help += "    ";
+  help += p;
+  help += '\n';
+}
+
 /* Fill HELP with an auto-generated "help" string fragment for
    OPTIONS.  */
 
@@ -601,25 +622,10 @@ build_help (gdb::array_view<const option_def> options, std::string &help)
 	  help += ' ';
 	  help += val_type_str;
 	}
-      help += "\n    ";
-      help += o.set_doc;
-      help += '\n';
+      help += "\n";
+      append_indended_doc (o.set_doc, help);
       if (o.help_doc != nullptr)
-	{
-	  const char *p = o.help_doc;
-	  const char *n = strchr (p, '\n');
-
-	  while (n != nullptr)
-	    {
-	      help += "    ";
-	      help.append (p, n - p + 1);
-	      p = n + 1;
-	      n = strchr (p, '\n');
-	    }
-	  help += "    ";
-	  help += p;
-	  help += '\n';
-	}
+	append_indended_doc (o.help_doc, help);
       help += '\n';
     }
 }
