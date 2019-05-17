@@ -165,17 +165,38 @@ proc_with_prefix test-frame-apply {cmd} {
 }
 
 # Basic option-machinery + "thread apply" command integration tests.
-proc_with_prefix test-thread-apply {cmd} {
-    test_completion_offers_commands "$cmd "
 
-    test_gdb_complete_multiple "$cmd " "-" "" {
-	"-ascending"
+proc_with_prefix test-thread-apply {} {
+
+    test_gdb_complete_unique "thread apply all" "thread apply all"
+    test_gdb_complete_unique "taas" "taas"
+
+    foreach cmd {
+	"thread apply all"
+	"taas"
+    } {
+	test_gdb_complete_multiple "$cmd " "-" "" {
+	    "-ascending"
+	    "-c"
+	    "-q"
+	    "-s"
+	}
+    }
+
+    test_gdb_complete_multiple "thread apply 1 " "-" "" {
 	"-c"
 	"-q"
 	"-s"
     }
 
-    test_completion_offers_commands "$cmd -c "
+    foreach cmd {
+	"thread apply all"
+	"thread apply 1"
+	"taas"
+    } {
+	test_completion_offers_commands "$cmd "
+	test_completion_offers_commands "$cmd -c "
+    }
 }
 
 # Miscelaneous tests.
@@ -519,14 +540,5 @@ foreach cmd {
     test-frame-apply $cmd
 }
 
-# Basic "frame apply" integration tests.
-
-test_gdb_complete_unique "thread apply all" "thread apply all"
-
-foreach cmd {
-    "thread apply all"
-    "thread apply 1"
-    "taas"
-} {
-    test-thread-apply $cmd
-}
+# Basic "thread apply" integration tests.
+test-thread-apply

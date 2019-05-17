@@ -1529,11 +1529,19 @@ The default is descending order."),
 };
 
 static inline std::array<gdb::option::option_def_group, 2>
-make_thread_apply_options_def_group (int *ascending,
-				     qcs_flags *flags)
+make_thread_apply_all_options_def_group (int *ascending,
+					 qcs_flags *flags)
 {
   return {{
     { ascending_option_def.def (), ascending},
+    { qcs_flags_option_defs, flags },
+  }};
+}
+
+static inline std::array<gdb::option::option_def_group, 2>
+make_thread_apply_options_def_group (qcs_flags *flags)
+{
+  return {{
     { qcs_flags_option_defs, flags },
   }};
 }
@@ -1552,8 +1560,8 @@ thread_apply_all_command (const char *cmd, int from_tty)
   int ascending = false;
   qcs_flags flags;
 
-  auto group = make_thread_apply_options_def_group (&ascending,
-						    &flags);
+  auto group = make_thread_apply_all_options_def_group (&ascending,
+							&flags);
   gdb::option::process_options (&cmd, false, group);
 
   validate_flags_qcs ("thread apply all", &flags);
@@ -1593,19 +1601,6 @@ thread_apply_all_command (const char *cmd, int from_tty)
 	if (thread_alive (thr))
 	  thr_try_catch_cmd (thr, cmd, from_tty, flags);
     }
-}
-
-/* Completer for "thread apply [all]".  */
-
-static void
-thread_apply_completer_1 (cmd_list_element *ignore, completion_tracker &tracker,
-			  const char *text)
-{
-  const auto group = make_thread_apply_options_def_group (nullptr, nullptr);
-  if (gdb::option::complete_options (tracker, &text, false, group))
-    return;
-
-  complete_command (tracker, text);
 }
 
 /* Completer for "thread apply [ID list]".  */
@@ -1658,7 +1653,11 @@ thread_apply_command_completer (cmd_list_element *ignore,
   tracker.advance_custom_word_point_by (cmd - text);
   text = cmd;
 
-  thread_apply_completer_1 (ignore, tracker, text);
+  const auto group = make_thread_apply_options_def_group (nullptr);
+  if (gdb::option::complete_options (tracker, &text, false, group))
+    return;
+
+  complete_command (tracker, text);
 }
 
 /* Completer for "thread apply all".  */
@@ -1668,7 +1667,12 @@ thread_apply_all_command_completer (cmd_list_element *ignore,
 				    completion_tracker &tracker,
 				    const char *text, const char *word)
 {
-  thread_apply_completer_1 (ignore, tracker, text);
+  const auto group = make_thread_apply_all_options_def_group (nullptr,
+							      nullptr);
+  if (gdb::option::complete_options (tracker, &text, false, group))
+    return;
+
+  complete_command (tracker, text);
 }
 
 /* Implementation of the "thread apply" command.  */
@@ -1694,8 +1698,10 @@ thread_apply_command (const char *tidlist, int from_tty)
 
   cmd = parser.cur_tok ();
 
-  while (parse_flags_qcs ("thread apply", &cmd, &flags))
-    ;
+  auto group = make_thread_apply_options_def_group (&flags);
+  gdb::option::process_options (&cmd, false, group);
+
+  validate_flags_qcs ("thread apply", &flags);
 
   if (*cmd == '\0')
     error (_("Please specify a command following the thread ID list"));
@@ -2077,8 +2083,7 @@ followed by COMMAND output.\n\
 Options:\n\
 %OPTIONS%"
 
-  const auto thread_apply_opts
-    = make_thread_apply_options_def_group (nullptr, nullptr);
+  const auto thread_apply_opts = make_thread_apply_options_def_group (nullptr);
 
   static std::string thread_apply_help = gdb::option::build_help (N_("\
 Apply a command to a list of threads.\n\
@@ -2093,12 +2098,15 @@ THREAD_APPLY_OPTION_HELP),
 		      &thread_cmd_list);
   set_cmd_completer_handle_brkchars (c, thread_apply_command_completer);
 
+  const auto thread_apply_all_opts
+    = make_thread_apply_all_options_def_group (nullptr, nullptr);
+
   static std::string thread_apply_all_help = gdb::option::build_help (N_("\
 Apply a command to all threads.\n\
 \n\
 Usage: thread apply all [OPTION]... COMMAND\n"
 THREAD_APPLY_OPTION_HELP),
-			       thread_apply_opts);
+			       thread_apply_all_opts);
 
   c = add_cmd ("all", class_run, thread_apply_all_command,
 	       thread_apply_all_help.c_str (),
