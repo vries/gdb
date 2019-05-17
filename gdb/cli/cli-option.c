@@ -327,7 +327,7 @@ parse_option (gdb::array_view<const option_def_group> options_group,
 	  }
 
 	option_value val;
-	val.uinteger = parse_cli_var_uinteger (match->type, args);
+	val.uinteger = parse_cli_var_uinteger (match->type, args, false);
 	return option_def_and_value {*match, match_ctx, val};
       }
     case var_enum:

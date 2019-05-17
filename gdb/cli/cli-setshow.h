@@ -28,9 +28,16 @@ extern int parse_cli_boolean_value (const char *arg);
 extern int parse_cli_boolean_value (const char **arg);
 
 /* Parse ARG, an option to a var_uinteger or var_zuinteger variable.
-   Either returns the parsed value on success or throws an error.  */
+   Either returns the parsed value on success or throws an error.  If
+   EXPRESSION is true, *ARG is parsed as an expression; otherwise, it
+   is parsed with get_ulongest.  It's not possible to parse the
+   integer as an expression when there may be valid input after the
+   integer, such as when parsing command options.  E.g., "print
+   -elements NUMBER -obj --".  In such case, parsing as an expression
+   would parse "-obj --" as part of the expression as well.  */
 extern unsigned int parse_cli_var_uinteger (var_types var_type,
-					    const char **arg);
+					    const char **arg,
+					    bool expression);
 
 /* Parse ARG, an option to a var_enum variable.  ENUM is a
    null-terminated array of possible values. Either returns the parsed

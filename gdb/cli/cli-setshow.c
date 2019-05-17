@@ -170,7 +170,8 @@ is_unlimited_literal (const char **arg)
 /* See cli-setshow.h.  */
 
 unsigned int
-parse_cli_var_uinteger (var_types var_type, const char **arg)
+parse_cli_var_uinteger (var_types var_type, const char **arg,
+			bool expression)
 {
   LONGEST val;
 
@@ -184,6 +185,8 @@ parse_cli_var_uinteger (var_types var_type, const char **arg)
 
   if (var_type == var_uinteger && is_unlimited_literal (arg))
     val = 0;
+  else if (expression)
+    val = parse_and_eval_long (*arg);
   else
     val = get_ulongest (arg);
 
@@ -397,7 +400,7 @@ do_set_command (const char *arg, int from_tty, struct cmd_list_element *c)
     case var_uinteger:
     case var_zuinteger:
       {
-	unsigned int val = parse_cli_var_uinteger (c->var_type, &arg);
+	unsigned int val = parse_cli_var_uinteger (c->var_type, &arg, true);
 
 	if (*(unsigned int *) c->var != val)
 	  {
