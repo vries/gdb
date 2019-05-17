@@ -323,6 +323,7 @@ show_backtrace_past_entry (struct ui_file *file, int from_tty,
 		    value);
 }
 
+static unsigned int backtrace_limit = UINT_MAX;
 static void
 show_backtrace_limit (struct ui_file *file, int from_tty,
 		      struct cmd_list_element *c, const char *value)
@@ -2297,7 +2298,7 @@ get_prev_frame (struct frame_info *this_frame)
      being 1-based and the level being 0-based, and the other accounts for
      the level of the new frame instead of the level of the current
      frame.  */
-  if (this_frame->level + 2 > curr_set_backtrace_options->backtrace_limit)
+  if (this_frame->level + 2 > backtrace_limit)
     {
       frame_debug_got_null_frame (this_frame, "backtrace limit exceeded");
       return NULL;
@@ -2928,16 +2929,6 @@ of the stack trace."),
 will terminate the backtrace there.  Set this variable if you need to see\n\
 the rest of the stack trace."),
   },
-
-  uinteger_option_def {
-    "limit",
-    [] (set_backtrace_options *opt) { return &opt->backtrace_limit; },
-    show_backtrace_limit, /* show_cmd_cb */
-    N_("Set an upper bound on the number of backtrace levels."),
-    N_("Show the upper bound on the number of backtrace levels."),
-    N_("No more than the specified number of frames can be displayed or examined.\n\
-Literal \"unlimited\" or zero means no limit."),
-  },
 };
 
 void
@@ -2959,6 +2950,17 @@ Show backtrace specific variables\n\
 Show backtrace variables such as the backtrace limit"),
 		  &show_backtrace_cmdlist, "show backtrace ",
 		  0/*allow-unknown*/, &showlist);
+
+  add_setshow_uinteger_cmd ("limit", class_obscure,
+			    &backtrace_limit, _("\
+Set an upper bound on the number of backtrace levels."), _("\
+Show the upper bound on the number of backtrace levels."), _("\
+No more than the specified number of frames can be displayed or examined.\n\
+Literal \"unlimited\" or zero means no limit."),
+			    NULL,
+			    show_backtrace_limit,
+			    &set_backtrace_cmdlist,
+			    &show_backtrace_cmdlist);
 
   gdb::option::add_setshow_cmds_for_options
     (class_stack, &user_set_backtrace_options,

@@ -906,13 +906,12 @@ struct set_backtrace_options
 {
   int backtrace_past_main = 0;
   int backtrace_past_entry = 0;
-  unsigned int backtrace_limit = UINT_MAX;
 };
 
 /* The values behind the global "set backtrace ..." options.  */
 extern set_backtrace_options user_set_backtrace_options;
 extern set_backtrace_options *curr_set_backtrace_options;
 
-extern const gdb::option::option_def set_backtrace_option_defs[3];
+extern const gdb::option::option_def set_backtrace_option_defs[2];
 
 #endif /* !defined (FRAME_H)  */

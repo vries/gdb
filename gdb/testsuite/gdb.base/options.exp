@@ -154,14 +154,13 @@ proc_with_prefix test-frame-apply {cmd} {
 
     test_gdb_complete_multiple "$cmd " "-" "" {
 	"-c"
-	"-limit"
 	"-past-entry"
 	"-past-main"
 	"-q"
 	"-s"
     }
 
-    test_completion_offers_commands "$cmd -limit 1 "
+    test_completion_offers_commands "$cmd -s "
 }
 
 # Basic option-machinery + "thread apply" command integration tests.
@@ -211,7 +210,6 @@ proc_with_prefix test-backtrace {} {
 	"-frame-arguments"
 	"-full"
 	"-hide"
-	"-limit"
 	"-no-filters"
 	"-past-entry"
 	"-past-main"
