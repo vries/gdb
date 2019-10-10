@@ -13,11 +13,121 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+# Compile the ada code in $code to a file based on $name, using the flags
+# $compile_flags as well as debug, nowarning and quiet.
+# Return 1 if code can be compiled
+# Leave the file name of the resulting object in the upvar object.
+# Similar to gdb_simple_compile, but using gdb_compile_ada_1 instead of
+# gdb_compile.
+
+proc gdb_simple_compile_ada {name code {type object} {compile_flags {}} {object obj}} {
+    upvar $object obj
+
+    switch -regexp -- $type {
+        "executable" {
+            set postfix "x"
+        }
+        "object" {
+            set postfix "o"
+        }
+        "preprocess" {
+            set postfix "i"
+        }
+        "assembly" {
+            set postfix "s"
+        }
+    }
+    set src [standard_temp_file $name.adb]
+    set obj [standard_temp_file $name-[pid].$postfix]
+    set compile_flags [concat $compile_flags {debug nowarnings quiet}]
+
+    gdb_produce_source $src $code
+
+    verbose "$name:  compiling testfile $src" 2
+    set lines [gdb_compile_ada_1 $src $obj $type $compile_flags]
+
+    if ![string match "" $lines] then {
+        verbose "$name:  compilation failed, returning 0" 2
+        return 0
+    }
+    return 1
+}
+
+# Global variable used in gdb_ada_needs_libs_pic_suffix to detect recursion.
+# Initialize to 0.
+
+set calculating_ada_needs_libs_pic_suffix 0
+
+# Caching true/false for whether we need to use -lgnarl_pic -lgnat_pic in
+# target_compile_ada_from_dir.
+
+gdb_caching_proc gdb_ada_needs_libs_pic_suffix {
+    global calculating_ada_needs_libs_pic_suffix
+    if { $calculating_ada_needs_libs_pic_suffix } {
+	return 0
+    }
+    set ada_hello {
+	with Ada.Text_IO;
+
+	procedure Hello is
+	begin
+	Ada.Text_IO.Put_Line("Hello, world!");
+	end Hello;
+    }
+
+    set calculating_ada_needs_libs_pic_suffix 1
+    set res \
+	[gdb_simple_compile_ada hello $ada_hello executable]
+    if { $res == 1 } {
+	set calculating_ada_needs_libs_pic_suffix 0
+	# Compilation works without the flags, we don't need them.
+	return 0
+    }
+    set flags {}
+    lappend flags "additional_flags=-largs"
+    lappend flags "additional_flags=-lgnarl_pic"
+    lappend flags "additional_flags=-lgnat_pic"
+    lappend flags "additional_flags=-margs"
+    set res \
+	[gdb_simple_compile_ada hello $ada_hello executable $flags]
+    if { $res == 1 } {
+	set calculating_ada_needs_libs_pic_suffix 0
+	# Compilation works with the flags, we need them.
+	return 1
+    }
+
+    set calculating_ada_needs_libs_pic_suffix 0
+    # Compilation doesn't work, even with the flags.  Assume we don't need
+    # them, since they don't seem to help.
+    return 0
+}
+
 # Call target_compile with SOURCE DEST TYPE and OPTIONS as argument,
 # after having temporarily changed the current working directory to
 # BUILDDIR.
 
 proc target_compile_ada_from_dir {builddir source dest type options} {
+    set args_dest m
+    set shared_rt 0
+    foreach op $options {
+	switch -exact -- $op {
+	    "additional_flags=-margs" {
+		set args_dest "m"
+	    }
+	    "additional_flags=-bargs" {
+		set args_dest "b"
+	    }
+	    "additional_flags=-largs" {
+		set args_dest "l"
+	    }
+	    "additional_flags=-shared" {
+		if { $args_dest == "b" } {
+		   set shared_rt 1
+		}
+	    }
+	}
+    }
     set saved_cwd [pwd]
 
     global board
@@ -29,6 +139,11 @@ proc target_compile_ada_from_dir {builddir source dest type options} {
 	    # Pretend gnatmake supports -pie/-no-pie, route it to
 	    # linker.
 	    append multilib_flag " -largs $op -margs"
+	    if { $op == "-pie" && $shared_rt == 0
+		 && [gdb_ada_needs_libs_pic_suffix] } {
+		# Work around PR gcc/87936 by using libgnat_pic
+		append multilib_flag " -largs -lgnarl_pic -lgnat_pic -margs"
+	    }
 	} else {
 	    append multilib_flag " $op"
 	}

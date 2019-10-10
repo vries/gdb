@@ -54,7 +54,9 @@ set gnatlink_options [list -largs $linkarg -Wl,-lsome_package -margs]
 
 set options [list debug]
 foreach option [concat $gnatbind_options $gnatlink_options] {
-    lappend options [concat "additional_flags=" $option]
+    set arg ""
+    append arg "additional_flags=" $option
+    lappend options $arg
 }
 
 # Create executable.
