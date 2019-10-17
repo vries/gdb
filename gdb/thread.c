@@ -709,7 +709,7 @@ delete_exited_threads (void)
       delete_thread (tp);
 }
 
-/* Return true value if stack temporaies are enabled for the thread
+/* Return true value if stack temporaries are enabled for the thread
    TP.  */
 
 bool

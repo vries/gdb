@@ -8968,7 +8968,7 @@ ada_to_fixed_type (struct type *type, const gdb_byte *valaddr,
       brobecker/2010-11-19: It seems to me that the only case where it is
       useful to preserve the typedef layer is when dealing with fat pointers.
       Perhaps, we could add a check for that and preserve the typedef layer
-      only in that situation.  But this seems unecessary so far, probably
+      only in that situation.  But this seems unnecessary so far, probably
       because we call check_typedef/ada_check_typedef pretty much everywhere.
       */
   if (TYPE_CODE (type) == TYPE_CODE_TYPEDEF

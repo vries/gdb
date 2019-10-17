@@ -373,7 +373,7 @@ set_endian (const char *ignore_args, int from_tty, struct cmd_list_element *c)
 
    SELECTED may be NULL, in which case we return the architecture
    associated with TARGET_DESC.  If SELECTED specifies a variant
-   of the architecture associtated with TARGET_DESC, return the
+   of the architecture associated with TARGET_DESC, return the
    more specific of the two.
 
    If SELECTED is a different architecture, but it is accepted as

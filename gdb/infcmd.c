@@ -2079,7 +2079,7 @@ set_environment_command (const char *arg, int from_tty)
   if (arg == 0)
     error_no_arg (_("environment variable and value"));
 
-  /* Find seperation between variable name and value.  */
+  /* Find separation between variable name and value.  */
   p = (char *) strchr (arg, '=');
   val = (char *) strchr (arg, ' ');
 

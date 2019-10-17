@@ -2515,7 +2515,7 @@ read_program_headers_from_bfd (bfd *abfd)
      ...  Though the system chooses virtual addresses for
      individual processes, it maintains the segments' relative
      positions.  Because position-independent code uses relative
-     addressesing between segments, the difference between
+     addressing between segments, the difference between
      virtual addresses in memory must match the difference
      between virtual addresses in the file.  The difference
      between the virtual address of any segment in memory and

@@ -2172,7 +2172,7 @@ call0_classify_opcode (xtensa_isa isa, xtensa_opcode opc)
    be within a bundle.  Updates the destination register tracking info
    accordingly.  The pc is needed only for pc-relative load instructions
    (eg. l32r).  The SP register number is needed to identify stores to
-   the stack frame.  Returns 0, if analysis was succesfull, non-zero
+   the stack frame.  Returns 0, if analysis was successful, non-zero
    otherwise.  */
 
 static int

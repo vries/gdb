@@ -1375,7 +1375,7 @@ struct field_info
     /* Number of fields (including baseclasses).  */
     int nfields = 0;
 
-    /* Set if the accesibility of one of the fields is not public.  */
+    /* Set if the accessibility of one of the fields is not public.  */
     int non_public_fields = 0;
 
     /* Member function fieldlist array, contains name of possibly overloaded

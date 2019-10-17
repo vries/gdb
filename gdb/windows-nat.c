@@ -518,7 +518,7 @@ windows_delete_thread (ptid_t ptid, DWORD exit_code, bool main_thread_p)
 
      Note that no notification was printed when the main thread
      was created, and thus, unless in verbose mode, we should be
-     symetrical, and avoid that notification for the main thread
+     symmetrical, and avoid that notification for the main thread
      here as well.  */
 
   if (info_verbose)

@@ -3737,7 +3737,7 @@ arm_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 	    }
 	}
 
-      /* Push stack padding for dowubleword alignment.  */
+      /* Push stack padding for doubleword alignment.  */
       if (nstack & (align - 1))
 	{
 	  si = push_stack_item (si, val, ARM_INT_REGISTER_SIZE);
@@ -6196,7 +6196,7 @@ cleanup_svc (struct gdbarch *gdbarch, struct regcache *regs,
 }
 
 
-/* Common copy routine for svc instruciton.  */
+/* Common copy routine for svc instruction.  */
 
 static int
 install_svc (struct gdbarch *gdbarch, struct regcache *regs,

@@ -2869,7 +2869,7 @@ hppa_match_insns (struct gdbarch *gdbarch, CORE_ADDR pc,
   return 1;
 }
 
-/* This relaxed version of the insstruction matcher allows us to match
+/* This relaxed version of the instruction matcher allows us to match
    from somewhere inside the pattern, by looking backwards in the
    instruction scheme.  */
 

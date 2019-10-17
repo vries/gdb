@@ -2591,7 +2591,7 @@ procfs_xfer_memory (gdb_byte *readbuf, const gdb_byte *writebuf,
    File descriptors are also cached.  As they are a limited resource,
    we cannot hold onto them indefinitely.  However, as they are
    expensive to open, we don't want to throw them away
-   indescriminately either.  As a compromise, we will keep the file
+   indiscriminately either.  As a compromise, we will keep the file
    descriptors for the parent process, but discard any file
    descriptors we may have accumulated for the threads.
 

@@ -1429,7 +1429,7 @@ step_over_info_valid_p (void)
      register contents, and memory.  We use this in step n1.
 
    - gdbarch_displaced_step_fixup adjusts registers and memory after
-     we have successfuly single-stepped the instruction, to yield the
+     we have successfully single-stepped the instruction, to yield the
      same effect the instruction would have had if we had executed it
      at its original address.  We use this in step n3.
 
