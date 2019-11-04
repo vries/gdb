@@ -4788,9 +4788,14 @@ stop_all_threads (void)
 					"infrun:   %s not executing\n",
 					target_pid_to_str (t->ptid).c_str ());
 
-		  /* The thread may be not executing, but still be
-		     resumed with a pending status to process.  */
-		  t->resumed = 0;
+		  if ((t->suspend.waitstatus.kind == TARGET_WAITKIND_SIGNALLED
+		       || t->suspend.waitstatus.kind == TARGET_WAITKIND_EXITED)
+		      && t->suspend.waitstatus_pending_p)
+		    ;
+		  else
+		    /* The thread may be not executing, but still be
+		       resumed with a pending status to process.  */
+		    t->resumed = 0;
 		}
 	    }
 
@@ -4818,8 +4823,34 @@ stop_all_threads (void)
 	      || event.ws.kind == TARGET_WAITKIND_EXITED
 	      || event.ws.kind == TARGET_WAITKIND_SIGNALLED)
 	    {
-	      /* All resumed threads exited
-		 or one thread/process exited/signalled.  */
+	      if (event.ptid != minus_one_ptid)
+		{
+		  thread_info *t = find_thread_ptid (event.target, event.ptid);
+		  if (t == nullptr)
+		    {
+		      /* This is the first time we see this thread.  */
+		      t = add_thread (event.target, event.ptid);
+		    }
+
+		  /* Set the threads as non-executing to avoid infinitely
+		     waiting for them to stop.  */
+		  mark_non_executing_threads (event.ptid, event.ws, event.target);
+
+		  if (event.ws.kind == TARGET_WAITKIND_NO_RESUMED)
+		    {
+		      /* Do nothing.  Already marked the threads.  */
+		    }
+		  else if (event.ws.kind == TARGET_WAITKIND_THREAD_EXITED)
+		    delete_thread (t);
+		  else
+		    {
+		      /* TARGET_WAITKIND_EXITED or
+			 TARGET_WAITKIND_SIGNALLED.  */
+		      save_waitstatus (t, &event.ws);
+		      t->resumed = 1;
+		      t->executing = 0;
+		    }
+		}
 	    }
 	  else
 	    {
