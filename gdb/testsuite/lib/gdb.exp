@@ -5257,6 +5257,19 @@ proc gdb_get_line_number { text { file "" } } {
     return $found
 }
 
+# Return 1 if we can rely on exit to be reported.
+proc exit_is_reliable { } {
+    # By default, we don't rely on exit() behavior of remote stubs --
+    # it's common for exit() to be implemented as a simple infinite
+    # loop, or a forced crash/reset.  For native targets, by default, we
+    # assume process exit is reported as such.
+    if { [target_info exists exit_is_reliable] } {
+	return [target_info exit_is_reliable]
+    } else {
+	return [expr ! [target_info exists use_gdb_stub]]
+    }
+}
+
 # Continue the program until it ends.
 #
 # MSSG is the error message that gets printed.  If not given, a
@@ -5269,7 +5282,7 @@ proc gdb_get_line_number { text { file "" } } {
 #	is accepted.
 
 proc gdb_continue_to_end {{mssg ""} {command continue} {allow_extra 0}} {
-  global inferior_exited_re use_gdb_stub
+  global inferior_exited_re
 
   if {$mssg == ""} {
       set text "continue until exit"
@@ -5282,18 +5295,9 @@ proc gdb_continue_to_end {{mssg ""} {command continue} {allow_extra 0}} {
       set extra ""
   }
 
-  # By default, we don't rely on exit() behavior of remote stubs --
-  # it's common for exit() to be implemented as a simple infinite
-  # loop, or a forced crash/reset.  For native targets, by default, we
-  # assume process exit is reported as such.  If a non-reliable target
-  # is used, we set a breakpoint at exit, and continue to that.
-  if { [target_info exists exit_is_reliable] } {
-      set exit_is_reliable [target_info exit_is_reliable]
-  } else {
-      set exit_is_reliable [expr ! $use_gdb_stub]
-  }
-
-  if { ! $exit_is_reliable } {
+  if { ![exit_is_reliable] } {
+    # If exit cannot be reliably detected, we set a breakpoint at exit, and
+    # continue to that.
     if {![gdb_breakpoint "exit"]} {
       return 0
     }
