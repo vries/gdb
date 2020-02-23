@@ -57,41 +57,13 @@ if {![runto_main]} {
     return -1
 }
 
-# We want to invoke setup_kfail (and in some cases setup_xfail) when
-# GDB does not yet have support for finding the values of variables in
-# (non-master) threads.  We'll check this by looking at the output of
-# "maint print thread-parent".  If this command is undefined, then GDB
-# does not yet have thread parent support, and it makes sense to kfail
-# tests which won't work.  It's possible for GDB to have this support,
-# but not work.  E.g. it may be the case that the plugin doesn't
-# exist or is not found.  We may eventually need to add additional
-# constraints related to setting allow_kfail to 0.  But, for the moment,
-# this simple test should be sufficient.
+# We want to invoke setup_xfail when the compiler does not yet have the
+# required support.
+set have_older_gcc -1
 
-set allow_kfail 1
-gdb_test_multiple "maint print thread-parent" "maint print thread-parent" {
-    -re "Undefined maintenance print command.*$gdb_prompt" {
-	pass "maint print thread-parent (does not exist)"
-    }
-    -re "No parent found.*" {
-	pass "maint print thread-parent"
-	set allow_kfail 0
-    }
-}
-
-# Determine whether to xfail some of the tests based on GCC version.
-#
-# This may need to be tweaked somewhat.  Testing shows that GCC 7.3.1
-# needs the xfails.  GCC 8.3.1 and 9.1.1 do not.  The assumption made
-# below is that all versions of gcc 8 and above won't require the
-# XFAIL setup and that all versions of gcc 7 and below will, but it's
-# possible that there are versions in between 7.3.1 and 8.3.1 for
-# which this assumption is invalid.
-
-set have_older_gcc 0
-if {[test_compiler_info {gcc-[0-7]-*}]} {
-    set have_older_gcc 1
-}
+# We want to invoke setup_kfail when GDB does not yet have support for
+# finding the values of variables in (non-master) threads.
+set allow_kfail -1
 
 # maybe_setup_kfail will set up a kfail for gdb/22214 when COND holds in
 # addition to considering the values of $have_older_gcc and $allow_kfail.
@@ -117,8 +89,32 @@ with_test_prefix "single_scope" {
 	with_test_prefix $pref {
 	    gdb_continue_to_breakpoint "at printf"
 
-	    if {$have_older_gcc} { setup_xfail "*-*-*" }
-	    set thread_num [get_valueof "" thread_num "unknown"]
+	    set fmt ""
+	    set exp thread_num     ;# Inferior variable
+	    set default "unknown"
+	    set val thread_num     ;# Tcl variable
+	    if { $have_older_gcc == -1 } {
+		# Inlined version of get_valueof with added xfail clause.
+		set test "get valueof \"${exp}\""
+		set $val ${default}
+		set cmd "print${fmt} ${exp}"
+		gdb_test_multiple $cmd "$test" {
+		    -re "\\$\[0-9\]* = (\[^\r\n\]*)\[\r\n\]*$gdb_prompt $" {
+			set $val $expect_out(1,string)
+			set have_older_gcc 0
+			pass $gdb_test_name
+		    }
+		    -re -wrap "No symbol \"$exp\" in current context." {
+			set have_older_gcc 1
+			setup_xfail "*-*-*"
+			fail $gdb_test_name
+		    }
+		}
+	    } else {
+		if {$have_older_gcc} { setup_xfail "*-*-*" }
+		set $val [get_valueof $fmt $exp $default]
+	    }
+
 	    if {$have_older_gcc} { setup_xfail "*-*-*" }
 	    gdb_test "print s1" "= -41"
 	    gdb_test "print s2" "= \[12\]02"
@@ -126,9 +122,29 @@ with_test_prefix "single_scope" {
 	    gdb_test "print s3" "= -43"
 	    gdb_test "print i1" "= 11"
 	    gdb_test "print i2" "= \[12]12"
-	    maybe_setup_kfail {$thread_num != 0}
-	    gdb_test "print i3" "= 13"
+	    if { $allow_kfail == -1 } {
+		gdb_test_multiple "print i3"  "" {
+		    -re -wrap "= 13" {
+			pass $gdb_test_name
+		    }
+		    -re -wrap "No symbol \"i3\" in current context\." {
+			set allow_kfail 0
+			xfail $gdb_test_name
+		    }
+		    -re -wrap "No frame is currently executing in block single_scope\." {
+			set allow_kfail 1
+			maybe_setup_kfail {$thread_num != 0}
+			fail $gdb_test_name
+		    }
+		}
+	    } else {
+		maybe_setup_kfail {$thread_num != 0}
+		gdb_test "print i3" "= 13"
+	    }
 	}
+    }
+    if { $allow_kfail == -1 } {
+	set allow_kfail 0
     }
 
     with_test_prefix "after parallel region" {
