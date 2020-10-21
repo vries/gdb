@@ -2920,10 +2920,20 @@ find_pc_sect_compunit_symtab (CORE_ADDR pc, struct obj_section *section)
 	  bv = COMPUNIT_BLOCKVECTOR (cust);
 	  b = BLOCKVECTOR_BLOCK (bv, GLOBAL_BLOCK);
 
-	  if (BLOCK_START (b) <= pc
-	      && BLOCK_END (b) > pc
-	      && (distance == 0
-		  || BLOCK_END (b) - BLOCK_START (b) < distance))
+	  bool in_range_p = BLOCK_START (b) <= pc && pc < BLOCK_END (b);
+	  if (!in_range_p)
+	    continue;
+
+	  if (BLOCKVECTOR_MAP (bv))
+	    {
+	      if (addrmap_find (BLOCKVECTOR_MAP (bv), pc) == nullptr)
+		continue;
+
+	      return cust;
+	    }
+
+	  if (distance == 0
+	      || BLOCK_END (b) - BLOCK_START (b) < distance)
 	    {
 	      /* For an objfile that has its functions reordered,
 		 find_pc_psymtab will find the proper partial symbol table
