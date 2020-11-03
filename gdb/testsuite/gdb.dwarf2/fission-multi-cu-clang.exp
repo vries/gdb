@@ -1,0 +1,165 @@
+# Copyright 2020 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+load_lib dwarf.exp
+
+# We run objcopy locally to split out the .dwo file.
+if [is_remote host] {
+    return 0
+}
+
+# This test can only be run on targets which support DWARF-2 and use gas.
+if ![dwarf2_support] {
+    return 0
+}
+
+# This test can only be run on x86-64 targets.
+if {![istarget x86_64-*] || ![is_lp64_target]} {
+    return 0
+}
+
+standard_testfile .c -dw.S
+
+# The sources we're pretending to compile.
+set src1 fission-multi-cu1.c
+set src2 fission-multi-cu2.c
+
+set asm_file [standard_output_file $srcfile2]
+Dwarf::assemble $asm_file {
+    declare_labels Llines1 Llines2 int_type
+    global srcdir subdir srcfile src1 src2
+
+    lassign \
+	[function_range main \
+	     "${srcdir}/${subdir}/${srcfile}"] \
+	main_start main_length
+
+    lassign \
+	[function_range func \
+	     "${srcdir}/${subdir}/${srcfile}"] \
+	func_start func_length
+
+    cu {} {
+	compile_unit {
+	    {language @DW_LANG_C}
+	    {name $src1}
+	    {stmt_list $Llines1 DW_FORM_sec_offset}
+	    {MACRO_AT_range {func}}
+	} {
+	    subprogram {
+		{external 1 flag}
+		{MACRO_AT_func {func}}
+		{type %$int_type}
+	    } {
+                DW_TAG_formal_parameter {
+                    {type %$int_type}
+                    {name arg}
+		    {DW_AT_const_value -1 DW_FORM_sdata}
+                }
+	    }
+	}
+    }
+
+    cu {} {
+	compile_unit {
+	    {language @DW_LANG_C}
+	    {name $src2}
+	    {stmt_list $Llines2 DW_FORM_sec_offset}
+	    {MACRO_AT_range {main}}
+	} {
+	    subprogram {
+		{external 1 flag}
+		{MACRO_AT_func {main}}
+		{type :$int_type}
+		{decl_file 1 udata}
+	    }
+	    int_type: base_type {
+		{name "int"}
+		{encoding @DW_ATE_signed}
+		{byte_size 4 DW_FORM_sdata}
+	    }
+	}
+    }
+
+    lines {version 2} Llines1 {
+	include_dir "${srcdir}/${subdir}"
+	file_name $src1 1
+
+	program {
+	    {DW_LNE_set_address $func_start}
+	    {line 20}
+	    {DW_LNS_copy}
+
+	    {DW_LNE_set_address func_label}
+	    {line 21}
+	    {DW_LNS_copy}
+
+	    {DW_LNE_set_address func_label_2}
+	    {DW_LNE_end_sequence}
+	}
+    }
+
+    lines {version 2} Llines2 {
+	include_dir "${srcdir}/${subdir}"
+	file_name $src2 1
+
+	program {
+	    {DW_LNE_set_address $main_start}
+	    {line 22}
+	    {DW_LNS_copy}
+
+	    {DW_LNE_set_address main_label}
+	    {line 23}
+	    {DW_LNS_copy}
+
+	    {DW_LNE_set_address main_label_2}
+	    {DW_LNE_end_sequence}
+	}
+    }
+}
+
+if { [prepare_for_testing "failed to prepare" ${testfile} \
+	  [list $srcfile $asm_file] {nodebug}] } {
+    return -1
+}
+
+gdb_exit
+gdb_start
+gdb_reinitialize_dir $srcdir/$subdir
+# Make sure we can find the .dwo file, regardless of whether we're
+# running in parallel mode.
+gdb_test_no_output "set debug-file-directory [file dirname $binfile]" \
+    "set debug-file-directory"
+gdb_load $binfile
+
+if ![runto_main] {
+    return -1
+}
+
+# Do a few basic things to verify we're finding the DWO debug info.
+
+gdb_test "ptype main" "type = int \\(\\)"
+gdb_test "ptype func" "type = int \\(int\\)"
+
+gdb_test "frame" "#0 *main \\(\\) at .*$src2:$decimal.*" \
+    "frame in main"
+
+gdb_test "break func" "Breakpoint.*at.* file .*$src1, line .*"
+
+gdb_test "continue" "Breakpoint.* func \\(arg=-1\\).*" \
+    "continue to func"
+
+gdb_test "frame" "#0 *func \\(arg=-1\\) at .*$src1:$decimal.*" \
+    "frame in func"
