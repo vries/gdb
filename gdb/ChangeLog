@@ -1,5 +1,16 @@
 2021-05-24  Tom Tromey  <tom@tromey.com>
 
+	* dwarf2/abbrev.h (struct abbrev_table) <section>: New member.
+	<abbrev_table>: Add 'sect' parameter.
+	* dwarf2/abbrev.c (abbrev_table::abbrev_table): Add 'sect'
+	parameter.
+	(abbrev_table::read): Update.
+	* dwarf2/abbrev-cache.h: New file.
+	* dwarf2/abbrev-cache.c: New file.
+	* Makefile.in (COMMON_SFILES): Add abbrev-cache.c.
+
+2021-05-24  Tom Tromey  <tom@tromey.com>
+
 	* minsyms.c (minimal_symbol_reader::install): Update.
 
 2021-06-18  Tom Tromey  <tom@tromey.com>
