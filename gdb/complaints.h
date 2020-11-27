@@ -42,9 +42,10 @@ extern int stop_whining;
   while (0)
 
 /* Clear out / initialize all complaint counters that have ever been
-   incremented.  */
+   incremented.  Prevent inlining this function for the benefit of GDB's
+   selftests in the testsuite.  */
 
-extern void clear_complaints ();
+extern void clear_complaints ()  __attribute__((noinline));
 
 
 #endif /* !defined (COMPLAINTS_H) */
