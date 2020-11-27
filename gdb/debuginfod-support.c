@@ -120,7 +120,8 @@ debuginfod_source_query (const unsigned char *build_id,
     printf_filtered (_("Download failed: %s.  Continuing without source file %ps.\n"),
 		     safe_strerror (-fd.get ()),
 		     styled_string (file_name_style.style (),  srcpath));
-  else
+
+  if (fd.get () >= 0)
     destname->reset (xstrdup (srcpath));
 
   debuginfod_end (c);
@@ -154,8 +155,10 @@ debuginfod_debuginfo_query (const unsigned char *build_id,
 		     safe_strerror (-fd.get ()),
 		     styled_string (file_name_style.style (),  filename));
 
-  destname->reset (dname);
+  if (fd.get () >= 0)
+    destname->reset (dname);
   debuginfod_end (c);
+
   return fd;
 }
 #endif
