@@ -129,7 +129,9 @@ gdb_test "apropos apropos" "apropos -- Search for commands matching a REGEXP.*"
 
 # Test apropos for commands having aliases.
 gdb_test "apropos Print backtrace of all stack frames, or innermost COUNT frames\." \
-    "backtrace, where, bt -- Print backtrace of all stack frames, or innermost COUNT frames\."
+    [multi_line \
+	 "backtrace, where, bt -- Print backtrace of all stack frames, or innermost COUNT frames\." \
+	 "new-backtrace -- Print backtrace of all stack frames, or innermost COUNT frames\."]
 
 # Test help for commands having aliases.
 gdb_test "help bt" "backtrace, where, bt\[\r\n\]+Print backtrace of all stack frames, or innermost COUNT frames\..*"
