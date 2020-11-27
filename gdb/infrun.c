@@ -6431,6 +6431,7 @@ process_event_stop_test (struct execution_control_state *ecs)
 	    else
 	      {
 		/* Case 3.  */
+		ecs->event_thread->stepping_over_breakpoint = 1;
 		keep_going (ecs);
 		return;
 	      }
