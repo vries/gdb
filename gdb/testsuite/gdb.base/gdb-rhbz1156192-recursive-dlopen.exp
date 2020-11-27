@@ -43,10 +43,21 @@ if { [gdb_compile_shlib ${srcfile_lib2} ${binfile_lib2} \
     return -1
 }
 
-if { [prepare_for_testing ${testfile}.exp ${executable} ${srcfile} \
-	[ list debug shlib_load "additional_flags=-Wno-deprecated-declarations" ]] } {
-    untested "Could not compile ${executable}"
-    return -1
+save_vars { env(_MALLOC_CHECK) env(GLIBC_TUNABLES) } {
+    # At check level 3, we may run into:
+    #   Error in `$exec': free(): invalid pointer: $hex ***
+    # Filed as bsc#1152509 - "gdb.base/gdb-rhbz1156192-recursive-dlopen.exp
+    # FAILs".
+    # Set the check level to 0 to prevent this.
+    setenv _MALLOC_CHECK 0
+    setenv GLIBC_TUNABLES glibc.malloc.check=0
+
+    if { [prepare_for_testing ${testfile}.exp ${executable} ${srcfile} \
+	      [ list debug shlib_load \
+		    "additional_flags=-Wno-deprecated-declarations" ]] } {
+	untested "Could not compile ${executable}"
+	return -1
+    }
 }
 
 proc do_test { has_libfoo has_libbar } {
