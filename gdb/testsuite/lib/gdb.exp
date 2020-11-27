@@ -84,6 +84,7 @@ load_lib cache.exp
 load_lib gdb-utils.exp
 load_lib memory.exp
 load_lib check-test-names.exp
+load_lib ada.exp
 
 global GDB
 
@@ -2109,6 +2110,11 @@ proc skip_fortran_tests {} {
 # Return a 1 if I don't even want to try to test ada.
 
 proc skip_ada_tests {} {
+    if { [gdb_can_compile_ada] == 0 } {
+	global gdb_test_file_name
+	unsupported "$gdb_test_file_name"
+	return 1
+    }
     return 0
 }
 
