@@ -19,7 +19,13 @@
    Please email any bugs, comments, and/or additions to this file to:
    bug-gdb@prep.ai.mit.edu  */
 
+#include <pthread.h>
+
+extern __thread int var;
+
 int main()
 {
-  return 0;
+  /* Ensure we link against pthreads even with --as-needed.  */
+  pthread_testcancel();
+  return var;
 }
