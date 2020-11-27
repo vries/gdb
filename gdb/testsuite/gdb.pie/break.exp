@@ -319,7 +319,7 @@ if ![runto_main] then { fail "break tests suppressed" }
 
 send_gdb "catch\n"
 gdb_expect {
-  -re "Catch requires an event name.*$gdb_prompt $"\
+  -re "List of catch subcommands:.*$gdb_prompt $"\
           {pass "catch requires an event name"}
   -re "$gdb_prompt $"\
           {fail "catch requires an event name"}
