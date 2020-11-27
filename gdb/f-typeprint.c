@@ -250,7 +250,7 @@ f_type_print_varspec_suffix (struct type *type, struct ui_file *stream,
     case TYPE_CODE_REF:
       f_type_print_varspec_suffix (TYPE_TARGET_TYPE (type), stream, 0, 1, 0,
 				   arrayprint_recurse_level, false);
-      fprintf_filtered (stream, ")");
+      fprintf_filtered (stream, " )");
       break;
 
     case TYPE_CODE_FUNC:
