@@ -148,13 +148,13 @@ proc do_attach_tests {} {
       -re "Load new symbol table from.*y or n.*$" {
          send_gdb "y\n"
          gdb_expect {
-            -re "Reading symbols from $escapedbinfile\.\.\.*done.*$gdb_prompt $"\
+            -re "Reading symbols from $escapedbinfile\.\.\.*$gdb_prompt $"\
                             {pass "(re)set file, before attach1"}
             -re "$gdb_prompt $" {fail "(re)set file, before attach1"}
             timeout         {fail "(timeout) (re)set file, before attach1"}
          }
       }
-      -re "Reading symbols from $escapedbinfile\.\.\.*done.*$gdb_prompt $"\
+      -re "Reading symbols from $escapedbinfile\.\.\.*$gdb_prompt $"\
                       {pass "set file, before attach1"}
       -re "$gdb_prompt $" {fail "set file, before attach1"}
       timeout         {fail "(timeout) set file, before attach1"}
