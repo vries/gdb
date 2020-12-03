@@ -151,18 +151,24 @@ value_subscript (struct value *array, LONGEST index)
     {
       struct type *range_type = tarray->index_type ();
       LONGEST lowerbound, upperbound;
+      bool upperbound_p = true;
 
-      get_discrete_bounds (range_type, &lowerbound, &upperbound);
+      if (get_discrete_bounds (range_type, &lowerbound, &upperbound) < 0)
+	{
+	  lowerbound = range_type->bounds ()->low.const_val ();
+	  upperbound_p = false;
+	}
+
       if (VALUE_LVAL (array) != lval_memory)
 	return value_subscripted_rvalue (array, index, lowerbound);
 
       if (c_style == 0)
 	{
-	  if (index >= lowerbound && index <= upperbound)
+	  if (index >= lowerbound && upperbound_p && index <= upperbound)
 	    return value_subscripted_rvalue (array, index, lowerbound);
 	  /* Emit warning unless we have an array of unknown size.
 	     An array of unknown size has lowerbound 0 and upperbound -1.  */
-	  if (upperbound > -1)
+	  if (upperbound_p && upperbound > -1)
 	    warning (_("array or string index out of range"));
 	  /* fall doing C stuff */
 	  c_style = 1;
