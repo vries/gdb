@@ -21,6 +21,7 @@
   subroutine f(s)
   character*(*) s
   s = s
+  print *, s
   end
 
   program main

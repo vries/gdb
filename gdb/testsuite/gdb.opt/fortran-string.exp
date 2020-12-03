@@ -34,6 +34,13 @@ if ![runto $srcfile:[gdb_get_line_number "s = s"]] then {
     continue
 }
 
-gdb_test "frame" ".*s='foo'.*"
-gdb_test "ptype s" "type = character\\*3"
+gdb_test "info args" ".*s = 'foo'.*"
+gdb_test_multiple "ptype s" "" {
+    -re -wrap "type = character \\(3\\)" {
+	pass $gdb_test_name
+    }
+    -re -wrap "type = character\\*3" {
+	pass $gdb_test_name
+    }
+}
 gdb_test "p s" "\\$\[0-9\]* = 'foo'"
