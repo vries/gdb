@@ -101,6 +101,7 @@ proc test_stop_on_solib_events { } {
     gdb_test_no_output "set stop-on-solib-events 1" "setting stop-on-solib-events"
 
     gdb_run_cmd
+    gdb_test "" "Wait for first prompt"
     foreach l $solib_event_order {
       incr pass
       with_test_prefix "pass #$pass" {
