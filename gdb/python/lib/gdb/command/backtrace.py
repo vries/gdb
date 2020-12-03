@@ -81,13 +81,19 @@ Use of the 'raw' qualifier avoids any filtering by loadable modules.
         # FIXME: provide option to start at selected frame
         # However, should still number as if starting from newest
         newest_frame = gdb.newest_frame()
-        iter = itertools.imap (FrameWrapper,
-                               FrameIterator (newest_frame))
+        if sys.version_info.major >= 3:
+            iter = map (FrameWrapper, FrameIterator (newest_frame))
+        else:
+            iter = itertools.imap (FrameWrapper,
+                                   FrameIterator (newest_frame))
         if filter:
             iter = gdb.backtrace.create_frame_filter (iter)
 
         # Now wrap in an iterator that numbers the frames.
-        iter = itertools.izip (itertools.count (0), iter)
+        if sys.version_info.major >= 3:
+            iter = zip (itertools.count (0), iter)
+        else:
+            iter = itertools.izip (itertools.count (0), iter)
 
         # Reverse if the user wanted that.
         if self.reverse.value:
