@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/resource.h>
-#include <stdio.h>
 #include <sys/mman.h>
 
 /* Use a noinline function to ensure that the buffer is not removed
@@ -63,7 +62,6 @@ down (int i)
 
   if (last && last < (void *) buf)
     {
-      printf ("%d: %p < %p\n", i, last, buf);
       marker_hit ();
     }
   last = buf;
