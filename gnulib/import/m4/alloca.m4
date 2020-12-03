@@ -96,7 +96,7 @@ AC_CACHE_CHECK([stack direction for C alloca],
                [ac_cv_c_stack_direction],
 [AC_RUN_IFELSE([AC_LANG_SOURCE(
 [AC_INCLUDES_DEFAULT
-int
+__attribute__ (noinline,noclone)) int
 find_stack_direction (int *addr, int depth)
 {
   int dir, dummy = 0;
