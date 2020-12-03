@@ -94,6 +94,7 @@ custom_malloc_hook (size_t size, const void *caller)
   /* Called recursively.  */
   result = malloc (size);
   /* Restore new hooks.  */
+  old_malloc_hook = __malloc_hook;
   __malloc_hook = custom_malloc_hook;
   return result;
 }
