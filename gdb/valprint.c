@@ -830,11 +830,11 @@ generic_value_print_complex (struct value *val, struct ui_file *stream,
   fprintf_filtered (stream, "%s", decorations->complex_prefix);
 
   struct value *real_part = value_real_part (val);
-  value_print_scalar_formatted (real_part, options, 0, stream);
+  generic_value_print (real_part, stream, 0, options, decorations);
   fprintf_filtered (stream, "%s", decorations->complex_infix);
 
   struct value *imag_part = value_imaginary_part (val);
-  value_print_scalar_formatted (imag_part, options, 0, stream);
+  generic_value_print (imag_part, stream, 0, options, decorations);
   fprintf_filtered (stream, "%s", decorations->complex_suffix);
 }
 

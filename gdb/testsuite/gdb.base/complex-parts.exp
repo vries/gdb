@@ -106,7 +106,8 @@ gdb_test "print (_Complex int) (23.75 + 8.88i)" " = 23 \\+ 8i"
 
 set re_reject_arg "Argument to complex arithmetic operation not supported\\."
 gdb_test "print (void *)0 + 5i" $re_reject_arg
-gdb_test "print (_Decimal32)0 + 5i" $re_reject_arg
+
+gdb_test "print (_Decimal32)0 + 5i" "= 0 \\+ 5.000000i"
 
 # Set language to c++.  Avoid warning by not having current frame.
 clean_restart

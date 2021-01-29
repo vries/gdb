@@ -3419,7 +3419,7 @@ bool
 can_create_complex_type (struct type *target_type)
 {
   return (target_type->code () == TYPE_CODE_INT
-	  || target_type->code () == TYPE_CODE_FLT);
+	  || is_floating_type (target_type));
 }
 
 /* Allocate a TYPE_CODE_COMPLEX type structure.  NAME is the type
