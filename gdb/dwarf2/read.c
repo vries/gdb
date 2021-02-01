@@ -2889,6 +2889,7 @@ create_addrmap_from_aranges (dwarf2_per_objfile *per_objfile,
 
   const gdb_byte *addr = section->buffer;
 
+  unsigned int nr_cus = 0;
   while (addr < section->buffer + section->size)
     {
       const gdb_byte *const entry_addr = addr;
@@ -3010,6 +3011,16 @@ create_addrmap_from_aranges (dwarf2_per_objfile *per_objfile,
 		 - baseaddr);
 	  addrmap_set_empty (mutable_map, start, end - 1, per_cu);
 	}
+      nr_cus++;
+    }
+
+  if (nr_cus != debug_info_offset_to_per_cu.size ())
+    {
+      warning (_("Section .debug_aranges does not contain the same amount of"
+		 " entries (%u) as the amount of CUs (%lu), ignoring"
+		 " .debug_aranges."), nr_cus,
+	       debug_info_offset_to_per_cu.size ());
+      return;
     }
 
   objfile->partial_symtabs->psymtabs_addrmap
@@ -5423,6 +5434,11 @@ dwarf2_read_debug_names (dwarf2_per_objfile *per_objfile)
     }
 
   create_addrmap_from_aranges (per_objfile, &per_bfd->debug_aranges);
+  if (objfile->partial_symtabs->psymtabs_addrmap == nullptr)
+    {
+      per_objfile->per_bfd->all_comp_units.clear ();
+      return false;
+    }
 
   per_bfd->debug_names_table = std::move (map);
   per_bfd->using_index = 1;
