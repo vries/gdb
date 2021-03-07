@@ -1,5 +1,14 @@
 2021-05-24  Tom Tromey  <tom@tromey.com>
 
+	* dwarf2/abbrev.h (struct abbrev_info) <tag>: Use ENUM_BITFIELD.
+	<has_children>: Now bool.
+	<interesting, size_if_constant, sibling_offset>: New members.
+	* dwarf2/abbrev.c (tag_interesting_for_index): New function.
+	(abbrev_table::read): Examine attributes and compute
+	interesting-ness.
+
+2021-05-24  Tom Tromey  <tom@tromey.com>
+
 	* dwarf2/abbrev.h (struct abbrev_table) <section>: New member.
 	<abbrev_table>: Add 'sect' parameter.
 	* dwarf2/abbrev.c (abbrev_table::abbrev_table): Add 'sect'
