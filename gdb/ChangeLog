@@ -1,5 +1,10 @@
 2021-05-24  Tom Tromey  <tom@tromey.com>
 
+	* dwarf2/read.c (skip_one_die): Handle sibling_offset and
+	size_if_constant.
+
+2021-05-24  Tom Tromey  <tom@tromey.com>
+
 	* dwarf2/abbrev.h (struct abbrev_info) <tag>: Use ENUM_BITFIELD.
 	<has_children>: Now bool.
 	<interesting, size_if_constant, sibling_offset>: New members.
