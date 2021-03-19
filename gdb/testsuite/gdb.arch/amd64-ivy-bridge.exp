@@ -20,7 +20,7 @@ if {![istarget "x86_64-*-*"]} then {
 set testfile amd64-ivy-bridge
 set test compilation
 if [prepare_for_testing ${testfile}.exp ${testfile}.x ${testfile}.S [list debug "additional_flags=-m64 -nostdlib"]] {
-    fail $test
+    unsupported $test
     return -1
 }
 pass $test
