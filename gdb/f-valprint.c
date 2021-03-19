@@ -117,7 +117,8 @@ f77_print_array_1 (int nss, int ndimensions, struct type *type,
   LONGEST lowerbound, upperbound;
   LONGEST i;
 
-  get_discrete_bounds (range_type, &lowerbound, &upperbound);
+  if (get_discrete_bounds (range_type, &lowerbound, &upperbound) < 0)
+    lowerbound = 0, upperbound = -1;
 
   if (nss != ndimensions)
     {
