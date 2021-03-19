@@ -1281,6 +1281,11 @@ captured_main_1 (struct captured_main_args *context)
     }
 }
 
+/* Prevent inlining this function for the benefit of GDB's selftests in the
+   testsuite.  */
+
+static void captured_main (void *data) __attribute__((noinline));
+
 static void
 captured_main (void *data)
 {
