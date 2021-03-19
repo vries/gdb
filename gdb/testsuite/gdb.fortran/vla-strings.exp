@@ -32,7 +32,7 @@ gdb_breakpoint [gdb_get_line_number "var_char-allocated-1"]
 gdb_continue_to_breakpoint "var_char-allocated-1"
 set test "whatis var_char first time"
 gdb_test_multiple "whatis var_char" $test {
-    -re "type = PTR TO -> \\( character\\*10\\)\r\n$gdb_prompt $" {
+    -re "type = PTR TO -> \\( character\\*10 \\)\r\n$gdb_prompt $" {
 	    pass $test
     }
     -re "type = character\\*10\r\n$gdb_prompt $" {
@@ -41,7 +41,7 @@ gdb_test_multiple "whatis var_char" $test {
 }
 set test "ptype var_char first time"
 gdb_test_multiple "ptype var_char" $test {
-    -re "type = PTR TO -> \\( character\\*10\\)\r\n$gdb_prompt $" {
+    -re "type = PTR TO -> \\( character\\*10 \\)\r\n$gdb_prompt $" {
 	    pass $test
     }
     -re "type = character\\*10\r\n$gdb_prompt $" {
@@ -59,7 +59,7 @@ gdb_breakpoint [gdb_get_line_number "var_char-filled-1"]
 gdb_continue_to_breakpoint "var_char-filled-1"
 set test "print var_char, var_char-filled-1"
 gdb_test_multiple "print var_char" $test {
-    -re "= \\(PTR TO -> \\( character\\*3\\)\\) $hex\r\n$gdb_prompt $" {
+    -re "= \\(PTR TO -> \\( character\\*3 \\)\\) $hex\r\n$gdb_prompt $" {
         gdb_test "print *var_char" "= 'foo'" "print *var_char, var_char-filled-1"
 	    pass $test
     }
@@ -69,7 +69,7 @@ gdb_test_multiple "print var_char" $test {
 }
 set test "ptype var_char, var_char-filled-1"
 gdb_test_multiple "ptype var_char" $test {
-    -re "type = PTR TO -> \\( character\\*3\\)\r\n$gdb_prompt $" {
+    -re "type = PTR TO -> \\( character\\*3 \\)\r\n$gdb_prompt $" {
 	    pass $test
     }
     -re "type = character\\*3\r\n$gdb_prompt $" {
@@ -84,7 +84,7 @@ gdb_breakpoint [gdb_get_line_number "var_char-filled-2"]
 gdb_continue_to_breakpoint "var_char-filled-2"
 set test "print var_char, var_char-filled-2"
 gdb_test_multiple "print var_char" $test {
-    -re "= \\(PTR TO -> \\( character\\*6\\)\\) $hex\r\n$gdb_prompt $" {
+    -re "= \\(PTR TO -> \\( character\\*6 \\)\\) $hex\r\n$gdb_prompt $" {
         gdb_test "print *var_char" "= 'foobar'" "print *var_char, var_char-filled-2"
 	    pass $test
     }
@@ -94,7 +94,7 @@ gdb_test_multiple "print var_char" $test {
 }
 set test "ptype var_char, var_char-filled-2"
 gdb_test_multiple "ptype var_char" $test {
-    -re "type = PTR TO -> \\( character\\*6\\)\r\n$gdb_prompt $" {
+    -re "type = PTR TO -> \\( character\\*6 \\)\r\n$gdb_prompt $" {
 	    pass $test
     }
     -re "type = character\\*6\r\n$gdb_prompt $" {

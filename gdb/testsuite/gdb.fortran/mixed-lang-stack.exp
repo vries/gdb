@@ -54,6 +54,7 @@ proc run_tests { lang } {
 	if { $lang == "c" || $lang == "c++" } {
 	    gdb_test "set language c" \
 		"Warning: the current language does not match this frame."
+	    setup_kfail *-*-* bsc#1178580
 	} else {
 	    gdb_test_no_output "set language $lang"
 	}
@@ -155,6 +156,10 @@ proc run_tests { lang } {
 			      "e = ${e_pattern}" \
 			      "g = ${g_pattern}" \
 			      "_e = 6" ]
+
+	if { $lang == "c" || $lang == "c++" } {
+	    setup_kfail *-*-* bsc#1178580
+	}
 
 	gdb_test "info args" $args_pattern \
 	    "info args in frame #7"
