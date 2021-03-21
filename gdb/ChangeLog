@@ -1,3 +1,8 @@
+2021-05-24  Tom Tromey  <tom@tromey.com>
+
+	* dwarf2/index-common.h (dwarf5_djb_hash): Declare.
+	* dwarf2/index-common.c (dwarf5_djb_hash): New overload.
+
 2021-06-13  Tom Tromey  <tom@tromey.com>
 
 	* dwarf2/read.c (process_psymtab_comp_unit_reader)
