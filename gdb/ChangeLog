@@ -1,5 +1,9 @@
 2021-05-24  Tom Tromey  <tom@tromey.com>
 
+	* addrmap.c (addrmap_mutable_find): Implement.
+
+2021-05-24  Tom Tromey  <tom@tromey.com>
+
 	* dwarf2/index-common.h (dwarf5_djb_hash): Declare.
 	* dwarf2/index-common.c (dwarf5_djb_hash): New overload.
 
