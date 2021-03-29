@@ -25,6 +25,7 @@
 #include "dwarf2/comp-unit-head.h"
 #include "dwarf2/cooked-index.h"
 #include "dwarf2/index-cache.h"
+#include "dwarf2/mapped-index.h"
 #include "dwarf2/section.h"
 #include "filename-seen-cache.h"
 #include "gdb_obstack.h"
