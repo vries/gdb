@@ -23,6 +23,12 @@
 #include "debuginfod-support.h"
 #include "gdbsupport/gdb_optional.h"
 
+#define DEBUG_DEBUGINFOD_CLIENT 0
+
+#if DEBUG_DEBUGINFOD_CLIENT
+#include <chrono>
+#endif
+
 #ifndef HAVE_LIBDEBUGINFOD
 scoped_fd
 debuginfod_source_query (const unsigned char *build_id,
@@ -114,6 +120,28 @@ debuginfod_init ()
   return c;
 }
 
+#if DEBUG_DEBUGINFOD_CLIENT
+static void
+print_build_id (FILE *stream, const char *prefix, const unsigned char *build_id,
+		int build_id_len, const char *postfix)
+{
+  if (prefix)
+    fprintf (stream, "%s", prefix);
+  for (int i = 0; i < build_id_len; ++i)
+    fprintf (stream, "%02x", build_id[i]);
+  if (postfix)
+    fprintf (stream, "%s", postfix);
+}
+
+static double
+time_elapsed (std::chrono::time_point<std::chrono::high_resolution_clock> start)
+{
+  auto end = std::chrono::high_resolution_clock::now ();
+  std::chrono::duration<double> diff = end - start;
+  return diff.count ();
+}
+#endif
+
 /* See debuginfod-support.h  */
 
 scoped_fd
@@ -131,14 +159,26 @@ debuginfod_source_query (const unsigned char *build_id,
   if (c == nullptr)
     return scoped_fd (-ENOMEM);
 
+#if DEBUG_DEBUGINFOD_CLIENT
+  fprintf (stderr, "TRYING SOURCE: %s\n", srcpath);
+  print_build_id (stderr, "BUILDID: ", build_id, build_id_len, "\n");
+#endif
+
   user_data data ("source file", srcpath);
 
   debuginfod_set_user_data (c.get (), &data);
+#if DEBUG_DEBUGINFOD_CLIENT
+  auto start = std::chrono::high_resolution_clock::now ();
+#endif
   scoped_fd fd (debuginfod_find_source (c.get (),
 					build_id,
 					build_id_len,
 					srcpath,
 					nullptr));
+#if DEBUG_DEBUGINFOD_CLIENT
+  fprintf (stderr, "TOOK: %f seconds\n", time_elapsed (start));
+  fprintf (stderr, "RESULT fd: %d\n", fd.get ());
+#endif
 
   /* TODO: Add 'set debug debuginfod' command to control when error messages are shown.  */
   if (fd.get () < 0 && fd.get () != -ENOENT)
@@ -172,9 +212,21 @@ debuginfod_debuginfo_query (const unsigned char *build_id,
   char *dname = nullptr;
   user_data data ("separate debug info for", filename);
 
+#if DEBUG_DEBUGINFOD_CLIENT
+  fprintf (stderr, "TRYING DEBUGINFO FOR: %s\n", filename);
+  print_build_id (stderr, "BUILDID: ", build_id, build_id_len, "\n");
+#endif
+
   debuginfod_set_user_data (c.get (), &data);
+#if DEBUG_DEBUGINFOD_CLIENT
+  auto start = std::chrono::high_resolution_clock::now();
+#endif
   scoped_fd fd (debuginfod_find_debuginfo (c.get (), build_id, build_id_len,
 					   &dname));
+#if DEBUG_DEBUGINFOD_CLIENT
+  fprintf (stderr, "TOOK: %f seconds\n", time_elapsed (start));
+  fprintf (stderr, "RESULT fd: %d\n", fd.get ());
+#endif
 
   if (fd.get () < 0 && fd.get () != -ENOENT)
     printf_filtered (_("Download failed: %s.  Continuing without debug info for %ps.\n"),
