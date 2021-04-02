@@ -347,6 +347,8 @@ post_create_inferior (struct target_ops *target, int from_tty)
      if the now pushed target supports hardware watchpoints.  */
   breakpoint_re_set ();
 
+  current_inferior ()->needs_setup = 0;
+
   gdb::observers::inferior_created.notify (target, from_tty);
 }
 
@@ -2414,11 +2416,6 @@ proceed_after_attach (inferior *inf)
 void
 setup_inferior (int from_tty)
 {
-  struct inferior *inferior;
-
-  inferior = current_inferior ();
-  inferior->needs_setup = 0;
-
   /* If no exec file is yet known, try to determine it from the
      process itself.  */
   if (get_exec_file (0) == NULL)

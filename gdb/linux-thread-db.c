@@ -1010,8 +1010,19 @@ try_thread_db_load (const char *library, bool check_auto_load_safe)
   if (strchr (library, '/') != NULL)
     info->filename = gdb_realpath (library).release ();
 
-  if (try_thread_db_load_1 (info))
-    return true;
+  try
+    {
+      if (try_thread_db_load_1 (info))
+	return true;
+    }
+  catch (const gdb_exception &except)
+    {
+      if (libthread_db_debug)
+	{
+	  exception_fprintf (gdb_stdlog, except,
+			     "Warning: try_thread_db_load: ");
+	}
+    }
 
   /* This library "refused" to work on current inferior.  */
   delete_thread_db_info (current_inferior ()->process_target (),
@@ -1182,10 +1193,13 @@ has_libpthread (void)
 static bool
 thread_db_load (void)
 {
-  struct thread_db_info *info;
+  inferior *inf = current_inferior ();
 
-  info = get_thread_db_info (current_inferior ()->process_target (),
-			     inferior_ptid.pid ());
+  if (inf->needs_setup)
+    return false;
+
+  thread_db_info *info = get_thread_db_info (inf->process_target (),
+					     inferior_ptid.pid ());
 
   if (info != NULL)
     return true;
