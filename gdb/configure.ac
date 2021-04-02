@@ -927,6 +927,14 @@ else
   fi
 fi
 
+if test "${GCC}" = yes; then
+  # G++ drops -lc, so wrap it using -Wl.  See PR gcc/99896.
+  GCC_LIBC="-Wl,-lc"
+  AC_SUBST(LIBC, $GCC_LIBC)
+else
+  AC_SUBST(LIBC, -lc)
+fi
+
 dnl Use --with-python-libdir to control where GDB looks for the Python
 dnl libraries.
 dnl

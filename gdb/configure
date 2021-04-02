@@ -728,6 +728,7 @@ HAVE_PYTHON_TRUE
 PYTHON_LIBS
 PYTHON_CPPFLAGS
 PYTHON_CFLAGS
+LIBC
 python_prog_path
 LTLIBMPFR
 LIBMPFR
@@ -11348,6 +11349,16 @@ _ACEOF
 
     fi
   fi
+fi
+
+if test "${GCC}" = yes; then
+  # G++ drops -lc, so wrap it using -Wl.  See PR gcc/99896.
+  GCC_LIBC="-Wl,-lc"
+  LIBC=$GCC_LIBC
+
+else
+  LIBC=-lc
+
 fi
 
 

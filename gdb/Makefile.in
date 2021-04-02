@@ -631,11 +631,12 @@ INTERNAL_LDFLAGS = \
 
 # Libraries and corresponding dependencies for compiling gdb.
 # XM_CLIBS, defined in *config files, have host-dependent libs.
-# LIBIBERTY appears twice on purpose.
+# LIBIBERTY appears twice on purpose.  LIBC is added before
+# LIBS to ensure that all functions in gdb_regex.c bind to libc.
 CLIBS = $(SIM) $(READLINE) $(OPCODES) $(LIBCTF) $(BFD) $(ZLIB) \
         $(LIBSUPPORT) $(INTL) $(LIBIBERTY) $(LIBDECNUMBER) \
 	$(XM_CLIBS) $(GDBTKLIBS) \
-	@LIBS@ @GUILE_LIBS@ @PYTHON_LIBS@ \
+	@LIBC@ @LIBS@ @GUILE_LIBS@ @PYTHON_LIBS@ \
 	$(LIBEXPAT) $(LIBLZMA) $(LIBBABELTRACE) $(LIBIPT) \
 	$(WIN32LIBS) $(LIBGNU) $(LIBGNU_EXTRA_LIBS) $(LIBICONV) \
 	$(LIBMPFR) $(LIBGMP) $(SRCHIGH_LIBS) $(LIBXXHASH) $(PTHREAD_LIBS) \
