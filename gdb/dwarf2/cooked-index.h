@@ -157,6 +157,8 @@ struct cooked_index_entry : public allocate_on_obstack
   cooked_index_entry *next;
 };
 
+class cooked_index_vector;
+
 /* An index of interesting DIEs.  This is "cooked", in contrast to a
    mapped .debug_names or .gdb_index, which are "raw".  An entry in
    the index is of type cooked_index_entry.
@@ -164,10 +166,11 @@ struct cooked_index_entry : public allocate_on_obstack
    Operations on the index are described below.  They are chosen to
    make it relatively simple to implement the symtab "quick"
    methods.  */
+
 class cooked_index
 {
 public:
-  cooked_index ();
+  cooked_index () = default;
   explicit cooked_index (cooked_index &&other) = default;
   DISABLE_COPY_AND_ASSIGN (cooked_index);
   cooked_index &operator= (cooked_index &&other) = default;
@@ -180,13 +183,16 @@ public:
 				 const cooked_index_entry *parent_entry,
 				 dwarf2_per_cu_data *per_cu);
 
-  /* Look up an entry by name.  */
-  const cooked_index_entry *find (gdb::string_view name)
+  /* Install a new fixed addrmap from the given mutable addrmap.  */
+  void install_addrmap (addrmap *map)
   {
-    uint32_t hashval = dwarf5_djb_hash (name);
-    return (const cooked_index_entry *) htab_find_with_hash (m_hash.get (),
-							     &name, hashval);
+    gdb_assert (m_addrmap == nullptr);
+    m_addrmap = addrmap_create_fixed (map, &m_storage);
   }
+
+  friend class cooked_index_vector;
+
+private:
 
   /* Return the entry that is believed to represent the program's
      "main".  This will return NULL if no such entry is available.  */
@@ -195,37 +201,20 @@ public:
     return m_main;
   }
 
-  /* Traverse all entries in the hash table, calling CALLBACK for
-     each.  When CALLBACK returns false, iteration stops.  */
-  void traverse
-       (gdb::function_view<bool (const cooked_index_entry *)> callback);
-
-  /* Install a new fixed addrmap from the given mutable addrmap.  */
-  void install_addrmap (addrmap *map)
+  /* Return the linked list of entries.  This is only called during
+     "finalization" setup, by cooked_index_vector.  */
+  cooked_index_entry *get_entries ()
   {
-    gdb_assert (m_addrmap == nullptr);
-    m_addrmap = addrmap_create_fixed (map, &m_storage);
+    cooked_index_entry *result = m_start;
+    /* We don't need this any more, so make sure it is unusable.  */
+    m_start = nullptr;
+    return result;
   }
 
   dwarf2_per_cu_data *lookup (CORE_ADDR addr)
   {
     return (dwarf2_per_cu_data *) addrmap_find (m_addrmap, addr);
   }
-
-  /* Finalize the index.  This should be called a single time, when
-     the index has been fully populated.  It enters all the entries
-     into the internal hash table.  */
-  void finalize ();
-
-private:
-
-  /* GNAT only emits mangled ("encoded") names in the DWARF, and does
-     not emit the module structure.  However, we need this structure
-     to do lookups.  This function recreates that structure for an
-     existing returns the base name (last element) of the full decoded
-     name.  */
-  gdb::unique_xmalloc_ptr<char> handle_gnat_encoded_entry
-       (cooked_index_entry *entry);
 
   /* Create a new cooked_index_entry and register it with this object.
      Entries are owned by this object.  The new item is returned.  */
@@ -251,13 +240,70 @@ private:
      entered into the hash table, at which point this is no longer
      used.  */
   cooked_index_entry *m_start = nullptr;
-  /* Storage for canonical names.  */
-  std::vector<gdb::unique_xmalloc_ptr<char>> m_names;
-  /* Hash table of entries.  */
-  htab_up m_hash;
   /* The addrmap.  This maps address ranges to dwarf2_per_cu_data
      objects.  */
   addrmap *m_addrmap = nullptr;
+};
+
+/* The main index of DIEs.  The parallel DIE indexers create
+   cooked_index objects.  Then, these are all handled to a
+   cooked_index_vector for storage and final indexing.  The index is
+   made by iterating over the entries previously created.  */
+
+class cooked_index_vector
+{
+public:
+
+  /* A convenience typedef for the vector that is contained in this
+     object.  */
+  typedef std::vector<std::unique_ptr<cooked_index>> vec_type;
+
+  explicit cooked_index_vector (vec_type &&vec);
+  DISABLE_COPY_AND_ASSIGN (cooked_index_vector);
+
+  /* Look up an entry by name.  */
+  const cooked_index_entry *find (gdb::string_view name)
+  {
+    uint32_t hashval = dwarf5_djb_hash (name);
+    void *slot = htab_find_with_hash (m_hash.get (), &name, hashval);
+    return (const cooked_index_entry *) slot;
+  }
+
+  /* Traverse all entries in the hash table, calling CALLBACK for
+     each.  When CALLBACK returns false, iteration stops.  */
+  void traverse
+       (gdb::function_view<bool (const cooked_index_entry *)> callback);
+
+  dwarf2_per_cu_data *lookup (CORE_ADDR addr);
+
+  /* Return the entry that is believed to represent the program's
+     "main".  This will return NULL if no such entry is available.  */
+  const cooked_index_entry *get_main () const;
+
+private:
+
+  /* GNAT only emits mangled ("encoded") names in the DWARF, and does
+     not emit the module structure.  However, we need this structure
+     to do lookups.  This function recreates that structure for an
+     existing returns the base name (last element) of the full decoded
+     name.  */
+  gdb::unique_xmalloc_ptr<char> handle_gnat_encoded_entry
+       (cooked_index_entry *entry);
+
+  /* Finalize the index.  This should be called a single time, when
+     the index has been fully populated.  It enters all the entries
+     into the internal hash table.  */
+  void finalize ();
+
+  /* The vector of cooked_index objects.  This is stored because the
+     entries are stored on the obstacks in those objects.  */
+  vec_type m_vector;
+
+  /* Hash table of entries.  */
+  htab_up m_hash;
+
+  /* Storage for canonical names.  */
+  std::vector<gdb::unique_xmalloc_ptr<char>> m_names;
 };
 
 #endif /* GDB_DWARF2_COOKED_INDEX_H */

@@ -46,14 +46,6 @@ eq_entry (const void *a, const void *b)
 
 /* See cooked-index.h.  */
 
-cooked_index::cooked_index ()
-  : m_hash (htab_create_alloc (10, hash_entry, eq_entry, nullptr,
-			       xcalloc, xfree))
-{
-}
-
-/* See cooked-index.h.  */
-
 const cooked_index_entry *
 cooked_index::add (sect_offset die_offset, enum dwarf_tag tag,
 		   cooked_index_flag flags, const char *name,
@@ -90,10 +82,16 @@ htab_traverse_noresize (htab_t tab, T callback)
   htab_traverse_noresize (tab, trampoline, &callback);
 }
 
-/* See cooked-index.h.  */
+cooked_index_vector::cooked_index_vector (vec_type &&vec)
+  : m_vector (std::move (vec)),
+    m_hash (htab_create_alloc (10, hash_entry, eq_entry, nullptr,
+			       xcalloc, xfree))
+{
+  finalize ();
+}
 
 void
-cooked_index::traverse
+cooked_index_vector::traverse
      (gdb::function_view<bool (const cooked_index_entry *)> callback)
 {
   htab_traverse_noresize (m_hash.get (), callback);
@@ -101,8 +99,22 @@ cooked_index::traverse
 
 /* See cooked-index.h.  */
 
+dwarf2_per_cu_data *
+cooked_index_vector::lookup (CORE_ADDR addr)
+{
+  for (const auto &index : m_vector)
+    {
+      dwarf2_per_cu_data *result = index->lookup (addr);
+      if (result != nullptr)
+	return result;
+    }
+  return nullptr;
+}
+
+/* See cooked-index.h.  */
+
 gdb::unique_xmalloc_ptr<char>
-cooked_index::handle_gnat_encoded_entry (cooked_index_entry *entry)
+cooked_index_vector::handle_gnat_encoded_entry (cooked_index_entry *entry)
 {
   std::string canonical = ada_decode (entry->name, false);
   if (canonical.empty ())
@@ -126,9 +138,11 @@ cooked_index::handle_gnat_encoded_entry (cooked_index_entry *entry)
 	{
 	  gdb::unique_xmalloc_ptr<char> new_name
 	    = make_unique_xstrndup (name.data (), name.length ());
-	  last = add (entry->die_offset, DW_TAG_namespace,
-		      0, new_name.get (), parent,
-		      entry->per_cu, last);
+	  /* It doesn't matter which obstack we allocate this on, so
+	     we pick the most convenient one.  */
+	  last = m_vector[0]->add (entry->die_offset, DW_TAG_namespace,
+				   0, new_name.get (), parent,
+				   entry->per_cu, last);
 	  last->canonical = last->name;
 	  m_names.push_back (std::move (new_name));
 	  *slot = last;
@@ -143,8 +157,28 @@ cooked_index::handle_gnat_encoded_entry (cooked_index_entry *entry)
 
 /* See cooked-index.h.  */
 
+const cooked_index_entry *
+cooked_index_vector::get_main () const
+{
+  const cooked_index_entry *result = nullptr;
+
+  for (const auto &index : m_vector)
+    {
+      const cooked_index_entry *entry = index->get_main ();
+      if (result == nullptr
+	  || ((result->flags & IS_MAIN) == 0
+	      && entry != nullptr
+	      && (entry->flags & IS_MAIN) != 0))
+	result = entry;
+    }
+
+  return result;
+}
+
+/* See cooked-index.h.  */
+
 void
-cooked_index::finalize ()
+cooked_index_vector::finalize ()
 {
   auto hash_name_ptr = [] (const void *p)
     {
@@ -166,12 +200,14 @@ cooked_index::finalize ()
   htab_up seen_names (htab_create_alloc (10, hash_name_ptr, eq_name_ptr,
 					 nullptr, xcalloc, xfree));
 
-
-  cooked_index_entry *next = nullptr;
-  for (cooked_index_entry *entry = m_start; entry != nullptr; entry = next)
+  for (auto &index : m_vector)
     {
-      /* The 'next' field is updated at the end of the loop, so
-	 preserve it here for the next iteration.  */
+      cooked_index_entry *entry = index->get_entries ();
+      cooked_index_entry *next = nullptr;
+      for (; entry != nullptr; entry = next)
+	{
+	  /* The 'next' field is updated at the end of the loop, so
+	     preserve it here for the next iteration.  */
 	  next = entry->next;
 
 	  gdb_assert (entry->canonical == nullptr);
@@ -189,10 +225,10 @@ cooked_index::finalize ()
 		  if (canon_name == nullptr)
 		    entry->canonical = entry->name;
 		  else
-		{
-		  entry->canonical = canon_name.get ();
-		  m_names.push_back (std::move (canon_name));
-		}
+		    {
+		      entry->canonical = canon_name.get ();
+		      m_names.push_back (std::move (canon_name));
+		    }
 		}
 	      else
 		{
@@ -219,15 +255,13 @@ cooked_index::finalize ()
 		}
 	    }
 
-      gdb_assert (entry->canonical != nullptr);
-      gdb::string_view lookup_name (entry->canonical);
-      uint32_t hashval = dwarf5_djb_hash (lookup_name);
-      void **slot = htab_find_slot_with_hash (m_hash.get (), &lookup_name,
-					      hashval, INSERT);
-      entry->next = (cooked_index_entry *) *slot;
-      *slot = entry;
+	  gdb_assert (entry->canonical != nullptr);
+	  gdb::string_view lookup_name (entry->canonical);
+	  uint32_t hashval = dwarf5_djb_hash (lookup_name);
+	  void **slot = htab_find_slot_with_hash (m_hash.get (), &lookup_name,
+						  hashval, INSERT);
+	  entry->next = (cooked_index_entry *) *slot;
+	  *slot = entry;
+	}
     }
-
-  /* We don't need this any more, so make sure it is unusable.  */
-  m_start = nullptr;
 }
