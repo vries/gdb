@@ -107,11 +107,20 @@ proc test {condition_eval target_non_stop non_stop displaced} {
 	    gdb_test "inferior 1" "Switching to .*"
 
 	    set attached 0
+	    set saw_attaching 0
 	    set eperm 0
 	    set test "attach"
 	    gdb_test_multiple "attach $testpid" $test {
+		-re "Attaching to program.*process $testpid\r\n" {
+		    set saw_attaching 1
+		    exp_continue
+		}
 		-re "new threads in iteration" {
 		    # Seen when "set debug libthread_db" is on.
+		    exp_continue
+		}
+		-re "Reading symbols from|Expanding full symbols from" {
+		    # Prevent -readnow timeout.
 		    exp_continue
 		}
 		-re "is a zombie - the process has already terminated.*$gdb_prompt " {
@@ -120,9 +129,13 @@ proc test {condition_eval target_non_stop non_stop displaced} {
 		-re "Unable to attach: .*$gdb_prompt " {
 		    fail $gdb_test_name
 		}
-		-re "Attaching to program.*process $testpid.*$gdb_prompt " {
-		    pass $test
-		    set attached 1
+		-re -wrap "" {
+		    if { $saw_attaching } {
+			set attached 1
+			pass $test
+		    } else {
+			fail $test
+		    }
 		}
 	    }
 
