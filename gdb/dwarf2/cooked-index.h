@@ -29,6 +29,7 @@
 #include "quick-symbol.h"
 #include "gdb_obstack.h"
 #include "addrmap.h"
+#include "gdbsupport/thread-pool.h"
 
 struct dwarf2_per_cu_data;
 
@@ -261,9 +262,21 @@ public:
   explicit cooked_index_vector (vec_type &&vec);
   DISABLE_COPY_AND_ASSIGN (cooked_index_vector);
 
+  ~cooked_index_vector ()
+  {
+    /* The 'finalize' method may be run in a different thread.  If
+       this object is destroyed before this completes, then the method
+       will end up writing to freed memory.  Waiting for this to
+       complete avoids this problem; and the cost seems ignorable
+       because creating and immediately destroying the debug info is a
+       relatively rare thing to do.  */
+    m_future.wait ();
+  }
+
   /* Look up an entry by name.  */
   const cooked_index_entry *find (gdb::string_view name)
   {
+    m_future.wait ();
     uint32_t hashval = dwarf5_djb_hash (name);
     void *slot = htab_find_with_hash (m_hash.get (), &name, hashval);
     return (const cooked_index_entry *) slot;
@@ -304,6 +317,11 @@ private:
 
   /* Storage for canonical names.  */
   std::vector<gdb::unique_xmalloc_ptr<char>> m_names;
+
+  /* A future that tracks when the 'finalize' method is done.  Note
+     that the 'get' method is never called on this future, only
+     'wait'.  */
+  std::future<void> m_future;
 };
 
 #endif /* GDB_DWARF2_COOKED_INDEX_H */

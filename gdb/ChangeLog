@@ -1,3 +1,13 @@
+2021-05-24  Tom Tromey  <tom@tromey.com>
+
+	* dwarf2/cooked-index.h (~cooked_index_vector): New.
+	(cooked_index_vector::find): Wait for m_future.
+	(cooked_index_vector::m_future): New member.
+	* dwarf2/cooked-index.c
+	(cooked_index_vector::cooked_index_vector): Initialize m_future.
+	Call finalize in background.
+	(cooked_index_vector::traverse): Wait for m_future.
+
 2021-05-31  Tom Tromey  <tom@tromey.com>
 
 	* dwarf2/cooked-index.h: New file.

@@ -85,15 +85,20 @@ htab_traverse_noresize (htab_t tab, T callback)
 cooked_index_vector::cooked_index_vector (vec_type &&vec)
   : m_vector (std::move (vec)),
     m_hash (htab_create_alloc (10, hash_entry, eq_entry, nullptr,
-			       xcalloc, xfree))
+			       xcalloc, xfree)),
+    m_future (gdb::thread_pool::g_thread_pool->post_task
+	      ([this] ()
+	      {
+		finalize ();
+	      }))
 {
-  finalize ();
 }
 
 void
 cooked_index_vector::traverse
      (gdb::function_view<bool (const cooked_index_entry *)> callback)
 {
+  m_future.wait ();
   htab_traverse_noresize (m_hash.get (), callback);
 }
 
