@@ -89,6 +89,8 @@
 #include "gdbsupport/pathstuff.h"
 #include "count-one-bits.h"
 #include <unordered_set>
+#include "dwarf2/abbrev-cache.h"
+#include "cooked-index.h"
 
 /* When == 1, print basic high level tracing messages.
    When > 1, be more verbose.
@@ -807,6 +809,16 @@ public:
   /* Release the new CU, putting it on the chain.  This cannot be done
      for dummy CUs.  */
   void keep ();
+
+  std::unique_ptr<dwarf2_cu> release_cu ()
+  {
+    return std::move (m_new_cu);
+  }
+
+  abbrev_table_up release_abbrev_table ()
+  {
+    return std::move (m_abbrev_table_holder);
+  }
 
 private:
   void init_tu_and_read_dwo_dies (dwarf2_per_cu_data *this_cu,
@@ -6865,6 +6877,201 @@ create_partial_symtab (dwarf2_per_cu_data *per_cu,
 
   return pst;
 }
+
+
+/* An instance of this is created when scanning DWARF to create a
+   cooked index.  */
+
+class cooked_index_storage
+{
+public:
+
+  cooked_index_storage ()
+    : m_reader_hash (htab_create_alloc (10, hash_reader_and_cu,
+					eq_reader_and_cu,
+					htab_delete_entry<reader_and_cu>,
+					xcalloc, xfree)),
+      m_index (new cooked_index),
+      m_addrmap_storage (),
+      m_addrmap (addrmap_create_mutable (&m_addrmap_storage))
+  {
+  }
+
+  DISABLE_COPY_AND_ASSIGN (cooked_index_storage);
+
+  /* Return the current abbrev cache.  */
+  abbrev_cache *get_abbrev_cache ()
+  {
+    return &m_abbrev_cache;
+  }
+
+  /* Return the DIE reader corresponding to PER_CU.  If no such reader
+     has been registered, return NULL.  */
+  die_reader_specs *get_reader (dwarf2_per_cu_data *per_cu)
+  {
+    int index = per_cu->index;
+    reader_and_cu *rcu
+      = (reader_and_cu *) htab_find_with_hash (m_reader_hash.get (),
+					       &index,
+					       index);
+    if (rcu == nullptr)
+      return nullptr;
+    return rcu->reader.get ();
+  }
+
+  die_reader_specs *preserve (cutu_reader &reader)
+  {
+    std::unique_ptr<reader_and_cu> rcu (new reader_and_cu);
+    rcu->reader.reset (new die_reader_specs (reader));
+    die_reader_specs *result = rcu->reader.get ();
+    rcu->cu = reader.release_cu ();
+
+    int index = rcu->cu->per_cu->index;
+    void **slot = htab_find_slot_with_hash (m_reader_hash.get (), &index,
+					    index, INSERT);
+    gdb_assert (*slot == nullptr);
+    *slot = rcu.release ();
+
+    m_abbrev_cache.add (reader.release_abbrev_table ());
+
+    return result;
+  }
+
+  const cooked_index_entry *add (sect_offset die_offset, enum dwarf_tag tag,
+				 cooked_index_flag flags,
+				 const char *name,
+				 const cooked_index_entry *parent_entry,
+				 dwarf2_per_cu_data *per_cu)
+  {
+    return m_index->add (die_offset, tag, flags, name, parent_entry, per_cu);
+  }
+
+  std::unique_ptr<cooked_index> release ()
+  {
+    m_index->install_addrmap (m_addrmap);
+    return std::move (m_index);
+  }
+
+  /* Return the mutable addrmap that is currently being created.  */
+  addrmap *get_addrmap ()
+  {
+    return m_addrmap;
+  }
+
+private:
+
+  struct reader_and_cu
+  {
+    std::unique_ptr<die_reader_specs> reader;
+    std::unique_ptr<dwarf2_cu> cu;
+  };
+
+  static hashval_t hash_reader_and_cu (const void *a)
+  {
+    const reader_and_cu *reader = (const reader_and_cu *) a;
+    return reader->cu->per_cu->index;
+  }
+
+  static int eq_reader_and_cu (const void *a, const void *b)
+  {
+    const reader_and_cu *ra = (const reader_and_cu *) a;
+    const int *rb = (const int *) b;
+    return ra->cu->per_cu->index == *rb;
+  }
+
+  abbrev_cache m_abbrev_cache;
+  htab_up m_reader_hash;
+  std::unique_ptr<cooked_index> m_index;
+
+  auto_obstack m_addrmap_storage;
+  addrmap *m_addrmap;
+};
+
+class cooked_indexer
+{
+public:
+
+  cooked_indexer (cooked_index_storage *storage,
+		  dwarf2_per_cu_data *per_cu,
+		  enum language language)
+    : m_index_storage (storage),
+      m_per_cu (per_cu),
+      m_language (language),
+      m_obstack (),
+      m_addrmap (addrmap_create_mutable (&m_obstack))
+  {
+  }
+
+  DISABLE_COPY_AND_ASSIGN (cooked_indexer);
+
+  void make_index (die_info *comp_unit_die,
+		   const struct die_reader_specs *reader,
+		   const gdb_byte *info_ptr);
+
+private:
+
+  CORE_ADDR form_addr (sect_offset offset, bool is_dwz)
+  {
+    CORE_ADDR value = to_underlying (offset);
+    if (is_dwz)
+      value |= ((CORE_ADDR) 1) << (8 * sizeof (CORE_ADDR) - 1);
+    return value;
+  }
+
+  void check_bounds (die_info *comp_unit_die, dwarf2_cu *cu);
+
+  const die_reader_specs *ensure_cu_exists (const die_reader_specs *reader,
+					    dwarf2_per_objfile *per_objfile,
+					    sect_offset sect_off,
+					    bool is_dwz,
+					    const gdb_byte **info_ptr_result);
+
+  const gdb_byte *index_dies (const struct die_reader_specs *reader,
+			      const gdb_byte *info_ptr,
+			      const cooked_index_entry *parent_entry);
+
+  const gdb_byte *scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
+				   const struct die_reader_specs *reader,
+				   const gdb_byte *watermark_ptr,
+				   const gdb_byte *info_ptr,
+				   const abbrev_info *abbrev,
+				   const char **name,
+				   const char **linkage_name,
+				   cooked_index_flag *flags,
+				   sect_offset *sibling_offset,
+				   const cooked_index_entry **parent_entry,
+				   CORE_ADDR *maybe_defer,
+				   bool for_specification);
+
+  const gdb_byte *index_imported_unit (const struct die_reader_specs *reader,
+				       const gdb_byte *info_ptr,
+				       const abbrev_info *abbrev);
+
+  const gdb_byte *recurse (const struct die_reader_specs *reader,
+			   const gdb_byte *info_ptr,
+			   const cooked_index_entry *parent_entry);
+
+  cooked_index_storage *m_index_storage;
+  // FIXME document the special meaning of this
+  dwarf2_per_cu_data *m_per_cu;
+  enum language m_language;
+
+  auto_obstack m_obstack;
+  addrmap *m_addrmap;
+
+  struct deferred_entry
+  {
+    sect_offset die_offset;
+    const char *name;
+    CORE_ADDR spec_offset;
+    dwarf_tag tag;
+    cooked_index_flag flags;
+  };
+
+  std::vector<deferred_entry> m_deferred_entries;
+};
+
+
 
 /* DIE reader function for process_psymtab_comp_unit.  */
 
@@ -18807,6 +19014,572 @@ read_full_die (const struct die_reader_specs *reader,
   return result;
 }
 
+
+void
+cooked_indexer::check_bounds (die_info *comp_unit_die, dwarf2_cu *cu)
+{
+  if (cu->per_cu->addresses_seen)
+    return;
+
+  CORE_ADDR best_lowpc = 0, best_highpc = 0;
+  /* Possibly set the default values of LOWPC and HIGHPC from
+     `DW_AT_ranges'.  */
+  enum pc_bounds_kind cu_bounds_kind
+    = dwarf2_get_pc_bounds (comp_unit_die, &best_lowpc, &best_highpc,
+			    cu, m_addrmap, this);
+  if (cu_bounds_kind == PC_BOUNDS_HIGH_LOW && best_lowpc < best_highpc)
+    {
+      struct objfile *objfile = cu->per_objfile->objfile;
+      CORE_ADDR baseaddr = objfile->text_section_offset ();
+      struct gdbarch *gdbarch = objfile->arch ();
+      CORE_ADDR low
+	= (gdbarch_adjust_dwarf2_addr (gdbarch, best_lowpc + baseaddr)
+	   - baseaddr);
+      CORE_ADDR high
+	= (gdbarch_adjust_dwarf2_addr (gdbarch, best_highpc + baseaddr)
+	   - baseaddr - 1);
+      /* Store the contiguous range if it is not empty; it can be
+	 empty for CUs with no code.  */
+      addrmap_set_empty (m_addrmap, low, high, cu->per_cu);
+
+      cu->per_cu->addresses_seen = true;
+    }
+}
+
+static bool
+tag_can_have_linkage_name (enum dwarf_tag tag)
+{
+  switch (tag)
+    {
+      // the types are only here due to that GCC PR.
+    case DW_TAG_class_type:
+    case DW_TAG_structure_type:
+    case DW_TAG_union_type:
+    case DW_TAG_variable:
+    case DW_TAG_subprogram:
+      // FIXME constant?
+      return true;
+
+    default:
+      return false;
+    }
+}
+
+const die_reader_specs *
+cooked_indexer::ensure_cu_exists (const die_reader_specs *reader,
+				  dwarf2_per_objfile *per_objfile,
+				  sect_offset sect_off, bool is_dwz,
+				  const gdb_byte **info_ptr_result)
+{
+  /* Lookups for type unit references are always in the CU, and
+     cross-CU references will crash.  */
+  if (reader->cu->per_cu->is_dwz == is_dwz
+      && reader->cu->header.offset_in_cu_p (sect_off))
+    return reader;
+
+  dwarf2_per_cu_data *per_cu
+    = dwarf2_find_containing_comp_unit (sect_off, is_dwz, per_objfile);
+
+  /* When scanning, we only want to visit a given CU a single time.
+     Doing this check here avoids self-imports as well.  */
+  if (info_ptr_result != nullptr)
+    {
+      if (per_cu->scanned)
+	return nullptr;
+      per_cu->scanned = true;
+    }
+  if (per_cu == m_per_cu)
+    return reader;
+
+  // FIXME Really we ought to get rid of the need for a CU entirely.
+  die_reader_specs *result = m_index_storage->get_reader (per_cu);
+  gdb_assert (info_ptr_result == nullptr || result == nullptr);
+  if (result == nullptr)
+    {
+      cutu_reader new_reader (per_cu, per_objfile, nullptr, nullptr, false);
+
+      // FIXME we should probably set this on the per-cu so it is
+      // cached.  just entering into the cooked_index_storage would
+      // also be ok.
+      if (new_reader.dummy_p)
+	return nullptr;
+
+      prepare_one_comp_unit (new_reader.cu, new_reader.comp_unit_die,
+			     language_minimal);
+      if (new_reader.comp_unit_die->has_children)
+	result = m_index_storage->preserve (new_reader);
+
+      if (info_ptr_result != nullptr)
+	{
+	  check_bounds (new_reader.comp_unit_die, new_reader.cu);
+	  *info_ptr_result = new_reader.info_ptr;
+	}
+    }
+
+  return result;
+}
+
+const gdb_byte *
+cooked_indexer::scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
+				 const struct die_reader_specs *reader,
+				 const gdb_byte *watermark_ptr,
+				 const gdb_byte *info_ptr,
+				 const abbrev_info *abbrev,
+				 const char **name,
+				 const char **linkage_name,
+				 cooked_index_flag *flags,
+				 sect_offset *sibling_offset,
+				 const cooked_index_entry **parent_entry,
+				 CORE_ADDR *maybe_defer,
+				 bool for_specification)
+{
+  bool origin_is_dwz = false;
+  bool is_declaration = false;
+  sect_offset origin_offset {};
+
+  gdb::optional<CORE_ADDR> low_pc;
+  gdb::optional<CORE_ADDR> high_pc;
+  bool high_pc_relative = false;
+
+  for (int i = 0; i < abbrev->num_attrs; ++i)
+    {
+      attribute attr;
+      info_ptr = read_attribute (reader, &attr, &abbrev->attrs[i], info_ptr);
+      if (attr.requires_reprocessing_p ())
+	read_attribute_reprocess (reader, &attr, abbrev->tag);
+
+      /* Store the data if it is of an attribute we want to keep in a
+	 partial symbol table.  */
+      switch (attr.name)
+	{
+	case DW_AT_name:
+	  switch (abbrev->tag)
+	    {
+	    case DW_TAG_compile_unit:
+	    case DW_TAG_partial_unit:
+	    case DW_TAG_type_unit:
+	      /* Compilation units have a DW_AT_name that is a filename, not
+		 a source language identifier.  */
+	      break;
+
+	    default:
+	      if (*name == nullptr)
+		*name = attr.as_string ();
+	      break;
+	    }
+	  break;
+
+	case DW_AT_linkage_name:
+	case DW_AT_MIPS_linkage_name:
+	  /* Note that both forms of linkage name might appear.  We
+	     assume they will be the same, and we only store the last
+	     one we see.  */
+	  if (*linkage_name == nullptr)
+	    *linkage_name = attr.as_string ();
+	  break;
+
+	case DW_AT_main_subprogram:
+	  if (attr.as_boolean ())
+	    *flags |= IS_MAIN;
+	  break;
+
+	case DW_AT_declaration:
+	  is_declaration = attr.as_boolean ();
+	  break;
+
+	case DW_AT_sibling:
+	  if (sibling_offset != nullptr)
+	    *sibling_offset = attr.get_ref_die_offset ();
+	  break;
+
+	case DW_AT_specification:
+	case DW_AT_abstract_origin:
+	case DW_AT_extension:
+	  origin_offset = attr.get_ref_die_offset ();
+	  origin_is_dwz = attr.form == DW_FORM_GNU_ref_alt;
+	  break;
+
+	case DW_AT_external:
+	  if (!attr.as_boolean ())
+	    *flags |= IS_STATIC;
+	  break;
+
+	case DW_AT_enum_class:
+	  if (attr.as_boolean ())
+	    *flags |= IS_ENUM_CLASS;
+	  break;
+
+	case DW_AT_low_pc:
+	  low_pc = attr.as_address ();
+	  break;
+
+	case DW_AT_high_pc:
+	  high_pc = attr.as_address ();
+	  if (reader->cu->header.version >= 4 && attr.form_is_constant ())
+	    high_pc_relative = true;
+	  break;
+
+	case DW_AT_location:
+	  if (!scanning_per_cu->addresses_seen && attr.form_is_block ())
+	    {
+	      struct dwarf_block *locdesc = attr.as_block ();
+	      CORE_ADDR addr = decode_locdesc (locdesc, reader->cu);
+	      if (addr != 0
+		  || reader->cu->per_objfile->per_bfd->has_section_at_zero)
+		{
+		  low_pc = addr;
+		  /* For variables, we don't want to try decoding the
+		     type just to find the size -- for gdb's purposes
+		     we only need the address of a variable.  */
+		  high_pc = addr + 1;
+		  high_pc_relative = false;
+		}
+	    }
+	  break;
+
+	case DW_AT_ranges:
+	  if (!scanning_per_cu->addresses_seen)
+	    {
+	      /* Offset in the .debug_ranges or .debug_rnglist section
+		 (depending on DWARF version).  */
+	      ULONGEST ranges_offset = attr.as_unsigned ();
+
+	      /* See dwarf2_cu::gnu_ranges_base's doc for why we might
+		 want to add this value.  */
+	      ranges_offset += reader->cu->gnu_ranges_base;
+
+	      CORE_ADDR lowpc, highpc;
+	      dwarf2_ranges_read (ranges_offset, &lowpc, &highpc, reader->cu,
+				  m_addrmap, scanning_per_cu, abbrev->tag);
+	    }
+	  break;
+	}
+    }
+
+  /* We don't want to examine declarations, but if we found a
+     declaration when handling DW_AT_specification or the like, then
+     that is ok.  */
+  if (is_declaration && !for_specification)
+    {
+      *linkage_name = nullptr;
+      *name = nullptr;
+    }
+  else if ((*name == nullptr
+	    || (*linkage_name == nullptr
+		&& tag_can_have_linkage_name (abbrev->tag))
+	    || (*parent_entry == nullptr && m_language != language_c))
+	   && origin_offset != sect_offset (0))
+    {
+      const die_reader_specs *new_reader
+	= ensure_cu_exists (reader, reader->cu->per_objfile, origin_offset,
+			    origin_is_dwz, nullptr);
+      if (new_reader != nullptr)
+	{
+	  const gdb_byte *new_info_ptr = (new_reader->buffer
+					  + to_underlying (origin_offset));
+
+	  if (new_reader->cu == reader->cu
+	      && new_info_ptr > watermark_ptr
+	      && maybe_defer != nullptr
+	      && *parent_entry == nullptr)
+	    *maybe_defer = form_addr (origin_offset, origin_is_dwz);
+	  else if (*parent_entry == nullptr)
+	    {
+	      CORE_ADDR lookup = form_addr (origin_offset, origin_is_dwz);
+	      *parent_entry
+		= (cooked_index_entry *) addrmap_find (m_addrmap, lookup);
+	    }
+
+	  unsigned int bytes_read;
+	  const abbrev_info *new_abbrev = peek_die_abbrev (*new_reader,
+							   new_info_ptr,
+							   &bytes_read);
+	  new_info_ptr += bytes_read;
+	  scan_attributes (scanning_per_cu, new_reader, new_info_ptr, new_info_ptr,
+			   new_abbrev, name, linkage_name, flags, nullptr,
+			   parent_entry, maybe_defer, true);
+	}
+    }
+
+  if (!for_specification)
+    {
+      if (m_language == language_ada
+	  && *linkage_name == nullptr
+	  /* && (abbrev->tag == DW_TAG_variable */
+	  /* 	  || abbrev->tag == DW_TAG_subprogram) */)
+	*linkage_name = *name;
+
+      if (!scanning_per_cu->addresses_seen
+	  && low_pc.has_value ()
+	  && (reader->cu->per_objfile->per_bfd->has_section_at_zero
+	      || *low_pc != 0)
+	  && high_pc.has_value ())
+	{
+	  if (high_pc_relative)
+	    high_pc = *high_pc + *low_pc;
+
+	  if (*high_pc > *low_pc)
+	    {
+	      struct objfile *objfile = reader->cu->per_objfile->objfile;
+	      CORE_ADDR baseaddr = objfile->text_section_offset ();
+	      struct gdbarch *gdbarch = objfile->arch ();
+	      CORE_ADDR lo
+		= (gdbarch_adjust_dwarf2_addr (gdbarch, *low_pc + baseaddr)
+		   - baseaddr);
+	      CORE_ADDR hi
+		= (gdbarch_adjust_dwarf2_addr (gdbarch, *high_pc + baseaddr)
+		   - baseaddr);
+	      addrmap_set_empty (m_addrmap, lo, hi - 1, scanning_per_cu);
+	    }
+	}
+    }
+
+  return info_ptr;
+}
+
+const gdb_byte *
+cooked_indexer::index_imported_unit (const struct die_reader_specs *reader,
+				     const gdb_byte *info_ptr,
+				     const abbrev_info *abbrev)
+{
+  sect_offset sect_off {};
+  bool is_dwz = false;
+
+  for (int i = 0; i < abbrev->num_attrs; ++i)
+    {
+      /* Note that we never need to reprocess attributes here.  */
+      attribute attr;
+      info_ptr = read_attribute (reader, &attr, &abbrev->attrs[i], info_ptr);
+
+      if (attr.name == DW_AT_import)
+	{
+	  sect_off = attr.get_ref_die_offset ();
+	  is_dwz = (attr.form == DW_FORM_GNU_ref_alt
+		    || reader->cu->per_cu->is_dwz);
+	}
+    }
+
+  /* Did not find DW_AT_import.  */
+  if (sect_off == sect_offset (0))
+    return info_ptr;
+
+  dwarf2_per_objfile *per_objfile = reader->cu->per_objfile;
+  const gdb_byte *new_info_ptr = nullptr;
+  const die_reader_specs *new_reader
+    = ensure_cu_exists (reader, per_objfile, sect_off, is_dwz, &new_info_ptr);
+  if (new_reader != nullptr)
+    {
+      gdb_assert (new_info_ptr != nullptr);
+      index_dies (new_reader, new_info_ptr, nullptr);
+
+      reader->cu->add_dependence (new_reader->cu->per_cu);
+    }
+
+  return info_ptr;
+}
+
+/* FIXME @#$@#$# DWARF
+   the problem here is that the interesting DIE isn't nested properly.
+   so gdb really does have to scan and save everything
+   this is horrible */
+
+// FIXME write a test case for this
+// FIXME and also a test case for the same situation but with forwarding,
+// where the specification DIE appears after the subprogram DIE
+
+ /* <1><130>: Abbrev Number: 10 (DW_TAG_namespace) */
+ /*    <131>   DW_AT_name        : NN */
+ /*    <134>   DW_AT_decl_file   : 1 */
+ /*    <135>   DW_AT_decl_line   : 3 */
+ /*    <136>   DW_AT_decl_column : 11 */
+ /*    <137>   DW_AT_sibling     : <0x14a> */
+ /* <2><13b>: Abbrev Number: 5 (DW_TAG_subprogram) */
+ /*    <13c>   DW_AT_external    : 1 */
+ /*    <13c>   DW_AT_name        : q */
+ /*    <13e>   DW_AT_decl_file   : 1 */
+ /*    <13f>   DW_AT_decl_line   : 4 */
+ /*    <140>   DW_AT_decl_column : 7 */
+ /*    <141>   DW_AT_linkage_name: (indirect string, offset: 0x6d): _ZN2NN1qEv */
+ /*    <145>   DW_AT_type        : <0x98> */
+ /*    <149>   DW_AT_declaration : 1 */
+ /* <2><149>: Abbrev Number: 0 */
+ /* <1><14a>: Abbrev Number: 11 (DW_TAG_subprogram) */
+ /*    <14b>   DW_AT_specification: <0x13b> */
+ /*    <14f>   DW_AT_low_pc      : 0x400531 */
+ /*    <157>   DW_AT_high_pc     : 0xb */
+ /*    <15f>   DW_AT_frame_base  : 1 byte block: 9c 	(DW_OP_call_frame_cfa) */
+ /*    <161>   DW_AT_GNU_all_call_sites: 1 */
+
+
+const gdb_byte *
+cooked_indexer::recurse (const struct die_reader_specs *reader,
+			 const gdb_byte *info_ptr,
+			 const cooked_index_entry *parent_entry)
+{
+  info_ptr = index_dies (reader, info_ptr, parent_entry);
+
+  if (parent_entry != nullptr)
+    {
+      CORE_ADDR start = form_addr (parent_entry->die_offset,
+				   reader->cu->per_cu->is_dwz);
+      CORE_ADDR end = form_addr (sect_offset (info_ptr - 1 - reader->buffer),
+				 reader->cu->per_cu->is_dwz);
+      addrmap_set_empty (m_addrmap, start, end, (void *) parent_entry);
+    }
+
+  return info_ptr;
+}
+
+const gdb_byte *
+cooked_indexer::index_dies (const struct die_reader_specs *reader,
+			    const gdb_byte *info_ptr,
+			    const cooked_index_entry *parent_entry)
+{
+  const gdb_byte *end_ptr = info_ptr + reader->cu->header.get_length ();
+
+  while (info_ptr < end_ptr)
+    {
+      sect_offset this_die = (sect_offset) (info_ptr - reader->buffer);
+      // printf_unfiltered (" @@ 0x%x\n", (unsigned int) to_underlying (this_die));
+      unsigned int bytes_read;
+      const abbrev_info *abbrev = peek_die_abbrev (*reader, info_ptr,
+						   &bytes_read);
+      info_ptr += bytes_read;
+      if (abbrev == nullptr)
+	break;
+
+      if (abbrev->tag == DW_TAG_imported_unit)
+	{
+	  info_ptr = index_imported_unit (reader, info_ptr, abbrev);
+	  continue;
+	}
+
+      if (!abbrev->interesting)
+	{
+	  info_ptr = skip_one_die (reader, info_ptr, abbrev);
+	  continue;
+	}
+
+      const char *name = nullptr;
+      const char *linkage_name = nullptr;
+      CORE_ADDR defer = 0;
+      cooked_index_flag flags = 0;
+      sect_offset sibling {};
+      const cooked_index_entry *this_parent_entry = parent_entry;
+      // FIXME addresses as well
+      // but maybe we can use debug_aranges already??
+      // yes but can we require it
+      info_ptr = scan_attributes (reader->cu->per_cu, reader, info_ptr,
+				  info_ptr, abbrev, &name, &linkage_name,
+				  &flags, &sibling, &this_parent_entry,
+				  &defer, false);
+
+      if (name == nullptr && abbrev->tag == DW_TAG_namespace)
+	name = "(anonymous namespace)";
+      /* FIXME here or in scan_attributes ?? */
+      if (abbrev->tag == DW_TAG_module || abbrev->tag == DW_TAG_namespace)
+	flags = flags & ~IS_STATIC;
+
+      const cooked_index_entry *this_entry = nullptr;
+      if (name != nullptr)
+	{
+	  if (defer != 0)
+	    m_deferred_entries.push_back ({
+		this_die, name, defer, abbrev->tag, flags
+	      });
+	  else
+	    this_entry = m_index_storage->add (this_die, abbrev->tag, flags,
+					       name, this_parent_entry,
+					       m_per_cu);
+	}
+
+      if (linkage_name != nullptr)
+	{
+	  /* We only want this to be "main" if it has a linkage name
+	     but not an ordinary name.  */
+	  if (name != nullptr)
+	    flags = flags & ~IS_MAIN;
+	  m_index_storage->add (this_die, abbrev->tag, flags | IS_LINKAGE,
+				linkage_name, nullptr, m_per_cu);
+	}
+
+      if (abbrev->has_children)
+	{
+	  switch (abbrev->tag)
+	    {
+	    case DW_TAG_class_type:
+	    case DW_TAG_interface_type:
+	    case DW_TAG_structure_type:
+	    case DW_TAG_union_type:
+	      if (m_language != language_c && this_entry != nullptr)
+		{
+		  info_ptr = recurse (reader, info_ptr, this_entry);
+		  continue;
+		}
+	      break;
+
+	    case DW_TAG_enumeration_type:
+	      /* We need to recurse even for an anonymous
+		 enumeration.  */
+	      info_ptr = recurse (reader, info_ptr, this_entry);
+	      continue;
+
+	    case DW_TAG_module:
+	    case DW_TAG_namespace:
+	      if (this_entry != nullptr)
+		{
+		  info_ptr = recurse (reader, info_ptr, this_entry);
+		  continue;
+		}
+	      break;
+
+	    case DW_TAG_subprogram:
+	      if ((m_language == language_fortran
+		   || m_language == language_ada)
+		  && this_entry != nullptr)
+		{
+		  info_ptr = recurse (reader, info_ptr, this_entry);
+		  continue;
+		}
+	      break;
+	    }
+
+	  if (sibling != sect_offset (0))
+	    {
+	      const gdb_byte *sibling_ptr
+		= reader->buffer + to_underlying (sibling);
+
+	      if (sibling_ptr < info_ptr)
+		complaint (_("DW_AT_sibling points backwards"));
+	      else if (sibling_ptr > reader->buffer_end)
+		reader->die_section->overflow_complaint ();
+	      else
+		info_ptr = sibling_ptr;
+	    }
+	  else
+	    info_ptr = skip_children (reader, info_ptr);
+	}
+    }
+
+  return info_ptr;
+}
+
+void
+cooked_indexer::make_index (die_info *comp_unit_die,
+			    const struct die_reader_specs *reader,
+			    const gdb_byte *info_ptr)
+{
+  check_bounds (comp_unit_die, reader->cu);
+  index_dies (reader, info_ptr, nullptr);
+
+  for (const auto &entry : m_deferred_entries)
+    {
+      cooked_index_entry *parent
+	= (cooked_index_entry *) addrmap_find (m_addrmap, entry.spec_offset);
+      m_index_storage->add (entry.die_offset, entry.tag, entry.flags,
+			    entry.name, parent, m_per_cu);
+    }
+}
 
 /* Returns nonzero if TAG represents a type that we might generate a partial
    symbol for.  */
