@@ -1,3 +1,7 @@
+2021-05-24  Tom Tromey  <tom@tromey.com>
+
+	* parallel-for.h (parallel_for_each): Add "n" parameter.
+
 2021-06-13  Tom Tromey  <tom@tromey.com>
 
 	* gdb_unique_ptr.h (make_unique_xstrndup): New function.
