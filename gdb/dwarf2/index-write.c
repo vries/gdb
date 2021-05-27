@@ -422,7 +422,7 @@ struct addrmap_index_data
   /* Non-zero if the previous_* fields are valid.
      We can't write an entry until we see the next entry (since it is only then
      that we know the end of the entry).  */
-  int previous_valid;
+  bool previous_valid = false;
   /* Index of the CU in the table of all CUs in the index file.  */
   unsigned int previous_cu_index;
   /* Start address of the CU.  */
@@ -459,10 +459,10 @@ add_address_entry_worker (void *datap, CORE_ADDR start_addr, void *obj)
       const auto it = data->cu_index_htab.find (pst);
       gdb_assert (it != data->cu_index_htab.cend ());
       data->previous_cu_index = it->second;
-      data->previous_valid = 1;
+      data->previous_valid = true;
     }
   else
-    data->previous_valid = 0;
+    data->previous_valid = false;
 
   return 0;
 }
@@ -476,12 +476,6 @@ write_address_map (dwarf2_per_bfd *per_bfd, data_buf &addr_vec,
 		   psym_index_map &cu_index_htab)
 {
   struct addrmap_index_data addrmap_index_data (addr_vec, cu_index_htab);
-
-  /* When writing the address table, we have to cope with the fact that
-     the addrmap iterator only provides the start of a region; we have to
-     wait until the next invocation to get the start of the next region.  */
-
-  addrmap_index_data.previous_valid = 0;
 
   addrmap_foreach (per_bfd->partial_symtabs->psymtabs_addrmap,
 		   add_address_entry_worker, &addrmap_index_data);
