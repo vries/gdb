@@ -407,17 +407,17 @@ write_hash_table (mapped_symtab *symtab, data_buf &output, data_buf &cpool)
     }
 }
 
-typedef std::unordered_map<partial_symtab *, unsigned int> psym_index_map;
+typedef std::unordered_map<dwarf2_per_cu_data *, unsigned int> cu_index_map;
 
 /* Helper struct for building the address table.  */
 struct addrmap_index_data
 {
-  addrmap_index_data (data_buf &addr_vec_, psym_index_map &cu_index_htab_)
+  addrmap_index_data (data_buf &addr_vec_, cu_index_map &cu_index_htab_)
     : addr_vec (addr_vec_), cu_index_htab (cu_index_htab_)
   {}
 
   data_buf &addr_vec;
-  psym_index_map &cu_index_htab;
+  cu_index_map &cu_index_htab;
 
   /* Non-zero if the previous_* fields are valid.
      We can't write an entry until we see the next entry (since it is only then
@@ -446,7 +446,7 @@ static int
 add_address_entry_worker (void *datap, CORE_ADDR start_addr, void *obj)
 {
   struct addrmap_index_data *data = (struct addrmap_index_data *) datap;
-  partial_symtab *pst = (partial_symtab *) obj;
+  dwarf2_psymtab *pst = (dwarf2_psymtab *) obj;
 
   if (data->previous_valid)
     add_address_entry (data->addr_vec,
@@ -456,7 +456,7 @@ add_address_entry_worker (void *datap, CORE_ADDR start_addr, void *obj)
   data->previous_cu_start = start_addr;
   if (pst != NULL)
     {
-      const auto it = data->cu_index_htab.find (pst);
+      const auto it = data->cu_index_htab.find (pst->per_cu_data);
       gdb_assert (it != data->cu_index_htab.cend ());
       data->previous_cu_index = it->second;
       data->previous_valid = true;
@@ -473,7 +473,7 @@ add_address_entry_worker (void *datap, CORE_ADDR start_addr, void *obj)
 
 static void
 write_address_map (dwarf2_per_bfd *per_bfd, data_buf &addr_vec,
-		   psym_index_map &cu_index_htab)
+		   cu_index_map &cu_index_htab)
 {
   struct addrmap_index_data addrmap_index_data (addr_vec, cu_index_htab);
 
@@ -1316,11 +1316,11 @@ write_gdbindex (dwarf2_per_objfile *per_objfile, FILE *out_file,
   data_buf objfile_cu_list;
   data_buf dwz_cu_list;
 
-  /* While we're scanning CU's create a table that maps a psymtab pointer
+  /* While we're scanning CU's create a table that maps a dwarf2_per_cu_data
      (which is what addrmap records) to its index (which is what is recorded
      in the index file).  This will later be needed to write the address
      table.  */
-  psym_index_map cu_index_htab;
+  cu_index_map cu_index_htab;
   cu_index_htab.reserve (per_objfile->per_bfd->all_comp_units.size ());
 
   /* Store out the .debug_type CUs, if any.  */
@@ -1348,7 +1348,7 @@ write_gdbindex (dwarf2_per_objfile *per_objfile, FILE *out_file,
 	    recursively_write_psymbols (objfile, psymtab, &symtab,
 					psyms_seen, this_counter);
 
-	  const auto insertpair = cu_index_htab.emplace (psymtab,
+	  const auto insertpair = cu_index_htab.emplace (per_cu,
 							 this_counter);
 	  gdb_assert (insertpair.second);
 	}
