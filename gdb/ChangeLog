@@ -1,5 +1,10 @@
 2021-05-28  Tom Tromey  <tom@tromey.com>
 
+	* dwarf2/index-write.c (write_one_signatured_type): Remove.
+	(write_gdbindex): Write type CUs in loop.
+
+2021-05-28  Tom Tromey  <tom@tromey.com>
+
 	* dwarf2/index-write.c (struct addrmap_index_data)
 	<previous_valid>: Now bool.  Initialize.
 	(add_address_entry_worker): Update.
