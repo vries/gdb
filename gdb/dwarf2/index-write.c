@@ -412,13 +412,18 @@ typedef std::unordered_map<dwarf2_per_cu_data *, unsigned int> cu_index_map;
 /* Helper struct for building the address table.  */
 struct addrmap_index_data
 {
-  addrmap_index_data (data_buf &addr_vec_, cu_index_map &cu_index_htab_)
-    : addr_vec (addr_vec_), cu_index_htab (cu_index_htab_)
+  addrmap_index_data (data_buf &addr_vec_, cu_index_map &cu_index_htab_,
+		      bool using_index_)
+    : addr_vec (addr_vec_),
+      cu_index_htab (cu_index_htab_),
+      using_index (using_index_)
   {}
 
   data_buf &addr_vec;
   cu_index_map &cu_index_htab;
 
+  /* FIXME */
+  bool using_index;
   /* Non-zero if the previous_* fields are valid.
      We can't write an entry until we see the next entry (since it is only then
      that we know the end of the entry).  */
@@ -446,7 +451,12 @@ static int
 add_address_entry_worker (void *datap, CORE_ADDR start_addr, void *obj)
 {
   struct addrmap_index_data *data = (struct addrmap_index_data *) datap;
-  dwarf2_psymtab *pst = (dwarf2_psymtab *) obj;
+
+  dwarf2_per_cu_data *per_cu;
+  if (data->using_index)
+    per_cu = (dwarf2_per_cu_data *) obj;
+  else
+    per_cu = obj == nullptr ? nullptr : ((dwarf2_psymtab *) obj)->per_cu_data;
 
   if (data->previous_valid)
     add_address_entry (data->addr_vec,
@@ -454,9 +464,9 @@ add_address_entry_worker (void *datap, CORE_ADDR start_addr, void *obj)
 		       data->previous_cu_index);
 
   data->previous_cu_start = start_addr;
-  if (pst != NULL)
+  if (per_cu != NULL)
     {
-      const auto it = data->cu_index_htab.find (pst->per_cu_data);
+      const auto it = data->cu_index_htab.find (per_cu);
       gdb_assert (it != data->cu_index_htab.cend ());
       data->previous_cu_index = it->second;
       data->previous_valid = true;
@@ -473,9 +483,10 @@ add_address_entry_worker (void *datap, CORE_ADDR start_addr, void *obj)
 
 static void
 write_address_map (struct addrmap *addrmap, data_buf &addr_vec,
-		   cu_index_map &cu_index_htab)
+		   cu_index_map &cu_index_htab, bool using_index)
 {
-  struct addrmap_index_data addrmap_index_data (addr_vec, cu_index_htab);
+  struct addrmap_index_data addrmap_index_data (addr_vec, cu_index_htab,
+						using_index);
 
   addrmap_foreach (addrmap, add_address_entry_worker, &addrmap_index_data);
 
@@ -1376,8 +1387,11 @@ write_gdbindex (dwarf2_per_objfile *per_objfile, FILE *out_file,
 
   /* Dump the address map.  */
   data_buf addr_vec;
-  write_address_map (per_objfile->per_bfd->partial_symtabs->psymtabs_addrmap,
-		     addr_vec, cu_index_htab);
+  write_address_map (per_objfile->per_bfd->using_index
+		     ? per_objfile->per_bfd->index_addrmap
+		     : per_objfile->per_bfd->partial_symtabs->psymtabs_addrmap,
+		     addr_vec, cu_index_htab,
+		     per_objfile->per_bfd->using_index);
 
   /* Now that we've processed all symbols we can shrink their cu_indices
      lists.  */
