@@ -189,7 +189,7 @@ struct mapped_symtab
   offset_type n_elements = 0;
   std::vector<symtab_index_entry> data;
 
-  /* Temporary storage for Ada names.  */
+  /* Temporary storage for names.  */
   auto_obstack m_string_obstack;
 };
 
@@ -1312,6 +1312,45 @@ write_gdbindex_1 (FILE *out_file,
   assert_file_size (out_file, total_len);
 }
 
+/* Write the contents of the internal "cooked" index.  */
+
+static void
+write_cooked_index (dwarf2_per_objfile *per_objfile,
+		    const cu_index_map &cu_index_htab,
+		    struct mapped_symtab *symtab)
+{
+  gdb_assert (per_objfile->per_bfd->using_index);
+
+  auto handle_entry = [&] (const cooked_index_entry *entry)
+  {
+    const auto it = cu_index_htab.find (entry->per_cu);
+    gdb_assert (it != cu_index_htab.cend ());
+
+    const char *name = entry->full_name (&symtab->m_string_obstack);
+
+    gdb_index_symbol_kind kind;
+    if (entry->tag == DW_TAG_subprogram)
+      kind = GDB_INDEX_SYMBOL_KIND_FUNCTION;
+    else if (entry->tag == DW_TAG_variable
+	     || entry->tag == DW_TAG_constant
+	     || entry->tag == DW_TAG_enumerator)
+      kind = GDB_INDEX_SYMBOL_KIND_VARIABLE;
+    /* FIXME namespace?  */
+    else if (entry->tag == DW_TAG_module
+	     || entry->tag == DW_TAG_common_block)
+      kind = GDB_INDEX_SYMBOL_KIND_OTHER;
+    else
+      kind = GDB_INDEX_SYMBOL_KIND_TYPE;
+
+    add_index_entry (symtab, name, (entry->flags & IS_STATIC) != 0,
+		     kind, it->second);
+
+    return true;
+  };
+
+  per_objfile->per_bfd->cooked_index_table->traverse (handle_entry);
+}
+
 /* Write contents of a .gdb_index section for OBJFILE into OUT_FILE.
    If OBJFILE has an associated dwz file, write contents of a .gdb_index
    section for that dwz file into DWZ_OUT_FILE.  If OBJFILE does not have an
@@ -1348,7 +1387,9 @@ write_gdbindex (dwarf2_per_objfile *per_objfile, FILE *out_file,
     {
       dwarf2_per_cu_data *per_cu
 	= per_objfile->per_bfd->all_comp_units[i].get ();
-      partial_symtab *psymtab = per_cu->v.psymtab;
+      partial_symtab *psymtab = (per_objfile->per_bfd->using_index
+				 ? nullptr
+				 : per_cu->v.psymtab);
 
       int &this_counter = per_cu->is_debug_types ? types_counter : counter;
 
@@ -1357,7 +1398,10 @@ write_gdbindex (dwarf2_per_objfile *per_objfile, FILE *out_file,
 	  if (psymtab->user == NULL)
 	    recursively_write_psymbols (objfile, psymtab, &symtab,
 					psyms_seen, this_counter);
+	}
 
+      if (psymtab != NULL || per_objfile->per_bfd->using_index)
+	{
 	  const auto insertpair = cu_index_htab.emplace (per_cu,
 							 this_counter);
 	  gdb_assert (insertpair.second);
@@ -1384,6 +1428,9 @@ write_gdbindex (dwarf2_per_objfile *per_objfile, FILE *out_file,
 
       ++this_counter;
     }
+
+  if (per_objfile->per_bfd->using_index)
+    write_cooked_index (per_objfile, cu_index_htab, &symtab);
 
   /* Dump the address map.  */
   data_buf addr_vec;
@@ -1598,15 +1645,17 @@ write_dwarf_index (dwarf2_per_objfile *per_objfile, const char *dir,
   dwarf2_per_bfd *per_bfd = per_objfile->per_bfd;
   struct objfile *objfile = per_objfile->objfile;
 
-  if (per_objfile->per_bfd->using_index)
+  if (per_objfile->per_bfd->using_index
+      && per_objfile->per_bfd->cooked_index_table == nullptr)
     error (_("Cannot use an index to create the index"));
 
   if (per_objfile->per_bfd->types.size () > 1)
     error (_("Cannot make an index when the file has multiple .debug_types sections"));
 
-  if (per_bfd->partial_symtabs == nullptr
-      || !per_bfd->partial_symtabs->psymtabs
-      || !per_bfd->partial_symtabs->psymtabs_addrmap)
+  if ((per_bfd->partial_symtabs == nullptr
+       || !per_bfd->partial_symtabs->psymtabs
+       || !per_bfd->partial_symtabs->psymtabs_addrmap)
+      && per_bfd->cooked_index_table == nullptr)
     return;
 
   struct stat st;

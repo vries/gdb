@@ -130,6 +130,11 @@ struct cooked_index_entry : public allocate_on_obstack
     return true;
   }
 
+  /* Construct the fully-qualified name of this entry and return a
+     pointer to it.  If allocation is needed, it will be done on
+     STORAGE.  */
+  const char *full_name (struct obstack *storage) const;
+
   /* The name as it appears in DWARF.  This always points into one of
      the mapped DWARF sections.  Note that this may be the name or the
      linkage name -- two entries are created for DIEs which have both
@@ -156,6 +161,10 @@ struct cooked_index_entry : public allocate_on_obstack
      chain together all entries that occupy the same hash table
      slot.  */
   cooked_index_entry *next;
+
+private:
+
+  void write_scope (struct obstack *storage, const char *sep) const;
 };
 
 class cooked_index_vector;

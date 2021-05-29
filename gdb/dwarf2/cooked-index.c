@@ -46,6 +46,53 @@ eq_entry (const void *a, const void *b)
 
 /* See cooked-index.h.  */
 
+const char *
+cooked_index_entry::full_name (struct obstack *storage) const
+{
+  if ((flags & IS_LINKAGE) != 0)
+    return canonical;
+
+  const char *sep = nullptr;
+  switch (per_cu->lang)
+    {
+    case language_cplus:
+    case language_rust:
+      sep = "::";
+      break;
+
+    case language_go:
+    case language_d:
+      sep = ".";
+      break;
+    }
+
+  if (sep == nullptr)
+    return canonical;
+
+  const cooked_index_entry *parent = parent_entry;
+  if (tag == DW_TAG_enumeration_type && (flags & IS_ENUM_CLASS) == 0)
+    parent = parent->parent_entry;
+
+  if (parent != nullptr)
+    parent->write_scope (storage, sep);
+  obstack_grow0 (storage, canonical, strlen (canonical));
+  return (const char *) obstack_finish (storage);
+}
+
+/* See cooked-index.h.  */
+
+void
+cooked_index_entry::write_scope (struct obstack *storage,
+				 const char *sep) const
+{
+  if (parent_entry != nullptr)
+    parent_entry->write_scope (storage, sep);
+  obstack_grow (storage, canonical, strlen (canonical));
+  obstack_grow (storage, sep, strlen (sep));
+}
+
+/* See cooked-index.h.  */
+
 const cooked_index_entry *
 cooked_index::add (sect_offset die_offset, enum dwarf_tag tag,
 		   cooked_index_flag flags, const char *name,
