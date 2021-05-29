@@ -1,3 +1,11 @@
+2021-05-29  Tom Tromey  <tom@tromey.com>
+
+	* dwarf2/index-write.c (struct signatured_type_index_data):
+	Remove.
+	(debug_names::write_one_signatured_type_data)
+	(debug_names::write_one_signatured_type): Remove.
+	(write_debug_names): Write type CUs in loop.
+
 2021-05-28  Tom Tromey  <tom@tromey.com>
 
 	* dwarf2/index-write.c (write_one_signatured_type): Remove.
