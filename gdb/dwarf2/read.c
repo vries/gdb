@@ -18541,7 +18541,7 @@ cooked_index_functions::expand_symtabs_matching
 			     search_flags, domain, kind);
 
   std::vector<gdb::string_view> name_vec
-    = split_name (lookup_name_without_params.c_str ());
+    = split_name (lookup_name_without_params.language_lookup_name (current_language->la_language));
   const cooked_index_entry *entry
     = per_objfile->per_bfd->cooked_index_table->find (name_vec.back ());
 
