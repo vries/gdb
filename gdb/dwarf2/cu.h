@@ -24,6 +24,9 @@
 #include "dwarf2/comp-unit-head.h"
 #include "gdbsupport/gdb_optional.h"
 
+struct dwarf2_cu;
+extern dwarf2_cu *sym_cu;
+
 /* Type used for delaying computation of method physnames.
    See comments for compute_delayed_physnames.  */
 struct delayed_method_info
@@ -272,10 +275,6 @@ public:
 
   struct partial_die_info *find_partial_die (sect_offset sect_off);
 
-  /* If this CU was inherited by another CU (via specification,
-     abstract_origin, etc), this is the ancestor CU.  */
-  dwarf2_cu *ancestor;
-
   /* Get the buildsym_compunit for this CU.  */
   buildsym_compunit *get_builder ()
   {
@@ -283,10 +282,10 @@ public:
     if (m_builder != nullptr)
       return m_builder.get ();
 
-    /* Otherwise, search ancestors for a valid builder.  */
-    if (ancestor != nullptr)
-      return ancestor->get_builder ();
+    if (sym_cu != nullptr)
+      return sym_cu->m_builder.get ();
 
+    gdb_assert_not_reached ("");
     return nullptr;
   }
 };
