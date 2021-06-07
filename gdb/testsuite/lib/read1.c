@@ -21,6 +21,9 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <stdio.h>
 
 /* Wrap 'read', forcing it to return only one byte at a time, if
    reading from the terminal.  */
@@ -38,7 +41,50 @@ read (int fd, void *buf, size_t count)
       setenv ("LD_PRELOAD", "", 1);
       read2 = dlsym (RTLD_NEXT, "read");
     }
+
+#ifdef READMORE
+  /* READMORE.  */
+
+#if 1
+  /* READMORE, method 1.  */
+
+  if (isatty (fd) != 0)
+    usleep (10 * 1000);
+  return read2 (fd, buf, count);
+
+#else
+  /* READMORE, method 2.  */
+  ssize_t res, res2;
+
+  res = read2 (fd, buf, count);
+  if (isatty (fd) == 0)
+    return res;
+
+  if (res == count || res == -1)
+    return res;
+
+  usleep (10 * 1000);
+  res2 = read2 (fd, (char *)buf + res, count - res);
+  if (res2 == -1)
+    {
+      if (errno == EAGAIN || errno == EIO)
+	res2 = 0;
+      else
+	{
+	  if (0)
+	    printf ("errno: %s\n", strerror (errno));
+	  return res2;
+	}
+    }
+
+  return res + res2;
+#endif
+
+#else
+  /* READ1 */
+
   if (count > 1 && isatty (fd) >= 1)
     count = 1;
   return read2 (fd, buf, count);
+#endif
 }
