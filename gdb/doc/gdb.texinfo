@@ -6957,6 +6957,13 @@ one thread while allowing others to run freely, stepping
 one thread while holding all others stopped, or stepping several threads
 independently and simultaneously.
 
+Note that attaching in non-stop mode stops all threads, just as in
+all-stop mode.  However, while in all-stop mode the attach command is
+finished only once all threads are stopped, in non-stop mode it's
+finished once the current thread is stopped.  Consequently, it's
+briefly possible to observe non-current threads still running after an
+attach.
+
 To enter non-stop mode, use this sequence of commands before you run
 or attach to your program:
 
