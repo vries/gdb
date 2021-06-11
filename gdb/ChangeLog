@@ -1,5 +1,11 @@
 2021-06-13  Tom Tromey  <tom@tromey.com>
 
+	* dwarf2/read.h (struct dwarf2_per_cu_data) <addresses_seen>: New
+	member.
+	* dwarf2/read.c (read_addrmap_from_aranges): Set addresses_seen.
+
+2021-06-13  Tom Tromey  <tom@tromey.com>
+
 	* dwarf2/read.c (read_addrmap_from_aranges): New function.
 	(create_addrmap_from_aranges): Use it.
 
