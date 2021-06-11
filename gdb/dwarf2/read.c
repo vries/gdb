@@ -7811,6 +7811,7 @@ add_partial_symbol (struct partial_die_info *pdi, struct dwarf2_cu *cu)
   partial_symbol psymbol;
   memset (&psymbol, 0, sizeof (psymbol));
   psymbol.ginfo.set_language (cu->language, &objfile->objfile_obstack);
+  psymbol.sect_off = pdi->sect_off;
   psymbol.ginfo.set_section_index (-1);
 
   /* The code below indicates that the psymbol should be installed by
