@@ -69,6 +69,8 @@ struct partial_symbol
 
   struct general_symbol_info ginfo;
 
+  sect_offset sect_off;
+
   /* Name space code.  */
 
   ENUM_BITFIELD(domain_enum_tag) domain : SYMBOL_DOMAIN_BITS;
