@@ -562,6 +562,8 @@ lookup_partial_symbol (struct objfile *objfile,
   return NULL;
 }
 
+bool lazy_expand_symtab_p = false;
+
 /* Get the symbol table that corresponds to a partial_symtab.
    This is fast after the first time you do it.
    The result will be NULL if the primary symtab has no symbols,
