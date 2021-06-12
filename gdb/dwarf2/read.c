@@ -1284,7 +1284,8 @@ enum pc_bounds_kind
 static enum pc_bounds_kind dwarf2_get_pc_bounds (struct die_info *,
 						 CORE_ADDR *, CORE_ADDR *,
 						 struct dwarf2_cu *,
-						 dwarf2_psymtab *);
+						 addrmap *,
+						 void *);
 
 static void get_scope_pc_bounds (struct die_info *,
 				 CORE_ADDR *, CORE_ADDR *,
@@ -7024,8 +7025,11 @@ process_psymtab_comp_unit_reader (const struct die_reader_specs *reader,
 
   /* Possibly set the default values of LOWPC and HIGHPC from
      `DW_AT_ranges'.  */
-  cu_bounds_kind = dwarf2_get_pc_bounds (comp_unit_die, &best_lowpc,
-					 &best_highpc, cu, pst);
+  cu_bounds_kind
+    = dwarf2_get_pc_bounds (comp_unit_die, &best_lowpc,
+			    &best_highpc, cu,
+			    per_bfd->partial_symtabs->psymtabs_addrmap,
+			    pst);
   if (cu_bounds_kind == PC_BOUNDS_HIGH_LOW && best_lowpc < best_highpc)
     {
       CORE_ADDR low
@@ -13082,7 +13086,7 @@ read_func_scope (struct die_info *die, struct dwarf2_cu *cu)
     }
 
   /* Ignore functions with missing or invalid low and high pc attributes.  */
-  if (dwarf2_get_pc_bounds (die, &lowpc, &highpc, cu, NULL)
+  if (dwarf2_get_pc_bounds (die, &lowpc, &highpc, cu, nullptr, nullptr)
       <= PC_BOUNDS_INVALID)
     {
       attr = dwarf2_attr (die, DW_AT_external, cu);
@@ -13255,7 +13259,7 @@ read_lexical_block_scope (struct die_info *die, struct dwarf2_cu *cu)
      as multiple lexical blocks?  Handling children in a sane way would
      be nasty.  Might be easier to properly extend generic blocks to
      describe ranges.  */
-  switch (dwarf2_get_pc_bounds (die, &lowpc, &highpc, cu, NULL))
+  switch (dwarf2_get_pc_bounds (die, &lowpc, &highpc, cu, nullptr, nullptr))
     {
     case PC_BOUNDS_NOT_PRESENT:
       /* DW_TAG_lexical_block has no attributes, process its children as if
@@ -13496,7 +13500,8 @@ read_call_site_scope (struct die_info *die, struct dwarf2_cu *cu)
 	  CORE_ADDR lowpc;
 
 	  /* DW_AT_entry_pc should be preferred.  */
-	  if (dwarf2_get_pc_bounds (target_die, &lowpc, NULL, target_cu, NULL)
+	  if (dwarf2_get_pc_bounds (target_die, &lowpc, NULL, target_cu,
+				    nullptr, nullptr)
 	      <= PC_BOUNDS_INVALID)
 	    complaint (_("DW_AT_call_target target DIE has invalid "
 			 "low pc, for referencing DIE %s [in module %s]"),
@@ -14004,10 +14009,9 @@ dwarf2_ranges_process (unsigned offset, struct dwarf2_cu *cu, dwarf_tag tag,
 static int
 dwarf2_ranges_read (unsigned offset, CORE_ADDR *low_return,
 		    CORE_ADDR *high_return, struct dwarf2_cu *cu,
-		    dwarf2_psymtab *ranges_pst, dwarf_tag tag)
+		    addrmap *map, void *datum, dwarf_tag tag)
 {
   struct objfile *objfile = cu->per_objfile->objfile;
-  dwarf2_per_bfd *per_bfd = cu->per_objfile->per_bfd;
   struct gdbarch *gdbarch = objfile->arch ();
   const CORE_ADDR baseaddr = objfile->text_section_offset ();
   int low_set = 0;
@@ -14018,7 +14022,7 @@ dwarf2_ranges_read (unsigned offset, CORE_ADDR *low_return,
   retval = dwarf2_ranges_process (offset, cu, tag,
     [&] (CORE_ADDR range_beginning, CORE_ADDR range_end)
     {
-      if (ranges_pst != NULL)
+      if (map != nullptr)
 	{
 	  CORE_ADDR lowpc;
 	  CORE_ADDR highpc;
@@ -14029,8 +14033,7 @@ dwarf2_ranges_read (unsigned offset, CORE_ADDR *low_return,
 	  highpc = (gdbarch_adjust_dwarf2_addr (gdbarch,
 						range_end + baseaddr)
 		    - baseaddr);
-	  addrmap_set_empty (per_bfd->partial_symtabs->psymtabs_addrmap,
-			     lowpc, highpc - 1, ranges_pst);
+	  addrmap_set_empty (map, lowpc, highpc - 1, datum);
 	}
 
       /* FIXME: This is recording everything as a low-high
@@ -14073,7 +14076,7 @@ dwarf2_ranges_read (unsigned offset, CORE_ADDR *low_return,
 static enum pc_bounds_kind
 dwarf2_get_pc_bounds (struct die_info *die, CORE_ADDR *lowpc,
 		      CORE_ADDR *highpc, struct dwarf2_cu *cu,
-		      dwarf2_psymtab *pst)
+		      addrmap *map, void *datum)
 {
   dwarf2_per_objfile *per_objfile = cu->per_objfile;
   struct attribute *attr;
@@ -14116,8 +14119,8 @@ dwarf2_get_pc_bounds (struct die_info *die, CORE_ADDR *lowpc,
 
 	  /* Value of the DW_AT_ranges attribute is the offset in the
 	     .debug_ranges section.  */
-	  if (!dwarf2_ranges_read (ranges_offset, &low, &high, cu, pst,
-				   die->tag))
+	  if (!dwarf2_ranges_read (ranges_offset, &low, &high, cu,
+				   map, datum, die->tag))
 	    return PC_BOUNDS_INVALID;
 	  /* Found discontinuous range of addresses.  */
 	  ret = PC_BOUNDS_RANGES;
@@ -14160,7 +14163,8 @@ dwarf2_get_subprogram_pc_bounds (struct die_info *die,
   CORE_ADDR low, high;
   struct die_info *child = die->child;
 
-  if (dwarf2_get_pc_bounds (die, &low, &high, cu, NULL) >= PC_BOUNDS_RANGES)
+  if (dwarf2_get_pc_bounds (die, &low, &high, cu, nullptr, nullptr)
+      >= PC_BOUNDS_RANGES)
     {
       *lowpc = std::min (*lowpc, low);
       *highpc = std::max (*highpc, high);
@@ -14197,7 +14201,8 @@ get_scope_pc_bounds (struct die_info *die,
   CORE_ADDR best_high = (CORE_ADDR) 0;
   CORE_ADDR current_low, current_high;
 
-  if (dwarf2_get_pc_bounds (die, &current_low, &current_high, cu, NULL)
+  if (dwarf2_get_pc_bounds (die, &current_low, &current_high, cu,
+			    nullptr, nullptr)
       >= PC_BOUNDS_RANGES)
     {
       best_low = current_low;
@@ -19414,7 +19419,7 @@ partial_die_info::read (const struct die_reader_specs *reader,
 	      ranges_offset += cu->gnu_ranges_base;
 
 	    if (dwarf2_ranges_read (ranges_offset, &lowpc, &highpc, cu,
-				    nullptr, tag))
+				    nullptr, nullptr, tag))
 	      has_pc_info = 1;
 	  }
 	  break;
