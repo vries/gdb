@@ -580,7 +580,12 @@ psymtab_to_symtab (struct objfile *objfile, struct partial_symtab *pst)
 
   /* If it's been looked up before, return it.  */
   if (pst->get_compunit_symtab (objfile))
-    return pst->get_compunit_symtab (objfile);
+    {
+      if (lazy_expand_symtab_p)
+	pst->reset_compunit_symtab (objfile);
+      else
+	return pst->get_compunit_symtab (objfile);
+    }
 
   /* If it has not yet been read in, read it.  */
   if (!pst->readin_p (objfile))

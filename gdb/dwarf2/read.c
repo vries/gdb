@@ -8582,6 +8582,8 @@ dwarf2_psymtab::expand_psymtab (struct objfile *objfile)
 bool
 dwarf2_psymtab::readin_p (struct objfile *objfile) const
 {
+  if (lazy_expand_symtab_p)
+    return false;
   dwarf2_per_objfile *per_objfile = get_dwarf2_per_objfile (objfile);
   return per_objfile->symtab_set_p (per_cu_data);
 }
