@@ -10547,15 +10547,35 @@ read_file_scope (struct die_info *die, struct dwarf2_cu *cu)
      for DW_AT_decl_file.  */
   handle_DW_AT_stmt_list (die, cu, fnd.comp_dir, lowpc);
 
+  unsigned int interesting_symbol_idx = 0;
+  partial_symbol *interesting_symbol =
+    ((cu->per_cu->interesting_symbols == nullptr
+      || cu->per_cu->interesting_symbols->empty ())
+     ? nullptr
+     : (*cu->per_cu->interesting_symbols)[interesting_symbol_idx]);
   /* Process all dies in compilation unit.  */
-  if (die->child != NULL)
+  for (child_die = die->child; child_die && child_die->tag;
+       child_die = child_die->sibling)
     {
-      child_die = die->child;
-      while (child_die && child_die->tag)
+      if (interesting_symbol == nullptr)
+	break;
+
+      if (interesting_symbol->sect_off > child_die->sect_off)
+	continue;
+
+      if (interesting_symbol->sect_off == child_die->sect_off)
 	{
 	  process_die (child_die, cu);
-	  child_die = child_die->sibling;
+	  interesting_symbol_idx++;
+	  if (interesting_symbol_idx
+	      == cu->per_cu->interesting_symbols->size ())
+	    break;
+	  interesting_symbol
+	    = (*cu->per_cu->interesting_symbols)[interesting_symbol_idx];
+	  continue;
 	}
+
+      gdb_assert_not_reached ("");
     }
 
   /* Decode macro information, if present.  Dwarf 2 macro information
