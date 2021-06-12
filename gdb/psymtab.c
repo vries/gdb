@@ -1000,6 +1000,23 @@ psymbol_functions::expand_matching_symbols
     }
 }
 
+static void
+add_interesting_symbol (struct partial_symtab *ps, partial_symbol *psym)
+{
+  bool found = false;
+  int i;
+
+  for (i = 0; i < ps->interesting_symbols.size (); ++i)
+    if (ps->interesting_symbols[i] == psym)
+      {
+	found = true;
+	break;
+      }
+
+  if (!found)
+    ps->interesting_symbols.push_back (psym);
+}
+
 /* A helper for psym_expand_symtabs_matching that handles searching
    included psymtabs.  This returns true if a symbol is found, and
    false otherwise.  It also updates the 'searched_flag' on the
@@ -1100,7 +1117,10 @@ recursively_search_psymtabs
 	    {
 	      /* Found a match, so notify our caller.  */
 	      result = PST_SEARCHED_AND_FOUND;
-	      keep_going = 0;
+	      if (lazy_expand_symtab_p)
+		add_interesting_symbol (ps, *psym);
+	      else
+		keep_going = 0;
 	    }
 	}
       psym++;

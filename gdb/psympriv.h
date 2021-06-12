@@ -328,6 +328,8 @@ struct partial_symtab
 
   struct partial_symtab **dependencies = nullptr;
 
+  std::vector<partial_symbol *> interesting_symbols;
+
   int number_of_dependencies = 0;
 
   /* Global symbol list.  This list will be sorted after readin to
