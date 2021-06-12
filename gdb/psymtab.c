@@ -1100,7 +1100,14 @@ recursively_search_psymtabs
 	    {
 	      /* Found a match, so notify our caller.  */
 	      result = PST_SEARCHED_AND_FOUND;
-	      keep_going = 0;
+	      if (lazy_expand_symtab_p)
+		{
+		  ps->interesting_symbols.push_back (*psym);
+		}
+	      else
+		{
+		  keep_going = 0;
+		}
 	    }
 	}
       psym++;
@@ -1126,7 +1133,10 @@ psymbol_functions::expand_symtabs_matching
 {
   /* Clear the search flags.  */
   for (partial_symtab *ps : require_partial_symbols (objfile))
-    ps->searched_flag = PST_NOT_SEARCHED;
+    {
+      ps->searched_flag = PST_NOT_SEARCHED;
+      ps->interesting_symbols.clear ();
+    }
 
   gdb::optional<lookup_name_info> psym_lookup_name;
   if (lookup_name != nullptr)
