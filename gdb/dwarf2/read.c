@@ -2216,6 +2216,8 @@ load_cu (dwarf2_per_cu_data *per_cu, dwarf2_per_objfile *per_objfile,
   return cu;
 }
 
+extern bool lazy_expand_symtab_p;
+
 /* Read in the symbols for PER_CU in the context of PER_OBJFILE.  */
 
 static void
@@ -8347,6 +8349,13 @@ locate_pdi_sibling (const struct die_reader_specs *reader,
   return skip_children (reader, info_ptr);
 }
 
+static bool
+partial_symbol_sect_off_less_than (const partial_symbol *a,
+				   const partial_symbol *b)
+{
+  return a->sect_off < b->sect_off;
+}
+
 /* Expand this partial symbol table into a full symbol table.  SELF is
    not NULL.  */
 
@@ -8355,7 +8364,18 @@ dwarf2_psymtab::read_symtab (struct objfile *objfile)
 {
   dwarf2_per_objfile *per_objfile = get_dwarf2_per_objfile (objfile);
 
-  gdb_assert (!per_objfile->symtab_set_p (per_cu_data));
+  if (lazy_expand_symtab_p)
+    {
+      std::sort (interesting_symbols.begin (),
+		 interesting_symbols.end (),
+		 partial_symbol_sect_off_less_than);
+      per_cu_data->interesting_symbols = &interesting_symbols;
+    }
+  else
+    {
+      gdb_assert (!per_objfile->symtab_set_p (per_cu_data));
+      per_cu_data->interesting_symbols = nullptr;
+    }
 
   /* If this psymtab is constructed from a debug-only objfile, the
      has_section_at_zero flag will not necessarily be correct.  We
