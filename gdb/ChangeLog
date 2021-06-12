@@ -1,5 +1,16 @@
 2021-06-13  Tom Tromey  <tom@tromey.com>
 
+	* dwarf2/read.c (process_psymtab_comp_unit_reader)
+	(read_func_scope, read_lexical_block_scope)
+	(read_call_site_scope): Update.
+	(dwarf2_ranges_read): Remove ranges_pst parameter; add address and
+	datum parameters.
+	(dwarf2_get_pc_bounds): Likewise.
+	(dwarf2_get_subprogram_pc_bounds, get_scope_pc_bounds)
+	(partial_die_info::read): Update.
+
+2021-06-13  Tom Tromey  <tom@tromey.com>
+
 	* dwarf2/read.h (struct dwarf2_per_cu_data) <addresses_seen>: New
 	member.
 	* dwarf2/read.c (read_addrmap_from_aranges): Set addresses_seen.
