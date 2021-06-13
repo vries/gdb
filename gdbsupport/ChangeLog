@@ -1,3 +1,12 @@
+2021-06-13  Tom Tromey  <tom@tromey.com>
+
+	* parallel-for.h (gdb::detail::par_for_accumulator): New class.
+	(parallel_for_each): Return vector of results.
+	* thread-pool.cc (thread_pool::do_post_task): Rename from
+	post_task.
+	* thread-pool.h (thread_pool::post_task): New overloads.
+	(thread_pool::do_post_task): Declare.
+
 2021-05-24  Tom Tromey  <tom@tromey.com>
 
 	* parallel-for.h (parallel_for_each): Add "n" parameter.
