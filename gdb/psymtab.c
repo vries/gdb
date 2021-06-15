@@ -279,6 +279,23 @@ psymbol_functions::find_pc_sect_compunit_symtab
   return NULL;
 }
 
+static void
+add_interesting_symbol (struct partial_symtab *ps, partial_symbol *psym)
+{
+  bool found = false;
+  int i;
+
+  for (i = 0; i < ps->interesting_symbols.size (); ++i)
+    if (ps->interesting_symbols[i] == psym)
+      {
+	found = true;
+	break;
+      }
+
+  if (!found)
+    ps->interesting_symbols.push_back (psym);
+}
+
 /* Find which partial symbol within a psymtab matches PC and SECTION.
    Return NULL if none.  */
 
@@ -339,6 +356,7 @@ find_pc_sect_psymbol (struct objfile *objfile,
 	}
     }
 
+  add_interesting_symbol (psymtab, best);
   return best;
 }
 
@@ -581,7 +599,9 @@ psymtab_to_symtab (struct objfile *objfile, struct partial_symtab *pst)
   /* If it's been looked up before, return it.  */
   if (pst->get_compunit_symtab (objfile))
     {
-      if (lazy_expand_symtab_p)
+      if (lazy_expand_symtab_p
+	  && (pst->interesting_symbols.size ()
+	      > pst->expanded_interesting_symbols))
 	pst->reset_compunit_symtab (objfile);
       else
 	return pst->get_compunit_symtab (objfile);
@@ -600,8 +620,11 @@ psymtab_to_symtab (struct objfile *objfile, struct partial_symtab *pst)
 	}
 
       pst->read_symtab (objfile);
+      //gdb_assert (pst->get_compunit_symtab (objfile) != nullptr);
+      pst->expanded_interesting_symbols = pst->interesting_symbols.size ();
     }
 
+  //gdb_assert (pst->get_compunit_symtab (objfile) != nullptr);
   return pst->get_compunit_symtab (objfile);
 }
 
@@ -1003,23 +1026,6 @@ psymbol_functions::expand_matching_symbols
 				   ordered_compare))
 	psymtab_to_symtab (objfile, ps);
     }
-}
-
-static void
-add_interesting_symbol (struct partial_symtab *ps, partial_symbol *psym)
-{
-  bool found = false;
-  int i;
-
-  for (i = 0; i < ps->interesting_symbols.size (); ++i)
-    if (ps->interesting_symbols[i] == psym)
-      {
-	found = true;
-	break;
-      }
-
-  if (!found)
-    ps->interesting_symbols.push_back (psym);
 }
 
 /* A helper for psym_expand_symtabs_matching that handles searching

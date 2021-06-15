@@ -332,6 +332,7 @@ struct partial_symtab
   struct partial_symtab **dependencies = nullptr;
 
   std::vector<partial_symbol *> interesting_symbols;
+  size_t expanded_interesting_symbols = 0;
 
   int number_of_dependencies = 0;
 
