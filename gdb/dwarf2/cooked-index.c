@@ -25,6 +25,26 @@
 #include "split-names.h"
 #include <algorithm>
 
+/* Hash function for cooked_index_entry.  */
+
+static hashval_t
+hash_entry (const void *e)
+{
+  const cooked_index_entry *entry = (const cooked_index_entry *) e;
+  return dwarf5_djb_hash (entry->canonical);
+}
+
+/* Equality function for cooked_index_entry.  */
+
+static int
+eq_entry (const void *a, const void *b)
+{
+  const cooked_index_entry *ae = (const cooked_index_entry *) a;
+  const gdb::string_view *sv = (const gdb::string_view *) b;
+  return (strlen (ae->canonical) == sv->length ()
+	  && strncasecmp (ae->canonical, sv->data (), sv->length ()) == 0);
+}
+
 /* See cooked-index.h.  */
 
 const char *
@@ -165,7 +185,8 @@ cooked_index_vector::lookup (CORE_ADDR addr)
 /* See cooked-index.h.  */
 
 gdb::unique_xmalloc_ptr<char>
-cooked_index_vector::handle_gnat_encoded_entry (cooked_index_entry *entry)
+cooked_index_vector::handle_gnat_encoded_entry (cooked_index_entry *entry,
+						htab_t gnat_entries)
 {
   std::string canonical = ada_decode (entry->name, false);
   if (canonical.empty ())
@@ -178,14 +199,12 @@ cooked_index_vector::handle_gnat_encoded_entry (cooked_index_entry *entry)
   for (const auto &name : names)
     {
       uint32_t hashval = dwarf5_djb_hash (name);
-      void **slot = htab_find_slot_with_hash (m_hash.get (), &name,
+      void **slot = htab_find_slot_with_hash (gnat_entries, &name,
 					      hashval, INSERT);
       /* CUs are processed in order, so we only need to check the most
 	 recent entry.  */
       cooked_index_entry *last = (cooked_index_entry *) *slot;
-      if (last == nullptr
-	  || last->tag != DW_TAG_namespace
-	  || last->per_cu != entry->per_cu)
+      if (last == nullptr || last->per_cu != entry->per_cu)
 	{
 	  gdb::unique_xmalloc_ptr<char> new_name
 	    = make_unique_xstrndup (name.data (), name.length ());
@@ -253,6 +272,9 @@ cooked_index_vector::finalize ()
 
   for (auto &index : m_vector)
     {
+      htab_up gnat_entries (htab_create_alloc (10, hash_entry, eq_entry,
+					       nullptr, xcalloc, xfree));
+
       std::vector<cooked_index_entry *> entries
 	= std::move (index->m_entries);
       for (cooked_index_entry *entry : entries)
@@ -268,7 +290,7 @@ cooked_index_vector::finalize ()
 		{
 		  /* FIXME use a bcache here?? */
 		  gdb::unique_xmalloc_ptr<char> canon_name
-		    = handle_gnat_encoded_entry (entry);
+		    = handle_gnat_encoded_entry (entry, gnat_entries.get ());
 		  if (canon_name == nullptr)
 		    entry->canonical = entry->name;
 		  else
