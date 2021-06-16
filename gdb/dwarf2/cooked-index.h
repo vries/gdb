@@ -59,15 +59,13 @@ struct cooked_index_entry : public allocate_on_obstack
   cooked_index_entry (sect_offset die_offset_, enum dwarf_tag tag_,
 		      cooked_index_flag flags_, const char *name_,
 		      const cooked_index_entry *parent_entry_,
-		      dwarf2_per_cu_data *per_cu_,
-		      cooked_index_entry *next_)
+		      dwarf2_per_cu_data *per_cu_)
     : name (name_),
       tag (tag_),
       flags (flags_),
       die_offset (die_offset_),
       parent_entry (parent_entry_),
-      per_cu (per_cu_),
-      next (next_)
+      per_cu (per_cu_)
   {
   }
 
@@ -135,6 +133,11 @@ struct cooked_index_entry : public allocate_on_obstack
      STORAGE.  */
   const char *full_name (struct obstack *storage) const;
 
+  bool operator< (const cooked_index_entry &other) const
+  {
+    return strcasecmp (canonical, other.canonical) < 0;
+  }
+
   /* The name as it appears in DWARF.  This always points into one of
      the mapped DWARF sections.  Note that this may be the name or the
      linkage name -- two entries are created for DIEs which have both
@@ -155,12 +158,6 @@ struct cooked_index_entry : public allocate_on_obstack
   const cooked_index_entry *parent_entry;
   /* The CU from which this entry originates.  */
   dwarf2_per_cu_data *per_cu;
-  /* This has two uses.  While initially reading the index, all
-     entries are kept on a linked list, chained by this member.
-     Later, entries are put into a hash table.  This is then used to
-     chain together all entries that occupy the same hash table
-     slot.  */
-  cooked_index_entry *next;
 
 private:
 
@@ -211,16 +208,6 @@ private:
     return m_main;
   }
 
-  /* Return the linked list of entries.  This is only called during
-     "finalization" setup, by cooked_index_vector.  */
-  cooked_index_entry *get_entries ()
-  {
-    cooked_index_entry *result = m_start;
-    /* We don't need this any more, so make sure it is unusable.  */
-    m_start = nullptr;
-    return result;
-  }
-
   dwarf2_per_cu_data *lookup (CORE_ADDR addr)
   {
     return (dwarf2_per_cu_data *) addrmap_find (m_addrmap, addr);
@@ -228,20 +215,22 @@ private:
 
   /* Create a new cooked_index_entry and register it with this object.
      Entries are owned by this object.  The new item is returned.  */
-  cooked_index_entry *add (sect_offset die_offset, enum dwarf_tag tag,
-			   cooked_index_flag flags,
-			   const char *name,
-			   const cooked_index_entry *parent_entry,
-			   dwarf2_per_cu_data *per_cu,
-			   cooked_index_entry *next)
+  cooked_index_entry *create (sect_offset die_offset,
+			      enum dwarf_tag tag,
+			      cooked_index_flag flags,
+			      const char *name,
+			      const cooked_index_entry *parent_entry,
+			      dwarf2_per_cu_data *per_cu)
   {
     return new (&m_storage) cooked_index_entry (die_offset, tag, flags,
 						name, parent_entry,
-						per_cu, next);
+						per_cu);
   }
 
   /* Storage for the entries.  */
   auto_obstack m_storage;
+  /* List of all entries.  */
+  std::vector<cooked_index_entry *> m_entries;
   /* If we found "main" or an entry with 'is_main' set, store it
      here.  */
   cooked_index_entry *m_main = nullptr;
@@ -282,19 +271,35 @@ public:
     m_future.wait ();
   }
 
-  /* Look up an entry by name.  */
-  const cooked_index_entry *find (gdb::string_view name)
+  /* A simple range over part of m_entries.  */
+  struct range
+  {
+    typedef std::vector<cooked_index_entry *>::iterator iterator;
+
+    iterator begin () const
+    {
+      return m_begin;
+    }
+
+    iterator end () const
+    {
+      return m_end;
+    }
+
+    iterator m_begin;
+    iterator m_end;
+  };
+
+  /* Look up an entry by name.  Returns a range of all matching
+     results.  */
+  range find (gdb::string_view name);
+
+  /* Return a range of all the entries.  */
+  range all_entries ()
   {
     m_future.wait ();
-    uint32_t hashval = dwarf5_djb_hash (name);
-    void *slot = htab_find_with_hash (m_hash.get (), &name, hashval);
-    return (const cooked_index_entry *) slot;
+    return { m_entries.begin (), m_entries.end () };
   }
-
-  /* Traverse all entries in the hash table, calling CALLBACK for
-     each.  When CALLBACK returns false, iteration stops.  */
-  void traverse
-       (gdb::function_view<bool (const cooked_index_entry *)> callback);
 
   dwarf2_per_cu_data *lookup (CORE_ADDR addr);
 
@@ -321,8 +326,8 @@ private:
      entries are stored on the obstacks in those objects.  */
   vec_type m_vector;
 
-  /* Hash table of entries.  */
-  htab_up m_hash;
+  /* List of all entries.  This is sorted during finalization.  */
+  std::vector<cooked_index_entry *> m_entries;
 
   /* Storage for canonical names.  */
   std::vector<gdb::unique_xmalloc_ptr<char>> m_names;

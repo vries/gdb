@@ -23,26 +23,7 @@
 #include "cp-support.h"
 #include "ada-lang.h"
 #include "split-names.h"
-
-/* Hash function for cooked_index_entry.  */
-
-static hashval_t
-hash_entry (const void *e)
-{
-  const cooked_index_entry *entry = (const cooked_index_entry *) e;
-  return dwarf5_djb_hash (entry->canonical);
-}
-
-/* Equality function for cooked_index_entry.  */
-
-static int
-eq_entry (const void *a, const void *b)
-{
-  const cooked_index_entry *ae = (const cooked_index_entry *) a;
-  const gdb::string_view *sv = (const gdb::string_view *) b;
-  return (strlen (ae->canonical) == sv->length ()
-	  && strncasecmp (ae->canonical, sv->data (), sv->length ()) == 0);
-}
+#include <algorithm>
 
 /* See cooked-index.h.  */
 
@@ -99,19 +80,20 @@ cooked_index::add (sect_offset die_offset, enum dwarf_tag tag,
 		   const cooked_index_entry *parent_entry,
 		   dwarf2_per_cu_data *per_cu)
 {
-  m_start = add (die_offset, tag, flags, name, parent_entry, per_cu,
-		 m_start);
+  cooked_index_entry *result = create (die_offset, tag, flags, name,
+				       parent_entry, per_cu);
+  m_entries.push_back (result);
 
   /* An explicitly-tagged main program should always override the
      implicit "main" discovery.  */
   if ((flags & IS_MAIN) != 0)
-    m_main = m_start;
+    m_main = result;
   else if (per_cu->lang != language_ada
 	   && m_main == nullptr
 	   && strcmp (name, "main") == 0)
-    m_main = m_start;
+    m_main = result;
 
-  return m_start;
+  return result;
 }
 
 /* Helper function to bridge the gap between a libiberty hash table
@@ -131,8 +113,6 @@ htab_traverse_noresize (htab_t tab, T callback)
 
 cooked_index_vector::cooked_index_vector (vec_type &&vec)
   : m_vector (std::move (vec)),
-    m_hash (htab_create_alloc (10, hash_entry, eq_entry, nullptr,
-			       xcalloc, xfree)),
     m_future (gdb::thread_pool::g_thread_pool->post_task
 	      ([this] ()
 	      {
@@ -141,12 +121,31 @@ cooked_index_vector::cooked_index_vector (vec_type &&vec)
 {
 }
 
-void
-cooked_index_vector::traverse
-     (gdb::function_view<bool (const cooked_index_entry *)> callback)
+/* See cooked-index.h.  */
+
+cooked_index_vector::range
+cooked_index_vector::find (gdb::string_view name)
 {
-  m_future.wait ();
-  htab_traverse_noresize (m_hash.get (), callback);
+  range result;
+
+
+  result.m_begin = std::lower_bound (m_entries.begin (), m_entries.end (),
+				     name,
+				     [] (const cooked_index_entry *entry,
+					 const gdb::string_view &n)
+  {
+    return strncasecmp (entry->canonical, n.data (), n.length ()) < 0;
+  });
+
+  result.m_end = std::upper_bound (m_entries.begin (), m_entries.end (),
+				   name,
+				   [] (const gdb::string_view &n,
+				       const cooked_index_entry *entry)
+  {
+    return strncasecmp (entry->canonical, n.data (), n.length ()) < 0;
+  });
+
+  return result;
 }
 
 /* See cooked-index.h.  */
@@ -192,9 +191,9 @@ cooked_index_vector::handle_gnat_encoded_entry (cooked_index_entry *entry)
 	    = make_unique_xstrndup (name.data (), name.length ());
 	  /* It doesn't matter which obstack we allocate this on, so
 	     we pick the most convenient one.  */
-	  last = m_vector[0]->add (entry->die_offset, DW_TAG_namespace,
-				   0, new_name.get (), parent,
-				   entry->per_cu, last);
+	  last = m_vector[0]->create (entry->die_offset, DW_TAG_namespace,
+				      0, new_name.get (), parent,
+				      entry->per_cu);
 	  last->canonical = last->name;
 	  m_names.push_back (std::move (new_name));
 	  *slot = last;
@@ -254,14 +253,10 @@ cooked_index_vector::finalize ()
 
   for (auto &index : m_vector)
     {
-      cooked_index_entry *entry = index->get_entries ();
-      cooked_index_entry *next = nullptr;
-      for (; entry != nullptr; entry = next)
+      std::vector<cooked_index_entry *> entries
+	= std::move (index->m_entries);
+      for (cooked_index_entry *entry : entries)
 	{
-	  /* The 'next' field is updated at the end of the loop, so
-	     preserve it here for the next iteration.  */
-	  next = entry->next;
-
 	  gdb_assert (entry->canonical == nullptr);
 	  if ((entry->per_cu->lang != language_cplus
 	       && entry->per_cu->lang != language_ada)
@@ -307,13 +302,20 @@ cooked_index_vector::finalize ()
 		}
 	    }
 
-	  gdb_assert (entry->canonical != nullptr);
-	  gdb::string_view lookup_name (entry->canonical);
-	  uint32_t hashval = dwarf5_djb_hash (lookup_name);
-	  void **slot = htab_find_slot_with_hash (m_hash.get (), &lookup_name,
-						  hashval, INSERT);
-	  entry->next = (cooked_index_entry *) *slot;
-	  *slot = entry;
+	  if (m_entries.empty ())
+	    m_entries = std::move (entries);
+	  else
+	    {
+	      m_entries.reserve (m_entries.size () + entries.size ());
+	      std::move (entries.begin (), entries.end (),
+			 std::back_inserter (m_entries));
+	    }
 	}
     }
+
+  std::sort (m_entries.begin (), m_entries.end (),
+	     [] (const cooked_index_entry *a, const cooked_index_entry *b)
+	     {
+	       return *a < *b;
+	     });
 }
