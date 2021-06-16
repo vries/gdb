@@ -18556,14 +18556,6 @@ cooked_index_functions::expand_symtabs_matching
       bool found = true;
 
       const cooked_index_entry *parent = entry->parent_entry;
-      /* In the special case where the parent is an enum, but not an
-	 enum class, we want to skip the parent, because the constant
-	 appears in the enclosing scope.  */
-      if (parent != nullptr
-	  && parent->tag == DW_TAG_enumeration_type
-	  && (parent->flags & IS_ENUM_CLASS) == 0)
-	parent = parent->parent_entry;
-
       for (int i = name_vec.size () - 1; i > 0; --i)
 	{
 	  /* If we ran out of entries, or if this segment doesn't
