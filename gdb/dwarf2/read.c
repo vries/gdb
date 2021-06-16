@@ -18394,24 +18394,21 @@ cooked_index_functions::expand_matching_symbols
 					   : SEARCH_STATIC_BLOCK);
   const language_defn *lang = language_def (language_ada);
 
-  auto callback = [=] (const cooked_index_entry *entry)
-  {
-    if (entry->parent_entry != nullptr)
-      return true;
+  for (const cooked_index_entry *entry
+	 : per_objfile->per_bfd->cooked_index_table->all_entries ())
+    {
+      if (entry->parent_entry != nullptr)
+	continue;
 
-    if (!entry->matches (search_flags)
-	|| !entry->matches (domain))
-      return true;
+      if (!entry->matches (search_flags)
+	  || !entry->matches (domain))
+	continue;
 
-    symbol_name_matcher_ftype *name_match
-      = lang->get_symbol_name_matcher (lookup_name);
-    if (name_match (entry->canonical, lookup_name, nullptr))
-      dw2_instantiate_symtab (entry->per_cu, per_objfile, false);
-
-    return true;
-  };
-
-  per_objfile->per_bfd->cooked_index_table->traverse (callback);
+      symbol_name_matcher_ftype *name_match
+	= lang->get_symbol_name_matcher (lookup_name);
+      if (name_match (entry->canonical, lookup_name, nullptr))
+	dw2_instantiate_symtab (entry->per_cu, per_objfile, false);
+    }
 }
 
 static bool
@@ -18425,7 +18422,6 @@ indexed_complete
       domain_enum domain,
       enum search_domain kind)
 {
-  bool result = true;
   // FIXME what about 'auto' etc
   const enum language language = current_language->la_language;
   // FIXME
@@ -18445,55 +18441,47 @@ indexed_complete
   if (lookup_name != nullptr)
     matcher = current_language->get_symbol_name_matcher (*lookup_name);
 
-  auto check_slot = [&] (const cooked_index_entry *entry)
-  {
-    for ( ; entry != nullptr; entry = entry->next)
-      {
-	/* No need to consider symbols from expanded CUs.  */
-	if (per_objfile->symtab_set_p (entry->per_cu))
-	  continue;
+  // FIXME should use a range
+  for (const cooked_index_entry *entry
+	 : per_objfile->per_bfd->cooked_index_table->all_entries ())
+    {
+      /* No need to consider symbols from expanded CUs.  */
+      if (per_objfile->symtab_set_p (entry->per_cu))
+	continue;
 
-	/* If file-matching was done, we don't need to consider
-	   symbols from unmarked CUs.  */
-	if (file_matcher != nullptr && !entry->per_cu->v.quick->mark)
-	  continue;
+      /* If file-matching was done, we don't need to consider
+	 symbols from unmarked CUs.  */
+      if (file_matcher != nullptr && !entry->per_cu->v.quick->mark)
+	continue;
 
-	/* If the language does not have namespaces, but the symbol
-	   does, then we can't construct a proper name anyhow, so we
-	   can skip it.  */
-	if (!has_namespaces && entry->parent_entry != nullptr)
-	  continue;
+      /* If the language does not have namespaces, but the symbol
+	 does, then we can't construct a proper name anyhow, so we
+	 can skip it.  */
+      if (!has_namespaces && entry->parent_entry != nullptr)
+	continue;
 
-	/* See if the symbol matches the type filter.  */
-	if (!entry->matches (search_flags)
-	    || !entry->matches (domain)
-	    || !entry->matches (kind))
-	  continue;
+      /* See if the symbol matches the type filter.  */
+      if (!entry->matches (search_flags)
+	  || !entry->matches (domain)
+	  || !entry->matches (kind))
+	continue;
 
-	auto_obstack storage;
-	const char *name = entry->full_name (&storage);
+      auto_obstack storage;
+      const char *name = entry->full_name (&storage);
 
-	if (matcher != nullptr && !matcher (name, *lookup_name, nullptr))
-	  continue;
+      if (matcher != nullptr && !matcher (name, *lookup_name, nullptr))
+	continue;
 
-	if (symbol_matcher != nullptr && !symbol_matcher (name))
-	  continue;
+      if (symbol_matcher != nullptr && !symbol_matcher (name))
+	continue;
 
-	if (!dw2_expand_symtabs_matching_one (entry->per_cu, per_objfile,
-					      file_matcher,
-					      expansion_notify))
-	  {
-	    result = false;
-	    return false;
-	  }
-      }
+      if (!dw2_expand_symtabs_matching_one (entry->per_cu, per_objfile,
+					    file_matcher,
+					    expansion_notify))
+	return false;
+    }
 
-    return true;
-  };
-
-  per_objfile->per_bfd->cooked_index_table->traverse (check_slot);
-
-  return result;
+  return true;
 }
 
 bool
@@ -18542,12 +18530,10 @@ cooked_index_functions::expand_symtabs_matching
 
   std::vector<gdb::string_view> name_vec
     = split_name (lookup_name_without_params.language_lookup_name (current_language->la_language));
-  const cooked_index_entry *entry
-    = per_objfile->per_bfd->cooked_index_table->find (name_vec.back ());
 
   auto name_match = strncmp;	/* FIXME */
-
-  for (; entry != nullptr; entry = entry->next)
+  for (const cooked_index_entry *entry
+	 : per_objfile->per_bfd->cooked_index_table->find (name_vec.back ()))
     {
       if (!entry->matches (search_flags)
 	  || !entry->matches (domain)
@@ -18596,7 +18582,7 @@ cooked_index_functions::expand_symtabs_matching
 	  && !dw2_expand_symtabs_matching_one (entry->per_cu, per_objfile,
 					       file_matcher,
 					       expansion_notify))
-	return false;
+	break;
     }
 
   return true;
