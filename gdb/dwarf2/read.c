@@ -18224,9 +18224,16 @@ cooked_indexer::index_dies (const struct die_reader_specs *reader,
 	      break;
 
 	    case DW_TAG_enumeration_type:
-	      /* We need to recurse even for an anonymous
-		 enumeration.  */
-	      info_ptr = recurse (reader, info_ptr, this_entry);
+	      /* We need to recurse even for an anonymous enumeration.
+		 Which scope we record as the parent scope depends on
+		 whether we're reading an "enum class".  If so, we use
+		 the enum itself as the parent, yielding names like
+		 "enum_class::enumerator"; otherwise we inject the
+		 names into our own parent scope.  */
+	      info_ptr = recurse (reader, info_ptr,
+				  ((flags & IS_ENUM_CLASS) == 0)
+				  ? parent_entry
+				  : this_entry);
 	      continue;
 
 	    case DW_TAG_module:
