@@ -17800,7 +17800,8 @@ cooked_indexer::ensure_cu_exists (const die_reader_specs *reader,
   gdb_assert (info_ptr_result == nullptr || result == nullptr);
   if (result == nullptr)
     {
-      cutu_reader new_reader (per_cu, per_objfile, nullptr, nullptr, false);
+      cutu_reader new_reader (per_cu, per_objfile, nullptr, nullptr, false,
+			      m_index_storage->get_abbrev_cache ());
 
       // FIXME we should probably set this on the per-cu so it is
       // cached.  just entering into the cooked_index_storage would
