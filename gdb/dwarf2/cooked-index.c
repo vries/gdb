@@ -161,7 +161,7 @@ cooked_index_vector::find (gdb::string_view name)
 				   [] (const gdb::string_view &n,
 				       const cooked_index_entry *entry)
   {
-    return strncasecmp (entry->canonical, n.data (), n.length ()) < 0;
+    return strncasecmp (entry->canonical, n.data (), n.length ()) > 0;
   });
 
   return result;
