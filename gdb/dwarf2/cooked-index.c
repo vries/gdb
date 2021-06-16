@@ -322,15 +322,15 @@ cooked_index_vector::finalize ()
 		    }
 		}
 	    }
+	}
 
-	  if (m_entries.empty ())
-	    m_entries = std::move (entries);
-	  else
-	    {
-	      m_entries.reserve (m_entries.size () + entries.size ());
-	      std::move (entries.begin (), entries.end (),
-			 std::back_inserter (m_entries));
-	    }
+      if (m_entries.empty ())
+	m_entries = std::move (entries);
+      else
+	{
+	  m_entries.reserve (m_entries.size () + entries.size ());
+	  std::move (entries.begin (), entries.end (),
+		     std::back_inserter (m_entries));
 	}
     }
 
