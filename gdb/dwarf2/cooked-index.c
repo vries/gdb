@@ -334,6 +334,7 @@ cooked_index_vector::finalize ()
 	}
     }
 
+  m_names.shrink_to_fit ();
   m_entries.shrink_to_fit ();
   std::sort (m_entries.begin (), m_entries.end (),
 	     [] (const cooked_index_entry *a, const cooked_index_entry *b)
