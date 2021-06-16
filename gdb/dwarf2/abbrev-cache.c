@@ -51,6 +51,10 @@ abbrev_cache::abbrev_cache ()
 void
 abbrev_cache::add (abbrev_table_up table)
 {
+  /* We allow this as a convenience to the caller.  */
+  if (table == nullptr)
+    return;
+
   search_key key = { table->section, table->sect_off };
   void **slot = htab_find_slot_with_hash (m_tables.get (), &key,
 					  to_underlying (table->sect_off),
