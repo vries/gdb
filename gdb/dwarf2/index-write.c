@@ -1091,34 +1091,32 @@ write_cooked_index (dwarf2_per_objfile *per_objfile,
 		    const cu_index_map &cu_index_htab,
 		    struct mapped_symtab *symtab)
 {
-  auto handle_entry = [&] (const cooked_index_entry *entry)
-  {
-    const auto it = cu_index_htab.find (entry->per_cu);
-    gdb_assert (it != cu_index_htab.cend ());
 
-    const char *name = entry->full_name (&symtab->m_string_obstack);
+  for (const cooked_index_entry *entry
+	 : per_objfile->per_bfd->cooked_index_table->all_entries ())
+    {
+      const auto it = cu_index_htab.find (entry->per_cu);
+      gdb_assert (it != cu_index_htab.cend ());
 
-    gdb_index_symbol_kind kind;
-    if (entry->tag == DW_TAG_subprogram)
-      kind = GDB_INDEX_SYMBOL_KIND_FUNCTION;
-    else if (entry->tag == DW_TAG_variable
-	     || entry->tag == DW_TAG_constant
-	     || entry->tag == DW_TAG_enumerator)
-      kind = GDB_INDEX_SYMBOL_KIND_VARIABLE;
-    /* FIXME namespace?  */
-    else if (entry->tag == DW_TAG_module
-	     || entry->tag == DW_TAG_common_block)
-      kind = GDB_INDEX_SYMBOL_KIND_OTHER;
-    else
-      kind = GDB_INDEX_SYMBOL_KIND_TYPE;
+      const char *name = entry->full_name (&symtab->m_string_obstack);
 
-    add_index_entry (symtab, name, (entry->flags & IS_STATIC) != 0,
-		     kind, it->second);
+      gdb_index_symbol_kind kind;
+      if (entry->tag == DW_TAG_subprogram)
+	kind = GDB_INDEX_SYMBOL_KIND_FUNCTION;
+      else if (entry->tag == DW_TAG_variable
+	       || entry->tag == DW_TAG_constant
+	       || entry->tag == DW_TAG_enumerator)
+	kind = GDB_INDEX_SYMBOL_KIND_VARIABLE;
+      /* FIXME namespace?  */
+      else if (entry->tag == DW_TAG_module
+	       || entry->tag == DW_TAG_common_block)
+	kind = GDB_INDEX_SYMBOL_KIND_OTHER;
+      else
+	kind = GDB_INDEX_SYMBOL_KIND_TYPE;
 
-    return true;
-  };
-
-  per_objfile->per_bfd->cooked_index_table->traverse (handle_entry);
+      add_index_entry (symtab, name, (entry->flags & IS_STATIC) != 0,
+		       kind, it->second);
+    }
 }
 
 /* Write contents of a .gdb_index section for OBJFILE into OUT_FILE.
@@ -1244,12 +1242,9 @@ write_debug_names (dwarf2_per_objfile *per_objfile,
       ++this_counter;
     }
 
-  per_objfile->per_bfd->cooked_index_table->traverse
-    ([&] (const cooked_index_entry *entry)
-    {
-      nametable.insert (entry);
-      return true;
-    });
+  for (const cooked_index_entry *entry
+	 : per_objfile->per_bfd->cooked_index_table->all_entries ())
+    nametable.insert (entry);
 
   nametable.build ();
 
