@@ -148,7 +148,6 @@ cooked_index_vector::find (gdb::string_view name)
 {
   range result;
 
-
   result.m_begin = std::lower_bound (m_entries.begin (), m_entries.end (),
 				     name,
 				     [] (const cooked_index_entry *entry,
