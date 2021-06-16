@@ -315,7 +315,7 @@ private:
      existing returns the base name (last element) of the full decoded
      name.  */
   gdb::unique_xmalloc_ptr<char> handle_gnat_encoded_entry
-       (cooked_index_entry *entry);
+       (cooked_index_entry *entry, htab_t gnat_entries);
 
   /* Finalize the index.  This should be called a single time, when
      the index has been fully populated.  It enters all the entries
