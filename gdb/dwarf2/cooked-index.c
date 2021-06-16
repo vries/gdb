@@ -116,21 +116,6 @@ cooked_index::add (sect_offset die_offset, enum dwarf_tag tag,
   return result;
 }
 
-/* Helper function to bridge the gap between a libiberty hash table
-   callback and the callback used by the "quick" methods.  */
-template<typename T>
-inline void
-htab_traverse_noresize (htab_t tab, T callback)
-{
-  auto trampoline = [] (void **slot, void *datum) -> int
-  {
-    T *cb = (T *) datum;
-    return (*cb) ((cooked_index_entry *) *slot);
-  };
-
-  htab_traverse_noresize (tab, trampoline, &callback);
-}
-
 cooked_index_vector::cooked_index_vector (vec_type &&vec)
   : m_vector (std::move (vec)),
     m_future (gdb::thread_pool::g_thread_pool->post_task
