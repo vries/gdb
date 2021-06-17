@@ -18049,7 +18049,6 @@ cooked_indexer::index_imported_unit (cutu_reader *reader,
     return info_ptr;
 
   dwarf2_per_objfile *per_objfile = reader->cu->per_objfile;
-  const gdb_byte *new_info_ptr = nullptr;
   cutu_reader *new_reader = ensure_cu_exists (reader, per_objfile, sect_off,
 					      is_dwz, true);
   if (new_reader != nullptr)
