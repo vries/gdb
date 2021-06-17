@@ -6729,7 +6729,7 @@ build_type_psymtabs_reader (cutu_reader *reader,
 
   gdb_assert (storage != nullptr);
   cooked_indexer indexer (storage, per_cu, cu->per_cu->lang);
-  indexer.make_index (type_unit_die, reader, info_ptr);
+  indexer.make_index (reader);
 }
 
 /* Struct used to sort TUs by their abbreviation table offset.  */
