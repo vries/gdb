@@ -6576,9 +6576,7 @@ public:
 
   DISABLE_COPY_AND_ASSIGN (cooked_indexer);
 
-  void make_index (die_info *comp_unit_die,
-		   cutu_reader *reader,
-		   const gdb_byte *info_ptr);
+  void make_index (cutu_reader *reader);
 
 private:
 
@@ -6590,7 +6588,7 @@ private:
     return value;
   }
 
-  void check_bounds (die_info *comp_unit_die, dwarf2_cu *cu);
+  void check_bounds (cutu_reader *reader);
 
   cutu_reader *ensure_cu_exists (cutu_reader *reader,
 				 dwarf2_per_objfile *per_objfile,
@@ -6696,7 +6694,7 @@ process_psymtab_comp_unit (dwarf2_per_cu_data *this_cu,
 				 pretend_language);
 	  gdb_assert (storage != nullptr);
 	  cooked_indexer indexer (storage, this_cu, reader.cu->per_cu->lang);
-	  indexer.make_index (reader.comp_unit_die, &reader, reader.info_ptr);
+	  indexer.make_index (&reader);
 	}
     }
 }
@@ -17701,16 +17699,18 @@ read_full_die (const struct die_reader_specs *reader,
 
 
 void
-cooked_indexer::check_bounds (die_info *comp_unit_die, dwarf2_cu *cu)
+cooked_indexer::check_bounds (cutu_reader *reader)
 {
-  if (cu->per_cu->addresses_seen)
+  if (reader->cu->per_cu->addresses_seen)
     return;
+
+  dwarf2_cu *cu = reader->cu;
 
   CORE_ADDR best_lowpc = 0, best_highpc = 0;
   /* Possibly set the default values of LOWPC and HIGHPC from
      `DW_AT_ranges'.  */
   enum pc_bounds_kind cu_bounds_kind
-    = dwarf2_get_pc_bounds (comp_unit_die, &best_lowpc, &best_highpc,
+    = dwarf2_get_pc_bounds (reader->comp_unit_die, &best_lowpc, &best_highpc,
 			    cu, m_addrmap, this);
   if (cu_bounds_kind == PC_BOUNDS_HIGH_LOW && best_lowpc < best_highpc)
     {
@@ -17800,7 +17800,7 @@ cooked_indexer::ensure_cu_exists (cutu_reader *reader,
     }
 
   if (for_scanning)
-    check_bounds (result->comp_unit_die, result->cu);
+    check_bounds (result);
 
   return result;
 }
@@ -18258,9 +18258,7 @@ cooked_indexer::index_dies (cutu_reader *reader,
 }
 
 void
-cooked_indexer::make_index (die_info *comp_unit_die,
-			    cutu_reader *reader,
-			    const gdb_byte *info_ptr)
+cooked_indexer::make_index (cutu_reader *reader)
 {
   check_bounds (comp_unit_die, reader->cu);
   index_dies (reader, info_ptr, nullptr);
