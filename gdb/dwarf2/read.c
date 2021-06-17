@@ -6597,7 +6597,6 @@ private:
 				 bool for_scanning);
 
   const gdb_byte *index_dies (cutu_reader *reader,
-			      const gdb_byte *info_ptr,
 			      const cooked_index_entry *parent_entry);
 
   const gdb_byte *scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
@@ -18055,8 +18054,7 @@ cooked_indexer::index_imported_unit (cutu_reader *reader,
 					      is_dwz, true);
   if (new_reader != nullptr)
     {
-      gdb_assert (new_info_ptr != nullptr);
-      index_dies (new_reader, new_info_ptr, nullptr);
+      index_dies (new_reader, nullptr);
 
       reader->cu->add_dependence (new_reader->cu->per_cu);
     }
@@ -18102,7 +18100,7 @@ cooked_indexer::recurse (cutu_reader *reader,
 			 const gdb_byte *info_ptr,
 			 const cooked_index_entry *parent_entry)
 {
-  info_ptr = index_dies (reader, info_ptr, parent_entry);
+  info_ptr = index_dies (reader, parent_entry);
 
   if (parent_entry != nullptr)
     {
@@ -18118,9 +18116,9 @@ cooked_indexer::recurse (cutu_reader *reader,
 
 const gdb_byte *
 cooked_indexer::index_dies (cutu_reader *reader,
-			    const gdb_byte *info_ptr,
 			    const cooked_index_entry *parent_entry)
 {
+  const gdb_byte *info_ptr = reader->info_ptr;
   const gdb_byte *end_ptr = info_ptr + reader->cu->header.get_length ();
 
   while (info_ptr < end_ptr)
@@ -18261,7 +18259,7 @@ void
 cooked_indexer::make_index (cutu_reader *reader)
 {
   check_bounds (reader);
-  index_dies (reader, info_ptr, nullptr);
+  index_dies (reader, nullptr);
 
   for (const auto &entry : m_deferred_entries)
     {
