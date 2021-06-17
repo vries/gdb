@@ -18260,7 +18260,7 @@ cooked_indexer::index_dies (cutu_reader *reader,
 void
 cooked_indexer::make_index (cutu_reader *reader)
 {
-  check_bounds (comp_unit_die, reader->cu);
+  check_bounds (reader);
   index_dies (reader, info_ptr, nullptr);
 
   for (const auto &entry : m_deferred_entries)
