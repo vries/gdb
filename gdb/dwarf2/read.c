@@ -805,6 +805,8 @@ public:
 
   DISABLE_COPY_AND_ASSIGN (cutu_reader);
 
+  cutu_reader (cutu_reader &&) = default;
+
   const gdb_byte *info_ptr = nullptr;
   struct die_info *comp_unit_die = nullptr;
   bool dummy_p = false;
@@ -812,11 +814,6 @@ public:
   /* Release the new CU, putting it on the chain.  This cannot be done
      for dummy CUs.  */
   void keep ();
-
-  std::unique_ptr<dwarf2_cu> release_cu ()
-  {
-    return std::move (m_new_cu);
-  }
 
   abbrev_table_up release_abbrev_table ()
   {
@@ -6478,9 +6475,9 @@ class cooked_index_storage
 public:
 
   cooked_index_storage ()
-    : m_reader_hash (htab_create_alloc (10, hash_reader_and_cu,
-					eq_reader_and_cu,
-					htab_delete_entry<reader_and_cu>,
+    : m_reader_hash (htab_create_alloc (10, hash_cutu_reader,
+					eq_cutu_reader,
+					htab_delete_entry<cutu_reader>,
 					xcalloc, xfree)),
       m_index (new cooked_index),
       m_addrmap_storage (),
@@ -6498,33 +6495,23 @@ public:
 
   /* Return the DIE reader corresponding to PER_CU.  If no such reader
      has been registered, return NULL.  */
-  die_reader_specs *get_reader (dwarf2_per_cu_data *per_cu)
+  cutu_reader *get_reader (dwarf2_per_cu_data *per_cu)
   {
     int index = per_cu->index;
-    reader_and_cu *rcu
-      = (reader_and_cu *) htab_find_with_hash (m_reader_hash.get (),
-					       &index,
-					       index);
-    if (rcu == nullptr)
-      return nullptr;
-    return rcu->reader.get ();
+    return (cutu_reader *) htab_find_with_hash (m_reader_hash.get (),
+						&index, index);
   }
 
-  die_reader_specs *preserve (cutu_reader &reader)
+  cutu_reader *preserve (std::unique_ptr<cutu_reader> reader)
   {
-    std::unique_ptr<reader_and_cu> rcu (new reader_and_cu);
-    rcu->reader.reset (new die_reader_specs (reader));
-    die_reader_specs *result = rcu->reader.get ();
-    rcu->cu = reader.release_cu ();
+    m_abbrev_cache.add (reader->release_abbrev_table ());
 
-    int index = rcu->cu->per_cu->index;
+    int index = reader->cu->per_cu->index;
     void **slot = htab_find_slot_with_hash (m_reader_hash.get (), &index,
 					    index, INSERT);
     gdb_assert (*slot == nullptr);
-    *slot = rcu.release ();
-
-    m_abbrev_cache.add (reader.release_abbrev_table ());
-
+    cutu_reader *result = reader.get ();
+    *slot = reader.release ();
     return result;
   }
 
@@ -6551,21 +6538,15 @@ public:
 
 private:
 
-  struct reader_and_cu
+  static hashval_t hash_cutu_reader (const void *a)
   {
-    std::unique_ptr<die_reader_specs> reader;
-    std::unique_ptr<dwarf2_cu> cu;
-  };
-
-  static hashval_t hash_reader_and_cu (const void *a)
-  {
-    const reader_and_cu *reader = (const reader_and_cu *) a;
+    const cutu_reader *reader = (const cutu_reader *) a;
     return reader->cu->per_cu->index;
   }
 
-  static int eq_reader_and_cu (const void *a, const void *b)
+  static int eq_cutu_reader (const void *a, const void *b)
   {
-    const reader_and_cu *ra = (const reader_and_cu *) a;
+    const cutu_reader *ra = (const cutu_reader *) a;
     const int *rb = (const int *) b;
     return ra->cu->per_cu->index == *rb;
   }
@@ -6596,7 +6577,7 @@ public:
   DISABLE_COPY_AND_ASSIGN (cooked_indexer);
 
   void make_index (die_info *comp_unit_die,
-		   const struct die_reader_specs *reader,
+		   cutu_reader *reader,
 		   const gdb_byte *info_ptr);
 
 private:
@@ -6611,18 +6592,18 @@ private:
 
   void check_bounds (die_info *comp_unit_die, dwarf2_cu *cu);
 
-  const die_reader_specs *ensure_cu_exists (const die_reader_specs *reader,
-					    dwarf2_per_objfile *per_objfile,
-					    sect_offset sect_off,
-					    bool is_dwz,
-					    const gdb_byte **info_ptr_result);
+  cutu_reader *ensure_cu_exists (cutu_reader *reader,
+				 dwarf2_per_objfile *per_objfile,
+				 sect_offset sect_off,
+				 bool is_dwz,
+				 bool for_scanning);
 
-  const gdb_byte *index_dies (const struct die_reader_specs *reader,
+  const gdb_byte *index_dies (cutu_reader *reader,
 			      const gdb_byte *info_ptr,
 			      const cooked_index_entry *parent_entry);
 
   const gdb_byte *scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
-				   const struct die_reader_specs *reader,
+				   cutu_reader *reader,
 				   const gdb_byte *watermark_ptr,
 				   const gdb_byte *info_ptr,
 				   const abbrev_info *abbrev,
@@ -6634,11 +6615,11 @@ private:
 				   CORE_ADDR *maybe_defer,
 				   bool for_specification);
 
-  const gdb_byte *index_imported_unit (const struct die_reader_specs *reader,
+  const gdb_byte *index_imported_unit (cutu_reader *reader,
 				       const gdb_byte *info_ptr,
 				       const abbrev_info *abbrev);
 
-  const gdb_byte *recurse (const struct die_reader_specs *reader,
+  const gdb_byte *recurse (cutu_reader *reader,
 			   const gdb_byte *info_ptr,
 			   const cooked_index_entry *parent_entry);
 
@@ -17769,11 +17750,11 @@ tag_can_have_linkage_name (enum dwarf_tag tag)
     }
 }
 
-const die_reader_specs *
-cooked_indexer::ensure_cu_exists (const die_reader_specs *reader,
+cutu_reader *
+cooked_indexer::ensure_cu_exists (cutu_reader *reader,
 				  dwarf2_per_objfile *per_objfile,
 				  sect_offset sect_off, bool is_dwz,
-				  const gdb_byte **info_ptr_result)
+				  bool for_scanning)
 {
   /* Lookups for type unit references are always in the CU, and
      cross-CU references will crash.  */
@@ -17786,7 +17767,7 @@ cooked_indexer::ensure_cu_exists (const die_reader_specs *reader,
 
   /* When scanning, we only want to visit a given CU a single time.
      Doing this check here avoids self-imports as well.  */
-  if (info_ptr_result != nullptr)
+  if (for_scanning)
     {
       bool nope = false;
       if (!per_cu->scanned.compare_exchange_strong (nope, true))
@@ -17796,8 +17777,7 @@ cooked_indexer::ensure_cu_exists (const die_reader_specs *reader,
     return reader;
 
   // FIXME Really we ought to get rid of the need for a CU entirely.
-  die_reader_specs *result = m_index_storage->get_reader (per_cu);
-  gdb_assert (info_ptr_result == nullptr || result == nullptr);
+  cutu_reader *result = m_index_storage->get_reader (per_cu);
   if (result == nullptr)
     {
       cutu_reader new_reader (per_cu, per_objfile, nullptr, nullptr, false,
@@ -17812,21 +17792,22 @@ cooked_indexer::ensure_cu_exists (const die_reader_specs *reader,
       prepare_one_comp_unit (new_reader.cu, new_reader.comp_unit_die,
 			     language_minimal);
       if (new_reader.comp_unit_die->has_children)
-	result = m_index_storage->preserve (new_reader);
-
-      if (info_ptr_result != nullptr)
 	{
-	  check_bounds (new_reader.comp_unit_die, new_reader.cu);
-	  *info_ptr_result = new_reader.info_ptr;
+	  std::unique_ptr<cutu_reader> copy
+	    (new cutu_reader (std::move (new_reader)));
+	  result = m_index_storage->preserve (std::move (copy));
 	}
     }
+
+  if (for_scanning)
+    check_bounds (result->comp_unit_die, result->cu);
 
   return result;
 }
 
 const gdb_byte *
 cooked_indexer::scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
-				 const struct die_reader_specs *reader,
+				 cutu_reader *reader,
 				 const gdb_byte *watermark_ptr,
 				 const gdb_byte *info_ptr,
 				 const abbrev_info *abbrev,
@@ -17975,9 +17956,9 @@ cooked_indexer::scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
 	    || (*parent_entry == nullptr && m_language != language_c))
 	   && origin_offset != sect_offset (0))
     {
-      const die_reader_specs *new_reader
+      cutu_reader *new_reader
 	= ensure_cu_exists (reader, reader->cu->per_objfile, origin_offset,
-			    origin_is_dwz, nullptr);
+			    origin_is_dwz, false);
       if (new_reader != nullptr)
 	{
 	  const gdb_byte *new_info_ptr = (new_reader->buffer
@@ -18043,7 +18024,7 @@ cooked_indexer::scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
 }
 
 const gdb_byte *
-cooked_indexer::index_imported_unit (const struct die_reader_specs *reader,
+cooked_indexer::index_imported_unit (cutu_reader *reader,
 				     const gdb_byte *info_ptr,
 				     const abbrev_info *abbrev)
 {
@@ -18070,8 +18051,8 @@ cooked_indexer::index_imported_unit (const struct die_reader_specs *reader,
 
   dwarf2_per_objfile *per_objfile = reader->cu->per_objfile;
   const gdb_byte *new_info_ptr = nullptr;
-  const die_reader_specs *new_reader
-    = ensure_cu_exists (reader, per_objfile, sect_off, is_dwz, &new_info_ptr);
+  cutu_reader *new_reader = ensure_cu_exists (reader, per_objfile, sect_off,
+					      is_dwz, true);
   if (new_reader != nullptr)
     {
       gdb_assert (new_info_ptr != nullptr);
@@ -18117,7 +18098,7 @@ cooked_indexer::index_imported_unit (const struct die_reader_specs *reader,
 
 
 const gdb_byte *
-cooked_indexer::recurse (const struct die_reader_specs *reader,
+cooked_indexer::recurse (cutu_reader *reader,
 			 const gdb_byte *info_ptr,
 			 const cooked_index_entry *parent_entry)
 {
@@ -18136,7 +18117,7 @@ cooked_indexer::recurse (const struct die_reader_specs *reader,
 }
 
 const gdb_byte *
-cooked_indexer::index_dies (const struct die_reader_specs *reader,
+cooked_indexer::index_dies (cutu_reader *reader,
 			    const gdb_byte *info_ptr,
 			    const cooked_index_entry *parent_entry)
 {
@@ -18278,7 +18259,7 @@ cooked_indexer::index_dies (const struct die_reader_specs *reader,
 
 void
 cooked_indexer::make_index (die_info *comp_unit_die,
-			    const struct die_reader_specs *reader,
+			    cutu_reader *reader,
 			    const gdb_byte *info_ptr)
 {
   check_bounds (comp_unit_die, reader->cu);
