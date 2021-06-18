@@ -1,3 +1,10 @@
+2021-06-18  Tom Tromey  <tom@tromey.com>
+
+	* dwarf2/read.c (process_psymtab_comp_unit): Update.
+	(build_type_psymtabs_reader): Remove info_ptr and type_unit_die
+	parameters.  Change reader to cutu_reader.
+	(build_type_psymtabs, process_skeletonless_type_unit): Update.
+
 2021-05-24  Tom Tromey  <tom@tromey.com>
 
 	* addrmap.c (addrmap_mutable_find): Implement.
