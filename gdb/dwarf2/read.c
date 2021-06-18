@@ -6710,7 +6710,6 @@ build_type_psymtabs_reader (cutu_reader *reader,
   struct signatured_type *sig_type;
   struct type_unit_group *tu_group;
   struct attribute *attr;
-  const gdb_byte *info_ptr = reader->info_ptr;
   struct die_info *type_unit_die = reader->comp_unit_die;
 
   gdb_assert (per_cu->is_debug_types);
