@@ -30,6 +30,8 @@
 #include "objfiles.h"
 #include "complaints.h"
 
+#include <mutex>
+
 void
 dwarf2_section_info::overflow_complaint () const
 {
@@ -118,10 +120,12 @@ dwarf2_section_info::empty () const
 void
 dwarf2_section_info::read (struct objfile *objfile)
 {
+  static std::mutex mutex;
   asection *sectp;
   bfd *abfd;
   gdb_byte *buf, *retbuf;
 
+  std::lock_guard<std::mutex> guard (mutex);
   if (readin)
     return;
   buffer = NULL;
