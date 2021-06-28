@@ -2041,6 +2041,25 @@ dwarf2_get_section_info (struct objfile *objfile,
   *sizep = info->size;
 }
 
+/* See dwarf2/read.h.  */
+
+void
+dwarf2_per_bfd::map_info_sections (struct objfile *objfile)
+{
+  info.read (objfile);
+  abbrev.read (objfile);
+  line.read (objfile);
+  str.read (objfile);
+  str_offsets.read (objfile);
+  line_str.read (objfile);
+  ranges.read (objfile);
+  rnglists.read (objfile);
+  addr.read (objfile);
+
+  for (auto &section : types)
+    section.read (objfile);
+}
+
 
 /* DWARF quick_symbol_functions support.  */
 
@@ -7785,7 +7804,7 @@ dwarf2_build_psymtabs_hard (dwarf2_per_objfile *per_objfile)
   scoped_restore restore_reading_psyms
     = make_scoped_restore (&per_bfd->reading_partial_symbols, true);
 
-  per_bfd->info.read (objfile);
+  per_bfd->map_info_sections (objfile);
 
   /* Any cached compilation units will be linked by the per-objfile
      read_in_chain.  Make sure to free them when we're done.  */
