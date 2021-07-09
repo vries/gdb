@@ -116,9 +116,10 @@ proc my_gdb_test {cmd pattern message} {
     }
 }
 
-# Hammer away for 5 seconds, alternating between inferiors.
+# Hammer away for 30 minutes, alternating between inferiors.
 set second 1000
-set duration [expr 5 * $second]
+set minute [expr 60 * $second]
+set duration [expr 30 * $minute]
 
 # Setup watchdog.
 set ::done 0
