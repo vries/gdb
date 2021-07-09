@@ -85,7 +85,7 @@ with_test_prefix "second inferior" {
 delete_breakpoints
 
 # These put too much noise in the logs.
-gdb_test_no_output "set print thread-events off"
+#gdb_test_no_output "set print thread-events off"
 
 # Continue all threads of both processes.
 gdb_test_no_output "set schedule-multiple on"
@@ -105,12 +105,21 @@ gdb_test_multiple $cmd "continuing" {
 # - on failure, clear the ok variable in the calling context, and
 #   break it.
 proc my_gdb_test {cmd pattern message} {
+    global gdb_prompt
+
     upvar inf inf
     upvar iter iter
-    if {[gdb_test_multiple $cmd "access mem ($message, inf=$inf, iter=$iter)" {
-	-wrap -re $pattern {
+    set res2 0
+    set res [gdb_test_multiple $cmd "access mem ($message, inf=$inf, iter=$iter)" {
+	-re "$pattern.*\r\n$gdb_prompt " {
 	}
-    }] != 0} {
+	-re "\r\n$gdb_prompt " {
+	    fail $gdb_test_name
+	    set res2 -1
+	}
+    }]
+
+    if { $res != 0 || $res2 != 0 } {
 	uplevel 1 {set ok 0}
 	return -code break
     }
@@ -131,7 +140,10 @@ set iter 0
 while {!$::done && $ok} {
     incr iter
     verbose -log "xxxxx: iteration $iter"
-    gdb_test "info threads" ".*" ""
+    gdb_test_multiple "info threads" "" {
+	-re "\r\n$gdb_prompt " {
+	}
+    }
 
     if {$inf == 1} {
 	set inf 2
@@ -154,3 +166,14 @@ while {!$::done && $ok} {
 if {$ok} {
     pass "access mem"
 }
+
+gdb_test_multiple "kill inferiors 1" "" {
+	-re "\r\n$gdb_prompt " {
+	}
+}
+
+gdb_test_multiple "kill inferiors 2" "" {
+	-re "\r\n$gdb_prompt " {
+	}
+}
+
