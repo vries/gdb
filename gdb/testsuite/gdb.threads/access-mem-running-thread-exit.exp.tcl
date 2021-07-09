@@ -125,6 +125,11 @@ proc my_gdb_test {cmd pattern message} {
     }
 }
 
+gdb_test_multiple "set debug lin-lwp-mem 1" "" {
+	-re "\r\n$gdb_prompt " {
+	}
+}
+
 # Hammer away for 30 minutes, alternating between inferiors.
 set second 1000
 set minute [expr 60 * $second]
@@ -167,6 +172,11 @@ if {$ok} {
     pass "access mem"
 }
 
+gdb_test_multiple "set debug lin-lwp-mem 0" "" {
+	-re "\r\n$gdb_prompt " {
+	}
+}
+
 gdb_test_multiple "kill inferiors 1" "" {
 	-re "\r\n$gdb_prompt " {
 	}
@@ -176,4 +186,3 @@ gdb_test_multiple "kill inferiors 2" "" {
 	-re "\r\n$gdb_prompt " {
 	}
 }
-

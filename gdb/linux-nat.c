@@ -199,10 +199,22 @@ show_debug_linux_nat (struct ui_file *file, int from_tty,
 		    value);
 }
 
+static unsigned int debug_linux_nat_mem;
+static void
+show_debug_linux_nat_mem (struct ui_file *file, int from_tty,
+			  struct cmd_list_element *c, const char *value)
+{
+  fprintf_filtered (file, _("Debugging of GNU/Linux lwp module mem is %s.\n"),
+		    value);
+}
+
 /* Print a linux-nat debug statement.  */
 
 #define linux_nat_debug_printf(fmt, ...) \
   debug_prefixed_printf_cond (debug_linux_nat, "linux-nat", fmt, ##__VA_ARGS__)
+
+#define linux_nat_mem_debug_printf(fmt, ...)				\
+  debug_prefixed_printf_cond (debug_linux_nat_mem, "linux-nat", fmt, ##__VA_ARGS__)
 
 struct simple_pid_list
 {
@@ -3818,8 +3830,8 @@ static struct
   /* Close FD and clear it to -1.  */
   void close ()
   {
-    linux_nat_debug_printf ("closing fd %d for /proc/%d/task/%ld/mem\n",
-			    fd, ptid.pid (), ptid.lwp ());
+    linux_nat_mem_debug_printf ("closing fd %d for /proc/%d/task/%ld/mem\n",
+				fd, ptid.pid (), ptid.lwp ());
     ::close (fd);
     fd = -1;
   }
@@ -3872,14 +3884,14 @@ linux_proc_xfer_memory_partial_pid (ptid_t ptid,
 
       if (last_proc_mem_file.fd == -1)
 	{
-	  linux_nat_debug_printf ("opening %s failed: %s (%d)\n",
-				  filename, safe_strerror (errno), errno);
+	  linux_nat_mem_debug_printf ("opening %s failed: %s (%d)\n",
+				      filename, safe_strerror (errno), errno);
 	  return -1;
 	}
       last_proc_mem_file.ptid = ptid;
 
-      linux_nat_debug_printf ("opened fd %d for %s\n",
-			      last_proc_mem_file.fd, filename);
+      linux_nat_mem_debug_printf ("opened fd %d for %s\n",
+				  last_proc_mem_file.fd, filename);
     }
 
   int fd = last_proc_mem_file.fd;
@@ -3899,14 +3911,17 @@ linux_proc_xfer_memory_partial_pid (ptid_t ptid,
 
   if (ret == -1)
     {
-      linux_nat_debug_printf ("accessing fd %d for pid %ld failed: %s (%d)\n",
-			      fd, ptid.lwp (),
-			      safe_strerror (errno), errno);
+      linux_nat_mem_debug_printf ("accessing fd %d for pid %ld failed: %s (%d)\n",
+				  fd, ptid.lwp (),
+				  safe_strerror (errno), errno);
     }
   else if (ret == 0)
     {
-      linux_nat_debug_printf ("accessing fd %d for pid %ld got EOF\n",
-			      fd, ptid.lwp ());
+      linux_nat_mem_debug_printf ("accessing fd %d for pid %ld got EOF\n",
+				  fd, ptid.lwp ());
+      linux_nat_mem_debug_printf ("fd %d for /proc/%d/task/%ld/mem\n",
+				  fd, last_proc_mem_file.ptid.pid (),
+				  last_proc_mem_file.ptid.lwp ());
     }
 
   return ret;
@@ -4546,6 +4561,16 @@ Enables printf debugging output."),
 			     NULL,
 			     show_debug_linux_nat,
 			     &setdebuglist, &showdebuglist);
+
+  add_setshow_zuinteger_cmd ("lin-lwp-mem", class_maintenance,
+			     &debug_linux_nat_mem, _("\
+Set debugging of GNU/Linux lwp mem module."), _("\
+Show debugging of GNU/Linux lwp mem module."), _("\
+Enables printf debugging output."),
+			     NULL,
+			     show_debug_linux_nat_mem,
+			     &setdebuglist, &showdebuglist);
+
 
   add_setshow_boolean_cmd ("linux-namespaces", class_maintenance,
 			   &debug_linux_namespaces, _("\
