@@ -22,6 +22,7 @@
 #include "inferior.h"
 #include "cli/cli-cmds.h"
 #include "aarch64-nat.h"
+#include "arch/aarch64-insn.h"
 
 #include <unordered_map>
 
@@ -225,27 +226,275 @@ aarch64_remove_watchpoint (CORE_ADDR addr, int len, enum target_hw_bp_type type,
   return ret;
 }
 
-/* See aarch64-nat.h.  */
+/* Macros to distinguish between various types of load/store instructions.  */
+
+/* Regular and Advanced SIMD load/store instructions.  */
+#define GENERAL_LOAD_STORE_P(insn) (bit (insn, 25) == 0 && bit (insn, 27) == 1)
+
+/* SVE load/store instruction.  */
+#define SVE_LOAD_STORE_P(insn) (bits (insn, 25, 28) == 0x2		      \
+				&& (bits (insn, 29, 31) == 0x4		      \
+				    || bits (insn, 29, 31) == 0x5	      \
+				    || bits (insn, 29, 31) == 0x6	      \
+				    || (bits (insn, 29, 31) == 0x7	      \
+					&& ((bit (insn, 15) == 0x0	      \
+					     && (bit (insn, 13) == 0x0	      \
+						 || bit (insn, 13) == 0x1))   \
+					     || (bit (insn, 15) == 0x1	      \
+						 && bit (insn, 13) == 0x0)    \
+					     || bits (insn, 13, 15) == 0x6    \
+					     || bits (insn, 13, 15) == 0x7))))
+
+/* Any load/store instruction (regular, Advanced SIMD or SVE).  */
+#define LOAD_STORE_P(insn) (GENERAL_LOAD_STORE_P (insn)			      \
+			    || SVE_LOAD_STORE_P (insn))
+
+/* Load/Store pair (regular or vector).  */
+#define LOAD_STORE_PAIR_P(insn) (bit (insn, 28) == 0 && bit (insn, 29) == 1)
+
+#define COMPARE_SWAP_PAIR_P(insn) (bits (insn, 30, 31) == 0		      \
+				   && bits (insn, 28, 29) == 0		      \
+				   && bit (insn, 26) == 0		      \
+				   && bits (insn, 23, 24) == 0		      \
+				   && bit (insn, 11) == 1)
+#define LOAD_STORE_EXCLUSIVE_PAIR_P(insn) (bit (insn, 31) == 1		      \
+					   && bits (insn, 28, 29) == 0	      \
+					   && bit (insn, 26) == 0	      \
+					   && bits (insn, 23, 24) == 0	      \
+					   && bit (insn, 11) == 1)
+
+#define LOAD_STORE_LITERAL_P(insn) (bit (insn, 28) == 1			      \
+				    && bit (insn, 29) == 0		      \
+				    && bit (insn, 24) == 0)
+
+/* Vector Load/Store multiple structures.  */
+#define LOAD_STORE_MS(insn) (bits (insn, 28, 29) == 0x0			      \
+			     && bit (insn, 31) == 0x0			      \
+			     && bit (insn, 26) == 0x1			      \
+			     && ((bits (insn, 23, 24) == 0x0		      \
+				  && bits (insn, 16, 21) == 0x0)	      \
+				 || (bits (insn, 23, 24) == 0x1		      \
+				     && bit (insn, 21) == 0x0)))
+
+/* Vector Load/Store single structure.  */
+#define LOAD_STORE_SS(insn) (bits (insn, 28, 29) == 0x0			      \
+			     && bit (insn, 31) == 0x0			      \
+			     && bit (insn, 26) == 0x1			      \
+			     && ((bits (insn, 23, 24) == 0x2		      \
+				  && bits (insn, 16, 20) == 0x0)	      \
+				 || (bits (insn, 23, 24) == 0x3)))
+
+/* Assuming INSN is a load/store instruction, return the size of the
+   memory access.  The patterns are documented in the ARM Architecture
+   Reference Manual - Index by encoding.  */
+
+static unsigned int
+get_load_store_access_size (CORE_ADDR insn)
+{
+  if (SVE_LOAD_STORE_P (insn))
+    {
+      /* SVE load/store instructions.  */
+
+      /* This is not always correct for SVE instructions, but it is a reasonable
+	 default for now.  Calculating the exact memory access size for SVE
+	 load/store instructions requires parsing instructions and evaluating
+	 the vector length.  */
+      return 16;
+    }
+
+  /* Non-SVE instructions.  */
+
+  bool vector = (bit (insn, 26) == 1);
+  bool ldst_pair = LOAD_STORE_PAIR_P (insn);
+
+  /* Is this an Advanced SIMD load/store instruction?  */
+  if (vector)
+    {
+      unsigned int size = bits (insn, 30, 31);
+
+      if (LOAD_STORE_LITERAL_P (insn))
+	{
+	  /* Advanced SIMD load/store literal */
+	  /* Sizes 4, 8 and 16 bytes.  */
+	  return 4 << size;
+	}
+      else if (LOAD_STORE_MS (insn))
+	{
+	  size = 8 << bit (insn, 30);
+
+	  unsigned char opcode = bits (insn, 12, 15);
+
+	  if (opcode == 0x0 || opcode == 0x2)
+	    size *= 4;
+	  else if (opcode == 0x4 || opcode == 0x6)
+	    size *= 3;
+	  else if (opcode == 0x8 || opcode == 0xa)
+	    size *= 2;
+
+	  return size;
+	}
+      else if (LOAD_STORE_SS (insn))
+	{
+	  size = 8 << bit (insn, 30);
+	  return size;
+	}
+      /* Advanced SIMD load/store instructions.  */
+      else if (ldst_pair)
+	{
+	  /* Advanced SIMD load/store pair.  */
+	  /* Sizes 8, 16 and 32 bytes.  */
+	  return (8 << size);
+	}
+      else
+	{
+	  /* Regular Advanced SIMD load/store instructions.  */
+	  size = size | (bit (insn, 23) << 2);
+	  return 1 << size;
+	}
+    }
+
+  /* This must be a regular GPR load/store instruction.  */
+
+  unsigned int size = bits (insn, 30, 31);
+  bool cs_pair = COMPARE_SWAP_PAIR_P (insn);
+  bool ldstx_pair = LOAD_STORE_EXCLUSIVE_PAIR_P (insn);
+
+  if (ldst_pair)
+    {
+      /* Load/Store pair.  */
+      if (size == 0x1)
+	{
+	  if (bit (insn, 22) == 0)
+	    /* STGP - 16 bytes.  */
+	    return 16;
+	  else
+	    /* LDPSW - 8 bytes.  */
+	    return 8;
+	}
+      /* Other Load/Store pair.  */
+      return (size == 0)? 8 : 16;
+    }
+  else if (cs_pair || ldstx_pair)
+    {
+      /* Compare Swap Pair or Load Store Exclusive Pair.  */
+      /* Sizes 8 and 16 bytes.  */
+      size = bit (insn, 30);
+      return (8 << size);
+    }
+  else if (LOAD_STORE_LITERAL_P (insn))
+    {
+      /* Load/Store literal.  */
+      /* Sizes between 4 and 8 bytes.  */
+      if (size == 0x2)
+	return 4;
+
+      return 4 << size;
+    }
+  else
+    {
+      /* General load/store instructions, with memory access sizes between
+	 1 and 8 bytes.  */
+      return (1 << size);
+    }
+}
+
+/* Return true if the regions [mem_addr, mem_addr + mem_len) and
+   [watch_addr, watch_addr + watch_len) overlap.  False otherwise.  */
+
+static bool
+hw_watch_regions_overlap (CORE_ADDR mem_addr, size_t mem_len,
+			  CORE_ADDR watch_addr, size_t watch_len)
+{
+  /* Quick check for non-overlapping case.  */
+  if (watch_addr >= (mem_addr + mem_len)
+      || mem_addr >= (watch_addr + watch_len))
+    return false;
+
+  CORE_ADDR start = std::max (mem_addr, watch_addr);
+  CORE_ADDR end = std::min (mem_addr + mem_len, watch_addr + watch_len);
+
+  return ((end - start) > 0);
+}
+
+/* Check if a hardware watchpoint has triggered.  If a trigger is detected,
+   return true and update ADDR_P with the stopped data address.
+   Otherwise return false.
+
+   STATE is the debug register's state, INSN is the instruction the inferior
+   stopped at and ADDR_TRAP is the reported stopped data address.  */
 
 bool
 aarch64_stopped_data_address (const struct aarch64_debug_reg_state *state,
-			      CORE_ADDR addr_trap, CORE_ADDR *addr_p)
+			      CORE_ADDR insn, CORE_ADDR addr_trap,
+			      CORE_ADDR *addr_p)
 {
-  int i;
+  /* There are 6 variations of watchpoint range and memory access
+     range positioning:
 
-  for (i = aarch64_num_wp_regs - 1; i >= 0; --i)
+     - W is the byte in the watchpoint range only.
+
+     - B is the byte in the memory access range ony.
+
+     - O is the byte in the overlapping region of the watchpoint range and
+       the memory access range.
+
+     1 - Non-overlapping, no triggers.
+
+     [WWWWWWWW]...[BBBBBBBB]
+
+     2 - Non-overlapping, no triggers.
+
+     [BBBBBBBB]...[WWWWWWWW]
+
+     3 - Overlapping partially, triggers.
+
+     [BBBBOOOOWWWW]
+
+     4 - Overlapping partially, triggers.
+
+     [WWWWOOOOBBBB]
+
+     5 - Memory access contained in watchpoint range, triggers.
+
+     [WWWWOOOOOOOOWWWW]
+
+     6 - Memory access containing watchpoint range, triggers.
+
+     [BBBBOOOOOOOOBBBB]
+  */
+
+  /* If there are no load/store instructions at PC, this must be a hardware
+     breakpoint hit.  Return early.
+
+     If a hardware breakpoint is placed at a PC containing a load/store
+     instruction, we will go through the memory access size check anyway, but
+     will eventually figure out there are no watchpoints matching such an
+     address.
+
+     There is one corner case though, which is having a hardware breakpoint and
+     a hardware watchpoint at PC, when PC contains a load/store
+     instruction.  That is an ambiguous case that is hard to differentiate.
+
+     There's not much we can do about that unless the kernel sends us enough
+     information to tell them apart.  */
+  if (!LOAD_STORE_P (insn))
+    return false;
+
+  /* Get the memory access size for the instruction at PC.  */
+  unsigned int memory_access_size = get_load_store_access_size (insn);
+
+  for (int i = aarch64_num_wp_regs - 1; i >= 0; --i)
     {
       const unsigned int offset
 	= aarch64_watchpoint_offset (state->dr_ctrl_wp[i]);
       const unsigned int len = aarch64_watchpoint_length (state->dr_ctrl_wp[i]);
       const CORE_ADDR addr_watch = state->dr_addr_wp[i] + offset;
-      const CORE_ADDR addr_watch_aligned = align_down (state->dr_addr_wp[i], 8);
       const CORE_ADDR addr_orig = state->dr_addr_orig_wp[i];
 
-      if (state->dr_ref_count_wp[i]
-	  && DR_CONTROL_ENABLED (state->dr_ctrl_wp[i])
-	  && addr_trap >= addr_watch_aligned
-	  && addr_trap < addr_watch + len)
+      if ((state->dr_ref_count_wp[i]
+	  && DR_CONTROL_ENABLED (state->dr_ctrl_wp[i]))
+	  && hw_watch_regions_overlap (addr_trap, memory_access_size,
+				       addr_watch, len))
 	{
 	  /* ADDR_TRAP reports the first address of the memory range
 	     accessed by the CPU, regardless of what was the memory
@@ -270,6 +519,7 @@ aarch64_stopped_data_address (const struct aarch64_debug_reg_state *state,
 	}
     }
 
+  /* No hardware watchpoint hits detected.  */
   return false;
 }
 

@@ -51,7 +51,8 @@ void aarch64_remove_debug_reg_state (pid_t pid);
    *ADDR_P.  */
 
 bool aarch64_stopped_data_address (const struct aarch64_debug_reg_state *state,
-				   CORE_ADDR addr_trap, CORE_ADDR *addr_p);
+				   CORE_ADDR insn, CORE_ADDR addr_trap,
+				   CORE_ADDR *addr_p);
 
 /* Helper functions used by aarch64_nat_target below.  See their
    definitions.  */
