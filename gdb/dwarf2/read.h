@@ -281,13 +281,6 @@ struct dwarf2_per_cu_data
     return dwarf_version;
   }
 
-  /* A type unit group has a per_cu object that is recognized by
-     having no section.  */
-  bool type_unit_group_p () const
-  {
-    return section == nullptr;
-  }
-
   /* Free any cached file names.  */
   void free_cached_file_names ();
 };

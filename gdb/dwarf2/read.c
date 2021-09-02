@@ -481,8 +481,10 @@ struct stmt_list_hash
    that can be shared across objfiles.  The non-shareable parts are in
    type_unit_group_unshareable.  */
 
-struct type_unit_group : public dwarf2_per_cu_data
+struct type_unit_group
 {
+  dwarf2_per_bfd *per_bfd = nullptr;
+
   /* The TUs that share this DW_AT_stmt_list entry.
      This is added to while parsing type units to build partial symtabs,
      and is deleted afterwards and not used again.  */
@@ -2074,11 +2076,6 @@ static void
 dw2_do_instantiate_symtab (dwarf2_per_cu_data *per_cu,
 			   dwarf2_per_objfile *per_objfile, bool skip_partial)
 {
-  /* Skip type_unit_groups, reading the type units they contain
-     is handled elsewhere.  */
-  if (per_cu->type_unit_group_p ())
-    return;
-
   {
     /* The destructor of dwarf2_queue_guard frees any entries left on
        the queue.  After this point we're guaranteed to leave this function
@@ -2863,8 +2860,6 @@ dw2_get_file_names (dwarf2_per_cu_data *this_cu,
 {
   /* This should never be called for TUs.  */
   gdb_assert (! this_cu->is_debug_types);
-  /* Nor type unit groups.  */
-  gdb_assert (! this_cu->type_unit_group_p ());
 
   if (this_cu->files_read)
     return this_cu->file_names;
@@ -22697,9 +22692,6 @@ load_full_type_unit (dwarf2_per_cu_data *per_cu,
 		     dwarf2_per_objfile *per_objfile)
 {
   struct signatured_type *sig_type;
-
-  /* Caller is responsible for ensuring type_unit_groups don't get here.  */
-  gdb_assert (! per_cu->type_unit_group_p ());
 
   /* We have the per_cu, but we need the signatured_type.
      Fortunately this is an easy translation.  */
