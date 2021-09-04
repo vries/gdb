@@ -483,12 +483,10 @@ struct stmt_list_hash
 
 struct type_unit_group
 {
-  dwarf2_per_bfd *per_bfd = nullptr;
-
   /* The TUs that share this DW_AT_stmt_list entry.
      This is added to while parsing type units to build partial symtabs,
      and is deleted afterwards and not used again.  */
-  std::vector<signatured_type *> *tus = nullptr;
+  /* std::vector<signatured_type *> *tus = nullptr; */
 
   /* The data used to construct the hash key.  */
   struct stmt_list_hash hash {};
@@ -6492,11 +6490,7 @@ allocate_type_unit_groups_table ()
 static std::unique_ptr<type_unit_group>
 create_type_unit_group (struct dwarf2_cu *cu, sect_offset line_offset_struct)
 {
-  dwarf2_per_objfile *per_objfile = cu->per_objfile;
-  dwarf2_per_bfd *per_bfd = per_objfile->per_bfd;
-
   std::unique_ptr<type_unit_group> tu_group (new type_unit_group);
-  tu_group->per_bfd = per_bfd;
 
   tu_group->hash.dwo_unit = cu->dwo_unit;
   tu_group->hash.line_sect_off = line_offset_struct;
@@ -6854,23 +6848,12 @@ build_type_psymtabs_reader (cutu_reader *reader,
 {
   struct dwarf2_cu *cu = reader->cu;
   struct dwarf2_per_cu_data *per_cu = cu->per_cu;
-  struct signatured_type *sig_type;
-  struct type_unit_group *tu_group;
-  struct attribute *attr;
   struct die_info *type_unit_die = reader->comp_unit_die;
 
   gdb_assert (per_cu->is_debug_types);
-  sig_type = (struct signatured_type *) per_cu;
 
   if (! type_unit_die->has_children)
     return;
-
-  attr = type_unit_die->attr (DW_AT_stmt_list);
-  tu_group = get_type_unit_group (cu, attr);
-
-  if (tu_group->tus == nullptr)
-    tu_group->tus = new std::vector<signatured_type *>;
-  tu_group->tus->push_back (sig_type);
 
   prepare_one_comp_unit (cu, type_unit_die, language_minimal);
 
