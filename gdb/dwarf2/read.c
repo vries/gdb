@@ -7133,11 +7133,14 @@ dwarf2_build_psymtabs_hard (dwarf2_per_objfile *per_objfile)
 	return result_type (thread_storage.release (), std::move (errors));
       });
 
+    /* Only show a given exception a single time.  */
+    std::unordered_set<gdb_exception> seen_exceptions;
     for (auto &one_result : results)
       {
 	indexes.push_back (std::move (one_result.first));
 	for (auto &one_exc : one_result.second)
-	  exception_print (gdb_stderr, one_exc);
+	  if (seen_exceptions.insert (one_exc).second)
+	    exception_print (gdb_stderr, one_exc);
       }
   }
 
