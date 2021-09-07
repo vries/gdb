@@ -115,6 +115,7 @@ complaint_interceptor::~complaint_interceptor ()
     }
 
   g_complaint_interceptor = nullptr;
+  deprecated_warning_hook = m_saved_warning_hook;
 }
 
 /* See complaints.h.  */
