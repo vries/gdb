@@ -9820,6 +9820,10 @@ allocate_dwo_file_hash_table ()
 				     xcalloc, xfree));
 }
 
+#if CXX_STD_THREAD
+static std::mutex dwo_files_mutex;
+#endif /* CXX_STD_THREAD */
+
 /* Lookup DWO file DWO_NAME.  */
 
 static void **
@@ -10536,6 +10540,10 @@ create_dwo_unit_in_dwp_v1 (dwarf2_per_objfile *per_objfile,
 		   sections.line.get_id (),
 		   sections.loc.get_id (),
 		   sections.str_offsets.get_id ());
+
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (dwo_files_mutex);
+#endif
   /* Can we use an existing virtual DWO file?  */
   dwo_file_slot = lookup_dwo_file_slot (per_objfile, virtual_dwo_name.c_str (),
 					comp_dir);
@@ -10721,6 +10729,9 @@ create_dwo_unit_in_dwp_v2 (dwarf2_per_objfile *per_objfile,
 		   (long) (sections.loc_size ? sections.loc_offset : 0),
 		   (long) (sections.str_offsets_size
 			   ? sections.str_offsets_offset : 0));
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (dwo_files_mutex);
+#endif
   /* Can we use an existing virtual DWO file?  */
   dwo_file_slot = lookup_dwo_file_slot (per_objfile, virtual_dwo_name.c_str (),
 					comp_dir);
@@ -10892,6 +10903,9 @@ create_dwo_unit_in_dwp_v5 (dwarf2_per_objfile *per_objfile,
 			    ? sections.str_offsets_offset : 0),
 		 (long) (sections.macro_size ? sections.macro_offset : 0),
 		 (long) (sections.rnglists_size ? sections.rnglists_offset: 0));
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (dwo_files_mutex);
+#endif
   /* Can we use an existing virtual DWO file?  */
   dwo_file_slot = lookup_dwo_file_slot (per_objfile,
 					virtual_dwo_name.c_str (),
@@ -11661,6 +11675,9 @@ lookup_dwo_cutu (dwarf2_cu *cu, const char *dwo_name, const char *comp_dir,
     {
       /* No DWP file, look for the DWO file.  */
 
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (dwo_files_mutex);
+#endif
       dwo_file_slot = lookup_dwo_file_slot (per_objfile, dwo_name, comp_dir);
       if (*dwo_file_slot == NULL)
 	{
