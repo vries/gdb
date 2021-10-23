@@ -134,3 +134,7 @@ for { set cv $cv_low } { $cv <= $cv_high } { incr cv } {
 	}
     }
 }
+
+foreach dw64 { 0 1 } {
+    test 5 5 $dw64
+}
