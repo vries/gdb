@@ -51,6 +51,27 @@ proc gdb_persistent_global_no_decl { args } {
     }
 }
 
+# Execute BODY, then FINALLY, even if an exception is thrown in BODY.
+
+proc finally { body finally } {
+    # Execute body.
+    set code [catch {uplevel 1 $body} result]
+
+    uplevel 1 $finally
+
+    # Return as appropriate.
+    if { $code == 1 } {
+        global errorInfo errorCode
+        return -code error -errorinfo $errorInfo -errorcode $errorCode $result
+    } elseif { $code > 1 } {
+	# FIXME: Should have "-level 1" here, to emulate actual
+	# finally behaviour.
+        return -code $code -level 2 $result
+    }
+
+    return $result
+}
+
 # Override proc load_lib.
 rename load_lib saved_load_lib
 # Run the runtest version of load_lib, and mark all variables that were
@@ -61,22 +82,15 @@ proc load_lib { file } {
        set known_globals($varname) 1
     }
 
-    set code [catch "saved_load_lib $file" result]
-
-    foreach varname [info globals] {
-       if { ![info exists known_globals($varname)] } {
-           gdb_persistent_global_no_decl $varname
-       }
+    finally {
+	saved_load_lib $file
+    } {
+	foreach varname [info globals] {
+	    if { ![info exists known_globals($varname)] } {
+		gdb_persistent_global_no_decl $varname
+	    }
+	}
     }
-
-    if {$code == 1} {
-	global errorInfo errorCode
-	return -code error -errorinfo $errorInfo -errorcode $errorCode $result
-    } elseif {$code > 1} {
-	return -code $code $result
-    }
-
-    return $result
 }
 
 load_lib libgloss.exp
@@ -1224,25 +1238,20 @@ proc gdb_test_multiple { command message args } {
     }
     set gdb_test_name "$message"
 
-    set result 0
-    set code [catch {gdb_expect $code} string]
-
-    # Clean up the gdb_test_name variable.  If we had a
-    # previous value then restore it, otherwise, delete the variable
-    # from the parent scope.
-    if { [info exists gdb_test_name_old] } {
-	set gdb_test_name "$gdb_test_name_old"
-    } else {
-	unset gdb_test_name
+    finally {
+	gdb_expect $code
+    } {
+	# Clean up the gdb_test_name variable.  If we had a
+	# previous value then restore it, otherwise, delete the variable
+	# from the parent scope.
+	if { [info exists gdb_test_name_old] } {
+	    set gdb_test_name "$gdb_test_name_old"
+	} else {
+	    unset gdb_test_name
+	}
     }
 
-    if {$code == 1} {
-	global errorInfo errorCode
-	return -code error -errorinfo $errorInfo -errorcode $errorCode $string
-    } elseif {$code > 1} {
-	return -code $code $string
-    }
-    return $result
+    return 0
 }
 
 # Usage: gdb_test_multiline NAME INPUT RESULT {INPUT RESULT} ...
@@ -2452,14 +2461,10 @@ proc with_test_prefix { prefix body } {
 
   set saved $pf_prefix
   append pf_prefix " " $prefix ":"
-  set code [catch {uplevel 1 $body} result]
-  set pf_prefix $saved
-
-  if {$code == 1} {
-      global errorInfo errorCode
-      return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-  } else {
-      return -code $code $result
+  finally {
+      uplevel 1 $body
+  } {
+      set pf_prefix $saved
   }
 }
 
@@ -2535,26 +2540,21 @@ proc save_vars { vars body } {
 	}
     }
 
-    set code [catch {uplevel 1 $body} result]
+    finally {
+	uplevel 1 $body
+    } {
+	foreach {var value} [array get saved_scalars] {
+	    uplevel 1 [list set $var $value]
+	}
 
-    foreach {var value} [array get saved_scalars] {
-	uplevel 1 [list set $var $value]
-    }
+	foreach {var value} [array get saved_arrays] {
+	    uplevel 1 [list unset $var]
+	    uplevel 1 [list array set $var $value]
+	}
 
-    foreach {var value} [array get saved_arrays] {
-	uplevel 1 [list unset $var]
-	uplevel 1 [list array set $var $value]
-    }
-
-    foreach var $unset_vars {
-	uplevel 1 [list unset -nocomplain $var]
-    }
-
-    if {$code == 1} {
-	global errorInfo errorCode
-	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-    } else {
-	return -code $code $result
+	foreach var $unset_vars {
+	    uplevel 1 [list unset -nocomplain $var]
+	}
     }
 }
 
@@ -2586,22 +2586,18 @@ proc save_target_board_info { vars body } {
 	}
     }
 
-    set code [catch {uplevel 1 $body} result]
+    finally {
+	uplevel 1 $body
+    } {
 
-    foreach {var value} [array get saved_target_board_info] {
-	unset_board_info $var
-	set_board_info $var $value
-    }
+	foreach {var value} [array get saved_target_board_info] {
+	    unset_board_info $var
+	    set_board_info $var $value
+	}
 
-    foreach var $unset_target_board_info {
-	unset_board_info $var
-    }
-
-    if {$code == 1} {
-	global errorInfo errorCode
-	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-    } else {
-	return -code $code $result
+	foreach var $unset_target_board_info {
+	    unset_board_info $var
+	}
     }
 }
 
@@ -2617,16 +2613,11 @@ proc with_cwd { dir body } {
     verbose -log "Switching to directory $dir (saved CWD: $saved_dir)."
     cd $dir
 
-    set code [catch {uplevel 1 $body} result]
-
-    verbose -log "Switching back to $saved_dir."
-    cd $saved_dir
-
-    if {$code == 1} {
-	global errorInfo errorCode
-	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-    } else {
-	return -code $code $result
+    finally {
+	uplevel 1 $body
+    } {
+	verbose -log "Switching back to $saved_dir."
+	cd $saved_dir
     }
 }
 
@@ -2667,17 +2658,12 @@ proc with_gdb_prompt { prompt body } {
     set gdb_prompt $prompt
     gdb_test_no_output "set prompt $prompt " ""
 
-    set code [catch {uplevel 1 $body} result]
-
-    verbose -log "Restoring gdb prompt to \"$saved \"."
-    set gdb_prompt $saved
-    gdb_test_no_output "set prompt $saved " ""
-
-    if {$code == 1} {
-	global errorInfo errorCode
-	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-    } else {
-	return -code $code $result
+    finally {
+	uplevel 1 $body
+    } {
+	verbose -log "Restoring gdb prompt to \"$saved \"."
+	set gdb_prompt $saved
+	gdb_test_no_output "set prompt $saved " ""
     }
 }
 
@@ -2702,15 +2688,10 @@ proc with_target_charset { target_charset body } {
 
     gdb_test_no_output "set target-charset $target_charset" ""
 
-    set code [catch {uplevel 1 $body} result]
-
-    gdb_test_no_output "set target-charset $saved" ""
-
-    if {$code == 1} {
-	global errorInfo errorCode
-	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-    } else {
-	return -code $code $result
+    finally {
+	uplevel 1 $body
+    } {
+	gdb_test_no_output "set target-charset $saved" ""
     }
 }
 
@@ -2748,19 +2729,14 @@ proc with_spawn_id { spawn_id body } {
 
     switch_gdb_spawn_id $spawn_id
 
-    set code [catch {uplevel 1 $body} result]
-
-    if [info exists saved_spawn_id] {
-	switch_gdb_spawn_id $saved_spawn_id
-    } else {
-	clear_gdb_spawn_id
-    }
-
-    if {$code == 1} {
-	global errorInfo errorCode
-	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-    } else {
-	return -code $code $result
+    finally {
+	uplevel 1 $body
+    } {
+	if [info exists saved_spawn_id] {
+	    switch_gdb_spawn_id $saved_spawn_id
+	} else {
+	    clear_gdb_spawn_id
+	}
     }
 }
 
@@ -2801,14 +2777,10 @@ proc with_timeout_factor { factor body } {
     set savedtimeout $timeout
 
     set timeout [expr [get_largest_timeout] * $factor]
-    set code [catch {uplevel 1 $body} result]
-
-    set timeout $savedtimeout
-    if {$code == 1} {
-	global errorInfo errorCode
-	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-    } else {
-	return -code $code $result
+    finally {
+	uplevel 1 $body
+    } {
+	set timeout $savedtimeout
     }
 }
 
@@ -5376,18 +5348,13 @@ proc with_complaints { n body } {
 	gdb_test_no_output "set complaints $n" ""
     }
 
-    set code [catch {uplevel 1 $body} result]
-
-    # Restore saved setting of complaints.
-    if { $save != "" } {
-	gdb_test_no_output "set complaints $save" ""
-    }
-
-    if {$code == 1} {
-	global errorInfo errorCode
-	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-    } else {
-	return -code $code $result
+    finally {
+	uplevel 1 $body
+    } {
+	# Restore saved setting of complaints.
+	if { $save != "" } {
+	    gdb_test_no_output "set complaints $save" ""
+	}
     }
 }
 
@@ -8035,30 +8002,23 @@ proc with_override { name override body } {
 	set existed false
     }
 
-    # Install the override.
     set new_args [info args $override]
     set new_body [info body $override]
-    eval proc $name {$new_args} {$new_body}
 
     # Execute body.
-    set code [catch {uplevel 1 $body} result]
+    finally {
+	# Install the override.
+	eval proc $name {$new_args} {$new_body}
 
-    # Restore old proc if it existed on entry, else delete it.
-    if { $existed } {
-	eval proc $name {$old_args} {$old_body}
-    } else {
-	rename $name ""
+	uplevel 1 $body
+    } {
+	# Restore old proc if it existed on entry, else delete it.
+	if { $existed } {
+	    eval proc $name {$old_args} {$old_body}
+	} else {
+	    rename $name ""
+	}
     }
-
-    # Return as appropriate.
-    if { $code == 1 } {
-        global errorInfo errorCode
-        return -code error -errorinfo $errorInfo -errorcode $errorCode $result
-    } elseif { $code > 1 } {
-        return -code $code $result
-    }
-
-    return $result
 }
 
 # Setup tuiterm.exp environment.  To be used in test-cases instead of
