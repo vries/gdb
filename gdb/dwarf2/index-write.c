@@ -1091,8 +1091,10 @@ write_cooked_index (dwarf2_per_objfile *per_objfile,
 		    const cu_index_map &cu_index_htab,
 		    struct mapped_symtab *symtab)
 {
-  for (const cooked_index_entry *entry
-	 : per_objfile->per_bfd->cooked_index_table->all_entries ())
+  cooked_index_vector *table
+    = (dynamic_cast<cooked_index_vector *>
+       (per_objfile->per_bfd->index_table.get ()));
+  for (const cooked_index_entry *entry : table->all_entries ())
     {
       const auto it = cu_index_htab.find (entry->per_cu);
       gdb_assert (it != cu_index_htab.cend ());
@@ -1182,8 +1184,10 @@ write_gdbindex (dwarf2_per_objfile *per_objfile, FILE *out_file,
 
   /* Dump the address map.  */
   data_buf addr_vec;
-  std::vector<addrmap *> addrmaps
-    = per_objfile->per_bfd->cooked_index_table->get_addrmaps ();
+  cooked_index_vector *table
+    = (dynamic_cast<cooked_index_vector *>
+       (per_objfile->per_bfd->index_table.get ()));
+  std::vector<addrmap *> addrmaps = table->get_addrmaps ();
   for (auto map : addrmaps)
     write_address_map (map, addr_vec, cu_index_htab);
 
@@ -1250,8 +1254,10 @@ write_debug_names (dwarf2_per_objfile *per_objfile,
 			  - per_objfile->per_bfd->tu_stats.nr_tus));
   gdb_assert (types_counter == per_objfile->per_bfd->tu_stats.nr_tus);
 
-  for (const cooked_index_entry *entry
-	 : per_objfile->per_bfd->cooked_index_table->all_entries ())
+  cooked_index_vector *table
+    = (dynamic_cast<cooked_index_vector *>
+       (per_objfile->per_bfd->index_table.get ()));
+  for (const cooked_index_entry *entry : table->all_entries ())
     nametable.insert (entry);
 
   nametable.build ();
@@ -1388,10 +1394,12 @@ write_dwarf_index (dwarf2_per_objfile *per_objfile, const char *dir,
 {
   struct objfile *objfile = per_objfile->objfile;
 
-  if (per_objfile->per_bfd->cooked_index_table == nullptr)
+  cooked_index_vector *table
+    = (dynamic_cast<cooked_index_vector *>
+       (per_objfile->per_bfd->index_table.get ()));
+  if (table == nullptr)
     {
-      if (per_objfile->per_bfd->index_table != nullptr
-	  || per_objfile->per_bfd->debug_names_table != nullptr)
+      if (per_objfile->per_bfd->index_table != nullptr)
 	error (_("Cannot use an index to create the index"));
       error (_("No debugging symbols"));
     }
