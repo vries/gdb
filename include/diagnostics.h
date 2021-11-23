@@ -40,6 +40,8 @@
 
 # define DIAGNOSTIC_IGNORE(option) \
   _Pragma (DIAGNOSTIC_STRINGIFY (GCC diagnostic ignored option))
+# define DIAGNOSTIC_ERROR(option) \
+  _Pragma (DIAGNOSTIC_STRINGIFY (GCC diagnostic error option))
 #else
 # define DIAGNOSTIC_PUSH
 # define DIAGNOSTIC_POP
@@ -61,6 +63,9 @@
 # define DIAGNOSTIC_IGNORE_FORMAT_NONLITERAL \
   DIAGNOSTIC_IGNORE ("-Wformat-nonliteral")
 
+# define DIAGNOSTIC_ERROR_SWITCH \
+  DIAGNOSTIC_ERROR ("-Wswitch")
+
 #elif defined (__GNUC__) /* GCC */
 
 # if __GNUC__ >= 7
@@ -73,6 +78,9 @@
 
 # define DIAGNOSTIC_IGNORE_FORMAT_NONLITERAL \
   DIAGNOSTIC_IGNORE ("-Wformat-nonliteral")
+
+# define DIAGNOSTIC_ERROR_SWITCH \
+  DIAGNOSTIC_ERROR ("-Wswitch")
 
 #endif
 
