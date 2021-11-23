@@ -108,9 +108,14 @@ static inline const char *
 target_waitkind_str (target_waitkind kind)
 {
 /* Make sure the compiler warns if a new TARGET_WAITKIND enumerator is added
-   but not handled here.  */
+   but not handled here.
+
+   GCC 4.8's "diagnostic push/pop" seems broken, it leaves -Werror=switch
+   enabled after the pop.  Skip it for GCC < 5.  */
 DIAGNOSTIC_PUSH
+#if (defined(__GNUC__) && __GNUC__ >= 5) || defined(__clang__)
 DIAGNOSTIC_ERROR_SWITCH
+#endif
   switch (kind)
   {
     case TARGET_WAITKIND_EXITED:
@@ -146,7 +151,9 @@ DIAGNOSTIC_ERROR_SWITCH
     case TARGET_WAITKIND_THREAD_EXITED:
       return "THREAD_EXITED";
   };
+#if (defined(__GNUC__) && __GNUC__ >= 5) || defined(__clang__)
 DIAGNOSTIC_POP
+#endif
 
   gdb_assert_not_reached ("invalid target_waitkind value: %d\n", (int) kind);
 }

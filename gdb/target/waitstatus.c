@@ -29,9 +29,14 @@ target_waitstatus::to_string () const
     ("status->kind = %s", target_waitkind_str (this->kind ()));
 
 /* Make sure the compiler warns if a new TARGET_WAITKIND enumerator is added
-   but not handled here.  */
+   but not handled here.
+
+   GCC 4.8's "diagnostic push/pop" seems broken, it leaves -Werror=switch
+   enabled after the pop.  Skip it for GCC < 5.  */
 DIAGNOSTIC_PUSH
+#if (defined(__GNUC__) && __GNUC__ >= 5) || defined(__clang__)
 DIAGNOSTIC_ERROR_SWITCH
+#endif
   switch (this->kind ())
     {
     case TARGET_WAITKIND_EXITED:
@@ -63,7 +68,9 @@ DIAGNOSTIC_ERROR_SWITCH
     case TARGET_WAITKIND_THREAD_CREATED:
       return str;
     }
+#if (defined(__GNUC__) && __GNUC__ >= 5) || defined(__clang__)
 DIAGNOSTIC_POP
+#endif
 
   gdb_assert_not_reached ("invalid target_waitkind value: %d",
 			  (int) this->kind ());
