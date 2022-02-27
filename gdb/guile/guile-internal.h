@@ -28,6 +28,7 @@
 #include "extension-priv.h"
 #include "symtab.h"
 #include "libguile.h"
+#include "top.h"		/* For quit_force().  */
 
 struct block;
 struct frame_info;
@@ -711,6 +712,10 @@ gdbscm_wrap (Function &&func, Args &&... args)
   try
     {
       result = func (std::forward<Args> (args)...);
+    }
+  catch (const gdb_exception_forced_quit &e)
+    {
+      quit_force (NULL, 0);
     }
   catch (const gdb_exception &except)
     {
