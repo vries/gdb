@@ -109,6 +109,10 @@ tui_rl_switch_mode (int notused1, int notused2)
 	  tui_enable ();
 	}
     }
+  catch (const gdb_exception_forced_quit &ex)
+    {
+      throw;
+    }
   catch (const gdb_exception &ex)
     {
       exception_print (gdb_stderr, ex);

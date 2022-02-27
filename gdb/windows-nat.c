@@ -825,6 +825,10 @@ catch_errors (void (*func) ())
     {
       func ();
     }
+  catch (const gdb_exception_forced_quit &ex)
+    {
+      throw;
+    }
   catch (const gdb_exception &ex)
     {
       exception_print (gdb_stderr, ex);

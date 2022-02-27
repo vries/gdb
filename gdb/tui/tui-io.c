@@ -1259,6 +1259,10 @@ tui_getc (FILE *fp)
     {
       return tui_getc_1 (fp);
     }
+  catch (const gdb_exception_forced_quit &ex)
+    {
+      throw;
+    }
   catch (const gdb_exception &ex)
     {
       /* Just in case, don't ever let an exception escape to readline.
