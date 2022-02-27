@@ -368,7 +368,7 @@ safe_execute_command (struct ui_out *command_uiout, const char *command,
     {
       execute_command (command, from_tty);
     }
-  catch (gdb_exception &exception)
+  catch (gdb_exception_error &exception)
     {
       e = std::move (exception);
     }
