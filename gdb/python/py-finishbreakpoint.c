@@ -20,6 +20,7 @@
 
 
 #include "defs.h"
+#include "top.h"		/* For quit_force().  */
 #include "python-internal.h"
 #include "breakpoint.h"
 #include "frame.h"
@@ -271,6 +272,10 @@ bpfinishpy_init (PyObject *self, PyObject *args, PyObject *kwargs)
 		}
 	    }
 	}
+    }
+  catch (const gdb_exception_forced_quit &except)
+    {
+      quit_force (NULL, 0);
     }
   catch (const gdb_exception &except)
     {
