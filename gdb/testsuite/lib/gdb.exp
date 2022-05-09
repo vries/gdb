@@ -130,7 +130,8 @@ if ![info exists INTERNAL_GDBFLAGS] {
 		   "-nx" \
 		   "-data-directory $BUILD_DATA_DIRECTORY" \
 		   {-iex "set height 0"} \
-		   {-iex "set width 0"}]]
+		   {-iex "set width 0"} \
+		   {-iex "set build-id-verbose 0"}]]
 }
 
 # The variable gdb_prompt is a regexp which matches the gdb prompt.
