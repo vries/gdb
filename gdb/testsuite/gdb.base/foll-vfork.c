@@ -40,12 +40,19 @@ main (int argc, char ** argv)
     memcpy (prog + len - 10, "vforked-prog", 12);
     prog[len + 2] = 0;
 
+#if DEBUG
     printf ("I'm the child!\n");
+#endif
     execlp (prog, prog, (char *) 0);
     perror ("exec failed");
     _exit (1);
   }
   else {
-    printf ("I'm the proud parent of child #%d!\n", pid);
+    const char *s = "I'm the proud parent of child";
+#if DEBUG
+    printf ("%s #%d!\n", s, pid);
+#else
+    const char *volatile v = s;
+#endif
   }
 }

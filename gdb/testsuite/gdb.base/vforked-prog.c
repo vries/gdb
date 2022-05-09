@@ -19,6 +19,11 @@
 
 int main (void)
 {
-  printf("Hello from vforked-prog...\n");
+  const char *s = "Hello from vforked-prog";
+#if DEBUG
+  printf ("%s...\n", s);
+#else
+  const char *volatile v = s;
+#endif
   return 0;
 }

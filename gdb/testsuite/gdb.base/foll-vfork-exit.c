@@ -29,12 +29,22 @@ main ()
   pid = vfork (); /* VFORK */
   if (pid == 0)
     {
-      printf ("I'm the child!\n");
+      const char *s = "I'm the child!";
+#if DEBUG
+      printf ("%s\n", s);
+#else
+    const char *volatile v = s;
+#endif
       _exit (0);
     }
   else
     {
-      printf ("I'm the proud parent of child #%d!\n", pid);
+      const char *s = "I'm the proud parent of child";
+#if DEBUG
+      printf ("%s #%d!\n", s, pid);
+#else
+    const char *volatile v = s;
+#endif
     }
 
   return 0;

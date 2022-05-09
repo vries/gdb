@@ -32,9 +32,14 @@ if [gdb_debug_enabled] {
     return 0
 }
 
+# Set DEBUG to 0 or 1 in sources.
+set debug 0
+
 standard_testfile
 
-set compile_options debug
+set compile_options {}
+lappend compile_options debug
+lappend compile_options additional_flags=-DDEBUG=$debug
 
 if {[build_executable $testfile.exp $testfile $srcfile $compile_options] == -1} {
     untested "failed to compile main testcase"
@@ -126,7 +131,7 @@ proc vfork_parent_follow_to_bp {} {
 
    gdb_test_no_output "set follow-fork parent"
 
-   set bp_location [gdb_get_line_number "printf (\"I'm the proud parent of child"]
+   set bp_location [gdb_get_line_number "I'm the proud parent of child"]
    gdb_test "break ${srcfile}:${bp_location}" ".*" "break, vfork to bp"
 
    set test "continue to bp"
@@ -176,7 +181,7 @@ proc vfork_and_exec_child_follow_to_main_bp {} {
 
    gdb_test_no_output "set follow-fork child"
 
-   set linenum [gdb_get_line_number "printf(\"Hello from vforked-prog" ${srcfile2}]
+   set linenum [gdb_get_line_number "Hello from vforked-prog" ${srcfile2}]
 
    set test "continue to bp"
    gdb_test_multiple "continue" $test {
@@ -278,7 +283,7 @@ proc tcatch_vfork_then_child_follow_exec {} {
    continue_to_vfork
 
    set linenum1 [gdb_get_line_number "pid = vfork ();"]
-   set linenum2 [gdb_get_line_number "printf(\"Hello from vforked-prog" ${srcfile2}]
+   set linenum2 [gdb_get_line_number "Hello from vforked-prog" ${srcfile2}]
 
    set test "finish"
    gdb_test_multiple "finish" $test {
@@ -356,7 +361,7 @@ proc vfork_relations_in_info_inferiors { variant } {
    if { $variant == "exec" } {
        global srcfile2
 
-       set linenum [gdb_get_line_number "printf(\"Hello from vforked-prog" ${srcfile2}]
+       set linenum [gdb_get_line_number "Hello from vforked-prog" ${srcfile2}]
        set test "continue to bp"
        gdb_test_multiple "continue" $test {
 	   -re ".*xecuting new program.*Breakpoint.*vforked-prog.c:${linenum}.*$gdb_prompt " {
@@ -487,7 +492,7 @@ set testfile "foll-vfork-exit"
 set srcfile ${testfile}.c
 set binfile [standard_output_file ${testfile}]
 
-if {[build_executable $testfile.exp $testfile $srcfile] == -1} {
+if {[build_executable $testfile.exp $testfile $srcfile $compile_options] == -1} {
     untested "failed to build $testfile"
     return
 }
