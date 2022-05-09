@@ -111,9 +111,21 @@ proc do_test { detach-on-fork } {
     gdb_test "info threads" "No threads\." \
 	"no threads left"
 
-    gdb_test "info inferiors" \
-	"Num\[ \t\]+Description\[ \t\]+Connection\[ \t\]+Executable\[ \t\]+\r\n\\* 1 \[^\r\n\]+" \
-	"only inferior 1 left"
+    set re \
+	[multi_line \
+	     "Num\[ \t\]+Description\[ \t\]+Connection\[ \t\]+Executable\[ \t\]+" \
+	     "\\* 1 \[^\r\n\]+"]
+    gdb_test_multiple "info inferiors" "only inferior 1 left" {
+	-re -wrap $re {
+	    pass $gdb_test_name
+	}
+	-re -wrap $re.* {
+	    if { ${detach-on-fork} == "off" } {
+		setup_kfail "threads/26272" *-*-*
+	    }
+	    fail $gdb_test_name
+	}
+    }
 }
 
 foreach_with_prefix detach-on-fork {"on" "off"} {
