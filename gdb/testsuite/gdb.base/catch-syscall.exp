@@ -166,7 +166,11 @@ proc insert_catch_syscall_with_many_args { syscalls numbers } {
     set filter_str ""
 
     foreach name $syscalls number $numbers {
-      set filter_str "${filter_str}'${name}' \\\[${number}\\\] "
+	if { [string is integer $name] } {
+	    append filter_str "${name} "
+	} else {
+	    append filter_str "'${name}' \\\[${number}\\\] "
+	}
     }
 
     set filter_str [ string trimright $filter_str " " ]
@@ -639,42 +643,120 @@ proc fill_all_syscalls_numbers {} {
     global all_syscalls_numbers last_syscall_number unknown_syscall_number all_syscalls
 
     foreach syscall $all_syscalls {
-	lappend all_syscalls_numbers [get_integer_valueof "${syscall}_syscall" -1]
+	if { [string is integer $syscall] } {
+	    lappend all_syscalls_numbers $syscall
+	} else {
+	    lappend all_syscalls_numbers [get_integer_valueof "${syscall}_syscall" -1]
+	}
     }
 
     set last_syscall_number [get_integer_valueof "exit_group_syscall" -1]
     set unknown_syscall_number [get_integer_valueof "unknown_syscall" -1]
 }
 
-# Set up the vector all_syscalls.
+# Catch syscall with NAME, or if gdb doesn't support that (yet), try NR
+# instead.
+
+proc catch_syscall_name_or_nr { name nr } {
+    global decimal
+
+    gdb_test_multiple "catch syscall $name" "" {
+	-re -wrap "Catchpoint $decimal \\(syscall '$name' \\\[$nr\\\]\\)" {
+	    pass $gdb_test_name
+	}
+	-re -wrap "Unknown syscall name '$name'\." {
+	    fail $gdb_test_name
+	    gdb_test "catch syscall $nr" "Catchpoint $decimal \\(syscall $nr\\)"
+	}
+    }
+}
+
+# Set up the vector all_syscalls.  Returns 1 upon success, 0 upon failure.
 
 proc setup_all_syscalls {} {
     global all_syscalls
     global gdb_prompt
+    global decimal
 
     # They are ordered according to the file, so do not change this.
     lappend all_syscalls "close"
     lappend all_syscalls "chroot"
 
+    if { ![runto_main] } {
+	return 0
+    }
+
     # SYS_pipe doesn't exist on aarch64 kernel.
     set test "check SYS_pipe"
+    set have_SYS_pipe 0
     gdb_test_multiple "p pipe_syscall" $test {
-	-re " = .*$gdb_prompt $" {
+	-re -wrap " = ($decimal)" {
 	    pass $test
-	    lappend all_syscalls "pipe"
+	    set have_SYS_pipe 1
+	    set SYS_pipe $expect_out(1,string)
 	}
-	-re "No symbol .*$gdb_prompt $" {
+	-re -wrap "No symbol .*" {
 	    pass $test
-	    # SYS_pipe isn't defined, use SYS_pipe2 instead.
-	    lappend all_syscalls "pipe2"
+	}
+    }
+
+    set test "check SYS_pipe2"
+    set have_SYS_pipe2 0
+    gdb_test_multiple "p pipe2_syscall" $test {
+	-re -wrap " = ($decimal)" {
+	    pass $test
+	    set have_SYS_pipe2 1
+	    set SYS_pipe2 $expect_out(1,string)
+	}
+	-re -wrap "No symbol .*" {
+	    pass $test
+	}
+    }
+
+    if { $have_SYS_pipe == 0 && $have_SYS_pipe2 == 0 } {
+	return 0
+    }
+
+    with_test_prefix "determine pipe syscall" {
+	set line [gdb_get_line_number "pipe (fd)"]
+	gdb_test "break $line"
+	gdb_continue_to_breakpoint "before pipe call"
+	if { $have_SYS_pipe } {
+	    catch_syscall_name_or_nr pipe $SYS_pipe
+	}
+	if { $have_SYS_pipe2 } {
+	    catch_syscall_name_or_nr pipe2 $SYS_pipe2
+	}
+	set ok 0
+	gdb_test_multiple "continue" "" {
+	    -re -wrap "Catchpoint $decimal \\(call to syscall (pipe|$SYS_pipe)\\).*" {
+		lappend all_syscalls $expect_out(1,string)
+		pass $gdb_test_name
+		set ok 1
+	    }
+	    -re -wrap "Catchpoint $decimal \\(call to syscall (pipe2|$SYS_pipe2)\\).*" {
+		lappend all_syscalls $expect_out(1,string)
+		pass $gdb_test_name
+		set ok 1
+	    }
+	    -re -wrap "" {
+		fail $gdb_test_name
+	    }
+	}
+	if { ! $ok } {
+	    return 0
 	}
     }
 
     lappend all_syscalls "write"
     lappend all_syscalls "read"
+
+    return 1
 }
 
-setup_all_syscalls
+if { ![setup_all_syscalls] } {
+    return -1
+}
 
 # Fill all the syscalls numbers before starting anything.
 fill_all_syscalls_numbers
