@@ -22,14 +22,14 @@ if {[prepare_for_testing "failed to prepare" "${testfile}" \
     return -1
 }
 
+set cmd "save gdb-index"
+
+set mode [classify_symtab_mode $testfile]
+if { ![string equal $mode "cooked_index"] } {
+    unsupported $cmd
+    return -1
+}
+
 # The bug was that gdb would crash when saving.
 set output_dir [standard_output_file ""]
-set cmd "save gdb-index"
-gdb_test_multiple "$cmd $output_dir" $cmd {
-    -re -wrap "Cannot use an index to create the index.*" {
-	unsupported $gdb_test_name
-    }
-    -re "^$cmd \[^\r\n\]*\r\n$gdb_prompt $" {
-	pass $gdb_test_name
-    }
-}
+gdb_test_no_output "$cmd $output_dir" $cmd

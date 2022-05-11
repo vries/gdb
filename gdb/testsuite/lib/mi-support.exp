@@ -676,6 +676,7 @@ proc mi_gdb_load { arg } {
 
 proc mi_readnow { args } {
     global mi_gdb_prompt
+    global decimal
 
     if { [llength $args] == 1 } {
 	set re [lindex $args 0]
@@ -683,20 +684,27 @@ proc mi_readnow { args } {
 	set re ""
     }
 
-    set readnow_p 0
-    set cmd "maint print objfiles $re"
+    set mode ""
+    set cmd "interpreter-exec mi \"maint print objfiles $re\""
     send_gdb "$cmd\n"
     gdb_expect {
-	-re ".gdb_index: faked for ..readnow.." {
-	    # Record that we've seen the above pattern.
-	    set readnow_p 1
-	    exp_continue
+	-re "\r\n\\.gdb_index: version ${decimal}(?=\r\n)" {
+	    set mode "gdb_index"
+	}
+	-re "\r\n\\.debug_names: exists(?=\r\n)" {
+	    set mode "debug_names"
+	}
+	-re "\r\nCooked index in use(?=\r\n)" {
+	    set mode "cooked_index"
 	}
 	-re "\\^done\r\n$mi_gdb_prompt$" {
 	}
     }
+    if { [string equal $mode ""] } {
+	set mode "readnow"
+    }
 
-    return $readnow_p
+    return [string equal $mode "readnow"]
 }
 
 # mi_gdb_test COMMAND [PATTERN [MESSAGE [IPATTERN]]] -- send a command to gdb;

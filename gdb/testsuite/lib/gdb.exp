@@ -8506,24 +8506,38 @@ gdb_caching_proc supports_fcf_protection {
   } executable "additional_flags=-fcf-protection=full"]
 }
 
-# Return 1 if symbols were read in using -readnow.  Otherwise, return 0.
+# Return symtab reading mode.
 
-proc readnow { args } {
+proc classify_symtab_mode { args } {
+    global decimal
+    set have_symtab 0
+    set mode ""
+
     if { [llength $args] == 1 } {
 	set re [lindex $args 0]
     } else {
 	set re ""
     }
 
-    set readnow_p 0
     # Given the listing from the following command can be very verbose, match
     # the patterns line-by-line.  This prevents timeouts from waiting for
     # too much data to come at once.
-    set cmd "maint print objfiles $re"
-    gdb_test_multiple $cmd "" -lbl {
-	-re "\r\n.gdb_index: faked for \"readnow\"" {
-	    # Record the we've seen the above pattern.
-	    set readnow_p 1
+    set cmd "maint print objfiles"
+    gdb_test_multiple "$cmd $re" "$cmd [file tail $re]" -lbl {
+	-re "\r\n\\.gdb_index: version ${decimal}(?=\r\n)" {
+	    set mode "gdb_index"
+	    gdb_test_lines "" $gdb_test_name ".*"
+	}
+	-re "\r\n\\.debug_names: exists(?=\r\n)" {
+	    set mode "debug_names"
+	    gdb_test_lines "" $gdb_test_name ".*"
+	}
+	-re "\r\nCooked index in use(?=\r\n)" {
+	    set mode "cooked_index"
+	    gdb_test_lines "" $gdb_test_name ".*"
+	}
+	-re "\r\nSymtabs:" {
+	    set have_symtab 1
 	    exp_continue
 	}
 	-re -wrap "" {
@@ -8531,7 +8545,21 @@ proc readnow { args } {
 	}
     }
 
-    return $readnow_p
+    if { [string equal $mode ""] } {
+	if { ! $have_symtab } {
+	    error "No symtabs for readnow"
+	}
+	set mode "readnow"
+    }
+
+    return $mode
+}
+
+# Return 1 if symbols were read in using -readnow.  Otherwise, return 0.
+
+proc readnow { args } {
+    set mode [classify_symtab_mode {*}$args]
+    return [string equal $mode "readnow"]
 }
 
 # Return index name if symbols were read in using an index.
@@ -8539,27 +8567,12 @@ proc readnow { args } {
 
 proc have_index { objfile } {
 
-    set res ""
-    set cmd "maint print objfiles $objfile"
-    gdb_test_multiple $cmd "" -lbl {
-	-re "\r\n.gdb_index: faked for \"readnow\"" {
-	    set res ""
-	    exp_continue
-	}
-	-re "\r\n.gdb_index:" {
-	    set res "gdb_index"
-	    exp_continue
-	}
-	-re "\r\n.debug_names:" {
-	    set res "debug_names"
-	    exp_continue
-	}
-	-re -wrap "" {
-	    # We don't care about any other input.
-	}
+    set mode [classify_symtab_mode $objfile]
+    if { [string equal $mode "gdb_index"] || [string equal $mode "debug_names"] } {
+	return $mode
     }
 
-    return $res
+    return ""
 }
 
 # Return 1 if partial symbols are available.  Otherwise, return 0.
@@ -8632,38 +8645,14 @@ proc add_gdb_index { program {style ""} } {
 # string (the default) means .gdb_index; "-dwarf-5" means .debug_names.
 
 proc ensure_gdb_index { binfile {style ""} } {
-    global decimal
-
     set testfile [file tail $binfile]
-    set test "check if index present"
-    set has_index 0
-    set has_readnow 0
-    gdb_test_multiple "mt print objfiles ${testfile}" $test -lbl {
-	-re "\r\n\\.gdb_index: version ${decimal}(?=\r\n)" {
-	    set has_index 1
-	    gdb_test_lines "" $gdb_test_name ".*"
-	}
-	-re "\r\n\\.debug_names: exists(?=\r\n)" {
-	    set has_index 1
-	    gdb_test_lines "" $gdb_test_name ".*"
-	}
-	-re "\r\n(Cooked index in use|Psymtabs)(?=\r\n)" {
-	    gdb_test_lines "" $gdb_test_name ".*"
-	}
-	-re ".gdb_index: faked for \"readnow\"" {
-	    set has_readnow 1
-	    gdb_test_lines "" $gdb_test_name ".*"
-	}
-	-re -wrap "" {
-	    fail $gdb_test_name
-	}
-    }
+    set mode [classify_symtab_mode $testfile]
 
-    if { $has_index } {
+    if { [string equal $mode "gdb_index"] || [string equal $mode "debug_names"] } {
 	return 0
     }
 
-    if { $has_readnow } {
+    if { [string equal $mode "readnow"] } {
 	return -1
     }
 
