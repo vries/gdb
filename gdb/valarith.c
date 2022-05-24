@@ -1376,7 +1376,10 @@ scalar_binop (struct value *arg1, struct value *arg2, enum exp_opcode op)
 	  switch (op)
 	    {
 	    case BINOP_ADD:
-	      v = v1 + v2;
+	      /* Avoid runtime error: signed integer overflow: \
+		 9223372036854775807 + 9223372036854775807 cannot be \
+		 represented in type 'long int'.  */
+	      v = (ULONGEST)v1 + (ULONGEST)v2;
 	      break;
 
 	    case BINOP_SUB:
@@ -1387,7 +1390,10 @@ scalar_binop (struct value *arg1, struct value *arg2, enum exp_opcode op)
 	      break;
 
 	    case BINOP_MUL:
-	      v = v1 * v2;
+	      /* Avoid runtime error: signed integer overflow: \
+		 9223372036854775807 * 9223372036854775807 cannot be \
+		 represented in type 'long int'.  */
+	      v = (ULONGEST)v1 * (ULONGEST)v2;
 	      break;
 
 	    case BINOP_DIV:
