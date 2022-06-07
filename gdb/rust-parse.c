@@ -687,6 +687,12 @@ rust_parser::lex_string ()
   int is_byte = pstate->lexptr[0] == 'b';
   int raw_length;
 
+  SCOPE_EXIT
+    {
+      current_string_val.length = obstack_object_size (&obstack);
+      current_string_val.ptr = (const char *) obstack_finish (&obstack);
+    };
+
   if (is_byte)
     ++pstate->lexptr;
   raw_length = starts_raw_string (pstate->lexptr);
@@ -747,8 +753,6 @@ rust_parser::lex_string ()
 	}
     }
 
-  current_string_val.length = obstack_object_size (&obstack);
-  current_string_val.ptr = (const char *) obstack_finish (&obstack);
   return is_byte ? BYTESTRING : STRING;
 }
 
@@ -2146,14 +2150,23 @@ rust_language::parser (struct parser_state *state) const
 
 /* A test helper that lexes a string, expecting a single token.  */
 
-static void
+static bool
 rust_lex_test_one (rust_parser *parser, const char *input, int expected)
 {
   int token;
 
   parser->reset (input);
 
-  token = parser->lex_one_token ();
+  try
+    {
+      token = parser->lex_one_token ();
+    }
+  catch (const gdb_exception &exc)
+    {
+      if (exc.error == NOT_SUPPORTED_ERROR)
+	return false;
+      throw;
+    }
   SELF_CHECK (token == expected);
 
   if (token)
@@ -2161,6 +2174,7 @@ rust_lex_test_one (rust_parser *parser, const char *input, int expected)
       token = parser->lex_one_token ();
       SELF_CHECK (token == 0);
     }
+  return true;
 }
 
 /* Test that INPUT lexes as the integer VALUE.  */
@@ -2169,7 +2183,8 @@ static void
 rust_lex_int_test (rust_parser *parser, const char *input,
 		   ULONGEST value, int kind)
 {
-  rust_lex_test_one (parser, input, kind);
+  if (!rust_lex_test_one (parser, input, kind))
+    return;
   SELF_CHECK (parser->current_int_val.val == value);
 }
 
@@ -2182,7 +2197,8 @@ rust_lex_exception_test (rust_parser *parser, const char *input,
   try
     {
       /* The "kind" doesn't matter.  */
-      rust_lex_test_one (parser, input, DECIMAL_INTEGER);
+      if (!rust_lex_test_one (parser, input, DECIMAL_INTEGER))
+	return;
       SELF_CHECK (0);
     }
   catch (const gdb_exception_error &except)
@@ -2198,7 +2214,8 @@ static void
 rust_lex_stringish_test (rust_parser *parser, const char *input,
 			 const char *value, int kind)
 {
-  rust_lex_test_one (parser, input, kind);
+  if (!rust_lex_test_one (parser, input, kind))
+    return;
   SELF_CHECK (parser->get_string () == value);
 }
 
