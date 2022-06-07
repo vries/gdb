@@ -47,4 +47,5 @@ gdb_test "print var_ż" " = 23"
 gdb_breakpoint "FUNC_Ż" message
 gdb_breakpoint "func_ż" message
 
-gdb_test "print var_𝕯" "warning: charset conversion failure.*"
+gdb_test "set debug symbol-lookup 1"
+gdb_test "print var_𝕯" "charset conversion failure.*"

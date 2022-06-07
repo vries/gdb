@@ -996,8 +996,10 @@ ada_encode_1 (const char *decoded, bool throw_errors)
 	  if (!warned)
 	    {
 	      warned = true;
-	      warning (_("charset conversion failure for '%s'.\n"
-			 "You may have the wrong value for 'set ada source-charset'."),
+	      if (symbol_lookup_debug)
+		gdb_printf (gdb_stdlog,
+			    _("charset conversion failure for '%s'.\n"
+			      "You may have the wrong value for 'set ada source-charset'."),
 		       encoding_buffer.c_str ());
 	    }
 
@@ -1078,9 +1080,10 @@ ada_fold_name (gdb::string_view name, bool throw_on_error = false)
 	  if (!warned)
 	    {
 	      warned = true;
-	      warning (_("could not convert '%s' from the host encoding (%s) to UTF-32.\n"
-			 "This normally should not happen, please file a bug report."),
-		       gdb::to_string (name).c_str (), host_charset ());
+	      if (symbol_lookup_debug)
+		gdb_printf (gdb_stdlog,
+			    _("could not convert '%s' from the host encoding (%s) to UTF-32.\n"),
+			    gdb::to_string (name).c_str (), host_charset ());
 	    }
 
 	  /* We don't try to recover from errors; just return the
