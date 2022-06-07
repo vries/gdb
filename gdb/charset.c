@@ -474,7 +474,14 @@ public:
   {
     m_desc = iconv_open (to, from);
     if (m_desc == (iconv_t) -1)
-      perror_with_name (_("Converting character sets"));
+      {
+	if (errno == EINVAL)
+	  throw_error (NOT_SUPPORTED_ERROR,
+		       _("Cannot convert between character sets `%s' and `%s'"),
+		       from, to);
+	else
+	  perror_with_name (_("Converting character sets"));
+      }
   }
 
   ~iconv_wrapper ()
