@@ -1782,119 +1782,6 @@ i386_analyze_register_saves (CORE_ADDR pc, CORE_ADDR current_pc,
   return pc;
 }
 
-static CORE_ADDR
-i386_skip_call_pc_thunk (struct gdbarch *gdbarch, CORE_ADDR start_pc,
-			 struct i386_frame_cache *cache)
-{
-  enum bfd_endian byte_order = gdbarch_byte_order (gdbarch);
-  CORE_ADDR pc, res_pc;
-  bool have_ax = false;
-  bool have_bx = false;
-  bool have_dx = false;
-  gdb_byte op;
-
-  /* Point to first insn.  */
-  pc = start_pc;
-
-  /* Insn: call <__x86.get_pc_thunk.ax>.  */
-  if (target_read_code (pc + 0, &op, 1))
-    return start_pc;
-  if (op != 0xe8)
-    return start_pc;
-
-  /* Check that last byte of insn is present.  */
-  if (target_read_code (pc + 4, &op, 1))
-    return start_pc;
-
-  /* Get address of call target.  */
-  CORE_ADDR get_pc_thunk_addr
-    = (pc + 5
-       + read_code_integer (pc + 1, 4, byte_order));
-
-  /* Point to second insn.  */
-  pc += 5;
-
-  /* Insn: add $0xdead,%eax.  */
-  if (target_read_code (pc + 0, &op, 1))
-    return start_pc;
-  if (op == 0x05)
-    {
-      have_ax = true;
-
-      /* Check that last byte of insn is present.  */
-      if (target_read_code (pc + 4, &op, 1))
-	return start_pc;
-
-      /* Point after second insn.  */
-      pc += 5;
-    }
-  else if (op == 0x81)
-    {
-      if (target_read_code (pc + 1, &op, 1))
-	return start_pc;
-      if (op == 0xc2)
-	have_dx = true;
-      else if (op == 0xc3)
-	have_bx = true;
-      else
-	return start_pc;
-
-      /* Check that last byte of insn is present.  */
-      if (target_read_code (pc + 5, &op, 1))
-	return start_pc;
-
-      /* Point after second insn.  */
-      pc += 6;
-    }
-  else
-    return start_pc;
-
-  /* We skipped past the get_pc_thunk call and associated add insn, save
-     pc to return it later.  */
-  res_pc = pc;
-
-  /* Now verify that the call target is as expected.  Point to first insn of
-     call target.  */
-  pc = get_pc_thunk_addr;
-
-  /* Insn: mov (%esp),%eax.  */
-  if (target_read_code (pc + 0 , &op, 1))
-    return start_pc;
-  if (op != 0x8b)
-    return start_pc;
-
-  if (target_read_code (pc + 1, &op, 1))
-    return start_pc;
-  if (have_ax && op == 0x04)
-    ;
-  else if (have_bx && op == 0x1c)
-    ;
-  else if (have_dx && op == 0x14)
-    ;
-  else
-    return start_pc;
-
-  if (target_read_code (pc + 2, &op, 1))
-    return start_pc;
-  if (op != 0x24)
-    return start_pc;
-
-  /* Point to second insn of call target.  */
-  pc += 3;
-
-  /* Insn: ret.  */
-  if (target_read_code (pc, &op, 1))
-    return start_pc;
-  if (op != 0xc3)
-    return start_pc;
-
-  /* Force prologue skipping to succeed.  */
-  if (cache->locals < 0)
-    cache->locals = 0;
-
-  return res_pc;
-}
-
 /* Do a full analysis of the prologue at PC and update CACHE
    accordingly.  Bail out early if CURRENT_PC is reached.  Return the
    address where the analysis stopped.
@@ -1934,9 +1821,7 @@ i386_analyze_prologue (struct gdbarch *gdbarch,
   pc = i386_skip_probe (pc);
   pc = i386_analyze_stack_align (pc, current_pc, cache);
   pc = i386_analyze_frame_setup (gdbarch, pc, current_pc, cache);
-  pc = i386_analyze_register_saves (pc, current_pc, cache);
-  pc = i386_skip_call_pc_thunk (gdbarch, pc, cache);
-  return pc;
+  return i386_analyze_register_saves (pc, current_pc, cache);
 }
 
 /* Return PC of first real instruction.  */
