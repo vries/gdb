@@ -7025,15 +7025,7 @@ process_event_stop_test (struct execution_control_state *ecs)
       && (execution_direction != EXEC_REVERSE
 	  || get_frame_id (frame) == ecs->event_thread->control.step_frame_id))
     {
-      infrun_debug_printf
-	("stepping inside range [%s-%s]",
-	 paddress (gdbarch, ecs->event_thread->control.step_range_start),
-	 paddress (gdbarch, ecs->event_thread->control.step_range_end));
-
-      /* Tentatively re-enable range stepping; `resume' disables it if
-	 necessary (e.g., if we're stepping over a breakpoint or we
-	 have software watchpoints).  */
-      ecs->event_thread->control.may_range_step = 1;
+      bool keep_going_p = true;
 
       /* When stepping backward, stop at beginning of line range
 	 (unless it's the function entry point, in which case
@@ -7042,11 +7034,23 @@ process_event_stop_test (struct execution_control_state *ecs)
       if (stop_pc == ecs->event_thread->control.step_range_start
 	  && stop_pc != ecs->stop_func_start
 	  && execution_direction == EXEC_REVERSE)
-	end_stepping_range (ecs);
-      else
-	keep_going (ecs);
+	keep_going_p = false;
 
-      return;
+      if (keep_going_p)
+	{
+	  infrun_debug_printf
+	    ("stepping inside range [%s-%s]",
+	     paddress (gdbarch, ecs->event_thread->control.step_range_start),
+	     paddress (gdbarch, ecs->event_thread->control.step_range_end));
+
+	  /* Tentatively re-enable range stepping; `resume' disables it if
+	     necessary (e.g., if we're stepping over a breakpoint or we
+	     have software watchpoints).  */
+	  ecs->event_thread->control.may_range_step = 1;
+
+	  keep_going (ecs);
+	  return;
+	}
     }
 
   /* We stepped out of the stepping range.  */
@@ -7543,6 +7547,8 @@ process_event_stop_test (struct execution_control_state *ecs)
 			       "it's not the start of a statement");
 	}
     }
+  else if (execution_direction == EXEC_REVERSE)
+    refresh_step_info = false;
 
   /* We aren't done stepping.
 
