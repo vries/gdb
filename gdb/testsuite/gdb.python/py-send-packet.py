@@ -122,12 +122,6 @@ def check_global_var(expected_val):
     if val != expected_val:
         raise gdb.GdbError("global_var is 0x%x, expected 0x%x" % (val, expected_val))
 
-# Return a bytes or bytearray object representing an 'X' packet with
-# address ADDR and bytes L.
-def bytes_xpacket (addr, l):
-    # Implement b"X%x,4:\xff\xff\xff\xff" % addr in a way that works
-    # in python 2.7 and 3.4.
-    return ("X%x,4:" % addr).encode('ascii') + bytearray(l)
 
 # Set the 'X' packet to the remote target to set a global variable.
 # Checks that we can send byte values.
@@ -139,26 +133,42 @@ def run_set_global_var_test():
     res = conn.send_packet("X%x,4:\x01\x01\x01\x01" % addr)
     assert isinstance(res, bytes)
     check_global_var(0x01010101)
-    res = conn.send_packet(bytes_xpacket(addr, [0x2, 0x2, 0x2, 0x2]))
+    res = conn.send_packet(b"X%x,4:\x02\x02\x02\x02" % addr)
     assert isinstance(res, bytes)
     check_global_var(0x02020202)
-
-    # This first attempt will not work as we're passing a Unicode string
-    # containing non-ascii characters.
-    saw_error = False
-    try:
+    if sys.version_info[0] > 2:
+        # On Python 3 this first attempt will not work as we're
+        # passing a Unicode string containing non-ascii characters.
+        saw_error = False
+        try:
+            res = conn.send_packet("X%x,4:\xff\xff\xff\xff" % addr)
+        except UnicodeError:
+            saw_error = True
+        except:
+            assert False
+        assert saw_error
+        check_global_var(0x02020202)
+        # Now we pass a bytes object, which will work.
+        res = conn.send_packet(b"X%x,4:\xff\xff\xff\xff" % addr)
+        check_global_var(0xFFFFFFFF)
+    else:
+        # On Python 2 we need to force the creation of a Unicode
+        # string, but, with that done, we expect to see the same error
+        # as on Python 3; the unicode string contains non-ascii
+        # characters.
+        saw_error = False
+        try:
+            res = conn.send_packet(unicode("X%x,4:\xff\xff\xff\xff") % addr)
+        except UnicodeError:
+            saw_error = True
+        except:
+            assert False
+        assert saw_error
+        check_global_var(0x02020202)
+        # Now we pass a plain string, which, on Python 2, is the same
+        # as a bytes object, this, we expect to work.
         res = conn.send_packet("X%x,4:\xff\xff\xff\xff" % addr)
-    except UnicodeError:
-        saw_error = True
-    except:
-        assert False
-
-    assert saw_error
-    check_global_var(0x02020202)
-    # Now we pass a bytes object, which will work.
-    res = conn.send_packet(bytes_xpacket(addr, [0xff, 0xff, 0xff, 0xff]))
-    check_global_var(0xFFFFFFFF)
-
+        check_global_var(0xFFFFFFFF)
     print("set global_var test passed")
 
 
