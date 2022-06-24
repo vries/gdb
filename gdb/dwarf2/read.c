@@ -7484,7 +7484,7 @@ queue_comp_unit (dwarf2_per_cu_data *per_cu,
   per_cu->queued = 1;
 
   gdb_assert (per_objfile->queue.has_value ());
-  per_objfile->queue->emplace (per_cu, per_objfile, pretend_language);
+  per_objfile->queue->emplace_back (per_cu, per_objfile, pretend_language);
 }
 
 /* If PER_CU is not yet expanded of queued for expansion, add it to the queue.
@@ -7562,60 +7562,84 @@ maybe_queue_comp_unit (struct dwarf2_cu *dependent_cu,
 static void
 process_queue (dwarf2_per_objfile *per_objfile)
 {
+  if (per_objfile->queue->empty ())
+    return;
+
   dwarf_read_debug_printf ("Expanding one or more symtabs of objfile %s ...",
 			   objfile_name (per_objfile->objfile));
 
-  /* The queue starts out with one item, but following a DIE reference
-     may load a new CU, adding it to the end of the queue.  */
+  using iter_type = decltype (per_objfile->queue->begin ());
+  using result_type = int;
+
+  size_t nr_to_be_processed = per_objfile->queue->size ();
+
   while (!per_objfile->queue->empty ())
     {
-      dwarf2_queue_item &item = per_objfile->queue->front ();
-      dwarf2_per_cu_data *per_cu = item.per_cu;
+      /* The queue starts out with one item, but following a DIE reference
+	 may load a new CU, adding it to the end of the queue.  */
+      std::vector<result_type> results
+	= gdb::parallel_for_each (1, per_objfile->queue->begin (),
+				  per_objfile->queue->end (),
+				  [=] (iter_type iter, iter_type end)
+	  {
+	    for (; iter != end; ++iter)
+	      {
+		dwarf2_queue_item &item = *iter;
+		dwarf2_per_cu_data *per_cu = item.per_cu;
 
-      if (!per_objfile->symtab_set_p (per_cu))
+		if (!per_objfile->symtab_set_p (per_cu))
+		  {
+		    dwarf2_cu *cu = per_objfile->get_cu (per_cu);
+
+		    /* Skip dummy CUs.  */
+		    if (cu != nullptr)
+		      {
+			unsigned int debug_print_threshold;
+			char buf[100];
+
+			if (per_cu->is_debug_types)
+			  {
+			    struct signatured_type *sig_type =
+			      (struct signatured_type *) per_cu;
+
+			    sprintf (buf, "TU %s at offset %s",
+				     hex_string (sig_type->signature),
+				     sect_offset_str (per_cu->sect_off));
+			    /* There can be 100s of TUs.
+			       Only print them in verbose mode.  */
+			    debug_print_threshold = 2;
+			  }
+			else
+			  {
+			    sprintf (buf, "CU at offset %s",
+				     sect_offset_str (per_cu->sect_off));
+			    debug_print_threshold = 1;
+			  }
+
+			if (dwarf_read_debug >= debug_print_threshold)
+			  dwarf_read_debug_printf ("Expanding symtab of %s", buf);
+
+			if (per_cu->is_debug_types)
+			  process_full_type_unit (cu, item.pretend_language);
+			else
+			  process_full_comp_unit (cu, item.pretend_language);
+
+			if (dwarf_read_debug >= debug_print_threshold)
+			  dwarf_read_debug_printf ("Done expanding %s", buf);
+		      }
+		  }
+	      }
+
+	    return result_type (1);
+	  });
+
+      for (int i = 0; i < nr_to_be_processed; ++i)
 	{
-	  dwarf2_cu *cu = per_objfile->get_cu (per_cu);
-
-	  /* Skip dummy CUs.  */
-	  if (cu != nullptr)
-	    {
-	      unsigned int debug_print_threshold;
-	      char buf[100];
-
-	      if (per_cu->is_debug_types)
-		{
-		  struct signatured_type *sig_type =
-		    (struct signatured_type *) per_cu;
-
-		  sprintf (buf, "TU %s at offset %s",
-			   hex_string (sig_type->signature),
-			   sect_offset_str (per_cu->sect_off));
-		  /* There can be 100s of TUs.
-		     Only print them in verbose mode.  */
-		  debug_print_threshold = 2;
-		}
-	      else
-		{
-		  sprintf (buf, "CU at offset %s",
-			   sect_offset_str (per_cu->sect_off));
-		  debug_print_threshold = 1;
-		}
-
-	      if (dwarf_read_debug >= debug_print_threshold)
-		dwarf_read_debug_printf ("Expanding symtab of %s", buf);
-
-	      if (per_cu->is_debug_types)
-		process_full_type_unit (cu, item.pretend_language);
-	      else
-		process_full_comp_unit (cu, item.pretend_language);
-
-	      if (dwarf_read_debug >= debug_print_threshold)
-		dwarf_read_debug_printf ("Done expanding %s", buf);
-	    }
+	  dwarf2_queue_item &item = per_objfile->queue->front ();
+	  dwarf2_per_cu_data *per_cu = item.per_cu;
+	  per_cu->queued = 0;
+	  per_objfile->queue->pop_front ();
 	}
-
-      per_cu->queued = 0;
-      per_objfile->queue->pop ();
     }
 
   dwarf_read_debug_printf ("Done expanding symtabs of %s.",
@@ -8426,10 +8450,17 @@ process_full_comp_unit (dwarf2_cu *cu, enum language pretend_language)
       cust->set_call_site_htab (cu->call_site_htab);
     }
 
-  per_objfile->set_symtab (cu->per_cu, cust);
+  {
+#if CXX_STD_THREAD
+    static std::mutex cu_lock;
 
-  /* Push it for inclusion processing later.  */
-  per_objfile->per_bfd->just_read_cus.push_back (cu->per_cu);
+  std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+    per_objfile->set_symtab (cu->per_cu, cust);
+
+    /* Push it for inclusion processing later.  */
+    per_objfile->per_bfd->just_read_cus.push_back (cu->per_cu);
+  }
 
   /* Not needed any more.  */
   cu->reset_builder ();
@@ -9567,9 +9598,9 @@ read_file_scope (struct die_info *die, struct dwarf2_cu *cu)
   cu->start_compunit_symtab (fnd.get_name (), fnd.intern_comp_dir (objfile),
 			     lowpc);
 
-  gdb_assert (per_objfile->sym_cu == nullptr);
+  gdb_assert (per_objfile->sym_cu[gdb::thread_pool::id()] == nullptr);
   scoped_restore restore_sym_cu
-    = make_scoped_restore (&per_objfile->sym_cu, cu);
+    = make_scoped_restore (&per_objfile->sym_cu[gdb::thread_pool::id()], cu);
 
   /* Decode line number information if present.  We do this before
      processing child DIEs, so that the line header table is available
@@ -9591,7 +9622,8 @@ read_file_scope (struct die_info *die, struct dwarf2_cu *cu)
 	  child_die = child_die->sibling;
 	}
     }
-  per_objfile->sym_cu = nullptr;
+
+  per_objfile->sym_cu[gdb::thread_pool::id()] = nullptr;
 
   /* Decode macro information, if present.  Dwarf 2 macro information
      refers to information in the line number info statement program

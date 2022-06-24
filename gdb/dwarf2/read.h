@@ -505,7 +505,10 @@ struct dwarf2_per_objfile
 {
   dwarf2_per_objfile (struct objfile *objfile, dwarf2_per_bfd *per_bfd)
     : objfile (objfile), per_bfd (per_bfd)
-  {}
+  {
+    for (int i = 0; i < gdb::thread_pool::g_thread_pool->thread_count (); ++i)
+      sym_cu.push_back (nullptr);
+  }
 
   ~dwarf2_per_objfile ();
 
@@ -573,10 +576,10 @@ struct dwarf2_per_objfile
   htab_up line_header_hash;
 
   /* The CU containing the m_builder in scope.  */
-  dwarf2_cu *sym_cu = nullptr;
+  std::vector<dwarf2_cu *> sym_cu;
 
   /* CUs that are queued to be read.  */
-  gdb::optional<std::queue<dwarf2_queue_item>> queue;
+  gdb::optional<std::deque<dwarf2_queue_item>> queue;
 
 private:
   /* Hold the corresponding compunit_symtab for each CU or TU.  This

@@ -166,6 +166,7 @@ thread_pool::set_thread_count (size_t num_threads)
 	  try
 	    {
 	      std::thread thread (&thread_pool::thread_function, this);
+	      m_thread_ids[thread.get_id ()] = i;
 	      thread.detach ();
 	    }
 	  catch (const std::system_error &)
