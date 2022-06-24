@@ -7067,9 +7067,9 @@ dwarf2_build_psymtabs_hard (dwarf2_per_objfile *per_objfile)
     using result_type = std::pair<std::unique_ptr<cooked_index>,
 				  std::vector<gdb_exception>>;
     std::vector<result_type> results
-      = gdb::parallel_for_each (1, per_bfd->all_comp_units.begin (),
-				per_bfd->all_comp_units.end (),
-				[=] (iter_type iter, iter_type end)
+      = gdb::sequential_for_each (1, per_bfd->all_comp_units.begin (),
+				  per_bfd->all_comp_units.end (),
+				  [=] (iter_type iter, iter_type end)
       {
 	std::vector<gdb_exception> errors;
 	cooked_index_storage thread_storage;
