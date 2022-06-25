@@ -24,6 +24,11 @@
 #include "bcache.h"
 
 #include <algorithm>
+#include <mutex>
+
+#if CXX_STD_THREAD
+extern std::mutex cu_lock;
+#endif
 
 namespace gdb {
 
@@ -142,6 +147,9 @@ bcache::expand_hash_table ()
 const void *
 bcache::insert (const void *addr, int length, bool *added)
 {
+#if CXX_STD_THREAD
+  std::lock_guard<std::mutex> guard (cu_lock);
+#endif
   unsigned long full_hash;
   unsigned short half_hash;
   int hash_index;

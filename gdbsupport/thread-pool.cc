@@ -149,11 +149,23 @@ thread_pool::~thread_pool ()
      case -- see the comment by the definition of g_thread_pool.  */
 }
 
+unsigned thread_pool::id ()
+{
+#if CXX_STD_THREAD
+    std::thread::id id = std::this_thread::get_id();
+    return g_thread_pool->m_thread_ids[id];
+#else
+    return 0;
+#endif
+}
+
 void
 thread_pool::set_thread_count (size_t num_threads)
 {
 #if CXX_STD_THREAD
   std::lock_guard<std::mutex> guard (m_tasks_mutex);
+
+  m_thread_ids[std::this_thread::get_id ()] = 0;
 
   /* If the new size is larger, start some new threads.  */
   if (m_thread_count < num_threads)
@@ -166,7 +178,7 @@ thread_pool::set_thread_count (size_t num_threads)
 	  try
 	    {
 	      std::thread thread (&thread_pool::thread_function, this);
-	      m_thread_ids[thread.get_id ()] = i;
+	      m_thread_ids[thread.get_id ()] = i + 1;
 	      thread.detach ();
 	    }
 	  catch (const std::system_error &)
@@ -174,7 +186,7 @@ thread_pool::set_thread_count (size_t num_threads)
 	      /* libstdc++ may not implement std::thread, and will
 		 throw an exception on use.  It seems fine to ignore
 		 this, and any other sort of startup failure here.  */
-	      num_threads = i;
+	      num_threads = i + 1;
 	      break;
 	    }
 	}

@@ -46,6 +46,7 @@
 #include "cp-abi.h"
 #include "cp-support.h"
 #include <ctype.h>
+#include <mutex>
 
 #include "stabsread.h"
 
@@ -4491,12 +4492,20 @@ cleanup_undefined_types_1 (void)
   undef_types_length = 0;
 }
 
+#if CXX_STD_THREAD
+extern std::mutex cu_lock;
+#endif
+
 /* Try to fix all the undefined types we encountered while processing
    this unit.  */
 
 void
 cleanup_undefined_stabs_types (struct objfile *objfile)
 {
+#if CXX_STD_THREAD
+  std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+
   cleanup_undefined_types_1 ();
   cleanup_undefined_types_noname (objfile);
 }

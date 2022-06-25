@@ -191,6 +191,10 @@ buildsym_compunit::record_pending_block (struct block *block,
     }
 }
 
+#if CXX_STD_THREAD
+extern std::mutex cu_lock;
+#endif
+
 /* Take one of the lists of symbols and make a block from it.  Keep
    the order the symbols have in the list (reversed from the input
    file).  Put the block on the list of pending blocks.  */
@@ -210,29 +214,34 @@ buildsym_compunit::finish_block_internal
   struct pending_block *pblock;
   struct pending_block *opblock;
 
-  block = (is_global
-	   ? allocate_global_block (&m_objfile->objfile_obstack)
-	   : allocate_block (&m_objfile->objfile_obstack));
+  {
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+    block = (is_global
+	     ? allocate_global_block (&m_objfile->objfile_obstack)
+	     : allocate_block (&m_objfile->objfile_obstack));
 
-  if (symbol)
-    {
-      block->set_multidict
-	(mdict_create_linear (&m_objfile->objfile_obstack, *listhead));
-    }
-  else
-    {
-      if (expandable)
-	{
-	  block->set_multidict
-	    (mdict_create_hashed_expandable (m_language));
-	  mdict_add_pending (block->multidict (), *listhead);
-	}
-      else
-	{
-	  block->set_multidict
-	    (mdict_create_hashed (&m_objfile->objfile_obstack, *listhead));
-	}
-    }
+    if (symbol)
+      {
+	block->set_multidict
+	  (mdict_create_linear (&m_objfile->objfile_obstack, *listhead));
+      }
+    else
+      {
+	if (expandable)
+	  {
+	    block->set_multidict
+	      (mdict_create_hashed_expandable (m_language));
+	    mdict_add_pending (block->multidict (), *listhead);
+	  }
+	else
+	  {
+	    block->set_multidict
+	      (mdict_create_hashed (&m_objfile->objfile_obstack, *listhead));
+	  }
+      }
+  }
 
   block->set_start (start);
   block->set_end (end);
@@ -370,11 +379,16 @@ buildsym_compunit::finish_block_internal
       opblock = pblock;
     }
 
-  block_set_using (block,
-		   (is_global
-		    ? m_global_using_directives
-		    : m_local_using_directives),
-		   &m_objfile->objfile_obstack);
+  {
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+    block_set_using (block,
+		     (is_global
+		      ? m_global_using_directives
+		      : m_local_using_directives),
+		     &m_objfile->objfile_obstack);
+  }
   if (is_global)
     m_global_using_directives = NULL;
   else
@@ -433,31 +447,36 @@ buildsym_compunit::make_blockvector ()
     {
     }
 
-  blockvector = (struct blockvector *)
-    obstack_alloc (&m_objfile->objfile_obstack,
-		   (sizeof (struct blockvector)
-		    + (i - 1) * sizeof (struct block *)));
+  {
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+    blockvector = (struct blockvector *)
+      obstack_alloc (&m_objfile->objfile_obstack,
+		     (sizeof (struct blockvector)
+		      + (i - 1) * sizeof (struct block *)));
 
-  /* Copy the blocks into the blockvector.  This is done in reverse
-     order, which happens to put the blocks into the proper order
-     (ascending starting address).  finish_block has hair to insert
-     each block into the list after its subblocks in order to make
-     sure this is true.  */
+    /* Copy the blocks into the blockvector.  This is done in reverse
+       order, which happens to put the blocks into the proper order
+       (ascending starting address).  finish_block has hair to insert
+       each block into the list after its subblocks in order to make
+       sure this is true.  */
 
-  blockvector->set_num_blocks (i);
-  for (next = m_pending_blocks; next; next = next->next)
-    blockvector->set_block (--i, next->block);
+    blockvector->set_num_blocks (i);
+    for (next = m_pending_blocks; next; next = next->next)
+      blockvector->set_block (--i, next->block);
 
-  free_pending_blocks ();
+    free_pending_blocks ();
 
-  /* If we needed an address map for this symtab, record it in the
-     blockvector.  */
-  if (m_pending_addrmap_interesting)
-    blockvector->set_map
-      (new (&m_objfile->objfile_obstack) addrmap_fixed
-       (&m_objfile->objfile_obstack, &m_pending_addrmap));
-  else
-    blockvector->set_map (nullptr);
+    /* If we needed an address map for this symtab, record it in the
+       blockvector.  */
+    if (m_pending_addrmap_interesting)
+      blockvector->set_map
+	(new (&m_objfile->objfile_obstack) addrmap_fixed
+	 (&m_objfile->objfile_obstack, &m_pending_addrmap));
+    else
+      blockvector->set_map (nullptr);
+  }
 
   /* Some compilers output blocks in the wrong order, but we depend on
      their being in the right order so we can binary search.  Check the

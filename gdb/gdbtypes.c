@@ -173,6 +173,10 @@ show_strict_type_checking (struct ui_file *file, int from_tty,
 }
 
 
+#if CXX_STD_THREAD
+extern std::mutex cu_lock;
+#endif
+
 /* Allocate a new OBJFILE-associated type structure and fill it
    with some defaults.  Space for the type structure is allocated
    on the objfile's objfile_obstack.  */
@@ -185,10 +189,15 @@ alloc_type (struct objfile *objfile)
   gdb_assert (objfile != NULL);
 
   /* Alloc the structure and start off with all fields zeroed.  */
-  type = OBSTACK_ZALLOC (&objfile->objfile_obstack, struct type);
-  TYPE_MAIN_TYPE (type) = OBSTACK_ZALLOC (&objfile->objfile_obstack,
-					  struct main_type);
-  OBJSTAT (objfile, n_types++);
+  {
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+    type = OBSTACK_ZALLOC (&objfile->objfile_obstack, struct type);
+    TYPE_MAIN_TYPE (type) = OBSTACK_ZALLOC (&objfile->objfile_obstack,
+					    struct main_type);
+    OBJSTAT (objfile, n_types++);
+  }
 
   type->set_owner (objfile);
 
@@ -295,11 +304,16 @@ alloc_type_instance (struct type *oldtype)
 
   /* Allocate the structure.  */
 
-  if (!oldtype->is_objfile_owned ())
-    type = GDBARCH_OBSTACK_ZALLOC (oldtype->arch_owner (), struct type);
-  else
-    type = OBSTACK_ZALLOC (&oldtype->objfile_owner ()->objfile_obstack,
-			   struct type);
+  {
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+    if (!oldtype->is_objfile_owned ())
+      type = GDBARCH_OBSTACK_ZALLOC (oldtype->arch_owner (), struct type);
+    else
+      type = OBSTACK_ZALLOC (&oldtype->objfile_owner ()->objfile_obstack,
+			     struct type);
+  }
 
   TYPE_MAIN_TYPE (type) = TYPE_MAIN_TYPE (oldtype);
 

@@ -7557,6 +7557,10 @@ maybe_queue_comp_unit (struct dwarf2_cu *dependent_cu,
   return queued && cu == nullptr;
 }
 
+#if CXX_STD_THREAD
+std::mutex cu_lock;
+#endif
+
 /* Process the queue.  */
 
 static void
@@ -7587,7 +7591,14 @@ process_queue (dwarf2_per_objfile *per_objfile)
 		dwarf2_queue_item &item = *iter;
 		dwarf2_per_cu_data *per_cu = item.per_cu;
 
-		if (!per_objfile->symtab_set_p (per_cu))
+		bool set_p;
+		{
+#if CXX_STD_THREAD
+		  std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+		  set_p = per_objfile->symtab_set_p (per_cu);
+		}
+		if (!set_p)
 		  {
 		    dwarf2_cu *cu = per_objfile->get_cu (per_cu);
 
@@ -8452,8 +8463,6 @@ process_full_comp_unit (dwarf2_cu *cu, enum language pretend_language)
 
   {
 #if CXX_STD_THREAD
-    static std::mutex cu_lock;
-
   std::lock_guard<std::mutex> guard (cu_lock);
 #endif
     per_objfile->set_symtab (cu->per_cu, cust);
@@ -20709,8 +20718,13 @@ new_symbol (struct die_info *die, struct type *type, struct dwarf2_cu *cu,
       if (space)
 	sym = space;
       else
-	sym = new (&objfile->objfile_obstack) symbol;
-      OBJSTAT (objfile, n_syms++);
+	{
+#if CXX_STD_THREAD
+	  std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+	  sym = new (&objfile->objfile_obstack) symbol;
+	  OBJSTAT (objfile, n_syms++);
+	}
 
       /* Cache this symbol's name and the name's demangled form (if any).  */
       sym->set_language (cu->per_cu->lang, &objfile->objfile_obstack);
@@ -23825,24 +23839,29 @@ set_die_type (struct die_info *die, struct type *type, struct dwarf2_cu *cu,
 	type->add_dyn_prop (DYN_PROP_DATA_LOCATION, prop);
     }
 
-  if (per_objfile->die_type_hash == NULL)
-    per_objfile->die_type_hash
-      = htab_up (htab_create_alloc (127,
-				    per_cu_offset_and_type_hash,
-				    per_cu_offset_and_type_eq,
-				    NULL, xcalloc, xfree));
+  {
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+    if (per_objfile->die_type_hash == NULL)
+      per_objfile->die_type_hash
+	= htab_up (htab_create_alloc (127,
+				      per_cu_offset_and_type_hash,
+				      per_cu_offset_and_type_eq,
+				      NULL, xcalloc, xfree));
 
-  ofs.per_cu = cu->per_cu;
-  ofs.sect_off = die->sect_off;
-  ofs.type = type;
-  slot = (struct dwarf2_per_cu_offset_and_type **)
-    htab_find_slot (per_objfile->die_type_hash.get (), &ofs, INSERT);
-  if (*slot)
-    complaint (_("A problem internal to GDB: DIE %s has type already set"),
-	       sect_offset_str (die->sect_off));
-  *slot = XOBNEW (&objfile->objfile_obstack,
-		  struct dwarf2_per_cu_offset_and_type);
-  **slot = ofs;
+    ofs.per_cu = cu->per_cu;
+    ofs.sect_off = die->sect_off;
+    ofs.type = type;
+    slot = (struct dwarf2_per_cu_offset_and_type **)
+      htab_find_slot (per_objfile->die_type_hash.get (), &ofs, INSERT);
+    if (*slot)
+      complaint (_("A problem internal to GDB: DIE %s has type already set"),
+		 sect_offset_str (die->sect_off));
+    *slot = XOBNEW (&objfile->objfile_obstack,
+		    struct dwarf2_per_cu_offset_and_type);
+    **slot = ofs;
+  }
   return type;
 }
 
@@ -23861,12 +23880,17 @@ get_die_type_at_offset (sect_offset sect_off,
 
   ofs.per_cu = per_cu;
   ofs.sect_off = sect_off;
-  slot = ((struct dwarf2_per_cu_offset_and_type *)
-	  htab_find (per_objfile->die_type_hash.get (), &ofs));
-  if (slot)
-    return slot->type;
-  else
-    return NULL;
+  {
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+    slot = ((struct dwarf2_per_cu_offset_and_type *)
+	    htab_find (per_objfile->die_type_hash.get (), &ofs));
+    if (slot)
+      return slot->type;
+    else
+      return NULL;
+  }
 }
 
 /* Look up the type for DIE in CU in die_type_hash,

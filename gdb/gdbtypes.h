@@ -56,6 +56,7 @@
 #include "dwarf2.h"
 #include "gdbsupport/gdb_obstack.h"
 #include "gmp-utils.h"
+#include <mutex>
 
 /* Forward declarations for prototypes.  */
 struct field;
@@ -2457,6 +2458,10 @@ extern const struct floatformat *floatformats_vax_d[BFD_ENDIAN_UNKNOWN];
 extern const struct floatformat *floatformats_ibm_long_double[BFD_ENDIAN_UNKNOWN];
 extern const struct floatformat *floatformats_bfloat16[BFD_ENDIAN_UNKNOWN];
 
+#if CXX_STD_THREAD
+extern std::mutex cu_lock;
+#endif
+
 /* Allocate space for storing data associated with a particular
    type.  We ensure that the space is allocated using the same
    mechanism that was used to allocate the space for the type
@@ -2471,12 +2476,20 @@ extern const struct floatformat *floatformats_bfloat16[BFD_ENDIAN_UNKNOWN];
    should call xmalloc directly, and ensure the memory is correctly freed
    when it is no longer needed.  */
 
-#define TYPE_ALLOC(t,size)                                              \
-  (obstack_alloc (((t)->is_objfile_owned ()                             \
-		   ? &((t)->objfile_owner ()->objfile_obstack)          \
-		   : gdbarch_obstack ((t)->arch_owner ())),             \
-		  size))
+static inline void *
+type_alloc (struct obstack *ob, size_t size)
+{
+#if CXX_STD_THREAD
+  std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+  return obstack_alloc (ob, size);
+}
 
+#define TYPE_ALLOC(t,size)					\
+  (type_alloc(((t)->is_objfile_owned ()				\
+	       ? &((t)->objfile_owner ()->objfile_obstack)	\
+	       : gdbarch_obstack ((t)->arch_owner ())),		\
+	      size))
 
 /* See comment on TYPE_ALLOC.  */
 

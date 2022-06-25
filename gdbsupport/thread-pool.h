@@ -120,15 +120,7 @@ public:
 #endif
   }
 
-  static unsigned id ()
-  {
-#if CXX_STD_THREAD
-    std::thread::id id = std::this_thread::get_id();
-    return g_thread_pool->m_thread_ids[id];
-#else
-    return 0;
-#endif
-  }
+  static unsigned id ();
 
   /* Post a task to the thread pool.  A future is returned, which can
      be used to wait for the result.  */

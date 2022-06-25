@@ -69,6 +69,7 @@
 #include <ctype.h>
 #include <chrono>
 #include <algorithm>
+#include <mutex>
 
 int (*deprecated_ui_load_progress_hook) (const char *section,
 					 unsigned long num);
@@ -2768,6 +2769,10 @@ deduce_language_from_filename (const char *filename)
   return language_unknown;
 }
 
+#if CXX_STD_THREAD
+extern std::mutex cu_lock;
+#endif
+
 /* Allocate and initialize a new symbol table.
    CUST is from the result of allocate_compunit_symtab.  */
 
@@ -2775,8 +2780,13 @@ struct symtab *
 allocate_symtab (struct compunit_symtab *cust, const char *filename)
 {
   struct objfile *objfile = cust->objfile ();
-  struct symtab *symtab
-    = OBSTACK_ZALLOC (&objfile->objfile_obstack, struct symtab);
+  struct symtab *symtab;
+  {
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+    symtab = OBSTACK_ZALLOC (&objfile->objfile_obstack, struct symtab);
+  }
 
   symtab->filename = objfile->intern (filename);
   symtab->fullname = NULL;
@@ -2819,17 +2829,22 @@ allocate_symtab (struct compunit_symtab *cust, const char *filename)
 struct compunit_symtab *
 allocate_compunit_symtab (struct objfile *objfile, const char *name)
 {
-  struct compunit_symtab *cu = OBSTACK_ZALLOC (&objfile->objfile_obstack,
-					       struct compunit_symtab);
-  const char *saved_name;
+  struct compunit_symtab *cu;
+  {
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (cu_lock);
+#endif
+    cu = OBSTACK_ZALLOC (&objfile->objfile_obstack, struct compunit_symtab);
 
-  cu->set_objfile (objfile);
+    cu->set_objfile (objfile);
 
   /* The name we record here is only for display/debugging purposes.
      Just save the basename to avoid path issues (too long for display,
      relative vs absolute, etc.).  */
-  saved_name = lbasename (name);
-  cu->name = obstack_strdup (&objfile->objfile_obstack, saved_name);
+    const char *saved_name;
+    saved_name = lbasename (name);
+    cu->name = obstack_strdup (&objfile->objfile_obstack, saved_name);
+  }
 
   cu->set_debugformat ("unknown");
 

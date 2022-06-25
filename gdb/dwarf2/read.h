@@ -506,7 +506,7 @@ struct dwarf2_per_objfile
   dwarf2_per_objfile (struct objfile *objfile, dwarf2_per_bfd *per_bfd)
     : objfile (objfile), per_bfd (per_bfd)
   {
-    for (int i = 0; i < gdb::thread_pool::g_thread_pool->thread_count (); ++i)
+    for (unsigned i = 0; i < gdb::thread_pool::g_thread_pool->thread_count () + 1; ++i)
       sym_cu.push_back (nullptr);
   }
 
