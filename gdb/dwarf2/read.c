@@ -6766,6 +6766,10 @@ private:
   std::vector<deferred_entry> m_deferred_entries;
 };
 
+#if CXX_STD_THREAD
+static std::mutex per_cu_long_lock;
+#endif
+
 /* Subroutine of dwarf2_build_psymtabs_hard to simplify it.
    Process compilation unit THIS_CU for a psymtab.  */
 
@@ -23567,6 +23571,8 @@ prepare_one_comp_unit (struct dwarf2_cu *cu, struct die_info *comp_unit_die,
 
   /* Set the language we're debugging.  */
   attr = dwarf2_attr (comp_unit_die, DW_AT_language, cu);
+
+  enum language lang;
   if (cu->producer != nullptr
       && strstr (cu->producer, "IBM XL C for OpenCL") != NULL)
     {
@@ -23574,19 +23580,34 @@ prepare_one_comp_unit (struct dwarf2_cu *cu, struct die_info *comp_unit_die,
 	 attribute is not standardised yet.  As a workaround for the
 	 language detection we fall back to the DW_AT_producer
 	 string.  */
-      cu->per_cu->lang = language_opencl;
+      lang = language_opencl;
     }
   else if (cu->producer != nullptr
 	   && strstr (cu->producer, "GNU Go ") != NULL)
     {
       /* Similar hack for Go.  */
-      cu->per_cu->lang = language_go;
+      lang = language_go;
     }
   else if (attr != nullptr)
-    cu->per_cu->lang = dwarf_lang_to_enum_language (attr->constant_value (0));
+    lang = dwarf_lang_to_enum_language (attr->constant_value (0));
   else
-    cu->per_cu->lang = pretend_language;
-  cu->language_defn = language_def (cu->per_cu->lang);
+    lang = pretend_language;
+
+  {
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (per_cu_long_lock);
+#endif
+    /* Assign cu->per_cu->lang lazily.  Note: we're not doing here:
+         if (cu->per_cu->lang == language_unknown)
+           cu->per_cu->lang = lang;
+         else
+           gdb_assert (cu->per_cu->lang == lang);
+       because language may go from unknown to minimal to c.  */
+    if (cu->per_cu->lang != lang)
+      cu->per_cu->lang = lang;
+  }
+
+  cu->language_defn = language_def (lang);
 }
 
 /* See read.h.  */
