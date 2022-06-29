@@ -175,7 +175,9 @@ struct dwarf2_per_cu_data
   ENUM_BITFIELD (dwarf_unit_type) unit_type : 8;
 
   /* The language of this CU.  */
-  ENUM_BITFIELD (language) lang : LANGUAGE_BITS;
+  struct {
+    ENUM_BITFIELD (language) lang : LANGUAGE_BITS;
+  };
 
   /* True if this CU has been scanned by the indexer; false if
      not.  */
