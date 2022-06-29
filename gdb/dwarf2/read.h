@@ -172,7 +172,9 @@ struct dwarf2_per_cu_data
   bool files_read : 1;
 
   /* The unit type of this CU.  */
-  ENUM_BITFIELD (dwarf_unit_type) unit_type : 8;
+  struct {
+    ENUM_BITFIELD (dwarf_unit_type) unit_type : 8;
+  };
 
   /* The language of this CU.  */
   struct {
