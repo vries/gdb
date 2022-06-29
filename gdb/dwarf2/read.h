@@ -163,7 +163,9 @@ public:
 
   /* If addresses have been read for this CU (usually from
      .debug_aranges), then this flag is set.  */
-  bool addresses_seen : 1;
+  struct {
+    bool addresses_seen : 1;
+  };
 
   /* A temporary mark bit used when iterating over all CUs in
      expand_symtabs_matching.  */
@@ -174,11 +176,16 @@ public:
   bool files_read : 1;
 
 private:
-  /* The unit type of this CU.  */
-  ENUM_BITFIELD (dwarf_unit_type) m_unit_type : 8;
+  /* Put some fields in a struct to ensure a separate memory location.  */
+  struct { 
+    /* The unit type of this CU.  */
+    ENUM_BITFIELD (dwarf_unit_type) m_unit_type : 8;
+  };
 
-  /* The language of this CU.  */
-  ENUM_BITFIELD (language) m_lang : LANGUAGE_BITS;
+  struct { 
+    /* The language of this CU.  */
+    ENUM_BITFIELD (language) m_lang : LANGUAGE_BITS;
+  };
 
 public:
   /* True if this CU has been scanned by the indexer; false if
