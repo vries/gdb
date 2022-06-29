@@ -6249,7 +6249,11 @@ cutu_reader::cutu_reader (dwarf2_per_cu_data *this_cu,
 	    this_cu->length = cu->header.get_length ();
 	  else
 	    gdb_assert (this_cu->length == cu->header.get_length ());
-	  this_cu->dwarf_version = cu->header.version;
+	  /* Init this_cu->dwarf_version lazily.  */
+	  if (this_cu->dwarf_version == 0)
+	    this_cu->dwarf_version = cu->header.version;
+	  else
+	    gdb_assert (this_cu->dwarf_version == cu->header.version);
 	}
     }
 
@@ -7206,6 +7210,9 @@ read_comp_units_from_section (dwarf2_per_objfile *per_objfile,
       this_cu->length = cu_header.length + cu_header.initial_length_size;
       this_cu->is_dwz = is_dwz;
       this_cu->section = section;
+      /* Init this asap, to make sure the lazy init (which may be run in
+	 parallel for the cooked index case) isn't necessary.  */
+      this_cu->dwarf_version = cu_header.version;
 
       info_ptr = info_ptr + this_cu->length;
       per_objfile->per_bfd->all_comp_units.push_back (std::move (this_cu));
