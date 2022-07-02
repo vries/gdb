@@ -94,6 +94,9 @@
 #include "gdbsupport/parallel-for.h"
 #include "gdbsupport/thread-pool.h"
 
+/* See read.h.  */
+std::mutex dwarf2_per_cu_data::lock;
+
 /* When == 1, print basic high level tracing messages.
    When > 1, be more verbose.
    This is in contrast to the low level DIE reading of dwarf_die_debug.  */

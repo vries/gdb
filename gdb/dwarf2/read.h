@@ -114,6 +114,11 @@ struct dwarf2_per_cu_data
   {
   }
 
+#if CXX_STD_THREAD
+  /* Lock to guard concurrent access to certain fields.  */
+  static std::mutex lock;
+#endif
+
   /* The start offset and length of this compilation unit.
      NOTE: Unlike comp_unit_head.length, this length includes
      initial_length_size.
@@ -337,6 +342,9 @@ public:
 
   void set_lang (enum language lang)
   {
+#if CXX_STD_THREAD
+    std::lock_guard<std::mutex> guard (lock);
+#endif
     /* We'd like to be more strict here, similar to what is done in
        set_unit_type,  but currently a partial unit can go from unknown to
        minimal to ada to c.  */
