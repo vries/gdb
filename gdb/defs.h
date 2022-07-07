@@ -235,6 +235,9 @@ gdb_static_assert (nr_languages <= (1 << LANGUAGE_BITS));
 /* The number of bytes needed to represent all languages.  */
 #define LANGUAGE_BYTES ((LANGUAGE_BITS + HOST_CHAR_BIT - 1) / HOST_CHAR_BIT)
 
+#define LANGUAGE_CONTAINER unsigned char
+gdb_static_assert (sizeof (LANGUAGE_CONTAINER) >= LANGUAGE_BYTES);
+
 enum precision_type
   {
     single_precision,
