@@ -34,6 +34,8 @@
 #include "inferior.h"
 #include "cli/cli-style.h"
 
+static std::unordered_map<bfd *, int> orig_bfd_count_sections_map;
+
 /* An object of this type is stored in the section's user data when
    mapping a section.  */
 
@@ -730,6 +732,7 @@ gdb_bfd_unref (struct bfd *abfd)
   bfd_set_usrdata (abfd, NULL);  /* Paranoia.  */
 
   htab_remove_elt (all_bfds, abfd);
+  orig_bfd_count_sections_map.erase (abfd);
 
   gdb_bfd_close_or_warn (abfd);
 
@@ -996,21 +999,34 @@ gdb_bfd_record_inclusion (bfd *includer, bfd *includee)
 
 gdb_static_assert (ARRAY_SIZE (_bfd_std_section) == 4);
 
+static int
+get_orig_bfd_count_sections (bfd *abfd)
+{
+  auto it = orig_bfd_count_sections_map.find (abfd);
+  if (it != orig_bfd_count_sections_map.end ())
+    return it->second;
+  int idx = bfd_count_sections (abfd);
+  orig_bfd_count_sections_map[abfd] = idx;
+  return idx;
+}
+
 /* See gdb_bfd.h.  */
 
 int
 gdb_bfd_section_index (bfd *abfd, asection *section)
 {
+  int count = get_orig_bfd_count_sections (abfd);
   if (section == NULL)
     return -1;
   else if (section == bfd_com_section_ptr)
-    return bfd_count_sections (abfd);
+    return count;
   else if (section == bfd_und_section_ptr)
-    return bfd_count_sections (abfd) + 1;
+    return count + 1;
   else if (section == bfd_abs_section_ptr)
-    return bfd_count_sections (abfd) + 2;
+    return count + 2;
   else if (section == bfd_ind_section_ptr)
-    return bfd_count_sections (abfd) + 3;
+    return count + 3;
+  gdb_assert (section->index < count);
   return section->index;
 }
 
@@ -1019,7 +1035,8 @@ gdb_bfd_section_index (bfd *abfd, asection *section)
 int
 gdb_bfd_count_sections (bfd *abfd)
 {
-  return bfd_count_sections (abfd) + 4;
+  int count = get_orig_bfd_count_sections (abfd);
+  return count + 4;
 }
 
 /* See gdb_bfd.h.  */
