@@ -203,7 +203,8 @@ proc test {condition_eval target_non_stop non_stop displaced} {
 
 	    set running_count 0
 	    set interrupted 0
-	    gdb_test_multiple "info threads" "all threads running" {
+	    set running_expected [expr ($n_threads + 1) * 2]
+	    gdb_test_multiple "info threads" "threads running" {
 		-re "\\(running\\)" {
 		    incr running_count
 		    exp_continue
@@ -225,8 +226,27 @@ proc test {condition_eval target_non_stop non_stop displaced} {
 		    }
 		}
 		-re "$gdb_prompt $" {
-		    gdb_assert {$running_count == ($n_threads + 1) * 2} $gdb_test_name
 		}
+	    }
+	    if { $interrupted == 0 } {
+		while { $running_count < $running_expected } {
+		    sleep 1
+		    set prev_running_count $running_count
+		    set running_count 0
+		    gdb_test_multiple "info threads" "threads running" {
+			-re "\\(running\\)" {
+			    incr running_count
+			    exp_continue
+			}
+			-re "$gdb_prompt $" {
+			}
+		    }
+		    if { $running_count == $prev_running_count } {
+			break
+		    }
+		}
+		gdb_assert {$running_count == $running_expected} \
+		    "all threads running"
 	    }
 
 	    gdb_test "detach" "Detaching from.*"
