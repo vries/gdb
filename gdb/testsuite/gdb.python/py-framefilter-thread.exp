@@ -39,7 +39,7 @@ gdb_breakpoint [gdb_get_line_number "Backtrace end breakpoint"]
 gdb_continue_to_breakpoint "Backtrace end breakpoint"
 
 # #2  0x00007ffff75f228d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:113^M
-gdb_test "bt no-filters" " in (\\.?_*clone|thread_start) \[^\r\n\]*" "bt no-filters"
+gdb_test "bt no-filters" " in (\\.?_*clone3?|thread_start) \[^\r\n\]*" "bt no-filters"
 
 # #2  0x00007ffff75f228d in 941595343737041 () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:113^M
 # vs.
