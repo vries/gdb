@@ -1361,10 +1361,10 @@ find_separate_debug_file_by_buildid (struct objfile *objfile,
   return std::string ();
 }
 
-extern void _initialize_build_id (void);
+void _initialize_build_id ();
 
 void
-_initialize_build_id (void)
+_initialize_build_id ()
 {
   add_setshow_zinteger_cmd ("build-id-verbose", no_class, &build_id_verbose,
 			    _("\
