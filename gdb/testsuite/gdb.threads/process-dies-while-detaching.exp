@@ -126,8 +126,12 @@ proc detach_and_expect_exit {inf_output_re test} {
 # Run to _exit in the child.
 
 proc continue_to_exit_bp {} {
-    gdb_breakpoint "_exit" temporary
-    gdb_continue_to_breakpoint "_exit" ".*_exit.*"
+    set line [gdb_get_line_number "Exit in child"]
+    gdb_breakpoint $line temporary
+    set line [gdb_get_line_number "Exit in thread"]
+    gdb_breakpoint $line temporary
+    gdb_continue_to_breakpoint "exit" ".*exit.*"
+    delete_breakpoints
 }
 
 # If testing single-process, simply detach from the process.
