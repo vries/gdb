@@ -34,6 +34,8 @@ if {[gdb_compile_ada "${srcfile}" "${binfile}" executable $options] != ""} {
 
 clean_restart ${testfile}
 
+gdb_test_no_output "maint set skip-prologue none"
+
 set bp_location [gdb_get_line_number "BREAK" ${testdir}/callee.adb]
 # The bug here was that gdb would set a breakpoint with two locations,
 # one of them at 0x0.

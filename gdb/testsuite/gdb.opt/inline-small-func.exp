@@ -49,6 +49,8 @@ if ![runto_main] {
 # below will only contain a single breakpoint.
 delete_breakpoints
 
+gdb_test_no_output "maint set skip-prologue none"
+
 # Place a breakpoint within the function in the header file.
 set linenum [gdb_get_line_number "callee: body" $srcfile2]
 gdb_breakpoint "${srcfile2}:${linenum}"

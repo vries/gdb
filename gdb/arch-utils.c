@@ -37,6 +37,7 @@
 #include "auxv.h"
 #include "observable.h"
 #include "solib-target.h"
+#include "maint.h"
 
 #include "gdbsupport/version.h"
 
@@ -1033,6 +1034,23 @@ default_print_insn (bfd_vma memaddr, disassemble_info *info)
   return (*disassemble_fn) (memaddr, info);
 }
 
+/* Helper function for gdbarch_skip_prologue_noexcept.  */
+
+static CORE_ADDR
+gdbarch_skip_prologue_line_table (struct gdbarch *gdbarch, CORE_ADDR pc)
+{
+  CORE_ADDR func_addr;
+
+  if (find_pc_partial_function (pc, NULL, &func_addr, NULL))
+    {
+      CORE_ADDR post_prologue_pc
+	= skip_prologue_using_sal (gdbarch, func_addr);
+      return std::max (pc, post_prologue_pc);
+    }
+
+  return gdbarch_skip_prologue (gdbarch, pc);
+}
+
 /* See arch-utils.h.  */
 
 CORE_ADDR
@@ -1042,7 +1060,14 @@ gdbarch_skip_prologue_noexcept (gdbarch *gdbarch, CORE_ADDR pc) noexcept
 
   try
     {
-      new_pc = gdbarch_skip_prologue (gdbarch, pc);
+      if (skip_prologue_method == spm_default)
+	new_pc = gdbarch_skip_prologue (gdbarch, pc);
+      else if (skip_prologue_method == spm_line_table)
+	new_pc = gdbarch_skip_prologue_line_table (gdbarch, pc);
+      else if (skip_prologue_method == spm_none)
+	new_pc = pc;
+      else
+	gdb_assert_not_reached ("");
     }
   catch (const gdb_exception &ex)
     {}

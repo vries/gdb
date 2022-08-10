@@ -66,4 +66,13 @@ class scoped_command_stats
 extern obj_section *maint_obj_section_from_bfd_section (bfd *abfd,
 							asection *asection,
 							objfile *ofile);
+
+/* Values for maint set skip-prologue.  */
+
+enum spm_value { spm_default, spm_line_table, spm_none };
+
+/* Current value of maint set skip-prologue.  */
+
+extern spm_value skip_prologue_method;
+
 #endif /* MAINT_H */

@@ -1204,6 +1204,55 @@ Selftests have been disabled for this build.\n"));
 #endif
 }
 
+/* See maint.h.  */
+
+spm_value skip_prologue_method = spm_default;
+
+/* Valid string arguments for maint set skip-prologue.  */
+
+static const char skip_prologue_method_default[] = "default";
+static const char skip_prologue_method_line_table[] = "line-table";
+static const char skip_prologue_method_line_none[] = "none";
+
+/* List of all valid string arguments for maint set skip-prologue.  */
+
+static const char *skip_prologue_method_enum[] = {
+  skip_prologue_method_default,
+  skip_prologue_method_line_table,
+  skip_prologue_method_line_none,
+  nullptr
+};
+
+/* Current string argument for maint set skip-prologue.  */
+
+static const char *skip_prologue_method_value = skip_prologue_method_default;
+
+/* Set skip_prologue_method.  */
+
+static void
+set_skip_prologue_method_command (const char *args, int from_tty,
+				  cmd_list_element *c)
+{
+  if (skip_prologue_method_value == skip_prologue_method_default)
+    skip_prologue_method = spm_default;
+  else if (skip_prologue_method_value == skip_prologue_method_line_table)
+    skip_prologue_method = spm_line_table;
+  else if (skip_prologue_method_value == skip_prologue_method_line_none)
+    skip_prologue_method = spm_none;
+  else
+    gdb_assert_not_reached ("Invalid skip_prologue_method kind value.");
+}
+
+/* Show skip_prologue_method.  */
+
+static void
+show_skip_prologue_method_command (struct ui_file *file, int from_tty,
+				   struct cmd_list_element *cmd,
+				   const char *value)
+{
+  gdb_printf (file, _("Skip prologue method is %s.\n"), value);
+}
+
 
 void _initialize_maint_cmds ();
 void
@@ -1474,6 +1523,16 @@ such as demangling symbol names."),
 					     maintenance_selftest_option_defs,
 					     &set_selftest_cmdlist,
 					     &show_selftest_cmdlist);
+
+  add_setshow_enum_cmd ("skip-prologue", class_maintenance,
+			skip_prologue_method_enum,
+			&skip_prologue_method_value,
+			_("Set skip-prologue method."),
+			_("Show skip-prologue method."),
+			_("Control the skip-prologue method."),
+			set_skip_prologue_method_command,
+			show_skip_prologue_method_command,
+			&maintenance_set_cmdlist, &maintenance_show_cmdlist);
 
   update_thread_pool_size ();
 }
