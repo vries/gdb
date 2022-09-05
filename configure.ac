@@ -3605,6 +3605,9 @@ case " $build_configdirs " in
 esac
 
 AC_CHECK_PROGS([MAKEINFO], makeinfo, [$MISSING makeinfo])
+if test $with_makeinfo = "no"; then
+MAKEINFO=true
+else
 case " $build_configdirs " in
   *" texinfo "*) MAKEINFO='$$r/$(BUILD_SUBDIR)/texinfo/makeinfo/makeinfo' ;;
   *)
@@ -3620,6 +3623,7 @@ changequote(,)
     ;;
 changequote([,])
 esac
+fi
 
 # FIXME: expect and dejagnu may become build tools?
 
