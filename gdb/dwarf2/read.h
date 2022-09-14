@@ -436,6 +436,20 @@ struct dwarf2_per_bfd
     return this->all_units[index].get ();
   }
 
+  /* Return the CU given its index in the CU table in the index.  */
+  dwarf2_per_cu_data *get_index_cu (int index) const
+  {
+    if (this->all_comp_units_index_cus.empty ())
+      return get_cu (index);
+
+    return this->all_comp_units_index_cus[index];
+  }
+
+  dwarf2_per_cu_data *get_index_tu (int index) const
+  {
+    return this->all_comp_units_index_tus[index];
+  }
+
   /* A convenience function to allocate a dwarf2_per_cu_data.  The
      returned object has its "index" field set properly.  The object
      is allocated on the dwarf2_per_bfd obstack.  */
@@ -495,6 +509,9 @@ public:
      vector that are limited to either the CU part or the TU part.  */
   gdb::array_view<dwarf2_per_cu_data_up> all_comp_units;
   gdb::array_view<dwarf2_per_cu_data_up> all_type_units;
+
+  std::vector<dwarf2_per_cu_data*> all_comp_units_index_cus;
+  std::vector<dwarf2_per_cu_data*> all_comp_units_index_tus;
 
   /* Table of struct type_unit_group objects.
      The hash key is the DW_AT_stmt_list value.  */
