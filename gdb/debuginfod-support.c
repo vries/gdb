@@ -33,6 +33,8 @@ static cmd_list_element *show_debuginfod_prefix_list;
 static const char debuginfod_on[] = "on";
 static const char debuginfod_off[] = "off";
 static const char debuginfod_ask[] = "ask";
+static const char debuginfod_one[] = "one";
+static const char debuginfod_all[] = "all";
 
 static const char *debuginfod_enabled_enum[] =
 {
@@ -41,6 +43,20 @@ static const char *debuginfod_enabled_enum[] =
   debuginfod_ask,
   nullptr
 };
+
+/* Valid values for set debuginfod cancel command.  */
+
+static const char *debuginfod_cancel_enum[] =
+{
+  debuginfod_one,
+  debuginfod_all,
+  debuginfod_ask,
+  nullptr
+};
+
+/* Value of debuginfod cancellation mode.  */
+
+static const char *debuginfod_cancel = debuginfod_ask;
 
 static const char *debuginfod_enabled =
 #if defined(HAVE_LIBDEBUGINFOD)
@@ -119,6 +135,20 @@ progressfn (debuginfod_client *c, long cur, long total)
       gdb_printf ("Cancelling download of %s %ps...\n",
 		  data->desc,
 		  styled_string (file_name_style.style (), data->fname));
+      if (debuginfod_cancel == debuginfod_ask)
+	{
+	  int resp = nquery (_("Cancel further downloading for this session? "));
+	  if (resp)
+	    debuginfod_cancel = debuginfod_all;
+	  else
+	    debuginfod_cancel = debuginfod_one;
+	}
+      if (debuginfod_cancel == debuginfod_all)
+	{
+	  gdb_printf (_("Debuginfod has been disabled.\nTo re-enable use the"
+			" 'set debuginfod enabled on' command.\n"));
+	  debuginfod_enabled = debuginfod_off;
+	}
       return 1;
     }
 
@@ -393,6 +423,33 @@ show_debuginfod_enabled (ui_file *file, int from_tty, cmd_list_element *cmd,
 		"\"%s\".\n"), debuginfod_enabled);
 }
 
+/* Set callback for "set debuginfod cancel".  */
+
+static void
+set_debuginfod_cancel (const char *value)
+{
+  debuginfod_cancel = value;
+}
+
+/* Get callback for "set debuginfod cancel".  */
+
+static const char *
+get_debuginfod_cancel ()
+{
+  return debuginfod_cancel;
+}
+
+/* Show callback for "set debuginfod cancel".  */
+
+static void
+show_debuginfod_cancel (ui_file *file, int from_tty, cmd_list_element *cmd,
+			 const char *value)
+{
+  gdb_printf (file,
+	      _("Debuginfod cancellation mode is currently set to "
+		"\"%s\".\n"), debuginfod_cancel);
+}
+
 /* Set callback for "set debuginfod urls".  */
 
 static void
@@ -470,6 +527,21 @@ source files."),
 			set_debuginfod_enabled,
 			get_debuginfod_enabled,
 			show_debuginfod_enabled,
+			&set_debuginfod_prefix_list,
+			&show_debuginfod_prefix_list);
+
+  add_setshow_enum_cmd ("cancel", class_run, debuginfod_cancel_enum,
+			_("Set cancellation mode for debuginfod."),
+			_("Show cancellation mode for debuginfod."),
+			_("\
+The cancellation mode controls the behavior of ^C while a file is downloading\
+ from debuginfod.\n\
+When set to one, ^C cancels a single download.\n\
+When set to all, ^C cancels all further downloads.\n\
+When set to ask, ^C asks what to do."),
+			set_debuginfod_cancel,
+			get_debuginfod_cancel,
+			show_debuginfod_cancel,
 			&set_debuginfod_prefix_list,
 			&show_debuginfod_prefix_list);
 
