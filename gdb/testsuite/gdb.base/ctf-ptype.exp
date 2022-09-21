@@ -26,11 +26,16 @@ set gcc_compiled [is_c_compiler_gcc]
 standard_testfile .c
 
 # Using `-gctf` generates full-fledged CTF debug information.
-set opts "additional_flags=-gctf"
-
-if { [prepare_for_testing "failed to prepare" ${testfile} \
-	  [list $srcfile] [list $opts nowarnings]] } {
-    return 0
+set opts {}
+lappend opts "additional_flags=-gctf"
+lappend opts "additional_flags=-Wl,-ctf-variables"
+lappend opts "nowarnings"
+save_vars { GDBFLAGS } {
+    append GDBFLAGS " -iex \"maint set symbol-read-order ctf\""
+    if { [prepare_for_testing "failed to prepare" ${testfile} \
+	      [list $srcfile] $opts] } {
+	return 0
+    }
 }
 
 # Test ptype of unnamed enumeration members before any action causes

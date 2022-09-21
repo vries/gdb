@@ -30,18 +30,28 @@ set gcc_compiled [is_c_compiler_gcc]
 standard_testfile whatis.c
 
 # Using `-gctf` generates full-fledged CTF debug information.
-set opts "additional_flags=-gctf -Wl,--export-dynamic"
-
+set opts {}
+lappend opts "additional_flags=-gctf"
+lappend opts "additional_flags=-Wl,--export-dynamic"
+lappend opts "additional_flags=-Wl,-ctf-variables"
+lappend opts "nowarnings"
 if { [prepare_for_testing "failed to prepare" ${testfile} \
-	  [list $srcfile] [list $opts nowarnings]] } {
+	  [list $srcfile] $opts] } {
     return 0
 }
 
 # test print command with functions return type
 set void "(void|)"
-gdb_test "print v_char_func" \
-    "$decimal = \{char \\(\\)\} 0x\[0-9a-z\]+ <v_char_func>.*" \
-    "print char function"
+gdb_test_multiple "print v_char_func" "print char function" {
+    -re -wrap "$decimal = \{char \\(\\)\} 0x\[0-9a-z\]+ <v_char_func>.*" {
+	pass $gdb_test_name
+    }
+    -re -wrap "$decimal = {<text variable, no debug info>} $hex <v_char_func>" {
+	# The ld linker drops functions, see PR ld/29594.
+	xfail $gdb_test_name
+	return 0
+    }
+}
 
 gdb_test "print v_signed_char_func" \
     "$decimal = \{signed char \\(\\)\} 0x\[0-9a-z\]+ <v_signed_char_func>.*" \
