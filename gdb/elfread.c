@@ -51,6 +51,7 @@
 #include "gdbsupport/scoped_fd.h"
 #include "debuginfod-support.h"
 #include "dwarf2/public.h"
+#include "cli/cli-cmds.h"
 
 /* The struct elfinfo is available only during ELF symbol table and
    psymtab reading.  It is destroyed at the completion of psymtab-reading.
@@ -1166,6 +1167,152 @@ elf_read_minimal_symbols (struct objfile *objfile, int symfile_flags,
   symtab_create_debug_printf ("done reading minimal symbols");
 }
 
+/* Symbol types supported by elfread.c.  */
+
+enum symbol_type
+  {
+    mdebug,
+    stabs,
+    dwarf2,
+    ctf,
+    sep,
+  };
+
+/* Strings corresponding to enum symbol_type.  */
+
+const char *symbol_type_to_string [] =
+  {
+    "mdebug",
+    "stabs",
+    "dwarf2",
+    "ctf",
+    "sep"
+  };
+
+/* Return symbol_type for string S in ST and return true, otherwise return
+   false.  If ALLOW_SEP is true, we also allow the sep symbol_type.  */
+
+static bool
+string_to_symbol_type (const char *s, enum symbol_type &st,
+		       bool allow_sep = false)
+{
+  size_t symbol_type_to_string_elems
+    = sizeof (symbol_type_to_string) / sizeof (*symbol_type_to_string);
+
+  for (unsigned int i = 0; i < symbol_type_to_string_elems; i++)
+    {
+      if (i == sep && !allow_sep)
+	continue;
+
+      if (strcmp (symbol_type_to_string[i], s) != 0)
+	continue;
+
+      st = (symbol_type)i;
+      return true;
+    }
+
+  return false;
+}
+
+/* The default "mdebug+stabs+dwarf2/ctf" means:
+   - read mdebug first
+   - then read stabs
+   - then read dwarf2
+   - then read ctf, but only if dwarf2 is not read.  */
+
+static std::string symbol_read_order_default = "mdebug+stabs+dwarf2/ctf";
+
+/* Set by the "maint set symbol-read-order <string>" command.  */
+
+static std::string symbol_read_order = symbol_read_order_default;
+
+/* Parsed representation of symbol_read_order.
+   For a symbol_read_order of "mdebug+stabs+dwarf2/ctf" we have
+   { mdebug, sep, stabs, sep, dwarf, ctf, sep }.  */
+
+std::vector<enum symbol_type> parsed_symbol_read_order;
+
+/* Init parsed_symbol_read_order using symbol_read_order.  Return true if
+   successful.  */
+
+static bool
+parse_symbol_read_order (void)
+{
+  parsed_symbol_read_order.clear ();
+
+  if (symbol_read_order.empty ())
+    return false;
+
+  const char *s = symbol_read_order.c_str ();
+
+  int prev_delim = -1;
+  for (int i = 0; i < symbol_read_order.size (); ++i)
+    {
+      char c = s[i];
+      if (c != '/' && c != '+')
+	continue;
+
+      if (i == 0 || i == symbol_read_order.size () - 1)
+	/* Cannot begin or end with delimiter.  */
+	return false;
+
+      if (prev_delim != -1 && prev_delim == i - 1)
+	/* Cannot have two subsequent delimiters.  */
+	return false;
+
+      prev_delim = i;
+    }
+
+  char s_dup[symbol_read_order.size ()];
+  strcpy (&s_dup[0], s);
+
+  for (const char *p = s; *p != '\0'; ++p)
+    {
+      gdb_assert (*p != '/' && *p != '+');
+      char *token = strtok (p == s ? s_dup : nullptr, "/+");
+      gdb_assert (strlen (token) != 0);
+      enum symbol_type st;
+      if (!string_to_symbol_type (token, st))
+	{
+	  parsed_symbol_read_order.clear ();
+	  return false;
+	}
+      parsed_symbol_read_order.push_back (st);
+
+      p += strlen (token);
+      if (*p == '\0')
+	{
+	  parsed_symbol_read_order.push_back (sep);
+	  break;
+	}
+
+      if (*p == '+')
+	{
+	  parsed_symbol_read_order.push_back (sep);
+	}
+      else if (*p == '/')
+	continue;
+      else
+	gdb_assert_not_reached ("");
+    }
+
+  return true;
+}
+
+static void
+update_symbol_read_order (const char *args, int from_tty,
+			  struct cmd_list_element *c)
+{
+  if (!parse_symbol_read_order ())
+    {
+      warning ("invalid argument: '%s', reverting to default: '%s'",
+	       symbol_read_order.c_str (), symbol_read_order_default.c_str ());
+      symbol_read_order = symbol_read_order_default;
+      bool res = parse_symbol_read_order ();
+      gdb_assert (res);
+    }
+}
+
 /* Dwarf-specific helper for elf_symfile_read.  Return true if we managed to
    load dwarf debug info.  */
 
@@ -1270,6 +1417,12 @@ elf_symfile_read_dwarf2 (struct objfile *objfile,
 static void
 elf_symfile_read (struct objfile *objfile, symfile_add_flags symfile_flags)
 {
+  if (parsed_symbol_read_order.empty ())
+    {
+      bool res = parse_symbol_read_order ();
+      gdb_assert (res);
+    }
+
   bfd *abfd = objfile->obfd.get ();
   struct elfinfo ei;
 
@@ -1294,38 +1447,59 @@ elf_symfile_read (struct objfile *objfile, symfile_add_flags symfile_flags)
      we don't do this then the XCOFF info is found first - for code in
      an included file XCOFF info is useless.  */
 
-  if (ei.mdebugsect)
+  for (int i = 0; i < parsed_symbol_read_order.size (); ++i)
     {
-      const struct ecoff_debug_swap *swap;
+      bool loaded_p = false;
+      switch (parsed_symbol_read_order[i])
+	{
+	case mdebug:
+	  if (ei.mdebugsect)
+	    {
+	      const struct ecoff_debug_swap *swap;
 
-      /* .mdebug section, presumably holding ECOFF debugging
-	 information.  */
-      swap = get_elf_backend_data (abfd)->elf_backend_ecoff_debug_swap;
-      if (swap)
-	elfmdebug_build_psymtabs (objfile, swap, ei.mdebugsect);
-    }
-  if (ei.stabsect)
-    {
-      asection *str_sect;
+	      /* .mdebug section, presumably holding ECOFF debugging
+		 information.  */
+	      swap = get_elf_backend_data (abfd)->elf_backend_ecoff_debug_swap;
+	      if (swap)
+		elfmdebug_build_psymtabs (objfile, swap, ei.mdebugsect);
+	      loaded_p = true;
+	    }
+	  break;
+	case stabs:
+	  if (ei.stabsect)
+	    {
+	      asection *str_sect;
 
-      /* Stab sections have an associated string table that looks like
-	 a separate section.  */
-      str_sect = bfd_get_section_by_name (abfd, ".stabstr");
+	      /* Stab sections have an associated string table that looks like
+		 a separate section.  */
+	      str_sect = bfd_get_section_by_name (abfd, ".stabstr");
 
-      /* FIXME should probably warn about a stab section without a stabstr.  */
-      if (str_sect)
-	elfstab_build_psymtabs (objfile,
-				ei.stabsect,
-				str_sect->filepos,
-				bfd_section_size (str_sect));
-    }
+	      /* FIXME should probably warn about a stab section without a stabstr.  */
+	      if (str_sect)
+		elfstab_build_psymtabs (objfile,
+					ei.stabsect,
+					str_sect->filepos,
+					bfd_section_size (str_sect));
+	      loaded_p = true;
+	    }
+	  break;
+	case ctf:
+	  if (ei.ctfsect)
+	    {
+	      elfctf_build_psymtabs (objfile);
+	      loaded_p = true;
+	    }
+	  break;
+	case dwarf2:
+	  loaded_p = elf_symfile_read_dwarf2 (objfile, symfile_flags);
+	}
 
-  bool has_dwarf2 = elf_symfile_read_dwarf2 (objfile, symfile_flags);
-
-  /* Read the CTF section only if there is no DWARF info.  */
-  if (!has_dwarf2 && ei.ctfsect)
-    {
-      elfctf_build_psymtabs (objfile);
+      if (loaded_p)
+	{
+	  for (i++; i < parsed_symbol_read_order.size (); ++i)
+	    if (parsed_symbol_read_order[i] == sep)
+	      break;
+	}
     }
 }
 
@@ -1420,4 +1594,13 @@ _initialize_elfread ()
   add_symtab_fns (bfd_target_elf_flavour, &elf_sym_fns);
 
   gnu_ifunc_fns_p = &elf_gnu_ifunc_fns;
+
+  add_setshow_string_cmd ("symbol-read-order", class_maintenance,
+			  &symbol_read_order, _("\
+Set the symbol read order."), _("		 \
+Show the symbol read order."), nullptr,
+			  update_symbol_read_order, nullptr,
+			   &maintenance_set_cmdlist,
+			   &maintenance_show_cmdlist);
+
 }
