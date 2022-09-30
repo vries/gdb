@@ -5059,7 +5059,11 @@ watchpoint_check (bpstat *bs)
 						       new_val)))
 	{
 	  bs->old_val = b->val;
+	  if (bs->old_val.get () != nullptr)
+	    set_internalvar (lookup_internalvar ("_wp_old_val"),
+			     bs->old_val.get ());
 	  b->val = release_value (new_val);
+	  set_internalvar (lookup_internalvar ("_wp_val"), b->val.get ());
 	  b->val_valid = true;
 	  if (new_val != NULL)
 	    value_free_to_mark (mark);
