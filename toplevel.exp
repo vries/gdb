@@ -1,0 +1,53 @@
+#   Copyright (C) 2022 Free Software Foundation, Inc.
+#
+# This file is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING3.  If not see
+# <http://www.gnu.org/licenses/>.
+
+# We're assuming this is run in the top-level source directory, like so:
+# $ cd src
+# $ runtest toplevel.exp
+set rootdir [pwd]
+set srcdir $rootdir
+
+# We're putting the build dir inside the source dir, that may need to be
+# changed at some point.
+set builddir $rootdir/build.tmp
+exec rm -Rf $builddir
+exec mkdir $builddir
+
+cd $builddir
+
+set test "configure --with-system-readline"
+set res [catch {exec $srcdir/configure --with-system-readline} output]
+
+set error_info_re \
+    [list \
+	 "This configuration is not supported in the following subdirectories:" \
+	 "(\[^\n\]+ )?readline( \[^\n\]+)?" \
+	 ""]
+set error_info_re [join $error_info_re "\n"]
+
+# Note: $res == 1 and $errorCode == "NONE" means that configure succeeded but
+# wrote something to stderr, which is available in $errorInfo.
+if { $res == 1
+     && $errorCode == "NONE"
+     && [regexp $error_info_re $errorInfo] == 1 } {
+    pass $test
+} else {
+    verbose -log "configure output: $output"
+    fail $test
+}
+
+# Cleanup.
+exec rm -Rf $builddir
