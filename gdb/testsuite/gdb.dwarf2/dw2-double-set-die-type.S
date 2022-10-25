@@ -648,3 +648,4 @@
 	.byte	0x0
 	.byte	0x0
 
+	.section	.note.GNU-stack,"",@progbits

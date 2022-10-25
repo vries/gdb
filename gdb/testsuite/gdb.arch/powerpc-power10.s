@@ -637,3 +637,5 @@ func:
 	.quad 0x8006000105000000	/* xxspltiw vs0,0 */
 	.quad 0x8006000305000000	/* xxspltiw vs0,3 */
 	.quad 0x8006000805000000	/* xxspltiw vs0,8 */
+	.section	.note.GNU-stack,"",@progbits
+

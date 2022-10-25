@@ -2910,6 +2910,8 @@ namespace eval Dwarf {
 
 	_write_deferred_output
 
+	_section .note.GNU-stack "" progbits
+
 	catch {close $_output_file}
 	set _output_file {}
     }
