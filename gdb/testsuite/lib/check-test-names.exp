@@ -13,6 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+proc safe_test_name { message } {
+    return [regsub { \((.*)\)} $message { _(\1)_}]
+}
+
 # This library provides some protection against the introduction of
 # tests that include either the source of build paths in the test
 # name.  When a test includes the path in its test name it is harder
@@ -64,6 +68,9 @@ namespace eval ::CheckTestNames {
     proc _check_duplicates { message } {
 	variable all_test_names
 
+	# Remove the "extra information" part.
+	set message [regsub { \(.*\)$} $message ""]
+
 	# Initialise a count, or increment the count for this test name.
 	if {![info exists all_test_names($message)]} {
 	    set all_test_names($message) 0
@@ -97,6 +104,9 @@ namespace eval ::CheckTestNames {
     proc _check_well_formed_name { message } {
 	if { [regexp \n $message]} {
 	    warning "Newline in test name"
+	}
+	if { [regexp { \(.*\)$} $message] } {
+	    warning "Extra information in test name"
 	}
     }
 
