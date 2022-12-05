@@ -1619,6 +1619,13 @@ handle_stap_probe (struct objfile *objfile, struct sdt_note *el,
       return;
     }
 
+  if (ignore_probe (provider, name, objfile_name (objfile)))
+    {
+      gdb_printf (gdb_stdlog, _("Ignoring SystemTap probe %s %s in %s.\n"),
+		  provider, name, objfile_name (objfile));
+      return;
+    }
+
   stap_probe *ret = new stap_probe (std::string (name), std::string (provider),
 				    address, gdbarch, sem_addr, probe_args);
 

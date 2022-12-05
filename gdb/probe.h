@@ -304,4 +304,9 @@ extern struct cmd_list_element **info_probes_cmdlist_get (void);
 extern struct value *probe_safe_evaluate_at_pc (frame_info_ptr frame,
 						unsigned n);
 
+/* Return true if the PROVIDER/NAME probe from OBJFILE_NAME needs to be
+   ignored.  */
+
+bool ignore_probe (const char *provider, const char *name,
+		   const char *objfile_name);
 #endif /* !defined (PROBE_H) */

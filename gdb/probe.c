@@ -680,6 +680,45 @@ disable_probes_command (const char *arg, int from_tty)
     }
 }
 
+static bool ignore_probes_p = false;
+static gdb::optional<compiled_regex> ignore_obj_pat;
+static gdb::optional<compiled_regex> ignore_prov_pat;
+static gdb::optional<compiled_regex> ignore_probe_pat;
+
+/* See comments in probe.h.  */
+
+bool ignore_probe (const char *provider, const char *name,
+		   const char *objfile_name)
+{
+  return (ignore_probes_p
+	  && (!ignore_obj_pat
+	      || ignore_obj_pat->exec (objfile_name, 0, NULL, 0) == 0)
+	  && (!ignore_prov_pat
+	      || ignore_prov_pat->exec (provider, 0, NULL, 0) == 0)
+	  && (!ignore_probe_pat
+	      || ignore_probe_pat->exec (name, 0, NULL, 0) == 0));
+}
+
+/* Implementation of the `maintenance ignore-probes' command.  */
+
+static void
+ignore_probes_command (const char *arg, int from_tty)
+{
+  std::string ignore_provider, ignore_probe_name, ignore_objname;
+
+  parse_probe_linespec ((const char *) arg, &ignore_provider,
+			&ignore_probe_name, &ignore_objname);
+
+  ignore_prov_pat.emplace (ignore_provider.c_str (), REG_NOSUB,
+			   _("Invalid provider regexp"));
+  ignore_probe_pat.emplace (ignore_probe_name.c_str (), REG_NOSUB,
+			    _("Invalid probe regexp"));
+  ignore_obj_pat.emplace (ignore_objname.c_str (), REG_NOSUB,
+			  _("Invalid object file regexp"));
+
+  ignore_probes_p = true;
+}
+
 /* See comments in probe.h.  */
 
 struct value *
@@ -931,4 +970,14 @@ If you do not specify any argument then the command will disable\n\
 all defined probes."),
 	   &disablelist);
 
+  add_cmd ("ignore-probes", class_maintenance, ignore_probes_command, _("\
+Ignore probes.\n\
+Usage: ignore probes [PROVIDER [NAME [OBJECT]]]\n\
+Each argument is a regular expression, used to select probes.\n\
+PROVIDER matches probe provider names.\n\
+NAME matches the probe names.\n\
+OBJECT matches the executable or shared library name.\n\
+If you do not specify any argument then the command will ignore\n\
+all defined probes.  Only supported for SystemTap probes"),
+	   &maintenancelist);
 }
