@@ -353,6 +353,17 @@ safe_execute_command (struct ui_out *command_uiout, const char *command,
     {
       execute_command (command, from_tty);
     }
+  catch (gdb_exception_forced_quit &exception)
+    {
+      /* Due to the way that the cli_inter::exec is structured, it is
+	 not safe to only catch gdb_exception_error below, thus
+	 allowing quit exceptions to propagate through.  (The CLI
+	 stream won't be reset as it should be.) So, for
+	 gdb_exception_forced_quit, which corresponds to GDB having
+	 received a SIGTERM signal, call quit_force() here which will
+	 cause GDB to terminate.  */
+      quit_force (NULL, 0);
+    }
   catch (gdb_exception &exception)
     {
       e = std::move (exception);
