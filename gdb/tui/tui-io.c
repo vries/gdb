@@ -1275,6 +1275,15 @@ tui_getc (FILE *fp)
     {
       return tui_getc_1 (fp);
     }
+  catch (const gdb_exception_forced_quit &ex)
+    {
+      /* As noted below, it's not safe to let an exception escape
+         to newline, so, for this case,  reset the quit flag for
+	 later QUIT checking.  */
+      sync_quit_force_run = 1;
+      set_quit_flag ();
+      return 0;
+    }
   catch (const gdb_exception &ex)
     {
       /* Just in case, don't ever let an exception escape to readline.
