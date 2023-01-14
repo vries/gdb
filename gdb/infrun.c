@@ -7032,9 +7032,21 @@ process_event_stop_test (struct execution_control_state *ecs)
 	 keep going back to the call point).  */
       CORE_ADDR stop_pc = ecs->event_thread->stop_pc ();
       if (stop_pc == ecs->event_thread->control.step_range_start
-	  && stop_pc != ecs->stop_func_start
 	  && execution_direction == EXEC_REVERSE)
-	keep_going_p = false;
+	{
+	  /* Backward, start of range.  */
+
+	  if (stop_pc != ecs->stop_func_start)
+	    /* Not start of function.  */
+	    keep_going_p = false;
+	  else if (skip_prologue_using_sal (gdbarch, stop_pc) == stop_pc)
+	    /* Start of function, but no prologue.  */
+	    keep_going_p = false;
+	  else
+	    {
+	      /* Start of function, with prologue.  Keep going.  */
+	    }
+	}
 
       if (keep_going_p)
 	{
