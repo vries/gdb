@@ -999,7 +999,11 @@ aarch64_make_prologue_cache_1 (frame_info_ptr this_frame,
   if (unwound_fp == 0)
     return;
 
-  cache->prev_sp = unwound_fp + cache->framesize;
+  if (cache->framereg == AARCH64_SP_REGNUM
+      && get_frame_register_unsigned (this_frame, AARCH64_FP_REGNUM) == unwound_fp)
+    cache->prev_sp = unwound_fp;
+  else
+    cache->prev_sp = unwound_fp + cache->framesize;
 
   /* Calculate actual addresses of saved registers using offsets
      determined by aarch64_analyze_prologue.  */
