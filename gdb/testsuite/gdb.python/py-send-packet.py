@@ -122,6 +122,15 @@ def check_global_var(expected_val):
     if val != expected_val:
         raise gdb.GdbError("global_var is 0x%x, expected 0x%x" % (val, expected_val))
 
+# Return a bytes object representing an 'X' packet with
+# address ADDR and bytes L.
+def bytes_xpacket (addr, l):
+    # Implement b"X%x,4:\xff\xff\xff\xff" % addr in a way that works
+    # across python versions.
+    res = ("X%x,4:" % addr).encode('ascii') + bytearray(l)
+    # Force it to type bytes.
+    res = bytes(res)
+    return res
 
 # Set the 'X' packet to the remote target to set a global variable.
 # Checks that we can send byte values.
@@ -133,7 +142,7 @@ def run_set_global_var_test():
     res = conn.send_packet("X%x,4:\x01\x01\x01\x01" % addr)
     assert isinstance(res, bytes)
     check_global_var(0x01010101)
-    res = conn.send_packet(b"X%x,4:\x02\x02\x02\x02" % addr)
+    res = conn.send_packet(bytes_xpacket(addr, [0x2, 0x2, 0x2, 0x2]))
     assert isinstance(res, bytes)
     check_global_var(0x02020202)
     if sys.version_info[0] > 2:
@@ -149,7 +158,7 @@ def run_set_global_var_test():
         assert saw_error
         check_global_var(0x02020202)
         # Now we pass a bytes object, which will work.
-        res = conn.send_packet(b"X%x,4:\xff\xff\xff\xff" % addr)
+        res = conn.send_packet(bytes_xpacket(addr, [0xff, 0xff, 0xff, 0xff]))
         check_global_var(0xFFFFFFFF)
     else:
         # On Python 2 we need to force the creation of a Unicode
