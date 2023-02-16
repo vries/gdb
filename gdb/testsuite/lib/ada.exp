@@ -87,10 +87,41 @@ proc gdb_compile_ada_1 {source dest type options} {
 # compile was successful.
 
 proc gdb_compile_ada {source dest type options} {
+    if { [gdb_can_compile_ada] == 0 } {
+	global gdb_test_file_name
+	unsupported "$gdb_test_file_name"
+	return "Cannot compile ada"
+    }
     set result [gdb_compile_ada_1 $source $dest $type $options]
 
     gdb_compile_test $source $result
     return $result
+}
+
+gdb_caching_proc gdb_can_compile_ada {
+    set name "hello"
+    set dir "[pwd]/tmp-ada-hello-[pid]"
+    set src "$dir/$name.adb"
+    set dest "$dir/$name"
+
+    set code {
+	with Ada.Text_IO;
+
+	procedure Hello is
+	begin
+	  Ada.Text_IO.Put_Line("Hello, world!");
+	end Hello;
+    }
+
+    file mkdir $dir
+    gdb_produce_source $src $code
+    set res [gdb_compile_ada_1 $src $dest executable {debug}]
+    file delete -force $dir
+
+    if { $res != "" } {
+	return 0
+    }
+    return 1
 }
 
 # Like standard_testfile, but for Ada.  Historically the Ada tests
