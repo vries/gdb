@@ -138,3 +138,4 @@ main:
 	.byte		0			/* aranges segment_size */
 
 .Laranges_end:
+	.section        .note.GNU-stack,"",@progbits
