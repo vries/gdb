@@ -317,6 +317,8 @@ puts -nonewline $f "\
 	.byte		0x0			/* Terminator */
 "
 
+puts -nonewline $f "\t.section\t.note.GNU-stack,\"\",@progbits"
+
 close $f
 
 set opts {}
