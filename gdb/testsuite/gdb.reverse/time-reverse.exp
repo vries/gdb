@@ -25,6 +25,8 @@ if ![supports_reverse] {
 
 standard_testfile
 
+if { ![have_syscall time] } { return }
+
 if { [prepare_for_testing "failed to prepare" $testfile $srcfile] } {
     return -1
 }
