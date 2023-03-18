@@ -43,9 +43,6 @@
 #include "value.h"
 #include "parser-defs.h"
 #include "m2-lang.h"
-#include "bfd.h" /* Required by objfiles.h.  */
-#include "symfile.h" /* Required by objfiles.h.  */
-#include "objfiles.h" /* For have_full_symbols and have_partial_symbols */
 #include "block.h"
 #include "m2-exp.h"
 
@@ -140,7 +137,7 @@ using namespace expr;
 %left '+' '-'
 %left '*' '/' DIV MOD
 %right UNARY
-%right '^' DOT '[' '('
+%right '^' DOT_ID '[' '('
 %right NOT '~'
 %left COLONCOLON QID
 /* This is not an actual token ; it is used for precedence. 
@@ -262,7 +259,7 @@ exp	:	DEC '(' exp ',' exp ')'
 			}
 	;
 
-exp	:	exp DOT NAME
+exp	:	exp DOT_ID NAME
 			{
 			  pstate->push_new<structop_operation>
 			    (pstate->pop (), copy_name ($3));
@@ -297,7 +294,7 @@ exp     :       exp '['
 			   that follow in the list.  It is *not* specific to
 			   function types */
 			{ pstate->start_arglist(); }
-		non_empty_arglist ']'  %prec DOT
+		non_empty_arglist ']'  %prec DOT_ID
 			{
 			  gdb_assert (pstate->arglist_len > 0);
 			  std::vector<operation_up> args
@@ -311,7 +308,7 @@ exp	:	exp '('
 			/* This is to save the value of arglist_len
 			   being accumulated by an outer function call.  */
 			{ pstate->start_arglist (); }
-		arglist ')'	%prec DOT
+		arglist ')'	%prec DOT_ID
 			{
 			  std::vector<operation_up> args
 			    = pstate->pop_vector (pstate->end_arglist ());
@@ -793,7 +790,7 @@ yylex (void)
       else
       {
 	 pstate->lexptr++;
-	 return DOT;
+	 return DOT_ID;
       }
 
 /* These are character tokens that appear as-is in the YACC grammar */
