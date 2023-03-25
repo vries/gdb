@@ -533,32 +533,37 @@ cooked_index::find (const std::string &name, bool completing) const
 
 /* See cooked-index.h.  */
 
-const cooked_index_entry *
-cooked_index::get_main () const
+const char *
+cooked_index::get_main_name (enum language *lang)
 {
-  const cooked_index_entry *result = nullptr;
+  if (m_main_name != nullptr)
+    return m_main_name;
 
   for (const auto &index : m_vector)
     {
       const cooked_index_entry *entry = index->get_main ();
-      /* Choose the first "main" we see.  The choice among several is
-	 arbitrary.  See the comment by the sole caller to understand
-	 the rationale for filtering by language.  */
+      /* Choose the first "main" we see.  We only do this for names
+	 not requiring canonicalization.  At this point in the process
+	 names might not have been canonicalized.  However, currently,
+	 languages that require this step also do not use
+	 DW_AT_main_subprogram.  An assert is appropriate here because
+	 this filtering is done in get_main.  */
       if (entry != nullptr
 	  && !language_requires_canonicalization (entry->per_cu->lang ()))
 	{
-	  result = entry;
+	  *lang = entry->per_cu->lang ();
+	  m_main_name = entry->full_name (&index->m_storage, true);
 	  break;
 	}
     }
 
-  return result;
+  return m_main_name;
 }
 
 /* See cooked-index.h.  */
 
 void
-cooked_index::dump (gdbarch *arch) const
+cooked_index::dump (gdbarch *arch)
 {
   /* Ensure the index is done building.  */
   this->wait ();
@@ -588,12 +593,12 @@ cooked_index::dump (gdbarch *arch) const
       gdb_printf ("\n");
     }
 
-  const cooked_index_entry *main_entry = this->get_main ();
-  if (main_entry != nullptr)
-    gdb_printf ("  main: ((cooked_index_entry *) %p) [%s]\n", main_entry,
-		  main_entry->name);
+  enum language lang = language_unknown;
+  const char *main_name = this->get_main_name (&lang);
+  if (main_name != nullptr)
+    gdb_printf ("  main: %s\n", main_name);
   else
-    gdb_printf ("  main: ((cooked_index_entry *) 0)\n");
+    gdb_printf ("  (no main)\n");
 
   gdb_printf ("\n");
   gdb_printf ("  address maps:\n");

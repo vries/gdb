@@ -5179,19 +5179,10 @@ dwarf2_build_psymtabs_hard (dwarf2_per_objfile *per_objfile)
      'index_table' member has been set.  */
   vec->start_writing_index (per_bfd);
 
-  const cooked_index_entry *main_entry = vec->get_main ();
-  if (main_entry != nullptr)
-    {
-      /* We only do this for names not requiring canonicalization.  At
-	 this point in the process names have not been canonicalized.
-	 However, currently, languages that require this step also do
-	 not use DW_AT_main_subprogram.  An assert is appropriate here
-	 because this filtering is done in get_main.  */
-      enum language lang = main_entry->per_cu->lang ();
-      gdb_assert (!language_requires_canonicalization (lang));
-      const char *full_name = main_entry->full_name (&per_bfd->obstack, true);
-      set_objfile_main_name (objfile, full_name, lang);
-    }
+  enum language lang = language_unknown;
+  const char *main_name = vec->get_main_name (&lang);
+  if (main_name != nullptr)
+    set_objfile_main_name (objfile, main_name, lang);
 
   dwarf_read_debug_printf ("Done building psymtabs of %s",
 			   objfile_name (objfile));

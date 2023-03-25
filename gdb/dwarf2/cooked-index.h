@@ -406,9 +406,9 @@ public:
      held by this object.  */
   std::vector<const addrmap *> get_addrmaps () const;
 
-  /* Return the entry that is believed to represent the program's
+  /* Return the name that is believed to represent the program's
      "main".  This will return NULL if no such entry is available.  */
-  const cooked_index_entry *get_main () const;
+  const char *get_main_name (enum language *lang);
 
   cooked_index *index_for_writing () override
   {
@@ -418,7 +418,7 @@ public:
   quick_symbol_functions_up make_quick_functions () const override;
 
   /* Dump a human-readable form of the contents of the index.  */
-  void dump (gdbarch *arch) const;
+  void dump (gdbarch *arch);
 
   /* Wait for the index to be completely finished.  For ordinary uses,
      the index code ensures this itself -- e.g., 'all_entries' will
@@ -445,6 +445,9 @@ private:
 
   /* A future that tracks when the 'index_write' method is done.  */
   gdb::future<void> m_write_future;
+
+  /* The main name.  */
+  const char *m_main_name = nullptr;
 };
 
 #endif /* GDB_DWARF2_COOKED_INDEX_H */
