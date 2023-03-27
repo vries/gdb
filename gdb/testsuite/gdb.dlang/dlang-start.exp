@@ -18,6 +18,7 @@
 load_lib d-support.exp
 
 if { [skip_d_tests] } { continue }
+if { ![can_compile d] } { continue }
 
 # This testcase verifies the behavior of the `start' command, which
 # does not work when we use the gdb stub...
