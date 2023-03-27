@@ -2471,6 +2471,18 @@ proc skip_d_tests {} {
     return 0
 }
 
+# Return a 1 if we can compile source files in LANG.
+
+proc can_compile { lang } {
+
+    if { $lang == "d" } {
+	set src { void main() {} }
+	return [gdb_can_simple_compile can_compile_$lang $src executable {d}]
+    }
+
+    error "can_compile doesn't support lang: $lang"
+}
+
 # Return 1 to skip Rust tests, 0 to try them.
 proc skip_rust_tests {} {
     if { ![isnative] } {
@@ -4630,6 +4642,10 @@ proc gdb_simple_compile {name code {type object} {compile_flags {}} {object obj}
     foreach flag $compile_flags {
 	if { "$flag" == "go" } {
 	    set ext "go"
+	    break
+	}
+	if { "$flag" eq "d" } {
+	    set ext "d"
 	    break
 	}
     }
