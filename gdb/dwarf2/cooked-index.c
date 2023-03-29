@@ -66,6 +66,23 @@ language_requires_canonicalization (enum language lang)
 	  || lang == language_cplus);
 }
 
+/* Return true if a plain "main" could be the main program for this
+   language.  Languages that are known to use some other mechanism are
+   excluded here.  */
+
+static bool
+language_may_use_plain_main (enum language lang)
+{
+  /* No need to handle "unknown" or "auto" here.  */
+  return (lang == language_c
+	  || lang == language_objc
+	  || lang == language_cplus
+	  || lang == language_m2
+	  || lang == language_asm
+	  || lang == language_opencl
+	  || lang == language_minimal);
+}
+
 /* See cooked-index.h.  */
 
 int
@@ -241,6 +258,11 @@ cooked_index_shard::add (sect_offset die_offset, enum dwarf_tag tag,
   /* An explicitly-tagged main program should always override the
      implicit "main" discovery.  */
   if ((flags & IS_MAIN) != 0)
+    m_main = result;
+  else if (parent_entry == nullptr
+	   && m_main == nullptr
+	   && language_may_use_plain_main (per_cu->lang ())
+	   && strcmp (name, "main") == 0)
     m_main = result;
 
   return result;
