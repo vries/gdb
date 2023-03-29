@@ -5179,8 +5179,9 @@ dwarf2_build_psymtabs_hard (dwarf2_per_objfile *per_objfile)
      'index_table' member has been set.  */
   vec->start_writing_index (per_bfd);
 
+  auto_obstack temp_storage;
   enum language lang = language_unknown;
-  const char *main_name = vec->get_main_name (&lang);
+  const char *main_name = vec->get_main_name (&temp_storage, &lang);
   if (main_name != nullptr)
     set_objfile_main_name (objfile, main_name, lang);
 

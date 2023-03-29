@@ -556,11 +556,22 @@ cooked_index::find (const std::string &name, bool completing) const
 /* See cooked-index.h.  */
 
 const char *
-cooked_index::get_main_name (enum language *lang)
+cooked_index::get_main_name (struct obstack *obstack, enum language *lang)
+  const
 {
-  if (m_main_name != nullptr)
-    return m_main_name;
+  const cooked_index_entry *entry = get_main ();
+  if (entry == nullptr)
+    return nullptr;
 
+  *lang = entry->per_cu->lang ();
+  return entry->full_name (obstack, true);
+}
+
+/* See cooked_index.h.  */
+
+const cooked_index_entry *
+cooked_index::get_main () const
+{
   const cooked_index_entry *best_entry = nullptr;
   for (const auto &index : m_vector)
     {
@@ -578,8 +589,7 @@ cooked_index::get_main_name (enum language *lang)
 	      if (!language_requires_canonicalization (entry->per_cu->lang ()))
 		{
 		  /* There won't be one better than this.  */
-		  best_entry = entry;
-		  break;
+		  return entry;
 		}
 	    }
 	  else
@@ -594,20 +604,13 @@ cooked_index::get_main_name (enum language *lang)
 	}
     }
 
-  if (best_entry != nullptr)
-    {
-      *lang = best_entry->per_cu->lang ();
-      m_main_name = best_entry->full_name (&m_per_bfd->per_bfd->obstack,
-					   true);
-    }
-
-  return m_main_name;
+  return best_entry;
 }
 
 /* See cooked-index.h.  */
 
 void
-cooked_index::dump (gdbarch *arch)
+cooked_index::dump (gdbarch *arch) const
 {
   /* Ensure the index is done building.  */
   this->wait ();
@@ -637,12 +640,12 @@ cooked_index::dump (gdbarch *arch)
       gdb_printf ("\n");
     }
 
-  enum language lang = language_unknown;
-  const char *main_name = this->get_main_name (&lang);
-  if (main_name != nullptr)
-    gdb_printf ("  main: %s\n", main_name);
+  const cooked_index_entry *main_entry = this->get_main ();
+  if (main_entry != nullptr)
+    gdb_printf ("  main: ((cooked_index_entry *) %p) [%s]\n", main_entry,
+		  main_entry->name);
   else
-    gdb_printf ("  (no main)\n");
+    gdb_printf ("  main: ((cooked_index_entry *) 0)\n");
 
   gdb_printf ("\n");
   gdb_printf ("  address maps:\n");

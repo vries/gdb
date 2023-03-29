@@ -406,9 +406,12 @@ public:
      held by this object.  */
   std::vector<const addrmap *> get_addrmaps () const;
 
-  /* Return the name that is believed to represent the program's
+  /* Return the entry that is believed to represent the program's
      "main".  This will return NULL if no such entry is available.  */
-  const char *get_main_name (enum language *lang);
+  const cooked_index_entry *get_main () const;
+
+  const char *get_main_name (struct obstack *obstack, enum language *lang)
+    const;
 
   cooked_index *index_for_writing () override
   {
@@ -418,7 +421,7 @@ public:
   quick_symbol_functions_up make_quick_functions () const override;
 
   /* Dump a human-readable form of the contents of the index.  */
-  void dump (gdbarch *arch);
+  void dump (gdbarch *arch) const;
 
   /* Wait for the index to be completely finished.  For ordinary uses,
      the index code ensures this itself -- e.g., 'all_entries' will
