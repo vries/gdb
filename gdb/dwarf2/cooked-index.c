@@ -561,6 +561,7 @@ cooked_index::get_main_name (enum language *lang)
   if (m_main_name != nullptr)
     return m_main_name;
 
+  const cooked_index_entry *best_entry = nullptr;
   for (const auto &index : m_vector)
     {
       const cooked_index_entry *entry = index->get_main ();
@@ -570,13 +571,33 @@ cooked_index::get_main_name (enum language *lang)
 	 languages that require this step also do not use
 	 DW_AT_main_subprogram.  An assert is appropriate here because
 	 this filtering is done in get_main.  */
-      if (entry != nullptr
-	  && !language_requires_canonicalization (entry->per_cu->lang ()))
+      if (entry != nullptr)
 	{
-	  *lang = entry->per_cu->lang ();
-	  m_main_name = entry->full_name (&index->m_storage, true);
-	  break;
+	  if ((entry->flags & IS_MAIN) != 0)
+	    {
+	      if (!language_requires_canonicalization (entry->per_cu->lang ()))
+		{
+		  /* There won't be one better than this.  */
+		  best_entry = entry;
+		  break;
+		}
+	    }
+	  else
+	    {
+	      /* This is one that is named "main".  Here we don't care
+		 if the language requires canonicalization, due to how
+		 the entry is detected.  Entries like this have worse
+		 priority than IS_MAIN entries.  */
+	      if (best_entry == nullptr)
+		best_entry = entry;
+	    }
 	}
+    }
+
+  if (best_entry != nullptr)
+    {
+      *lang = best_entry->per_cu->lang ();
+      m_main_name = best_entry->full_name (&index->m_storage, true);
     }
 
   return m_main_name;
