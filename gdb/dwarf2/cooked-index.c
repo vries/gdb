@@ -597,7 +597,8 @@ cooked_index::get_main_name (enum language *lang)
   if (best_entry != nullptr)
     {
       *lang = best_entry->per_cu->lang ();
-      m_main_name = best_entry->full_name (&index->m_storage, true);
+      m_main_name = best_entry->full_name (&m_per_bfd->per_bfd->obstack,
+					   true);
     }
 
   return m_main_name;
