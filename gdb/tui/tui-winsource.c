@@ -668,8 +668,9 @@ tui_source_window_base::update_exec_info (bool refresh_p)
       struct tui_source_element *src_element = &m_content[i];
       char element[TUI_EXECINFO_SIZE];
       size_t last_element = TUI_EXECINFO_SIZE - 1;
+      char space = tui_left_margin_verbose ? '_' : ' ';
       for (int j = 0; j < last_element; ++j)
-	element[j] = ' ';
+	element[j] = space;
       element[last_element] = '\0';
 
       /* Now update the exec info content based upon the state

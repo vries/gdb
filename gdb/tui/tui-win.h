@@ -55,4 +55,6 @@ extern bool compact_source;
    current position indicator.  */
 extern bool style_tui_current_position;
 
+extern bool tui_left_margin_verbose;
+
 #endif /* TUI_TUI_WIN_H */
