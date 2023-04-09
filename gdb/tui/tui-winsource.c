@@ -666,8 +666,9 @@ tui_source_window_base::update_exec_info (bool refresh_p)
   for (int i = 0; i < m_content.size (); i++)
     {
       struct tui_source_element *src_element = &m_content[i];
-      char element[TUI_EXECINFO_SIZE];
-      size_t last_element = TUI_EXECINFO_SIZE - 1;
+      /* Add 1 for '\0'.  */
+      char element[TUI_EXECINFO_SIZE + 1];
+      size_t last_element = TUI_EXECINFO_SIZE;
       char space = tui_left_margin_verbose ? '_' : ' ';
       for (int j = 0; j < last_element; ++j)
 	element[j] = space;
