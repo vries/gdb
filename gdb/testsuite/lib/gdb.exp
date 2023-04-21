@@ -157,6 +157,7 @@ load_lib cache.exp
 load_lib gdb-utils.exp
 load_lib memory.exp
 load_lib check-test-names.exp
+load_lib ada.exp
 
 # The path to the GDB binary to test.
 global GDB
@@ -2597,6 +2598,13 @@ proc allow_ada_tests {} {
 	# Currently gdb_ada_compile doesn't support remote host.
 	return 0
     }
+
+    if { [gdb_can_compile_ada] == 0 } {
+	global gdb_test_file_name
+	unsupported "$gdb_test_file_name"
+	return 0
+    }
+
     return 1
 }
 
