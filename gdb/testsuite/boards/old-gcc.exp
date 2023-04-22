@@ -1,0 +1,80 @@
+# Copyright 2023 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+load_board_description "local-board"
+
+# This is based on baseboards/unix.exp.
+# At the moment we only support systems that unix.exp supports.
+load_generic_config "unix"
+
+process_multilib_options ""
+
+# Simulate aspects of gcc 4.8.5.
+
+set gcc_common {
+for arg in "$@"; do
+    case $arg in
+	-no-pie)
+	    echo "$driver: error: unrecognized command line option '$arg'"
+	    exit 1
+	    ;;
+	-gdwarf-5)
+	    echo "$compiler: error: dwarf version 5 is not supported"
+	    exit 1
+	    ;;
+	-ggnu-pubnames)
+	    echo "$compiler: error: unrecognised debug output level \"gnu-pubnames\""
+	    exit 1
+	    ;;
+	*)
+	    ;;
+    esac
+done
+}
+
+
+set gcc \
+    [list \
+	{#!/bin/sh} \
+	{driver=gcc } \
+	{compiler=cc1 } \
+	$gcc_common \
+	{gcc -std=gnu90 "$@"}]
+
+set gxx \
+    [list \
+	{#!/bin/sh} \
+	{driver=g++ } \
+	{compiler=cc1plus } \
+	$gcc_common \
+	{g++ -std=gnu++03 "$@" }]
+
+set gfortran \
+    [list \
+	{#!/bin/sh} \
+	{driver=gfortran } \
+	{compiler=f951 } \
+	$gcc_common \
+	{gfortran "$@" }]
+
+set found_gcc [cached_file gcc.sh [join $gcc "\n"] 1]
+set found_gxx [cached_file g++.sh [join $gxx "\n"] 1]
+set found_gfortran [cached_file gfortran.sh [join $gfortran "\n"] 1]
+
+set CC_FOR_TARGET "$found_gcc"
+set CXX_FOR_TARGET "$found_gxx"
+set F90_FOR_TARGET "$found_gfortran"
+
+set_board_info compiler "$found_gcc"
