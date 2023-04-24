@@ -21,9 +21,17 @@
 
 load_lib completion-support.exp
 
+set flags {}
+lappend flags debug
+
 if { [is_c_compiler_gcc] } {
     # Gcc fully supports fextended-identifiers starting GCC 5.
     require {expr [gcc_major_version] >= 5}
+
+    # GCC 5 defaults to gnu11, but a mockup compiler might have a version of 5
+    # or higher, and an older c dialect default.  So, set the minimally
+    # required c dialect explicitly.
+    lappend flags additional_flags=-std=c99
 }
 
 standard_testfile
@@ -31,7 +39,7 @@ standard_testfile
 # Enable basic use of UTF-8.  LC_ALL gets reset for each testfile.
 setenv LC_ALL C.UTF-8
 
-if { [prepare_for_testing "failed to prepare" ${testfile} [list $srcfile]] } {
+if { [prepare_for_testing "failed to prepare" ${testfile} [list $srcfile] $flags] } {
     return -1
 }
 
