@@ -20,8 +20,12 @@ load_lib data-structures.exp
 
 standard_testfile cpls.cc cpls2.cc cpls-hyphen.cc
 
+set flags {}
+lappend flags debug
+lappend flags c++
+
 if {[prepare_for_testing "failed to prepare" $testfile \
-	 [list $srcfile $srcfile2 $srcfile3] {debug}]} {
+	 [list $srcfile $srcfile2 $srcfile3] $flags]} {
     return -1
 }
 

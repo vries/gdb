@@ -17,8 +17,12 @@ load_lib dwarf.exp
 
 standard_testfile index.cc
 
+set flags {}
+lappend flags debug
+lappend flags c++
+
 if {[prepare_for_testing "failed to prepare" "${testfile}" \
-	 [list ${srcfile}]]} {
+	 [list ${srcfile}] $flags]} {
     return -1
 }
 
