@@ -19,6 +19,7 @@ load_lib rust-support.exp
 if {[skip_rust_tests]} {
     return
 }
+if { ![have_host_locale C.UTF-8] } { return }
 
 # Non-ASCII identifiers were allowed starting in 1.53.
 set v [split [rust_compiler_version] .]
