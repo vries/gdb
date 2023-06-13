@@ -21,7 +21,8 @@ set binfuncfile [standard_output_file ${testfile}-func.bin]
 set binfile [standard_output_file ${testfile}]
 
 if { [gdb_compile "${srcdir}/${subdir}/${srcfuncfile}" "${objfuncfile}" object {}] != "" } {
-    gdb_suppress_entire_file "Testcase compile failed, so all tests in this file will automatically fail."
+    unsupported "Testcase compile failed, so all tests in this file will automatically fail."
+    return
 }
 
 set objcopy [catch "exec objcopy -O binary --only-section .text ${objfuncfile} ${binfuncfile}" output]
