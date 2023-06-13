@@ -52,7 +52,7 @@ gdb_expect {
 # exiting the function.  Still we could retry the gstack command if we fail.
 
 set test "spawn gstack"
-set command "sh -c GDB=$GDB\\ GDBARGS=-data-directory\\\\\\ $BUILD_DATA_DIRECTORY\\ sh\\ ${srcdir}/../gstack.sh\\ $pid\\;echo\\ GSTACK-END"
+set command "sh -c GDB=$GDB\\ GDBARGS=-data-directory\\\\\\ $GDB_DATA_DIRECTORY\\ sh\\ ${srcdir}/../gstack.sh\\ $pid\\;echo\\ GSTACK-END"
 set res [remote_spawn host $command];
 if { $res < 0 || $res == "" } {
     perror "Spawning $command failed."
