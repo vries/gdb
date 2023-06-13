@@ -20,12 +20,22 @@ if { [prepare_for_testing rhbz1261564-aarch64-watchpoint.exp "rhbz1261564-aarch6
 if { ! [ runto main ] } then { return 0 }
 
 set test "rwatch aligned.var4"
-if [istarget "s390*-*-*"] {
-    gdb_test $test {Target does not support this type of hardware watchpoint\.}
-    untested "s390* does not support hw read watchpoint"
+
+set supported 1
+gdb_test_multiple $test "" {
+    -re -wrap "Hardware read watchpoint \[0-9\]+: aligned.var4" {
+	pass $gdb_test_name
+    }
+    -re -wrap "Target does not support this type of hardware watchpoint\\." {
+	set supported 0
+    }
+}
+
+if { !$supported } {
+    unsupported $test
     return
 }
-gdb_test $test "Hardware read watchpoint \[0-9\]+: aligned.var4"
+
 
 proc checkvar { address } {
     global gdb_prompt
