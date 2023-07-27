@@ -88,10 +88,18 @@ index_cache::disable ()
 
 /* See dwarf-index-cache.h.  */
 
-void
-index_cache::store (dwarf2_per_bfd *per_bfd)
+index_cache_store_context::index_cache_store_context (const index_cache &ic)
 {
-  if (!enabled ())
+  m_enabled = ic.enabled ();
+}
+
+/* See dwarf-index-cache.h.  */
+
+void
+index_cache::store (dwarf2_per_bfd *per_bfd,
+		    const struct index_cache_store_context &ctx)
+{
+  if (!ctx.m_enabled)
     return;
 
   /* Get build id of objfile.  */
