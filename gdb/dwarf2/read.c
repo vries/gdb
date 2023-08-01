@@ -5175,10 +5175,6 @@ dwarf2_build_psymtabs_hard (dwarf2_per_objfile *per_objfile)
   cooked_index *vec = new cooked_index (std::move (indexes));
   per_bfd->index_table.reset (vec);
 
-  /* Cannot start writing the index entry until after the
-     'index_table' member has been set.  */
-  vec->start_writing_index (per_bfd);
-
   const cooked_index_entry *main_entry = vec->get_main ();
   if (main_entry != nullptr)
     {
@@ -5192,6 +5188,10 @@ dwarf2_build_psymtabs_hard (dwarf2_per_objfile *per_objfile)
       const char *full_name = main_entry->full_name (&per_bfd->obstack, true);
       set_objfile_main_name (objfile, full_name, lang);
     }
+
+  /* Cannot start writing the index entry until after the
+     'index_table' member has been set.  */
+  vec->start_writing_index (per_bfd);
 
   dwarf_read_debug_printf ("Done building psymtabs of %s",
 			   objfile_name (objfile));

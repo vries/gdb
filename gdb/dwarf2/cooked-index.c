@@ -462,6 +462,9 @@ cooked_index::start_writing_index (dwarf2_per_bfd *per_bfd)
 {
   struct index_cache_store_context ctx (global_index_cache, per_bfd);
 
+  if (global_index_cache.enabled ())
+    main_name ();
+
   /* This must be set after all the finalization tasks have been
      started, because it may call 'wait'.  */
   m_write_future
