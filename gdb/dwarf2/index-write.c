@@ -1126,9 +1126,13 @@ write_gdbindex_1 (FILE *out_file,
 static void
 write_cooked_index (cooked_index *table,
 		    const cu_index_map &cu_index_htab,
-		    struct mapped_symtab *symtab)
+		    struct mapped_symtab *symtab,
+		    dwarf2_per_bfd *per_bfd)
 {
-  const char *main_for_ada = main_name ();
+  const cooked_index_entry *main_entry = table->get_main ();
+  const char *main_for_ada = (main_entry != nullptr ?
+			      main_entry->full_name (&per_bfd->obstack, true)
+			      : nullptr);
 
   for (const cooked_index_entry *entry : table->all_entries ())
     {
@@ -1253,7 +1257,7 @@ write_gdbindex (dwarf2_per_bfd *per_bfd, cooked_index *table,
       ++this_counter;
     }
 
-  write_cooked_index (table, cu_index_htab, &symtab);
+  write_cooked_index (table, cu_index_htab, &symtab, per_bfd);
 
   /* Dump the address map.  */
   data_buf addr_vec;
