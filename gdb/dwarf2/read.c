@@ -16491,52 +16491,49 @@ cooked_indexer::scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
 	  const gdb_byte *new_info_ptr = (new_reader->buffer
 					  + to_underlying (origin_offset));
 
-	  if (*parent_entry == nullptr)
+	  gdb_assert (reader->cu->per_cu->is_debug_types
+		      == new_reader->cu->per_cu->is_debug_types);
+	  CORE_ADDR addr
+	    = parent_map::form_addr (origin_offset, origin_is_dwz,
+				     reader->cu->per_cu->is_debug_types);
+	  if (new_reader->cu == reader->cu)
 	    {
-	      gdb_assert (reader->cu->per_cu->is_debug_types
-			  == new_reader->cu->per_cu->is_debug_types);
-	      CORE_ADDR addr
-		= parent_map::form_addr (origin_offset, origin_is_dwz,
-					 reader->cu->per_cu->is_debug_types);
-	      if (new_reader->cu == reader->cu)
+	      /* Intra-CU case.  */
+	      if (new_info_ptr > watermark_ptr)
 		{
-		  /* Intra-CU case.  */
-		  if (new_info_ptr > watermark_ptr)
-		    {
-		      /* Defer because origin is not read yet.  */
-		      *maybe_defer = addr;
-		    }
-		  else
-		    {
-		      auto tmp = find_parent (addr);
-		      if (tmp == &parent_map::deferred)
-			{
-			  /* Defer because origin is deferred.  */
-			  *maybe_defer = addr;
-			}
-		      else
-			*parent_entry = tmp;
-		    }
+		  /* Defer because origin is not read yet.  */
+		  *maybe_defer = addr;
 		}
 	      else
 		{
-		  /* Inter-CU case.  */
-		  if (parent_valid (addr))
+		  auto tmp = find_parent (addr);
+		  if (tmp == &parent_map::deferred)
 		    {
-		      auto tmp = find_parent (addr);
-		      if (tmp == &parent_map::deferred)
-			{
-			  /* Defer because origin is deferred.  */
-			  *maybe_defer = addr;
-			}
-		      else
-			*parent_entry = tmp;
-		    }
-		  else
-		    {
-		      /* Defer because origin is in other shard.  */
+		      /* Defer because origin is deferred.  */
 		      *maybe_defer = addr;
 		    }
+		  else
+		    *parent_entry = tmp;
+		}
+	    }
+	  else
+	    {
+	      /* Inter-CU case.  */
+	      if (parent_valid (addr))
+		{
+		  auto tmp = find_parent (addr);
+		  if (tmp == &parent_map::deferred)
+		    {
+		      /* Defer because origin is deferred.  */
+		      *maybe_defer = addr;
+		    }
+		  else
+		    *parent_entry = tmp;
+		}
+	      else
+		{
+		  /* Defer because origin is in other shard.  */
+		  *maybe_defer = addr;
 		}
 	    }
 
