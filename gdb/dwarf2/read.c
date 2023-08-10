@@ -16607,6 +16607,8 @@ cooked_indexer::index_dies (cutu_reader *reader,
       cooked_index_flag flags = IS_STATIC;
       sect_offset sibling {};
       const cooked_index_entry *this_parent_entry = parent_entry;
+      if (abbrev->tag == DW_TAG_inlined_subroutine)
+	this_parent_entry = nullptr;
       info_ptr = scan_attributes (reader->cu->per_cu, reader, info_ptr,
 				  info_ptr, abbrev, &name, &linkage_name,
 				  &flags, &sibling, &this_parent_entry,
@@ -16631,9 +16633,14 @@ cooked_indexer::index_dies (cutu_reader *reader,
 		this_die, name, defer, abbrev->tag, flags
 	      });
 	  else
-	    this_entry = m_index_storage->add (this_die, abbrev->tag, flags,
-					       name, this_parent_entry,
-					       m_per_cu);
+	    {
+	      if (this_parent_entry != nullptr)
+		set_parent ((CORE_ADDR)this_die, (CORE_ADDR)this_die,
+			    this_parent_entry);
+	      this_entry = m_index_storage->add (this_die, abbrev->tag, flags,
+						 name, this_parent_entry,
+						 m_per_cu);
+	    }
 	}
 
       if (linkage_name != nullptr)
@@ -16694,7 +16701,8 @@ cooked_indexer::index_dies (cutu_reader *reader,
 
 	    case DW_TAG_subprogram:
 	      if ((m_language == language_fortran
-		   || m_language == language_ada)
+		   || m_language == language_ada
+		   || m_language == language_cplus)
 		  && this_entry != nullptr)
 		{
 		  info_ptr = recurse (reader, info_ptr, this_entry, true);
