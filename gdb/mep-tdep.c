@@ -47,7 +47,10 @@
 #include "gdbarch.h"
 
 /* Get the user's customized MeP coprocessor register names from
-   libopcodes.  */
+   libopcodes.  Make cgen names unique to prevent ODR conflicts with other
+   targets.  */
+#define cgen_operand_type mep_cgen_operand_type
+#define cgen_hw_type mep_cgen_hw_type
 #include "opcodes/mep-desc.h"
 #include "opcodes/mep-opc.h"
 

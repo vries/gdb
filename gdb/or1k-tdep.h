@@ -23,6 +23,9 @@
 #define TARGET_OR1K
 #endif
 
+/* Make cgen names unique to prevent ODR conflicts with other targets.  */
+#define cgen_operand_type or1k_cgen_operand_type
+#define cgen_hw_type or1k_cgen_hw_type
 #include "opcodes/or1k-desc.h"
 #include "opcodes/or1k-opc.h"
 

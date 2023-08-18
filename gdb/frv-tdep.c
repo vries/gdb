@@ -29,7 +29,6 @@
 #include "dis-asm.h"
 #include "sim-regno.h"
 #include "sim/sim-frv.h"
-#include "opcodes/frv-desc.h"	/* for the H_SPR_... enums */
 #include "symtab.h"
 #include "elf-bfd.h"
 #include "elf/frv.h"
@@ -39,6 +38,11 @@
 #include "frv-tdep.h"
 #include "objfiles.h"
 #include "gdbarch.h"
+
+/* Make cgen names unique to prevent ODR conflicts with other targets.  */
+#define cgen_operand_type frv_cgen_operand_type
+#define cgen_hw_type frv_cgen_hw_type
+#include "opcodes/frv-desc.h"	/* for the H_SPR_... enums */
 
 struct frv_unwind_cache		/* was struct frame_extra_info */
   {
