@@ -228,6 +228,12 @@ cooked_index_entry::write_scope (struct obstack *storage,
 
 /* See cooked-index.h.  */
 
+cooked_index_entry parent_map::deferred((sect_offset)0, (dwarf_tag)0,
+					(cooked_index_flag)0, nullptr,
+					nullptr, nullptr);
+
+/* See cooked-index.h.  */
+
 const cooked_index_entry *
 cooked_index_shard::add (sect_offset die_offset, enum dwarf_tag tag,
 			 cooked_index_flag flags, const char *name,
@@ -446,6 +452,8 @@ cooked_index_shard::wait (bool allow_quit) const
 cooked_index::cooked_index (vec_type &&vec)
   : m_vector (std::move (vec))
 {
+  handle_deferred_entries ();
+
   for (auto &idx : m_vector)
     idx->finalize ();
 
@@ -647,6 +655,75 @@ cooked_index::maybe_write_index (dwarf2_per_bfd *per_bfd,
 
   /* (maybe) store an index in the cache.  */
   global_index_cache.store (per_bfd, ctx);
+}
+
+/* See cooked-index.h.  */
+
+const cooked_index_entry *
+cooked_index_shard::resolve_deferred_entry
+  (const deferred_entry &de, const cooked_index_entry *parent_entry)
+{
+  reset_parent_deferred (parent_map::form_addr (de.die_offset, de.per_cu_2->is_dwz,
+						de.per_cu_2->is_debug_types));
+  return add (de.die_offset, de.tag, de.flags, de.name,
+	      parent_entry, de.per_cu);
+}
+
+/* See cooked-index.h.  */
+
+const cooked_index_entry *
+cooked_index::find_parent_deferred_entry
+  (const cooked_index_shard::deferred_entry &entry) const
+{
+  const cooked_index_entry *parent_entry = nullptr;
+  for (auto &parent_map_shard : m_vector)
+    {
+      auto res = parent_map_shard->find_parent (entry.spec_offset);
+      if (res != nullptr)
+	{
+	  parent_entry = res;
+	  break;
+	}
+    }
+
+  return parent_entry;
+}
+
+/* See cooked-index.h.  */
+
+void
+cooked_index::handle_deferred_entries ()
+{
+  bool changed;
+  bool deferred;
+  do
+    {
+      deferred = false;
+      changed = false;
+      for (auto &shard : m_vector)
+	for (auto it = shard->m_deferred_entries->begin ();
+	     it != shard->m_deferred_entries->end (); )
+	  {
+	    const cooked_index_entry *parent_entry
+	      = find_parent_deferred_entry (*it);
+	    if (parent_entry == &parent_map::deferred)
+	      {
+		deferred = true;
+		it++;
+		continue;
+	      }
+	    shard->resolve_deferred_entry (*it, parent_entry);
+	    it = shard->m_deferred_entries->erase (it);
+	    changed = true;
+	  }
+    }
+  while (changed && deferred);
+
+  for (auto &shard : m_vector)
+    {
+      shard->m_die_range_map.reset (nullptr);
+      shard->m_deferred_entries.reset (nullptr);
+    }
 }
 
 /* Wait for all the index cache entries to be written before gdb

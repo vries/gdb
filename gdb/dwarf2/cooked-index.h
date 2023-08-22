@@ -34,6 +34,7 @@
 #include "dwarf2/mapped-index.h"
 #include "dwarf2/tag.h"
 #include "gdbsupport/range-chain.h"
+#include <unordered_set>
 
 struct dwarf2_per_cu_data;
 struct dwarf2_per_bfd;
@@ -242,19 +243,29 @@ private:
 class parent_map
 {
 public:
+  /* A dummy cooked_index_entry to mark that computing the parent has been
+     deferred.  */
+  static cooked_index_entry deferred;
+
   /* A helper function to turn a section offset into an address that
      can be used in a parent_map.  */
-  static CORE_ADDR form_addr (sect_offset offset, bool is_dwz)
+  static CORE_ADDR form_addr (sect_offset offset, bool is_dwz,
+			      bool is_debug_types)
   {
     CORE_ADDR value = to_underlying (offset);
     if (is_dwz)
       value |= ((CORE_ADDR) 1) << (8 * sizeof (CORE_ADDR) - 1);
+    if (is_debug_types)
+      value |= ((CORE_ADDR) 1) << (8 * sizeof (CORE_ADDR) - 2);
     return value;
   }
 
   /* Find the parent of DIE LOOKUP.  */
   const cooked_index_entry *find_parent (CORE_ADDR lookup) const
   {
+    if (m_deferred.find (lookup) != m_deferred.end ())
+      return &parent_map::deferred;
+
     const void *obj = m_parent_map.find (lookup);
     return static_cast<const cooked_index_entry *> (obj);
   }
@@ -265,12 +276,28 @@ public:
   {
     /* Calling set_empty with nullptr is currently not allowed.  */
     if (parent_entry != nullptr)
-      m_parent_map.set_empty (start, end, (void *)parent_entry);
+      {
+	gdb_assert (parent_entry != &parent_map::deferred);
+	m_parent_map.set_empty (start, end, (void *)parent_entry);
+      }
+  }
+
+  void set_parent_deferred (CORE_ADDR addr)
+  {
+    m_deferred.emplace (addr);
+  }
+
+  void reset_parent_deferred (CORE_ADDR addr)
+  {
+    m_deferred.erase (addr);
   }
 
 private:
   /* An addrmap that maps from section offsets to cooked_index_entry *.  */
   addrmap_mutable m_parent_map;
+
+  /* DIEs that are deffered.  */
+  std::unordered_set<CORE_ADDR> m_deferred;
 };
 
 class cooked_index;
@@ -285,7 +312,12 @@ class cooked_index;
 class cooked_index_shard
 {
 public:
-  cooked_index_shard () = default;
+  cooked_index_shard ()
+  {
+    m_die_range_map.reset (new parent_map);
+    m_deferred_entries.reset (new std::vector<deferred_entry>);
+  }
+
   DISABLE_COPY_AND_ASSIGN (cooked_index_shard);
 
   /* Create a new cooked_index_entry and register it with this object.
@@ -328,6 +360,52 @@ public:
      results.  If COMPLETING is true, then a larger range, suitable
      for completion, will be returned.  */
   range find (const std::string &name, bool completing) const;
+
+  /* Find the parent of DIE LOOKUP.  */
+  const cooked_index_entry *
+  find_parent (CORE_ADDR lookup) const
+  {
+    return m_die_range_map->find_parent (lookup);
+  }
+
+  /* Set the parent of DIES in range [START, END] to PARENT_ENTRY.  */
+  void set_parent (CORE_ADDR start, CORE_ADDR end,
+		   const cooked_index_entry *parent_entry)
+  {
+    m_die_range_map->set_parent (start, end, parent_entry);
+  }
+
+  void set_parent_deferred (CORE_ADDR addr)
+  {
+    m_die_range_map->set_parent_deferred (addr);
+  }
+
+  void reset_parent_deferred (CORE_ADDR addr)
+  {
+    m_die_range_map->reset_parent_deferred (addr);
+  }
+
+  /* A single deferred entry.  See m_deferred_entries.  */
+  struct deferred_entry
+  {
+    sect_offset die_offset;
+    const char *name;
+    CORE_ADDR spec_offset;
+    dwarf_tag tag;
+    cooked_index_flag flags;
+    dwarf2_per_cu_data *per_cu;
+    dwarf2_per_cu_data *per_cu_2;
+  };
+
+  /* Defer creating a cooked_index_entry corresponding to DEFERRED.  */
+  void defer_entry (deferred_entry de)
+  {
+    m_deferred_entries->push_back (de);
+  }
+
+  /* Variant of add that takes a deferred_entry as parameter.  */
+  const cooked_index_entry *resolve_deferred_entry
+    (const deferred_entry &entry, const cooked_index_entry *parent_entry);
 
 private:
 
@@ -386,6 +464,20 @@ private:
      that the 'get' method is never called on this future, only
      'wait'.  */
   gdb::future<void> m_future;
+
+  /* An addrmap that maps from section offsets (see the form_addr
+     method) to newly-created entries.  See m_deferred_entries to
+     understand this.  */
+  std::unique_ptr<parent_map> m_die_range_map;
+
+  /* The generated DWARF can sometimes have the declaration for a
+     method in a class (or perhaps namespace) scope, with the
+     definition appearing outside this scope... just one of the many
+     bad things about DWARF.  In order to handle this situation, we
+     defer certain entries until the end of scanning, at which point
+     we'll know the containing context of all the DIEs that we might
+     have scanned.  This vector stores these deferred entries.  */
+  std::unique_ptr<std::vector<deferred_entry>> m_deferred_entries;
 };
 
 /* The main index of DIEs.  The parallel DIE indexers create
@@ -468,6 +560,13 @@ public:
   void start_writing_index (dwarf2_per_bfd *per_bfd);
 
 private:
+
+  /* Find the parent corresponding to deferred entry ENTRY.  */
+  const cooked_index_entry *find_parent_deferred_entry
+    (const cooked_index_shard::deferred_entry &entry) const;
+
+  /* Create cooked_index_entries for the deferred entries.  */
+  void handle_deferred_entries ();
 
   /* Maybe write the index to the index cache.  */
   void maybe_write_index (dwarf2_per_bfd *per_bfd,
