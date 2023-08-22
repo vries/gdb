@@ -295,6 +295,68 @@ public:
      for completion, will be returned.  */
   range find (const std::string &name, bool completing) const;
 
+  const cooked_index_entry *
+  find_parent (CORE_ADDR lookup)
+  {
+    void *obj = m_die_range_map.find (lookup);
+    const cooked_index_entry *parent_entry
+      = static_cast <const cooked_index_entry *> (obj);
+    return parent_entry;
+  }
+
+  void set_parent (CORE_ADDR start, CORE_ADDR end,
+		   const cooked_index_entry *parent_entry)
+  {
+    /* Calling set_empty with nullptr is currently not allowed.  Note that we
+       still check the desired effect.  */
+    if (parent_entry != nullptr)
+      m_die_range_map.set_empty (start, end, (void *)parent_entry);
+
+    /* Assert that set_parent has the desired effect.  This is not trivial due
+       to how set_empty works.  If the range already has been set before, it
+       has no effect.  */
+    gdb_assert (m_die_range_map.find (start) == parent_entry);
+    if (end != start)
+      gdb_assert (m_die_range_map.find (end) == parent_entry);
+  }
+
+  void dump_parent ()
+  {
+    auto annotate_cooked_index_entry
+      = [] (struct ui_file *outfile, const void *value)
+      {
+	const cooked_index_entry *parent_entry
+	  = (const cooked_index_entry *)value;
+	if (parent_entry == nullptr)
+	  return;
+	if (parent_entry ==  (const cooked_index_entry *)-1)
+	  {
+	    gdb_printf (outfile, " (deferred)");
+	    return;
+	  }
+	gdb_printf (outfile, " (0x%" PRIx64 ")",
+		    to_underlying (parent_entry->die_offset));
+      };
+
+    addrmap_dump (&m_die_range_map, gdb_stdlog, nullptr, annotate_cooked_index_entry);
+  }
+
+  /* A single deferred entry.  See m_deferred_entries.  */
+  struct deferred_entry
+  {
+    sect_offset die_offset;
+    const char *name;
+    CORE_ADDR spec_offset;
+    dwarf_tag tag;
+    cooked_index_flag flags;
+    dwarf2_per_cu_data *per_cu;
+  };
+
+  void defer_entry (deferred_entry de)
+  {
+    m_deferred_entries.push_back (de);
+  }
+
 private:
 
   /* Return the entry that is believed to represent the program's
@@ -352,6 +414,20 @@ private:
      that the 'get' method is never called on this future, only
      'wait'.  */
   gdb::future<void> m_future;
+
+  /* An addrmap that maps from section offsets (see the form_addr
+     method) to newly-created entries.  See m_deferred_entries to
+     understand this.  */
+  addrmap_mutable m_die_range_map;
+
+  /* The generated DWARF can sometimes have the declaration for a
+     method in a class (or perhaps namespace) scope, with the
+     definition appearing outside this scope... just one of the many
+     bad things about DWARF.  In order to handle this situation, we
+     defer certain entries until the end of scanning, at which point
+     we'll know the containing context of all the DIEs that we might
+     have scanned.  This vector stores these deferred entries.  */
+  std::vector<deferred_entry> m_deferred_entries;
 };
 
 /* The main index of DIEs.  The parallel DIE indexers create
@@ -432,6 +508,93 @@ public:
 
   /* Start writing to the index cache, if the user asked for this.  */
   void start_writing_index (dwarf2_per_bfd *per_bfd);
+
+  void handle_deferred_entries ()
+  {
+    const bool debug_handle_deferred_entries = false;
+    if (debug_handle_deferred_entries)
+      for (auto &shard : m_vector)
+	shard->dump_parent ();
+
+    bool changed;
+    unsigned cnt_deferred;
+
+    do
+      {
+	changed = false;
+	cnt_deferred = 0;
+
+	for (auto &shard : m_vector)
+	  {
+	    std::vector<cooked_index_shard::deferred_entry>::iterator it;
+	    for (it = shard->m_deferred_entries.begin ();
+		 it != shard->m_deferred_entries.end (); )
+	      {
+		const auto &entry = *it;
+		cnt_deferred++;
+		const cooked_index_entry *parent_entry = nullptr;
+		bool found = false;
+		for (auto &shard_2 : m_vector)
+		  {
+		    auto res = shard_2->find_parent (entry.spec_offset);
+		    if (res != nullptr)
+		      {
+			/* We currently assume that no derrered entry is
+			   dependent on another deferred entry.  If that turns
+			   out to be not the case, detect it here.  */
+			gdb_assert (res != (const cooked_index_entry *)-1);
+			parent_entry = res;
+			found = true;
+			break;
+		      }
+		  }
+		if (!found)
+		  {
+		    ++it;
+		    continue;
+		  }
+
+		if (debug_handle_deferred_entries)
+		  {
+		    gdb_printf (gdb_stdlog,
+				"Resolve deferred: 0x%" PRIx64 " -> 0x%lx: ",
+				to_underlying (entry.die_offset),
+				entry.spec_offset);
+		    if (parent_entry == nullptr)
+		      gdb_printf (gdb_stdlog, "no parent\n");
+		    else
+		      gdb_printf (gdb_stdlog, "0x%" PRIx64 "\n",
+				  to_underlying (parent_entry->die_offset));
+		  }
+		shard->add (entry.die_offset, entry.tag, entry.flags,
+			    entry.name, parent_entry, entry.per_cu);
+		it = shard->m_deferred_entries.erase (it);
+		cnt_deferred--;
+		changed = true;
+	      }
+	  }
+      } while (cnt_deferred > 0 && changed);
+
+    if (cnt_deferred > 0)
+      {
+	for (auto &shard : m_vector)
+	  {
+	    std::vector<cooked_index_shard::deferred_entry>::iterator it;
+	    for (it = shard->m_deferred_entries.begin ();
+		 it != shard->m_deferred_entries.end (); )
+	      {
+		const auto &entry = *it;
+		const cooked_index_entry *parent_entry = nullptr;
+		shard->add (entry.die_offset, entry.tag, entry.flags,
+			    entry.name, parent_entry, entry.per_cu);
+		it = shard->m_deferred_entries.erase (it);
+		cnt_deferred--;
+	      }
+	  }
+      }
+
+    gdb_assert (cnt_deferred == 0);
+  }
 
 private:
 

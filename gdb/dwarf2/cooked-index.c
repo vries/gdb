@@ -446,6 +446,8 @@ cooked_index_shard::wait (bool allow_quit) const
 cooked_index::cooked_index (vec_type &&vec)
   : m_vector (std::move (vec))
 {
+  handle_deferred_entries ();
+
   for (auto &idx : m_vector)
     idx->finalize ();
 

@@ -4670,6 +4670,22 @@ public:
     return &m_addrmap;
   }
 
+  const cooked_index_entry *find_parent (CORE_ADDR lookup)
+  {
+    return m_index->find_parent (lookup);
+  }
+
+  void set_parent (CORE_ADDR start, CORE_ADDR end,
+		   const cooked_index_entry *parent_entry)
+  {
+    m_index->set_parent (start, end, parent_entry);
+  }
+
+  void defer_entry (cooked_index_shard::deferred_entry de)
+  {
+    m_index->defer_entry (de);
+  }
+
 private:
 
   /* Hash function for a cutu_reader.  */
@@ -4801,94 +4817,18 @@ private:
 
   const cooked_index_entry *find_parent (CORE_ADDR lookup)
   {
-    void *obj = m_die_range_map.find (lookup);
-    const cooked_index_entry *parent_entry
-      = static_cast<const cooked_index_entry *> (obj);
-    return parent_entry;
+    return m_index_storage->find_parent (lookup);
   }
 
   void set_parent (CORE_ADDR start, CORE_ADDR end,
 		   const cooked_index_entry *parent_entry)
   {
-    /* Calling set_empty with nullptr is currently not allowed.  Note that we
-       still check the desired effect.  */
-    if (parent_entry != nullptr)
-      m_die_range_map.set_empty (start, end, (void *)parent_entry);
-
-    /* Assert that set_parent has the desired effect.  This is not trivial due
-       to how set_empty works.  If the range already has been set before, it
-       has no effect.  */
-    gdb_assert (m_die_range_map.find (start) == parent_entry);
-    if (end != start)
-      gdb_assert (m_die_range_map.find (end) == parent_entry);
+    m_index_storage->set_parent (start, end, parent_entry);
   }
 
-  void dump_parent ()
+  void defer_entry (cooked_index_shard::deferred_entry de)
   {
-    auto annotate_cooked_index_entry
-      = [] (struct ui_file *outfile, const void *value)
-      {
-	const cooked_index_entry *parent_entry
-	  = (const cooked_index_entry *)value;
-	if (parent_entry == nullptr)
-	  return;
-	gdb_printf (outfile, " (0x%" PRIx64 ")",
-		    to_underlying (parent_entry->die_offset));
-      };
-
-    addrmap_dump (&m_die_range_map, gdb_stdlog, nullptr, annotate_cooked_index_entry);
-  }
-
-  /* A single deferred entry.  */
-  struct deferred_entry
-  {
-    sect_offset die_offset;
-    const char *name;
-    CORE_ADDR spec_offset;
-    dwarf_tag tag;
-    cooked_index_flag flags;
-  };
-
-  /* The generated DWARF can sometimes have the declaration for a
-     method in a class (or perhaps namespace) scope, with the
-     definition appearing outside this scope... just one of the many
-     bad things about DWARF.  In order to handle this situation, we
-     defer certain entries until the end of scanning, at which point
-     we'll know the containing context of all the DIEs that we might
-     have scanned.  This vector stores these deferred entries.  */
-  std::vector<deferred_entry> m_deferred_entries;
-
-  void defer_entry (deferred_entry de)
-  {
-    m_deferred_entries.push_back (de);
-  }
-
-  void handle_deferred_entries ()
-  {
-    const bool debug_handle_deferred_entries = false;
-
-    if (debug_handle_deferred_entries)
-      dump_parent ();
-
-    for (const auto &entry : m_deferred_entries)
-      {
-	const cooked_index_entry *parent_entry
-	  = find_parent (entry.spec_offset);
-	if (debug_handle_deferred_entries)
-	  {
-	    gdb_printf (gdb_stdlog,
-			"Resolve deferred: 0x%" PRIx64 " -> 0x%lx: ",
-			to_underlying (entry.die_offset),
-			entry.spec_offset);
-	    if (parent_entry == nullptr)
-	      gdb_printf (gdb_stdlog, "no parent\n");
-	    else
-	      gdb_printf (gdb_stdlog, "0x%" PRIx64 "\n",
-			  to_underlying (parent_entry->die_offset));
-	  }
-	m_index_storage->add (entry.die_offset, entry.tag, entry.flags,
-			      entry.name, parent_entry, m_per_cu);
-      }
+    m_index_storage->defer_entry (de);
   }
 };
 
@@ -16432,8 +16372,9 @@ cooked_indexer::scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
 	  const gdb_byte *new_info_ptr = (new_reader->buffer
 					  + to_underlying (origin_offset));
 
-	  if (new_reader->cu == reader->cu
-	      && new_info_ptr > watermark_ptr
+	  if ((new_reader->cu != reader->cu
+	       || (new_reader->cu == reader->cu
+		   && new_info_ptr > watermark_ptr))
 	      && *parent_entry == nullptr)
 	    *maybe_defer = form_addr (origin_offset, origin_is_dwz);
 	  else if (*parent_entry == nullptr)
@@ -16629,9 +16570,12 @@ cooked_indexer::index_dies (cutu_reader *reader,
       if (name != nullptr)
 	{
 	  if (defer != 0)
-	    defer_entry ({
-		this_die, name, defer, abbrev->tag, flags
-	      });
+	    {
+	      set_parent ((CORE_ADDR)this_die, (CORE_ADDR)this_die, (const cooked_index_entry *)-1);
+	      defer_entry ({
+		  this_die, name, defer, abbrev->tag, flags, m_per_cu
+		});
+	    }
 	  else
 	    {
 	      if (this_parent_entry != nullptr)
@@ -16739,8 +16683,6 @@ cooked_indexer::make_index (cutu_reader *reader)
   if (!reader->comp_unit_die->has_children)
     return;
   index_dies (reader, reader->info_ptr, nullptr, false);
-
-  handle_deferred_entries ();
 }
 
 /* An implementation of quick_symbol_functions for the cooked DWARF
