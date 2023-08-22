@@ -200,6 +200,12 @@ cooked_index_entry::write_scope (struct obstack *storage,
 
 /* See cooked-index.h.  */
 
+cooked_index_entry parent_map::deferred((sect_offset)0, (dwarf_tag)0,
+					(cooked_index_flag)0, nullptr,
+					nullptr, nullptr);
+
+/* See cooked-index.h.  */
+
 const cooked_index_entry *
 cooked_index::add (sect_offset die_offset, enum dwarf_tag tag,
 		   cooked_index_flag flags, const char *name,
@@ -402,6 +408,8 @@ cooked_index::find (const std::string &name, bool completing)
 cooked_index_vector::cooked_index_vector (vec_type &&vec)
   : m_vector (std::move (vec))
 {
+  handle_deferred_entries ();
+
   for (auto &idx : m_vector)
     idx->finalize ();
 }
@@ -465,6 +473,75 @@ cooked_index_vector::get_main () const
     }
 
   return result;
+}
+
+/* See cooked-index.h.  */
+
+const cooked_index_entry *
+cooked_index::resolve_deferred_entry
+  (const deferred_entry &de, const cooked_index_entry *parent_entry)
+{
+  reset_parent_deferred (parent_map::form_addr (de.die_offset, de.per_cu_2->is_dwz,
+						de.per_cu_2->is_debug_types));
+  return add (de.die_offset, de.tag, de.flags, de.name,
+	      parent_entry, de.per_cu);
+}
+
+/* See cooked-index.h.  */
+
+const cooked_index_entry *
+cooked_index_vector::find_parent_deferred_entry
+  (const cooked_index::deferred_entry &entry) const
+{
+  const cooked_index_entry *parent_entry = nullptr;
+  for (auto &parent_map_shard : m_vector)
+    {
+      auto res = parent_map_shard->find_parent (entry.spec_offset);
+      if (res != nullptr)
+	{
+	  parent_entry = res;
+	  break;
+	}
+    }
+
+  return parent_entry;
+}
+
+/* See cooked-index.h.  */
+
+void
+cooked_index_vector::handle_deferred_entries ()
+{
+  bool changed;
+  bool deferred;
+  do
+    {
+      deferred = false;
+      changed = false;
+      for (auto &shard : m_vector)
+	for (auto it = shard->m_deferred_entries->begin ();
+	     it != shard->m_deferred_entries->end (); )
+	  {
+	    const cooked_index_entry *parent_entry
+	      = find_parent_deferred_entry (*it);
+	    if (parent_entry == &parent_map::deferred)
+	      {
+		deferred = true;
+		it++;
+		continue;
+	      }
+	    shard->resolve_deferred_entry (*it, parent_entry);
+	    it = shard->m_deferred_entries->erase (it);
+	    changed = true;
+	  }
+    }
+  while (changed && deferred);
+
+  for (auto &shard : m_vector)
+    {
+      shard->m_die_range_map.reset (nullptr);
+      shard->m_deferred_entries.reset (nullptr);
+    }
 }
 
 void _initialize_cooked_index ();
