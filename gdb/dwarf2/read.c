@@ -4723,16 +4723,6 @@ public:
 
 private:
 
-  /* A helper function to turn a section offset into an address that
-     can be used in an addrmap.  */
-  CORE_ADDR form_addr (sect_offset offset, bool is_dwz)
-  {
-    CORE_ADDR value = to_underlying (offset);
-    if (is_dwz)
-      value |= ((CORE_ADDR) 1) << (8 * sizeof (CORE_ADDR) - 1);
-    return value;
-  }
-
   /* A helper function to scan the PC bounds of READER and record them
      in the storage's addrmap.  */
   void check_bounds (cutu_reader *reader);
@@ -4800,7 +4790,20 @@ private:
   /* An addrmap that maps from section offsets (see the form_addr
      method) to newly-created entries.  See m_deferred_entries to
      understand this.  */
-  addrmap_mutable m_die_range_map;
+  parent_map m_die_range_map;
+
+  /* Find the parent of DIE LOOKUP.  */
+  const cooked_index_entry *find_parent (CORE_ADDR lookup) const
+  {
+    return m_die_range_map.find_parent (lookup);
+  }
+
+  /* Set the parent of DIES in range [START, END] to PARENT_ENTRY.  */
+  void set_parent (CORE_ADDR start, CORE_ADDR end,
+		   const cooked_index_entry *parent_entry)
+  {
+    m_die_range_map.set_parent (start, end, parent_entry);
+  }
 
   /* A single deferred entry.  */
   struct deferred_entry
@@ -16439,15 +16442,13 @@ cooked_indexer::scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
 
 	  if (*parent_entry == nullptr)
 	    {
-	      CORE_ADDR addr = form_addr (origin_offset, origin_is_dwz);
+	      CORE_ADDR addr
+		= parent_map::form_addr (origin_offset, origin_is_dwz);
 	      if (new_reader->cu == reader->cu
 		  && new_info_ptr > watermark_ptr)
 		*maybe_defer = addr;
 	      else
-		{
-		  void *obj = m_die_range_map.find (addr);
-		  *parent_entry = static_cast <cooked_index_entry *> (obj);
-		}
+		*parent_entry = find_parent (addr);
 	    }
 
 	  unsigned int bytes_read;
@@ -16565,11 +16566,13 @@ cooked_indexer::recurse (cutu_reader *reader,
     {
       /* Both start and end are inclusive, so use both "+ 1" and "- 1" to
 	 limit the range to the children of parent_entry.  */
-      CORE_ADDR start = form_addr (parent_entry->die_offset + 1,
-				   reader->cu->per_cu->is_dwz);
-      CORE_ADDR end = form_addr (sect_offset (info_ptr - 1 - reader->buffer),
+      CORE_ADDR start
+	= parent_map::form_addr (parent_entry->die_offset + 1,
 				 reader->cu->per_cu->is_dwz);
-      m_die_range_map.set_empty (start, end, (void *) parent_entry);
+      CORE_ADDR end
+	= parent_map::form_addr (sect_offset (info_ptr - 1 - reader->buffer),
+				 reader->cu->per_cu->is_dwz);
+      set_parent (start, end, parent_entry);
     }
 
   return info_ptr;
@@ -16742,8 +16745,7 @@ cooked_indexer::make_index (cutu_reader *reader)
 
   for (const auto &entry : m_deferred_entries)
     {
-      void *obj = m_die_range_map.find (entry.spec_offset);
-      cooked_index_entry *parent = static_cast<cooked_index_entry *> (obj);
+      const cooked_index_entry *parent = find_parent (entry.spec_offset);
       m_index_storage->add (entry.die_offset, entry.tag, entry.flags,
 			    entry.name, parent, m_per_cu);
     }

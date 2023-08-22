@@ -239,6 +239,38 @@ private:
 		    bool for_name) const;
 };
 
+class parent_map
+{
+public:
+  /* A helper function to turn a section offset into an address that
+     can be used in a parent_map.  */
+  static CORE_ADDR form_addr (sect_offset offset, bool is_dwz)
+  {
+    CORE_ADDR value = to_underlying (offset);
+    if (is_dwz)
+      value |= ((CORE_ADDR) 1) << (8 * sizeof (CORE_ADDR) - 1);
+    return value;
+  }
+
+  /* Find the parent of DIE LOOKUP.  */
+  const cooked_index_entry *find_parent (CORE_ADDR lookup) const
+  {
+    const void *obj = m_parent_map.find (lookup);
+    return static_cast<const cooked_index_entry *> (obj);
+  }
+
+  /* Set the parent of DIES in range [START, END] to PARENT_ENTRY.  */
+  void set_parent (CORE_ADDR start, CORE_ADDR end,
+		   const cooked_index_entry *parent_entry)
+  {
+    m_parent_map.set_empty (start, end, (void *)parent_entry);
+  }
+
+private:
+  /* An addrmap that maps from section offsets to cooked_index_entry *.  */
+  addrmap_mutable m_parent_map;
+};
+
 class cooked_index;
 
 /* An index of interesting DIEs.  This is "cooked", in contrast to a
