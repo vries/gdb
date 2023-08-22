@@ -4799,6 +4799,20 @@ private:
      understand this.  */
   addrmap_mutable m_die_range_map;
 
+  const cooked_index_entry *find_parent (CORE_ADDR lookup)
+  {
+    void *obj = m_die_range_map.find (lookup);
+    const cooked_index_entry *parent_entry
+      = static_cast<const cooked_index_entry *> (obj);
+    return parent_entry;
+  }
+
+  void set_parent (CORE_ADDR start, CORE_ADDR end,
+		   const cooked_index_entry *parent_entry)
+  {
+    m_die_range_map.set_empty (start, end, (void *)parent_entry);
+  }
+
   /* A single deferred entry.  */
   struct deferred_entry
   {
@@ -4817,6 +4831,22 @@ private:
      we'll know the containing context of all the DIEs that we might
      have scanned.  This vector stores these deferred entries.  */
   std::vector<deferred_entry> m_deferred_entries;
+
+  void defer_entry (deferred_entry de)
+  {
+    m_deferred_entries.push_back (de);
+  }
+
+  void handle_deferred_entries ()
+  {
+    for (const auto &entry : m_deferred_entries)
+      {
+	const cooked_index_entry *parent_entry
+	  = find_parent (entry.spec_offset);
+	m_index_storage->add (entry.die_offset, entry.tag, entry.flags,
+			      entry.name, parent_entry, m_per_cu);
+      }
+  }
 };
 
 /* Subroutine of dwarf2_build_psymtabs_hard to simplify it.
@@ -16366,8 +16396,7 @@ cooked_indexer::scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
 	  else if (*parent_entry == nullptr)
 	    {
 	      CORE_ADDR lookup = form_addr (origin_offset, origin_is_dwz);
-	      void *obj = m_die_range_map.find (lookup);
-	      *parent_entry = static_cast <cooked_index_entry *> (obj);
+	      *parent_entry = find_parent (lookup);
 	    }
 
 	  unsigned int bytes_read;
@@ -16489,7 +16518,7 @@ cooked_indexer::recurse (cutu_reader *reader,
 				   reader->cu->per_cu->is_dwz);
       CORE_ADDR end = form_addr (sect_offset (info_ptr - 1 - reader->buffer),
 				 reader->cu->per_cu->is_dwz);
-      m_die_range_map.set_empty (start, end, (void *) parent_entry);
+      set_parent (start, end, parent_entry);
     }
 
   return info_ptr;
@@ -16555,7 +16584,7 @@ cooked_indexer::index_dies (cutu_reader *reader,
       if (name != nullptr)
 	{
 	  if (defer != 0)
-	    m_deferred_entries.push_back ({
+	    defer_entry ({
 		this_die, name, defer, abbrev->tag, flags
 	      });
 	  else
@@ -16660,13 +16689,7 @@ cooked_indexer::make_index (cutu_reader *reader)
     return;
   index_dies (reader, reader->info_ptr, nullptr, false);
 
-  for (const auto &entry : m_deferred_entries)
-    {
-      void *obj = m_die_range_map.find (entry.spec_offset);
-      cooked_index_entry *parent = static_cast<cooked_index_entry *> (obj);
-      m_index_storage->add (entry.die_offset, entry.tag, entry.flags,
-			    entry.name, parent, m_per_cu);
-    }
+  handle_deferred_entries ();
 }
 
 /* An implementation of quick_symbol_functions for the cooked DWARF
