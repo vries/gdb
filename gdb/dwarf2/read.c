@@ -4865,10 +4865,27 @@ private:
 
   void handle_deferred_entries ()
   {
+    const bool debug_handle_deferred_entries = false;
+
+    if (debug_handle_deferred_entries)
+      dump_parent ();
+
     for (const auto &entry : m_deferred_entries)
       {
 	const cooked_index_entry *parent_entry
 	  = find_parent (entry.spec_offset);
+	if (debug_handle_deferred_entries)
+	  {
+	    gdb_printf (gdb_stdlog,
+			"Resolve deferred: 0x%" PRIx64 " -> 0x%lx: ",
+			to_underlying (entry.die_offset),
+			entry.spec_offset);
+	    if (parent_entry == nullptr)
+	      gdb_printf (gdb_stdlog, "no parent\n");
+	    else
+	      gdb_printf (gdb_stdlog, "0x%" PRIx64 "\n",
+			  to_underlying (parent_entry->die_offset));
+	  }
 	m_index_storage->add (entry.die_offset, entry.tag, entry.flags,
 			      entry.name, parent_entry, m_per_cu);
       }
