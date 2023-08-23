@@ -4810,7 +4810,17 @@ private:
   void set_parent (CORE_ADDR start, CORE_ADDR end,
 		   const cooked_index_entry *parent_entry)
   {
-    m_die_range_map.set_empty (start, end, (void *)parent_entry);
+    /* Calling set_empty with nullptr is currently not allowed.  Note that we
+       still check the desired effect.  */
+    if (parent_entry != nullptr)
+      m_die_range_map.set_empty (start, end, (void *)parent_entry);
+
+    /* Assert that set_parent has the desired effect.  This is not trivial due
+       to how set_empty works.  If the range already has been set before, it
+       has no effect.  */
+    gdb_assert (m_die_range_map.find (start) == parent_entry);
+    if (end != start)
+      gdb_assert (m_die_range_map.find (end) == parent_entry);
   }
 
   /* A single deferred entry.  */
