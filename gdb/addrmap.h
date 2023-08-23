@@ -207,6 +207,8 @@ private:
    components that map to PAYLOAD.  (If PAYLOAD is NULL, the entire
    map is dumped.)  */
 void addrmap_dump (struct addrmap *map, struct ui_file *outfile,
-		   void *payload);
+		   void *payload,
+		   void (*annotate_value)(struct ui_file *outfile,
+					  const void *value) = nullptr);
 
 #endif /* ADDRMAP_H */

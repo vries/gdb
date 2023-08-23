@@ -4823,6 +4823,22 @@ private:
       gdb_assert (m_die_range_map.find (end) == parent_entry);
   }
 
+  void dump_parent ()
+  {
+    auto annotate_cooked_index_entry
+      = [] (struct ui_file *outfile, const void *value)
+      {
+	const cooked_index_entry *parent_entry
+	  = (const cooked_index_entry *)value;
+	if (parent_entry == nullptr)
+	  return;
+	gdb_printf (outfile, " (0x%" PRIx64 ")",
+		    to_underlying (parent_entry->die_offset));
+      };
+
+    addrmap_dump (&m_die_range_map, gdb_stdlog, nullptr, annotate_cooked_index_entry);
+  }
+
   /* A single deferred entry.  */
   struct deferred_entry
   {

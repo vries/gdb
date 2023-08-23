@@ -361,7 +361,9 @@ addrmap_mutable::~addrmap_mutable ()
 /* See addrmap.h.  */
 
 void
-addrmap_dump (struct addrmap *map, struct ui_file *outfile, void *payload)
+addrmap_dump (struct addrmap *map, struct ui_file *outfile, void *payload,
+	      void (*annotate_value)(struct ui_file *outfile,
+				     const void *value))
 {
   /* True if the previously printed addrmap entry was for PAYLOAD.
      If so, we want to print the next one as well (since the next
@@ -380,11 +382,16 @@ addrmap_dump (struct addrmap *map, struct ui_file *outfile, void *payload)
       addr_str = "<ends here>";
 
     if (matches || previous_matched)
-      gdb_printf (outfile, "  %s%s %s\n",
-		  payload != nullptr ? "  " : "",
-		  core_addr_to_string (start_addr),
-		  addr_str);
-
+      {
+	gdb_printf (outfile, "  %s%s %s",
+		    payload != nullptr ? "  " : "",
+		    core_addr_to_string (start_addr),
+		    addr_str);
+	/* Annotate value.  */
+	if (annotate_value != nullptr)
+	  annotate_value (outfile, obj);
+	gdb_printf (outfile, "\n");
+      }
     previous_matched = matches;
 
     return 0;
