@@ -263,7 +263,9 @@ public:
   void set_parent (CORE_ADDR start, CORE_ADDR end,
 		   const cooked_index_entry *parent_entry)
   {
-    m_parent_map.set_empty (start, end, (void *)parent_entry);
+    /* Calling set_empty with nullptr is currently not allowed.  */
+    if (parent_entry != nullptr)
+      m_parent_map.set_empty (start, end, (void *)parent_entry);
   }
 
 private:
