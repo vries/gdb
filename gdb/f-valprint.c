@@ -266,6 +266,7 @@ public:
     if (m_options->repeat_count_threshold < UINT_MAX
 	&& elt_type_prev != nullptr)
       {
+	scoped_value_mark free_values;
 	struct value *e_val = value_from_component (m_val, elt_type, elt_off);
 	struct value *e_prev = value_from_component (m_val, elt_type,
 						     elt_off_prev);
