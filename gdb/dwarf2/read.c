@@ -12506,7 +12506,7 @@ read_call_site_scope (struct die_info *die, struct dwarf2_cu *cu)
 	  std::vector<CORE_ADDR> addresses;
 	  dwarf2_ranges_read_low_addrs (ranges_offset, target_cu,
 					target_die->tag, addresses);
-	  CORE_ADDR *saved = XOBNEWVAR (&objfile->objfile_obstack, CORE_ADDR,
+	  CORE_ADDR *saved = XOBNEWVEC (&objfile->objfile_obstack, CORE_ADDR,
 					addresses.size ());
 	  std::copy (addresses.begin (), addresses.end (), saved);
 	  call_site->target.set_loc_array (addresses.size (), saved);
