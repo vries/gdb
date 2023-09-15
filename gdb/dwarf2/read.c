@@ -4823,6 +4823,32 @@ private:
      we'll know the containing context of all the DIEs that we might
      have scanned.  This vector stores these deferred entries.  */
   std::vector<deferred_entry> m_deferred_entries;
+
+  /* Defer creating a cooked_index_entry corresponding to deferred_entry DE.  */
+  void defer_entry (const deferred_entry &de)
+  {
+    m_deferred_entries.push_back (de);
+  }
+
+  /* Create a cooked_index_entry corresponding to deferred_entry DE with
+     parent PARENT_ENTRY.  */
+  const cooked_index_entry *resolve_deferred_entry
+    (const deferred_entry &de, const cooked_index_entry *parent_entry)
+  {
+    return m_index_storage->add (de.die_offset, de.tag, de.flags, de.name,
+				 parent_entry, m_per_cu);
+  }
+
+  /* Create cooked_index_entries for the deferred entries.  */
+  void handle_deferred_entries ()
+  {
+    for (const auto &entry : m_deferred_entries)
+      {
+	const cooked_index_entry *parent_entry
+	  = find_parent (entry.spec_offset);
+	resolve_deferred_entry (entry, parent_entry);
+      }
+  }
 };
 
 /* Subroutine of dwarf2_build_psymtabs_hard to simplify it.
@@ -16638,7 +16664,7 @@ cooked_indexer::index_dies (cutu_reader *reader,
       if (name != nullptr)
 	{
 	  if (defer != 0)
-	    m_deferred_entries.push_back ({
+	    defer_entry ({
 		this_die, name, defer, abbrev->tag, flags
 	      });
 	  else
@@ -16743,12 +16769,7 @@ cooked_indexer::make_index (cutu_reader *reader)
     return;
   index_dies (reader, reader->info_ptr, nullptr, false);
 
-  for (const auto &entry : m_deferred_entries)
-    {
-      const cooked_index_entry *parent = find_parent (entry.spec_offset);
-      m_index_storage->add (entry.die_offset, entry.tag, entry.flags,
-			    entry.name, parent, m_per_cu);
-    }
+  handle_deferred_entries ();
 }
 
 /* An implementation of quick_symbol_functions for the cooked DWARF
