@@ -4710,6 +4710,12 @@ public:
     m_index->set_parent_valid (start, end);
   }
 
+  /* Return true if find_parents can be relied upon.  */
+  bool parent_valid (CORE_ADDR addr)
+  {
+    return m_index->parent_valid (addr);
+  }
+
 private:
 
   /* Hash function for a cutu_reader.  */
@@ -4857,6 +4863,12 @@ private:
   void set_parent_valid (CORE_ADDR start, CORE_ADDR end)
   {
     m_index_storage->set_parent_valid (start, end);
+  }
+
+  /* Return true if find_parents can be relied upon.  */
+  bool parent_valid (CORE_ADDR addr)
+  {
+    return m_index_storage->parent_valid (addr);
   }
 };
 
@@ -16509,7 +16521,22 @@ cooked_indexer::scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
 	      else
 		{
 		  /* Inter-CU case.  */
-		  *maybe_defer = addr;
+		  if (parent_valid (addr))
+		    {
+		      auto tmp = find_parent (addr);
+		      if (tmp == &parent_map::deferred)
+			{
+			  /* Defer because origin is deferred.  */
+			  *maybe_defer = addr;
+			}
+		      else
+			*parent_entry = tmp;
+		    }
+		  else
+		    {
+		      /* Defer because origin is in other shard.  */
+		      *maybe_defer = addr;
+		    }
 		}
 	    }
 
