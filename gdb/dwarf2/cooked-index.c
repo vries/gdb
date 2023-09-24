@@ -408,6 +408,7 @@ cooked_index::find (const std::string &name, bool completing)
 cooked_index_vector::cooked_index_vector (vec_type &&vec)
   : m_vector (std::move (vec))
 {
+  /* Handle deferred entries, inter-cu case.  */
   handle_deferred_entries ();
 
   for (auto &idx : m_vector)
@@ -473,6 +474,40 @@ cooked_index_vector::get_main () const
     }
 
   return result;
+}
+
+/* See cooked-index.h.  */
+
+const cooked_index_entry *
+cooked_index::find_parent_deferred_entry
+  (const cooked_index::deferred_entry &entry) const
+{
+  return find_parent (entry.spec_offset);
+}
+
+/* See cooked-index.h.  */
+
+void
+cooked_index::handle_deferred_entries ()
+{
+  for (auto it = m_deferred_entries->begin (); it != m_deferred_entries->end (); )
+    {
+      const deferred_entry & deferred_entry = *it;
+      if (!parent_valid (deferred_entry.spec_offset))
+	{
+	  it++;
+	  continue;
+	}
+      const cooked_index_entry *parent_entry
+	= find_parent_deferred_entry (deferred_entry);
+      if (parent_entry == &parent_map::deferred)
+	{
+	  it++;
+	  continue;
+	}
+      resolve_deferred_entry (deferred_entry, parent_entry);
+      it = m_deferred_entries->erase (it);
+    }
 }
 
 /* See cooked-index.h.  */
