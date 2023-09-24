@@ -452,6 +452,7 @@ cooked_index_shard::wait (bool allow_quit) const
 cooked_index::cooked_index (vec_type &&vec)
   : m_vector (std::move (vec))
 {
+  /* Handle deferred entries, inter-cu case.  */
   handle_deferred_entries ();
 
   for (auto &idx : m_vector)
@@ -655,6 +656,40 @@ cooked_index::maybe_write_index (dwarf2_per_bfd *per_bfd,
 
   /* (maybe) store an index in the cache.  */
   global_index_cache.store (per_bfd, ctx);
+}
+
+/* See cooked-index.h.  */
+
+const cooked_index_entry *
+cooked_index_shard::find_parent_deferred_entry
+  (const cooked_index_shard::deferred_entry &entry) const
+{
+  return find_parent (entry.spec_offset);
+}
+
+/* See cooked-index.h.  */
+
+void
+cooked_index_shard::handle_deferred_entries ()
+{
+  for (auto it = m_deferred_entries->begin (); it != m_deferred_entries->end (); )
+    {
+      const deferred_entry & deferred_entry = *it;
+      if (!parent_valid (deferred_entry.spec_offset))
+	{
+	  it++;
+	  continue;
+	}
+      const cooked_index_entry *parent_entry
+	= find_parent_deferred_entry (deferred_entry);
+      if (parent_entry == &parent_map::deferred)
+	{
+	  it++;
+	  continue;
+	}
+      resolve_deferred_entry (deferred_entry, parent_entry);
+      it = m_deferred_entries->erase (it);
+    }
 }
 
 /* See cooked-index.h.  */
