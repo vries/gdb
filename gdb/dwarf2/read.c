@@ -4698,6 +4698,12 @@ public:
     m_index->defer_entry (de);
   }
 
+  /* Handle deferred entries, intra-cu case.  */
+  void handle_deferred_entries ()
+  {
+    m_index->handle_deferred_entries ();
+  }
+
   /* Mark parents in range [START, END] as valid .  */
   void set_parent_valid (CORE_ADDR start, CORE_ADDR end)
   {
@@ -5191,6 +5197,10 @@ dwarf2_build_psymtabs_hard (dwarf2_per_objfile *per_objfile)
 		errors.push_back (std::move (except));
 	      }
 	  }
+
+	/* Handle deferred entries, intra-cu case.  */
+	thread_storage.handle_deferred_entries ();
+
 	return result_type (thread_storage.release (), std::move (errors));
       }, task_size);
 
