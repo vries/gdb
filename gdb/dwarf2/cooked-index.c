@@ -723,6 +723,7 @@ cooked_index::handle_deferred_entries ()
     {
       shard->m_die_range_map.reset (nullptr);
       shard->m_deferred_entries.reset (nullptr);
+      shard->m_die_range_map_valid.reset (nullptr);
     }
 }
 
