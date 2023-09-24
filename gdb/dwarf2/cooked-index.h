@@ -408,6 +408,13 @@ public:
   const cooked_index_entry *resolve_deferred_entry
     (const deferred_entry &entry, const cooked_index_entry *parent_entry);
 
+  /* Find the parent entry for deferred_entry ENTRY.  */
+  const cooked_index_entry *find_parent_deferred_entry
+    (const cooked_index_shard::deferred_entry &entry) const;
+
+  /* Create cooked_index_entries for the deferred entries.  */
+  void handle_deferred_entries ();
+
   /* Mark parents in range [START, END] as valid .  */
   void set_parent_valid (CORE_ADDR start, CORE_ADDR end)
   {
