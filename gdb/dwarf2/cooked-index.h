@@ -316,6 +316,7 @@ public:
   {
     m_die_range_map.reset (new parent_map);
     m_deferred_entries.reset (new std::vector<deferred_entry>);
+    m_die_range_map_valid.reset (new addrmap_mutable);
   }
 
   DISABLE_COPY_AND_ASSIGN (cooked_index_shard);
@@ -407,6 +408,18 @@ public:
   const cooked_index_entry *resolve_deferred_entry
     (const deferred_entry &entry, const cooked_index_entry *parent_entry);
 
+  /* Mark parents in range [START, END] as valid .  */
+  void set_parent_valid (CORE_ADDR start, CORE_ADDR end)
+  {
+    m_die_range_map_valid->set_empty (start, end, (void *) 1);
+  }
+
+  /* Return true if find_parents can be relied upon.  */
+  bool parent_valid (CORE_ADDR addr)
+  {
+    return m_die_range_map_valid->find (addr) != nullptr;
+  }
+
 private:
 
   /* Return the entry that is believed to represent the program's
@@ -469,6 +482,8 @@ private:
      method) to newly-created entries.  See m_deferred_entries to
      understand this.  */
   std::unique_ptr<parent_map> m_die_range_map;
+
+  std::unique_ptr<addrmap> m_die_range_map_valid;
 
   /* The generated DWARF can sometimes have the declaration for a
      method in a class (or perhaps namespace) scope, with the

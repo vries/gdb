@@ -4516,6 +4516,12 @@ public:
     m_index->defer_entry (de);
   }
 
+  /* Mark parents in range [START, END] as valid .  */
+  void set_parent_valid (CORE_ADDR start, CORE_ADDR end)
+  {
+    m_index->set_parent_valid (start, end);
+  }
+
 private:
 
   /* Hash function for a cutu_reader.  */
@@ -4658,6 +4664,11 @@ private:
   void defer_entry (const cooked_index_shard::deferred_entry &de)
   {
     m_index_storage->defer_entry (de);
+  }
+
+  void set_parent_valid (CORE_ADDR start, CORE_ADDR end)
+  {
+    m_index_storage->set_parent_valid (start, end);
   }
 };
 
@@ -16364,6 +16375,11 @@ cooked_indexer::index_dies (cutu_reader *reader,
 			     + to_underlying (reader->cu->header.sect_off)
 			     + reader->cu->header.get_length_with_initial ());
 
+  const CORE_ADDR start_cu
+    = parent_map::form_addr (sect_offset (info_ptr - reader->buffer),
+			     reader->cu->per_cu->is_dwz,
+			     reader->cu->per_cu->is_debug_types);
+
   while (info_ptr < end_ptr)
     {
       sect_offset this_die = (sect_offset) (info_ptr - reader->buffer);
@@ -16513,6 +16529,14 @@ cooked_indexer::index_dies (cutu_reader *reader,
 	    info_ptr = skip_children (reader, info_ptr);
 	}
     }
+
+  {
+    CORE_ADDR end_prev_die
+      = parent_map::form_addr (sect_offset (info_ptr - reader->buffer - 1),
+			       reader->cu->per_cu->is_dwz,
+			       reader->cu->per_cu->is_debug_types);
+    set_parent_valid (start_cu, end_prev_die);
+  }
 
   return info_ptr;
 }
