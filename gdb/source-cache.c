@@ -42,6 +42,7 @@
 
 #if GDB_SELF_TEST
 #include "gdbsupport/block-signals.h"
+#include "top.h"
 #endif
 
 /* The number of source files we'll cache.  */
@@ -199,10 +200,51 @@ get_language_name (enum language lang)
 class gdb_highlight_event_listener : public srchilite::HighlightEventListener
 {
 public:
+  explicit gdb_highlight_event_listener (const std::string &fullname)
+    : m_fullname (fullname)
+  {
+  }
+
   void notify (const srchilite::HighlightEvent &event) override
   {
+    if (sync_quit_force_run)
+      {
+	/* Handle SIGTERM.  */
+	QUIT;
+	gdb_assert_not_reached ("");
+      }
+
+    /* If target_terminal::is_ours, we can ask the user a question and get an
+       answer.  We're not sure if or how !target_terminal::is_ours can happen.
+       Assert to catch it happening.  Note that we're asserting before
+       checking the quit flag, such that we don't rely on the user pressing
+       ^C so detect this.  */
+    gdb_assert (target_terminal::is_ours ());
+
+    if (!check_quit_flag ())
+      {
+	/* User didn't press ^C, nothing to do.  */
+	return;
+      }
+
+    /* Ask the user what to do.  */
+    int resp
+      = yquery (_("Cancel source styling using GNU source highlight of %s?"),
+		m_fullname.c_str ());
+    if (!resp)
+      {
+	/* Continue highlighting.  */
+	return;
+      }
+
+    /* Interrupt highlighting.  Note that check_quit_flag clears the
+       quit_flag, so we have to set it again.  */
+    set_quit_flag ();
     QUIT;
   }
+
+private:
+  const std::string &m_fullname;
 };
 
 #endif /* HAVE_SOURCE_HIGHLIGHT */
@@ -237,10 +279,13 @@ try_source_highlight (std::string &contents ATTRIBUTE_UNUSED,
 	{
 	  highlighter = new srchilite::SourceHighlight ("esc.outlang");
 	  highlighter->setStyleFile ("esc.style");
-
-	  static gdb_highlight_event_listener event_listener;
-	  highlighter->setHighlightEventListener (&event_listener);
 	}
+
+      gdb_highlight_event_listener event_listener (fullname);
+      highlighter->setHighlightEventListener (&event_listener);
+      /* Make sure that the highlighter's EventListener doesn't become a
+	 dangling pointer.  */
+      SCOPE_EXIT { highlighter->setHighlightEventListener (nullptr); };
 
       std::istringstream input (contents);
       std::ostringstream output;
@@ -255,8 +300,7 @@ try_source_highlight (std::string &contents ATTRIBUTE_UNUSED,
     }
   catch (const gdb_exception_quit &)
     {
-      /* SIGINT, rethrow.  */
-      throw;
+      /* SIGINT, ignore.  */
     }
   catch (...)
     {
@@ -348,6 +392,9 @@ static void gnu_source_highlight_test ()
   sync_quit_force_run = false;
   check_quit_flag ();
 
+  scoped_restore save_confirm
+    = make_scoped_restore (&confirm, false);
+
   /* Pretend user send SIGINT.  */
   set_quit_flag ();
 
@@ -362,7 +409,7 @@ static void gnu_source_highlight_test ()
     {
       saw_quit = true;
     }
-  SELF_CHECK (saw_quit);
+  SELF_CHECK (!saw_quit);
   SELF_CHECK (!res);
   SELF_CHECK (prog == styled_prog);
 
@@ -434,13 +481,16 @@ source_cache::ensure (struct symtab *s)
 	     reasons:
 	     - the language is not supported.
 	     - the language cannot not be auto-detected from the file name.
+	     - styling took too long and was interrupted by the user.
 	     - no stylers available.
 
 	     Since styling failed, don't try styling the file again after it
 	     drops from the cache.
 
 	     Note that clearing the source cache also clears
-	     m_no_styling_files.  */
+	     m_no_styling_files, so if styling took too long, and the user
+	     interrupted it, and the source cache gets cleared, the user will
+	     need to interrupt styling again.  */
 	  m_no_styling_files.insert (fullname);
 	}
     }
