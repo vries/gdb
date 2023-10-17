@@ -37,6 +37,7 @@
 #include <sstream>
 #include <srchilite/sourcehighlight.h>
 #include <srchilite/langmap.h>
+#include <srchilite/highlighteventlistener.h>
 #endif
 
 #if GDB_SELF_TEST
@@ -193,6 +194,17 @@ get_language_name (enum language lang)
   return nullptr;
 }
 
+/* Class with notify function called during highlighting.  */
+
+class gdb_highlight_event_listener : public srchilite::HighlightEventListener
+{
+public:
+  void notify (const srchilite::HighlightEvent &event) override
+  {
+    QUIT;
+  }
+};
+
 #endif /* HAVE_SOURCE_HIGHLIGHT */
 
 /* Try to highlight CONTENTS from file FULLNAME in language LANG using
@@ -225,6 +237,9 @@ try_source_highlight (std::string &contents ATTRIBUTE_UNUSED,
 	{
 	  highlighter = new srchilite::SourceHighlight ("esc.outlang");
 	  highlighter->setStyleFile ("esc.style");
+
+	  static gdb_highlight_event_listener event_listener;
+	  highlighter->setHighlightEventListener (&event_listener);
 	}
 
       std::istringstream input (contents);
@@ -232,6 +247,16 @@ try_source_highlight (std::string &contents ATTRIBUTE_UNUSED,
       highlighter->highlight (input, output, lang_name, fullname);
       contents = std::move (output).str ();
       styled = true;
+    }
+  catch (const gdb_exception_forced_quit &)
+    {
+      /* SIGTERM, rethrow.  */
+      throw;
+    }
+  catch (const gdb_exception_quit &)
+    {
+      /* SIGINT, rethrow.  */
+      throw;
     }
   catch (...)
     {
@@ -295,6 +320,51 @@ static void gnu_source_highlight_test ()
     SELF_CHECK (prog.size () < styled_prog.size ());
   else
     SELF_CHECK (prog == styled_prog);
+
+  /* Make sure there are no SIGINT or SIGTERM pending.  */
+  sync_quit_force_run = false;
+  check_quit_flag ();
+
+  /* Pretend user send SIGTERM.  */
+  set_force_quit_flag ();
+
+  bool saw_forced_quit = false;
+  res = false;
+  styled_prog = prog;
+  try
+    {
+      res = try_source_highlight (styled_prog, language_c, "test.c");
+    }
+  catch (const gdb_exception_forced_quit &ex)
+    {
+      saw_forced_quit = true;
+    }
+
+  SELF_CHECK (saw_forced_quit);
+  SELF_CHECK (!res);
+  SELF_CHECK (prog == styled_prog);
+
+  /* Make sure there are no SIGINT or SIGTERM pending.  */
+  sync_quit_force_run = false;
+  check_quit_flag ();
+
+  /* Pretend user send SIGINT.  */
+  set_quit_flag ();
+
+  bool saw_quit = false;
+  res = false;
+  styled_prog = prog;
+  try
+    {
+      res = try_source_highlight (styled_prog, language_c, "test.c");
+    }
+  catch (const gdb_exception_quit &ex)
+    {
+      saw_quit = true;
+    }
+  SELF_CHECK (saw_quit);
+  SELF_CHECK (!res);
+  SELF_CHECK (prog == styled_prog);
 
   /* Make sure there are no SIGINT or SIGTERM pending.  */
   sync_quit_force_run = false;
