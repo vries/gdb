@@ -9063,12 +9063,23 @@ normal_stop ()
   if (saved_context.changed ())
     return true;
 
-  /* Notify observers about the stop.  This is where the interpreters
-     print the stop event.  */
-  notify_normal_stop ((inferior_ptid != null_ptid
-		       ? inferior_thread ()->control.stop_bpstat
-		       : nullptr),
-		      stop_print_frame);
+  {
+    /* If the current quit_handler is infrun_quit_handler, and
+       target_terminal::is_ours, pressing ^C is ignored by QUIT.  See
+       infrun_quit_handler for an explanation.  At this point, there's
+       no need for this behaviour anymore, and we want to be able to interrupt
+       notify_normal_stop, so install the default_quit_handler.  */
+    scoped_restore restore_quit_handler
+      = make_scoped_restore (&quit_handler, default_quit_handler);
+
+    /* Notify observers about the stop.  This is where the interpreters
+       print the stop event.  */
+    notify_normal_stop ((inferior_ptid != null_ptid
+			 ? inferior_thread ()->control.stop_bpstat
+			 : nullptr),
+			stop_print_frame);
+  }
+
   annotate_stopped ();
 
   if (target_has_execution ())
