@@ -39,6 +39,10 @@
 #include <srchilite/langmap.h>
 #endif
 
+#if GDB_SELF_TEST
+#include "gdbsupport/block-signals.h"
+#endif
+
 /* The number of source files we'll cache.  */
 
 #define MAX_ENTRIES 5
@@ -243,6 +247,62 @@ try_source_highlight (std::string &contents ATTRIBUTE_UNUSED,
   return false;
 #endif /* HAVE_SOURCE_HIGHLIGHT */
 }
+
+#ifdef HAVE_SOURCE_HIGHLIGHT
+#if GDB_SELF_TEST
+namespace selftests
+{
+static void gnu_source_highlight_test ()
+{
+  const std::string prog
+    = ("int\n"
+       "foo (void)\n"
+       "{\n"
+       "  return 0;\n"
+       "}\n");
+  const std::string fullname = "test.c";
+  std::string styled_prog;
+
+  /* Make sure that the user can't raise SIGTERM and SIGINT.  */
+  gdb::block_signals blocker;
+
+  /* If SIGINT or SIGTERM is pending, handle it as usual.  */
+  QUIT;
+  gdb_assert (!sync_quit_force_run);
+
+  /* In some cases, QUIT doesn't handle SIGINT.  If so, bail out.  */
+  if (check_quit_flag ())
+    {
+      set_quit_flag ();
+      return;
+    }
+  gdb_assert (!check_quit_flag ());
+
+  bool res = false;
+  bool saw_exception = false;
+  styled_prog = prog;
+  try
+    {
+      res = try_source_highlight (styled_prog, language_c, fullname);
+    }
+  catch (...)
+    {
+      saw_exception = true;
+    }
+
+  SELF_CHECK (!saw_exception);
+  if (res)
+    SELF_CHECK (prog.size () < styled_prog.size ());
+  else
+    SELF_CHECK (prog == styled_prog);
+
+  /* Make sure there are no SIGINT or SIGTERM pending.  */
+  sync_quit_force_run = false;
+  check_quit_flag ();
+}
+}
+#endif /* GDB_SELF_TEST */
+#endif /* HAVE_SOURCE_HIGHLIGHT */
 
 /* See source-cache.h.  */
 
@@ -475,5 +535,9 @@ styling to source code lines that are shown."),
 
 #if GDB_SELF_TEST
   selftests::register_test ("source-cache", selftests::extract_lines_test);
+#ifdef HAVE_SOURCE_HIGHLIGHT
+  selftests::register_test ("gnu-source-highlight",
+			    selftests::gnu_source_highlight_test);
+#endif
 #endif
 }
