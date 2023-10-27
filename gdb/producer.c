@@ -81,6 +81,44 @@ producer_is_gcc (const char *producer, int *major, int *minor)
 
 /* See producer.h.  */
 
+int
+producer_is_gas (const char *producer, int *major, int *minor)
+{
+  if (producer == nullptr)
+    {
+      /* No producer, don't know.  */
+      return 0;
+    }
+
+  const char prefix[] = "GNU AS ";
+  if (!startswith (producer, prefix))
+    {
+      /* Producer is not gas.  */
+      return 0;
+    }
+
+  /* Ensure that major/minor are not nullptrs.  */
+  int maj, min;
+  if (major == nullptr)
+    major = &maj;
+  if (minor == nullptr)
+    minor = &min;
+
+  /* Skip prefix.  */
+  const char *cs = &producer[strlen (prefix)];
+
+  int scanned = sscanf (cs, "%d.%d", major, minor);
+  if (scanned != 2)
+    {
+      /* Unable to scan major/minor version.  */
+      return 0;
+    }
+
+  return 1;
+}
+
+  /* See producer.h.  */
+
 bool
 producer_is_icc_ge_19 (const char *producer)
 {
