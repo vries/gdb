@@ -1105,13 +1105,27 @@ handle_vfork_child_exec_or_exit (int exec)
 	     go ahead and create a new one for this exiting
 	     inferior.  */
 
+	  struct address_space *aspace;
+	  {
+	    /* Temporarily switch to the vfork parent, to facilitate ptrace
+	       calls done during maybe_new_address_space.  We won't need to
+	       do this anymore once we start using refcounting to decide
+	       whether an address space is shared.  See this (
+	       https://sourceware.org/pipermail/gdb-patches/2023-October/202928.html
+	       ) discussion.  */
+	    scoped_restore save_inferior_ptid
+	      = make_scoped_restore (&inferior_ptid);
+	    inferior_ptid = ptid_t (vfork_parent->pid);
+	    aspace = maybe_new_address_space ();
+	  }
+
 	  /* Switch to no-thread while running clone_program_space, so
 	     that clone_program_space doesn't want to read the
 	     selected frame of a dead process.  */
 	  scoped_restore_current_thread restore_thread;
 	  switch_to_no_thread ();
 
-	  inf->pspace = new program_space (maybe_new_address_space ());
+	  inf->pspace = new program_space (aspace);
 	  inf->aspace = inf->pspace->aspace;
 	  set_current_program_space (inf->pspace);
 	  inf->removable = true;
