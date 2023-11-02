@@ -395,6 +395,9 @@ target_auxv_search (const gdb::byte_vector &auxv, target_ops *ops,
     switch (parse_auxv (ops, gdbarch, &ptr, data + len, &type, &val))
       {
       case 1:			/* Here's an entry, check it.  */
+	if (type == AT_NULL && ptr != data + len)
+	  /* Found end-of-vector marker not at the end of the vector.  */
+	  return -1;
 	if (type == match)
 	  {
 	    *valp = val;
