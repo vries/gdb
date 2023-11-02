@@ -430,8 +430,17 @@ linux_is_uclinux (void)
 {
   CORE_ADDR dummy;
 
-  return (target_auxv_search (AT_NULL, &dummy) > 0
-	  && target_auxv_search (AT_PAGESZ, &dummy) == 0);
+  int res = target_auxv_search (AT_NULL, &dummy);
+  if (res != 1)
+    return -1;
+
+  res = target_auxv_search (AT_PAGESZ, &dummy);
+  if (res == -1)
+    return -1;
+  if (res == 1 && dummy == 0)
+    return -1;
+
+  return !res;
 }
 
 static int

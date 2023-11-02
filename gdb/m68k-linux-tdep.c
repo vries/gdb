@@ -230,6 +230,7 @@ m68k_linux_get_sigtramp_info (frame_info_ptr this_frame)
      target so we can use the correct sigcontext layouts.  */
   if (target_is_uclinux == -1)
     target_is_uclinux = linux_is_uclinux ();
+  gdb_assert (target_is_uclinux != -1);
 
   sp = get_frame_register_unsigned (this_frame, M68K_SP_REGNUM);
 
