@@ -64,7 +64,12 @@ maybe_new_address_space (void)
   if (shared_aspace)
     {
       /* Just return the first in the list.  */
-      return program_spaces[0]->aspace;
+      struct address_space *res = program_spaces[0]->aspace;
+
+      /* Increase the reference count.  */
+      res->incref ();
+
+      return res;
     }
 
   return new address_space ();
@@ -122,8 +127,10 @@ program_space::~program_space ()
   /* Defer breakpoint re-set because we don't want to create new
      locations for this pspace which we're tearing down.  */
   clear_symtab_users (SYMFILE_DEFER_BP_RESET);
-  if (!gdbarch_has_shared_address_space (current_inferior ()->arch ()))
+  if (this->aspace->refcount () == 0)
     delete this->aspace;
+  else
+    this->aspace->decref ();
 }
 
 /* See progspace.h.  */
@@ -414,8 +421,16 @@ update_address_spaces (void)
       struct address_space *aspace = new address_space ();
 
       delete current_program_space->aspace;
+
+      bool first = true;
       for (struct program_space *pspace : program_spaces)
-	pspace->aspace = aspace;
+	{
+	  pspace->aspace = aspace;
+	  if (first)
+	    first = false;
+	  else
+	    aspace->incref ();
+	}
     }
   else
     for (struct program_space *pspace : program_spaces)

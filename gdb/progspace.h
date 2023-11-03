@@ -384,11 +384,18 @@ private:
 /* An address space.  It is used for comparing if
    pspaces/inferior/threads see the same address space and for
    associating caches to each address space.  */
-struct address_space
+struct address_space : public refcounted_object
 {
   /* Create a new address space object, and add it to the list.  */
   address_space ();
   DISABLE_COPY_AND_ASSIGN (address_space);
+
+  ~address_space ()
+  {
+    /* A refcount > 0 means it's shared.  Make sure we only destruct unshared
+       address spaces.  */
+    gdb_assert (refcount () == 0);
+  }
 
   /* Returns the integer address space id of this address space.  */
   int num () const
