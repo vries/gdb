@@ -96,9 +96,9 @@ remove_program_space (program_space *pspace)
 /* See progspace.h.  */
 
 program_space::program_space (address_space *aspace_)
-  : num (++last_program_space_num),
-    aspace (aspace_)
+  : num (++last_program_space_num)
 {
+  set_aspace (aspace_);
   program_spaces.push_back (this);
   gdb::observers::new_program_space.notify (this);
 }
@@ -122,8 +122,7 @@ program_space::~program_space ()
   /* Defer breakpoint re-set because we don't want to create new
      locations for this pspace which we're tearing down.  */
   clear_symtab_users (SYMFILE_DEFER_BP_RESET);
-  if (!gdbarch_has_shared_address_space (current_inferior ()->arch ()))
-    delete this->aspace;
+  reset_aspace ();
 }
 
 /* See progspace.h.  */
@@ -409,20 +408,19 @@ update_address_spaces (void)
 
   init_address_spaces ();
 
+  for (struct program_space *pspace : program_spaces)
+    pspace->reset_aspace ();
+
   if (shared_aspace)
     {
       struct address_space *aspace = new address_space ();
 
-      delete current_program_space->aspace;
       for (struct program_space *pspace : program_spaces)
-	pspace->aspace = aspace;
+	pspace->set_aspace (aspace);
     }
   else
     for (struct program_space *pspace : program_spaces)
-      {
-	delete pspace->aspace;
-	pspace->aspace = new address_space ();
-      }
+      pspace->set_aspace (new address_space ());
 
   for (inferior *inf : all_inferiors ())
     if (gdbarch_has_global_solist (current_inferior ()->arch ()))
@@ -433,7 +431,26 @@ update_address_spaces (void)
 
 
 
+void
+program_space::set_aspace (struct address_space *aspace_)
+{
+  aspace = aspace_;
+
+  aspace->incref ();
+}
+
 /* See progspace.h.  */
+
+void
+program_space::reset_aspace ()
+{
+  aspace->decref ();
+
+  if (aspace->refcount () == 0)
+    delete aspace;
+
+  aspace = nullptr;
+}
 
 void
 program_space::clear_solib_cache ()

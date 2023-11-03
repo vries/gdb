@@ -336,6 +336,10 @@ struct program_space
      make breakpoints global).  */
   struct address_space *aspace = NULL;
 
+  void set_aspace (struct address_space *aspace);
+
+  void reset_aspace ();
+
   /* True if this program space's section offsets don't yet represent
      the final offsets of the "live" address space (that is, the
      section addresses still require the relocation offsets to be
@@ -384,11 +388,16 @@ private:
 /* An address space.  It is used for comparing if
    pspaces/inferior/threads see the same address space and for
    associating caches to each address space.  */
-struct address_space
+struct address_space : public refcounted_object
 {
   /* Create a new address space object, and add it to the list.  */
   address_space ();
   DISABLE_COPY_AND_ASSIGN (address_space);
+
+  ~address_space ()
+  {
+    gdb_assert (refcount () == 0);
+  }
 
   /* Returns the integer address space id of this address space.  */
   int num () const
