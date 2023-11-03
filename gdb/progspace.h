@@ -193,6 +193,7 @@ struct program_space
   /* Constructs a new empty program space, binds it to ASPACE, and
      adds it to the program space list.  */
   explicit program_space (address_space *aspace);
+  explicit program_space (std::shared_ptr<address_space> aspace);
 
   /* Releases a program space, and all its contents (shared libraries,
      objfiles, and any other references to the program space in other
@@ -334,7 +335,7 @@ struct program_space
      are global, then this field is ignored (we don't currently
      support inferiors sharing a program space if the target doesn't
      make breakpoints global).  */
-  struct address_space *aspace = NULL;
+  std::shared_ptr<address_space> aspace = nullptr;
 
   /* True if this program space's section offsets don't yet represent
      the final offsets of the "live" address space (that is, the
@@ -445,7 +446,7 @@ private:
 /* Maybe create a new address space object, and add it to the list, or
    return a pointer to an existing address space, in case inferiors
    share an address space.  */
-extern struct address_space *maybe_new_address_space (void);
+extern std::shared_ptr<address_space> maybe_new_address_space (void);
 
 /* Update all program spaces matching to address spaces.  The user may
    have created several program spaces, and loaded executables into

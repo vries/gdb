@@ -55,7 +55,7 @@ address_space::address_space ()
    return a pointer to an existing address space, in case inferiors
    share an address space on this target system.  */
 
-struct address_space *
+std::shared_ptr<address_space>
 maybe_new_address_space (void)
 {
   int shared_aspace
@@ -67,7 +67,9 @@ maybe_new_address_space (void)
       return program_spaces[0]->aspace;
     }
 
-  return new address_space ();
+  std::shared_ptr<address_space> res;
+  res.reset (new address_space ());
+  return std::move (res);
 }
 
 /* Start counting over from scratch.  */
@@ -96,9 +98,17 @@ remove_program_space (program_space *pspace)
 /* See progspace.h.  */
 
 program_space::program_space (address_space *aspace_)
-  : num (++last_program_space_num),
-    aspace (aspace_)
+  : num (++last_program_space_num)
 {
+  aspace.reset (aspace_);
+  program_spaces.push_back (this);
+  gdb::observers::new_program_space.notify (this);
+}
+
+program_space::program_space (std::shared_ptr<address_space> aspace_)
+  : num (++last_program_space_num)
+{
+  aspace = aspace_;
   program_spaces.push_back (this);
   gdb::observers::new_program_space.notify (this);
 }
@@ -122,8 +132,7 @@ program_space::~program_space ()
   /* Defer breakpoint re-set because we don't want to create new
      locations for this pspace which we're tearing down.  */
   clear_symtab_users (SYMFILE_DEFER_BP_RESET);
-  if (!gdbarch_has_shared_address_space (current_inferior ()->arch ()))
-    delete this->aspace;
+  aspace = nullptr;
 }
 
 /* See progspace.h.  */
@@ -413,16 +422,12 @@ update_address_spaces (void)
     {
       struct address_space *aspace = new address_space ();
 
-      delete current_program_space->aspace;
       for (struct program_space *pspace : program_spaces)
-	pspace->aspace = aspace;
+	pspace->aspace.reset (aspace);
     }
   else
     for (struct program_space *pspace : program_spaces)
-      {
-	delete pspace->aspace;
-	pspace->aspace = new address_space ();
-      }
+      pspace->aspace.reset (new address_space ());
 
   for (inferior *inf : all_inferiors ())
     if (gdbarch_has_global_solist (current_inferior ()->arch ()))
