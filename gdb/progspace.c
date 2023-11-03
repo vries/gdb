@@ -55,7 +55,7 @@ address_space::address_space ()
    return a pointer to an existing address space, in case inferiors
    share an address space on this target system.  */
 
-struct address_space *
+std::shared_ptr<address_space>
 maybe_new_address_space (void)
 {
   int shared_aspace
@@ -67,7 +67,7 @@ maybe_new_address_space (void)
       return program_spaces[0]->aspace;
     }
 
-  return new address_space ();
+  return std::make_shared<address_space> ();
 }
 
 /* Start counting over from scratch.  */
@@ -95,9 +95,9 @@ remove_program_space (program_space *pspace)
 
 /* See progspace.h.  */
 
-program_space::program_space (address_space *aspace_)
+program_space::program_space (std::shared_ptr<address_space> aspace_)
   : num (++last_program_space_num),
-    aspace (aspace_)
+       aspace (std::move (aspace_))
 {
   program_spaces.push_back (this);
   gdb::observers::new_program_space.notify (this);
@@ -122,8 +122,6 @@ program_space::~program_space ()
   /* Defer breakpoint re-set because we don't want to create new
      locations for this pspace which we're tearing down.  */
   clear_symtab_users (SYMFILE_DEFER_BP_RESET);
-  if (!gdbarch_has_shared_address_space (current_inferior ()->arch ()))
-    delete this->aspace;
 }
 
 /* See progspace.h.  */
@@ -411,18 +409,14 @@ update_address_spaces (void)
 
   if (shared_aspace)
     {
-      struct address_space *aspace = new address_space ();
+      auto aspace = std::make_shared<address_space> ();
 
-      delete current_program_space->aspace;
       for (struct program_space *pspace : program_spaces)
 	pspace->aspace = aspace;
     }
   else
     for (struct program_space *pspace : program_spaces)
-      {
-	delete pspace->aspace;
-	pspace->aspace = new address_space ();
-      }
+      pspace->aspace = std::make_shared<address_space> ();
 
   for (inferior *inf : all_inferiors ())
     if (gdbarch_has_global_solist (current_inferior ()->arch ()))
@@ -459,5 +453,6 @@ initialize_progspace (void)
      modules have done that.  Do this before
      initialize_current_architecture, because that accesses the ebfd
      of current_program_space.  */
-  current_program_space = new program_space (new address_space ());
+  current_program_space
+    = new program_space (std::make_shared<address_space> ());
 }

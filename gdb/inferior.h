@@ -584,7 +584,7 @@ public:
   bool removable = false;
 
   /* The address space bound to this inferior.  */
-  struct address_space *aspace = NULL;
+  std::shared_ptr<address_space> aspace;
 
   /* The program space bound to this inferior.  */
   struct program_space *pspace = NULL;
