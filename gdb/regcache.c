@@ -1617,7 +1617,7 @@ get_thread_arch_aspace_regcache_and_check (process_stratum_target *target,
      the current inferior's gdbarch.  Also use the current inferior's address
      space.  */
   gdbarch *arch = current_inferior ()->gdbarch;
-  address_space *aspace = current_inferior ()->aspace;
+  address_space *aspace = current_inferior ()->aspace.get ();
   regcache *regcache
     = get_thread_arch_aspace_regcache (target, ptid, arch, aspace);
 
