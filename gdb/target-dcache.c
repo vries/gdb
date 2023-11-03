@@ -33,7 +33,7 @@ int
 target_dcache_init_p (void)
 {
   DCACHE *dcache
-    = target_dcache_aspace_key.get (current_program_space->aspace);
+    = target_dcache_aspace_key.get (current_program_space->aspace.get ());
 
   return (dcache != NULL);
 }
@@ -44,7 +44,7 @@ void
 target_dcache_invalidate (void)
 {
   DCACHE *dcache
-    = target_dcache_aspace_key.get (current_program_space->aspace);
+    = target_dcache_aspace_key.get (current_program_space->aspace.get ());
 
   if (dcache != NULL)
     dcache_invalidate (dcache);
@@ -56,7 +56,7 @@ target_dcache_invalidate (void)
 DCACHE *
 target_dcache_get (void)
 {
-  return target_dcache_aspace_key.get (current_program_space->aspace);
+  return target_dcache_aspace_key.get (current_program_space->aspace.get ());
 }
 
 /* Return the target dcache.  If it is not initialized yet, initialize
@@ -66,12 +66,13 @@ DCACHE *
 target_dcache_get_or_init (void)
 {
   DCACHE *dcache
-    = target_dcache_aspace_key.get (current_program_space->aspace);
+    = target_dcache_aspace_key.get (current_program_space->aspace.get ());
 
   if (dcache == NULL)
     {
       dcache = dcache_init ();
-      target_dcache_aspace_key.set (current_program_space->aspace, dcache);
+      target_dcache_aspace_key.set (current_program_space->aspace.get (),
+				    dcache);
     }
 
   return dcache;
