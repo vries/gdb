@@ -118,8 +118,8 @@ gdb_continue_to_end
 # manually added and removed.
 gdb_test "add-inferior" \
     [multi_line \
-	 "^NewProgspaceEvent: <gdb.Progspace object at $hex>" \
-	 "\\\[New inferior 3\\\]" \
+	 "^\\\[New inferior 3\\\]" \
+	 "NewProgspaceEvent: <gdb.Progspace object at $hex>" \
 	 "Added inferior 3\[^\r\n\]*"]
 gdb_test "remove-inferior 3" \
     "^FreeProgspaceEvent: <gdb.Progspace object at $hex>"

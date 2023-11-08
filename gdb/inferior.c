@@ -843,16 +843,13 @@ remove_inferior_command (const char *args, int from_tty)
 struct inferior *
 add_inferior_with_spaces (void)
 {
-  struct program_space *pspace;
-  struct inferior *inf;
+  struct inferior *inf = add_inferior (0);
 
   /* If all inferiors share an address space on this system, this
      doesn't really return a new address space; otherwise, it
      really does.  */
-  pspace = new program_space (maybe_new_address_space ());
-  inf = add_inferior (0);
-  inf->pspace = pspace;
-  inf->aspace = pspace->aspace;
+  inf->pspace = new program_space (maybe_new_address_space ());
+  inf->aspace = inf->pspace->aspace;
 
   /* Setup the inferior's initial arch, based on information obtained
      from the global "set ..." options.  */
@@ -1012,16 +1009,13 @@ clone_inferior_command (const char *args, int from_tty)
 
   for (i = 0; i < copies; ++i)
     {
-      struct program_space *pspace;
-      struct inferior *inf;
+      struct inferior *inf = add_inferior (0);
 
       /* If all inferiors share an address space on this system, this
 	 doesn't really return a new address space; otherwise, it
 	 really does.  */
-      pspace = new program_space (maybe_new_address_space ());
-      inf = add_inferior (0);
-      inf->pspace = pspace;
-      inf->aspace = pspace->aspace;
+      inf->pspace = new program_space (maybe_new_address_space ());
+      inf->aspace = inf->pspace->aspace;
       inf->set_arch (orginf->arch ());
 
       switch_to_inferior_and_push_target (inf, no_connection, orginf);
@@ -1031,7 +1025,7 @@ clone_inferior_command (const char *args, int from_tty)
       if (inf->tdesc_info.from_user_p ())
 	inf->tdesc_info = orginf->tdesc_info;
 
-      clone_program_space (pspace, orginf->pspace);
+      clone_program_space (inf->pspace, orginf->pspace);
 
       /* Copy properties from the original inferior to the new one.  */
       inf->set_args (orginf->args ());
