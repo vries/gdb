@@ -57,6 +57,18 @@ struct tui_cmd_window : public tui_win_info
     /* The command window can't be made invisible.  */
   }
 
+  /* Compute the minimum height of this window.  */
+  virtual int min_height () const override
+  {
+    int preferred_min = tui_win_info::min_height ();
+    int max = max_height ();
+    /* If there is enough space to accommodate the preferred minimum height,
+       use it.  Otherwise, use as much as possible.  */
+    return (preferred_min <= max
+	    ? preferred_min
+	    : max);
+  }
+
   int start_line = 0;
 
 protected:
