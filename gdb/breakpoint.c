@@ -12630,7 +12630,8 @@ delete_breakpoint (struct breakpoint *bpt)
   if (bpt->number)
     notify_breakpoint_deleted (bpt);
 
-  breakpoint_chain.erase (breakpoint_chain.iterator_to (*bpt));
+  if (bpt->is_linked ())
+    breakpoint_chain.erase (breakpoint_chain.iterator_to (*bpt));
 
   /* Be sure no bpstat's are pointing at the breakpoint after it's
      been freed.  */
