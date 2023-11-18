@@ -1508,6 +1508,17 @@ linux_resume_one_lwp_throw (struct lwp_info *lp, int step,
   else
     lp->stop_pc = 0;
 
+  if (catch_syscall_enabled () > 0)
+    {
+      /* Function inf_ptrace_target::resume uses PT_SYSCALL.  */
+    }
+  else
+    {
+      /* Function inf_ptrace_target::resume uses PT_CONTINUE.
+	 Invalidate syscall_number cache.  */
+      lp->syscall_number = -1;
+    }
+
   linux_target->low_prepare_to_resume (lp);
   linux_target->low_resume (lp->ptid, step, signo);
 
@@ -1762,7 +1773,31 @@ linux_handle_syscall_trap (struct lwp_info *lp, int stopping)
   struct target_waitstatus *ourstatus = &lp->waitstatus;
   struct gdbarch *gdbarch = target_thread_architecture (lp->ptid);
   thread_info *thread = linux_target->find_thread (lp->ptid);
-  int syscall_number = (int) gdbarch_get_syscall_number (gdbarch, thread);
+
+  enum target_waitkind new_syscall_state
+    = (lp->syscall_state == TARGET_WAITKIND_SYSCALL_ENTRY
+       ? TARGET_WAITKIND_SYSCALL_RETURN
+       : TARGET_WAITKIND_SYSCALL_ENTRY);
+
+  int syscall_number;
+  if (new_syscall_state == TARGET_WAITKIND_SYSCALL_RETURN
+      && lp->syscall_number != -1)
+    {
+      /* Calling gdbarch_get_syscall_number for TARGET_WAITKIND_SYSCALL_RETURN
+	 is unreliable on some targets for some syscalls, use the syscall
+	 detected at TARGET_WAITKIND_SYSCALL_ENTRY instead.  */
+      syscall_number = lp->syscall_number;
+      linux_nat_debug_printf
+	(_("Using syscall number %d supplied by syscall_number cache"),
+	 syscall_number);
+    }
+  else
+    {
+      syscall_number = (int) gdbarch_get_syscall_number (gdbarch, thread);
+      linux_nat_debug_printf
+	(_("Using syscall number %d supplied by architecture hook"),
+	 syscall_number);
+    }
 
   if (stopping)
     {
@@ -1791,6 +1826,7 @@ linux_handle_syscall_trap (struct lwp_info *lp, int stopping)
 	 "PTRACE_CONT for SIGSTOP", syscall_number, lp->ptid.lwp ());
 
       lp->syscall_state = TARGET_WAITKIND_IGNORE;
+      lp->syscall_number = -1;
       ptrace (PTRACE_CONT, lp->ptid.lwp (), 0, 0);
       lp->stopped = 0;
       return 1;
@@ -1801,9 +1837,18 @@ linux_handle_syscall_trap (struct lwp_info *lp, int stopping)
      the user could install a new catchpoint for this syscall
      between syscall enter/return, and we'll need to know to
      report a syscall return if that happens.  */
-  lp->syscall_state = (lp->syscall_state == TARGET_WAITKIND_SYSCALL_ENTRY
-		       ? TARGET_WAITKIND_SYSCALL_RETURN
-		       : TARGET_WAITKIND_SYSCALL_ENTRY);
+  lp->syscall_state = new_syscall_state;
+
+  if (lp->syscall_state == TARGET_WAITKIND_SYSCALL_ENTRY)
+    {
+      /* Save to use in TARGET_WAITKIND_SYSCALL_RETURN.  */
+      lp->syscall_number = syscall_number;
+    }
+  else
+    {
+      /* Reset to prevent stale values.  */
+      lp->syscall_number = -1;
+    }
 
   if (catch_syscall_enabled ())
     {

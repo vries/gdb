@@ -134,13 +134,7 @@ proc check_return_from_syscall { syscall { pattern "" } } {
 		return 1
 	    }
 	    -re -wrap ".*Breakpoint $decimal, main .*" {
-		# On Powerpc the kernel does not report the returned from
-		# syscall as expected by the test.  GDB bugzilla 28623.
-		if { [istarget "powerpc64*-linux*"] } {
-		    xfail $thistest
-		} else {
-		    fail $thistest
-		}
+		fail $thistest
 		return 0
 	    }
 	}

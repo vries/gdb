@@ -277,6 +277,9 @@ struct lwp_info : intrusive_list_node<lwp_info>
      - TARGET_WAITKIND_SYSCALL_RETURN */
   enum target_waitkind syscall_state;
 
+  /* Syscall number corresponding to syscall_state.  */
+  int syscall_number = -1;
+
   /* The processor core this LWP was last seen on.  */
   int core = -1;
 
