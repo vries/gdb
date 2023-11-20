@@ -1977,6 +1977,11 @@ linux_handle_extended_wait (struct lwp_info *lp, int status)
      you have to be using PTRACE_SEIZE to get that.  */
   lp->syscall_state = TARGET_WAITKIND_SYSCALL_ENTRY;
 
+  struct gdbarch *gdbarch = target_thread_architecture (lp->ptid);
+  int syscall_number = gdbarch_extended_event_to_syscall (gdbarch, event);
+  if (syscall_number != -1)
+    lp->syscall_number = syscall_number;
+
   if (event == PTRACE_EVENT_FORK || event == PTRACE_EVENT_VFORK
       || event == PTRACE_EVENT_CLONE)
     {

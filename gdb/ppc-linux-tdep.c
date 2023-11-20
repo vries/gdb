@@ -64,6 +64,7 @@
 #include "elf-bfd.h"
 #include "producer.h"
 #include "target-float.h"
+#include "nat/linux-ptrace.h"
 
 #include "features/rs6000/powerpc-32l.c"
 #include "features/rs6000/powerpc-altivec32l.c"
@@ -1373,6 +1374,19 @@ ppc_linux_get_syscall_number (struct gdbarch *gdbarch,
 static struct linux_record_tdep ppc_linux_record_tdep;
 static struct linux_record_tdep ppc64_linux_record_tdep;
 
+static int
+ppc_linux_extended_event_to_syscall (struct gdbarch *gdbarch, int event)
+{
+  switch (event)
+    {
+    case PTRACE_EVENT_EXEC:
+      /* Execve syscall.  */
+      return 11;
+    }
+
+  return -1;
+}
+
 /* ppc_canonicalize_syscall maps from the native PowerPC Linux set of
    syscall ids into a canonical set of syscall ids used by process
    record.  (See arch/powerpc/include/uapi/asm/unistd.h in kernel tree.)
@@ -2172,6 +2186,9 @@ ppc_linux_init_abi (struct gdbarch_info info,
 
   /* Get the syscall number from the arch's register.  */
   set_gdbarch_get_syscall_number (gdbarch, ppc_linux_get_syscall_number);
+
+  set_gdbarch_extended_event_to_syscall (gdbarch,
+					 ppc_linux_extended_event_to_syscall);
 
   /* SystemTap functions.  */
   set_gdbarch_stap_integer_prefixes (gdbarch, stap_integer_prefixes);
