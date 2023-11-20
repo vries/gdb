@@ -325,4 +325,7 @@ extern enum return_value_convention default_gdbarch_return_value
       struct regcache *regcache, struct value **read_value,
       const gdb_byte *writebuf);
 
+/* Default implementation of gdbarch extended_event_to_syscall method.  */
+extern int default_extended_event_to_syscall (struct gdbarch *, int);
+
 #endif /* ARCH_UTILS_H */

@@ -2064,6 +2064,18 @@ Get architecture-specific system calls information from registers.
     predicate=True,
 )
 
+Method(
+    comment="""
+Function for the 'catch syscall' feature.
+Translate extended wait event to architecture-specific system call number.
+""",
+    type="int",
+    name="extended_event_to_syscall",
+    params=[("int", "event")],
+    predefault="default_extended_event_to_syscall",
+    invalid=False,
+)
+
 Value(
     comment="""
 The filename of the XML syscall for this architecture.

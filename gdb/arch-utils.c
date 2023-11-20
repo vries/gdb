@@ -1492,6 +1492,14 @@ gdbarch_initialized_p (gdbarch *arch)
   return arch->initialized_p;
 }
 
+/* See arch-utils.h.  */
+
+int
+default_extended_event_to_syscall (struct gdbarch *, int)
+{
+  return -1;
+}
+
 void _initialize_gdbarch_utils ();
 void
 _initialize_gdbarch_utils ()

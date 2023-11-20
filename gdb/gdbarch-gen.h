@@ -1283,6 +1283,13 @@ typedef LONGEST (gdbarch_get_syscall_number_ftype) (struct gdbarch *gdbarch, thr
 extern LONGEST gdbarch_get_syscall_number (struct gdbarch *gdbarch, thread_info *thread);
 extern void set_gdbarch_get_syscall_number (struct gdbarch *gdbarch, gdbarch_get_syscall_number_ftype *get_syscall_number);
 
+/* Function for the 'catch syscall' feature.
+   Translate extended wait event to architecture-specific system call number. */
+
+typedef int (gdbarch_extended_event_to_syscall_ftype) (struct gdbarch *gdbarch, int event);
+extern int gdbarch_extended_event_to_syscall (struct gdbarch *gdbarch, int event);
+extern void set_gdbarch_extended_event_to_syscall (struct gdbarch *gdbarch, gdbarch_extended_event_to_syscall_ftype *extended_event_to_syscall);
+
 /* The filename of the XML syscall for this architecture. */
 
 extern const char * gdbarch_xml_syscall_file (struct gdbarch *gdbarch);

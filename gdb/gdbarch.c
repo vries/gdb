@@ -207,6 +207,7 @@ struct gdbarch
   gdbarch_get_siginfo_type_ftype *get_siginfo_type = nullptr;
   gdbarch_record_special_symbol_ftype *record_special_symbol = nullptr;
   gdbarch_get_syscall_number_ftype *get_syscall_number = nullptr;
+  gdbarch_extended_event_to_syscall_ftype *extended_event_to_syscall = default_extended_event_to_syscall;
   const char * xml_syscall_file = 0;
   struct syscalls_info * syscalls_info = 0;
   const char *const * stap_integer_prefixes = 0;
@@ -475,6 +476,7 @@ verify_gdbarch (struct gdbarch *gdbarch)
   /* Skip verify of get_siginfo_type, has predicate.  */
   /* Skip verify of record_special_symbol, has predicate.  */
   /* Skip verify of get_syscall_number, has predicate.  */
+  /* Skip verify of extended_event_to_syscall, invalid_p == 0 */
   /* Skip verify of xml_syscall_file, invalid_p == 0 */
   /* Skip verify of syscalls_info, invalid_p == 0 */
   /* Skip verify of stap_integer_prefixes, invalid_p == 0 */
@@ -1198,6 +1200,9 @@ gdbarch_dump (struct gdbarch *gdbarch, struct ui_file *file)
   gdb_printf (file,
 	      "gdbarch_dump: get_syscall_number = <%s>\n",
 	      host_address_to_string (gdbarch->get_syscall_number));
+  gdb_printf (file,
+	      "gdbarch_dump: extended_event_to_syscall = <%s>\n",
+	      host_address_to_string (gdbarch->extended_event_to_syscall));
   gdb_printf (file,
 	      "gdbarch_dump: xml_syscall_file = %s\n",
 	      pstring (gdbarch->xml_syscall_file));
@@ -4510,6 +4515,23 @@ set_gdbarch_get_syscall_number (struct gdbarch *gdbarch,
 				gdbarch_get_syscall_number_ftype get_syscall_number)
 {
   gdbarch->get_syscall_number = get_syscall_number;
+}
+
+int
+gdbarch_extended_event_to_syscall (struct gdbarch *gdbarch, int event)
+{
+  gdb_assert (gdbarch != NULL);
+  gdb_assert (gdbarch->extended_event_to_syscall != NULL);
+  if (gdbarch_debug >= 2)
+    gdb_printf (gdb_stdlog, "gdbarch_extended_event_to_syscall called\n");
+  return gdbarch->extended_event_to_syscall (gdbarch, event);
+}
+
+void
+set_gdbarch_extended_event_to_syscall (struct gdbarch *gdbarch,
+				       gdbarch_extended_event_to_syscall_ftype extended_event_to_syscall)
+{
+  gdbarch->extended_event_to_syscall = extended_event_to_syscall;
 }
 
 const char *
