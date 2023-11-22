@@ -320,7 +320,7 @@ extern std::vector<memory_read_result> read_memory_robust
 extern LONGEST target_write (struct target_ops *ops,
 			     enum target_object object,
 			     const char *annex, const gdb_byte *buf,
-			     ULONGEST offset, LONGEST len);
+			     ULONGEST offset, LONGEST len, bool with_quit = true);
 
 /* Similar to target_write, except that it also calls PROGRESS with
    the number of bytes written and the opaque BATON after every
@@ -334,7 +334,7 @@ LONGEST target_write_with_progress (struct target_ops *ops,
 				    const char *annex, const gdb_byte *buf,
 				    ULONGEST offset, LONGEST len,
 				    void (*progress) (ULONGEST, void *),
-				    void *baton);
+				    void *baton, bool with_quit = true);
 
 /* Wrapper to perform a full read of unknown size.  OBJECT/ANNEX will be read
    using OPS.  The return value will be uninstantiated if the transfer fails or
@@ -1588,7 +1588,7 @@ extern int target_read_code (CORE_ADDR memaddr, gdb_byte *myaddr, ssize_t len);
 /* For target_write_memory see target/target.h.  */
 
 extern int target_write_raw_memory (CORE_ADDR memaddr, const gdb_byte *myaddr,
-				    ssize_t len);
+				    ssize_t len, bool with_quit = true);
 
 /* Fetches the target's memory map.  If one is found it is sorted
    and returned, after some consistency checking.  Otherwise, NULL

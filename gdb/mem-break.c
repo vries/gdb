@@ -81,7 +81,7 @@ default_memory_remove_breakpoint (struct gdbarch *gdbarch,
   gdbarch_sw_breakpoint_from_kind (gdbarch, bp_tgt->kind, &bplen);
 
   return target_write_raw_memory (bp_tgt->placed_address, bp_tgt->shadow_contents,
-				  bplen);
+				  bplen, false);
 }
 
 

@@ -1844,11 +1844,11 @@ target_write_memory (CORE_ADDR memaddr, const gdb_byte *myaddr, ssize_t len)
    target_write.  */
 
 int
-target_write_raw_memory (CORE_ADDR memaddr, const gdb_byte *myaddr, ssize_t len)
+target_write_raw_memory (CORE_ADDR memaddr, const gdb_byte *myaddr, ssize_t len, bool with_quit)
 {
   if (target_write (current_inferior ()->top_target (),
 		    TARGET_OBJECT_RAW_MEMORY, NULL,
-		    myaddr, memaddr, len) == len)
+		    myaddr, memaddr, len, with_quit) == len)
     return 0;
   else
     return -1;
@@ -2175,7 +2175,8 @@ target_write_with_progress (struct target_ops *ops,
 			    enum target_object object,
 			    const char *annex, const gdb_byte *buf,
 			    ULONGEST offset, LONGEST len,
-			    void (*progress) (ULONGEST, void *), void *baton)
+			    void (*progress) (ULONGEST, void *), void *baton,
+			    bool with_quit)
 {
   LONGEST xfered_total = 0;
   int unit_size = 1;
@@ -2210,7 +2211,8 @@ target_write_with_progress (struct target_ops *ops,
 	(*progress) (xfered_partial, baton);
 
       xfered_total += xfered_partial;
-      QUIT;
+      if (with_quit)
+	QUIT;
     }
   return len;
 }
@@ -2221,10 +2223,10 @@ LONGEST
 target_write (struct target_ops *ops,
 	      enum target_object object,
 	      const char *annex, const gdb_byte *buf,
-	      ULONGEST offset, LONGEST len)
+	      ULONGEST offset, LONGEST len, bool with_quit)
 {
   return target_write_with_progress (ops, object, annex, buf, offset, len,
-				     NULL, NULL);
+				     NULL, NULL, with_quit);
 }
 
 /* Help for target_read_alloc and target_read_stralloc.  See their comments
