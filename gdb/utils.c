@@ -655,6 +655,48 @@ warning_filename_and_errno (const char *filename, int saved_errno)
 	   safe_strerror (saved_errno));
 }
 
+/* See utils.h.  */
+
+int scoped_suppress_quit::suppress_quit_enabled_cnt;
+bool scoped_suppress_quit::suppress_quit_seen;
+
+/* See utils.h.  */
+
+scoped_suppress_quit::scoped_suppress_quit ()
+{
+  gdb_assert (is_main_thread ());
+  suppress_quit_enabled_cnt++;
+}
+
+/* See utils.h.  */
+
+scoped_suppress_quit::~scoped_suppress_quit () noexcept(false)
+{
+  suppress_quit_enabled_cnt--;
+  gdb_assert (suppress_quit_enabled_cnt >= 0);
+
+  if (suppress_quit_enabled_cnt != 0)
+    return;
+
+  bool tmp_suppress_quit_seen = suppress_quit_seen;
+  suppress_quit_seen = false;
+
+  if (!tmp_suppress_quit_seen)
+    return;
+
+  /* A QUIT was suppressed, unsuppress it here.  This may throw.  */
+  QUIT;
+}
+
+/* See utils.h.  */
+
+bool
+scoped_suppress_quit::suppress_quit_enabled ()
+{
+  suppress_quit_seen = true;
+  return suppress_quit_enabled_cnt > 0;
+}
+
 /* Called when a memory allocation fails, with the number of bytes of
    memory requested in SIZE.  */
 

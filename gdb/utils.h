@@ -486,4 +486,25 @@ private:
   std::vector<string_file> m_warnings;
 };
 
+/* RAII-style class to suppress the effect of calling QUIT until scope exit.  */
+
+class scoped_suppress_quit
+{
+public:
+
+  scoped_suppress_quit ();
+  ~scoped_suppress_quit () noexcept(false);
+
+  /* Whether suppression is currently active.  */
+  static bool suppress_quit_enabled ();
+
+private:
+
+  /* Nesting level.  */
+  static int suppress_quit_enabled_cnt;
+
+  /* Whether QUIT was called during suppression.  */
+  static bool suppress_quit_seen;
+};
+
 #endif /* GDB_UTILS_H */

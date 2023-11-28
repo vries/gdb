@@ -12622,6 +12622,9 @@ notify_breakpoint_deleted (breakpoint *b)
 void
 delete_breakpoint (struct breakpoint *bpt)
 {
+  /* Make sure that the function cannot be interrupted by QUIT.  */
+  scoped_suppress_quit do_scoped_suppress_quit;
+
   gdb_assert (bpt != NULL);
 
   /* Has this bp already been deleted?  This can happen because

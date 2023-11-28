@@ -1202,6 +1202,9 @@ maybe_quit ()
   if (!is_main_thread ())
     return;
 
+  if (scoped_suppress_quit::suppress_quit_enabled ())
+    return;
+
   if (sync_quit_force_run)
     quit ();
 
