@@ -16842,7 +16842,8 @@ cooked_indexer::index_dies (cutu_reader *reader,
 
 	    case DW_TAG_subprogram:
 	      if ((m_language == language_fortran
-		   || m_language == language_ada)
+		   || m_language == language_ada
+		   || m_language == language_cplus)
 		  && this_entry != nullptr)
 		{
 		  info_ptr = recurse (reader, info_ptr, this_entry, true);
