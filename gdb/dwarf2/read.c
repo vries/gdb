@@ -16543,7 +16543,8 @@ cooked_indexer::index_dies (cutu_reader *reader,
 	   && (parent_entry == nullptr
 	       || parent_entry->tag != DW_TAG_subprogram
 	       || abbrev->tag == DW_TAG_subprogram
-	       || abbrev->tag == DW_TAG_entry_point));
+	       || abbrev->tag == DW_TAG_entry_point
+	       || abbrev->tag == DW_TAG_inlined_subroutine));
 
       if (!die_interesting)
 	{
@@ -16564,6 +16565,9 @@ cooked_indexer::index_dies (cutu_reader *reader,
 	 its surrounding subroutine.  */
       if (abbrev->tag == DW_TAG_entry_point)
 	this_parent_entry = parent_entry->get_parent ();
+      else if (abbrev->tag == DW_TAG_inlined_subroutine)
+	this_parent_entry = nullptr;
+
       info_ptr = scan_attributes (reader->cu->per_cu, reader, info_ptr,
 				  info_ptr, abbrev, &name, &linkage_name,
 				  &flags, &sibling, &this_parent_entry,
@@ -16669,7 +16673,8 @@ cooked_indexer::index_dies (cutu_reader *reader,
 
 	    case DW_TAG_subprogram:
 	      if ((m_language == language_fortran
-		   || m_language == language_ada)
+		   || m_language == language_ada
+		   || m_language == language_cplus)
 		  && this_entry != nullptr)
 		{
 		  info_ptr = recurse (reader, info_ptr, this_entry, true);

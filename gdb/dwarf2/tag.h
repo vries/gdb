@@ -81,6 +81,7 @@ tag_matches_domain (dwarf_tag tag, domain_search_flags search, language lang)
       break;
 
     case DW_TAG_subprogram:
+    case DW_TAG_inlined_subroutine:
     case DW_TAG_entry_point:
       flags = SEARCH_FUNCTION_DOMAIN;
       break;
