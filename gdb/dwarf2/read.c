@@ -16600,9 +16600,18 @@ cooked_indexer::index_dies (cutu_reader *reader,
 				      flags | IS_PARENT_DEFERRED, name,
 				      defer, m_per_cu);
 	  else
-	    this_entry
-	      = m_index_storage->add (this_die, abbrev->tag, flags, name,
-				      this_parent_entry, m_per_cu);
+	    {
+	      if (this_parent_entry != nullptr)
+		{
+		  parent_map::addr_type addr
+		    = parent_map::form_addr (this_die,
+					     reader->cu->per_cu->is_dwz);
+		  m_die_range_map->add_entry (addr, addr, this_parent_entry);
+		}
+	      this_entry
+		= m_index_storage->add (this_die, abbrev->tag, flags, name,
+					this_parent_entry, m_per_cu);
+	    }
 	}
 
       if (linkage_name != nullptr)
