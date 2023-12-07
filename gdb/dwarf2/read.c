@@ -16601,6 +16601,14 @@ cooked_indexer::index_dies (cutu_reader *reader,
 				      this_parent_entry, m_per_cu);
 	}
 
+      if (this_parent_entry != nullptr)
+	{
+	  parent_map::addr_type addr
+	    = parent_map::form_addr (this_die,
+				     reader->cu->per_cu->is_dwz);
+	  m_die_range_map->add_entry (addr, addr, this_parent_entry);
+	}
+
       if (linkage_name != nullptr)
 	{
 	  /* We only want this to be "main" if it has a linkage name
