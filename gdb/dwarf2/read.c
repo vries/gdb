@@ -16745,9 +16745,15 @@ cooked_indexer::index_dies (cutu_reader *reader,
 		});
 	    }
 	  else
-	    this_entry = m_index_storage->add (this_die, abbrev->tag, flags,
-					       name, this_parent_entry,
-					       m_per_cu);
+	    {
+	      CORE_ADDR addr
+		= parent_map::form_addr (this_die, reader->cu->per_cu->is_dwz,
+					 reader->cu->per_cu->is_debug_types);
+	      set_parent (addr, addr, this_parent_entry);
+	      this_entry = m_index_storage->add (this_die, abbrev->tag, flags,
+						 name, this_parent_entry,
+						 m_per_cu);
+	    }
 	}
 
       if (linkage_name != nullptr)
