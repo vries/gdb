@@ -84,7 +84,7 @@ struct cooked_index_entry : public allocate_on_obstack
       tag (tag_),
       flags (flags_),
       die_offset (die_offset_),
-      parent_entry (parent_entry_),
+      m_parent_entry (parent_entry_),
       per_cu (per_cu_)
   {
   }
@@ -223,12 +223,26 @@ struct cooked_index_entry : public allocate_on_obstack
   cooked_index_flag flags;
   /* The offset of this DIE.  */
   sect_offset die_offset;
+private:
   /* The parent entry.  This is NULL for top-level entries.
      Otherwise, it points to the parent entry, such as a namespace or
      class.  */
-  const cooked_index_entry *parent_entry;
+  const cooked_index_entry *m_parent_entry;
+public:
   /* The CU from which this entry originates.  */
   dwarf2_per_cu_data *per_cu;
+
+  /* Set parent entry to PARENT.  */
+  void set_parent (const cooked_index_entry *parent)
+  {
+    m_parent_entry = parent;
+  }
+
+  /* Return parent entry.  */
+  const cooked_index_entry *get_parent () const
+  {
+    return m_parent_entry;
+  }
 
 private:
 

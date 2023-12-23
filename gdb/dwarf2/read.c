@@ -16688,7 +16688,7 @@ cooked_index_functions::expand_symtabs_matching
 	     matches.  */
 	  bool found = true;
 
-	  const cooked_index_entry *parent = entry->parent_entry;
+	  const cooked_index_entry *parent = entry->get_parent ();
 	  for (int i = name_vec.size () - 1; i > 0; --i)
 	    {
 	      /* If we ran out of entries, or if this segment doesn't
@@ -16701,7 +16701,7 @@ cooked_index_functions::expand_symtabs_matching
 		  break;
 		}
 
-	      parent = parent->parent_entry;
+	      parent = parent->get_parent ();
 	    }
 
 	  if (!found)
