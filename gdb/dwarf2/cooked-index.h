@@ -38,6 +38,7 @@
 struct dwarf2_per_cu_data;
 struct dwarf2_per_bfd;
 struct index_cache_store_context;
+struct cooked_index_entry;
 
 /* Flags that describe an entry in the index.  */
 enum cooked_index_flag_enum : unsigned char
@@ -53,8 +54,29 @@ enum cooked_index_flag_enum : unsigned char
   /* True if this entry is just for the declaration of a type, not the
      definition.  */
   IS_TYPE_DECLARATION = 16,
+  /* True is parent_entry.deferred has a value rather than parent_entry
+     .resolved.  */
+  IS_PARENT_DEFERRED = 32,
 };
 DEF_ENUM_FLAGS_TYPE (enum cooked_index_flag_enum, cooked_index_flag);
+
+/* Type representing either a resolved or deferred cooked_index_entry.  */
+
+union cooked_index_entry_ref
+{
+  cooked_index_entry_ref (CORE_ADDR deferred_)
+  {
+    deferred = deferred_;
+  }
+
+  cooked_index_entry_ref (const cooked_index_entry *resolved_)
+  {
+    resolved = resolved_;
+  }
+
+  const cooked_index_entry *resolved;
+  CORE_ADDR deferred;
+};
 
 /* Return a string representation of FLAGS.  */
 
@@ -78,7 +100,7 @@ struct cooked_index_entry : public allocate_on_obstack
 {
   cooked_index_entry (sect_offset die_offset_, enum dwarf_tag tag_,
 		      cooked_index_flag flags_, const char *name_,
-		      const cooked_index_entry *parent_entry_,
+		      cooked_index_entry_ref parent_entry_,
 		      dwarf2_per_cu_data *per_cu_)
     : name (name_),
       tag (tag_),
@@ -227,7 +249,7 @@ private:
   /* The parent entry.  This is NULL for top-level entries.
      Otherwise, it points to the parent entry, such as a namespace or
      class.  */
-  const cooked_index_entry *m_parent_entry;
+  cooked_index_entry_ref m_parent_entry;
 public:
   /* The CU from which this entry originates.  */
   dwarf2_per_cu_data *per_cu;
@@ -235,13 +257,30 @@ public:
   /* Set parent entry to PARENT.  */
   void set_parent (const cooked_index_entry *parent)
   {
-    m_parent_entry = parent;
+    gdb_assert ((flags & IS_PARENT_DEFERRED) == 0);
+    m_parent_entry.resolved = parent;
+  }
+
+  /* Resolve deferred parent entry to PARENT.  */
+  void resolve_parent (const cooked_index_entry *parent)
+  {
+    gdb_assert ((flags & IS_PARENT_DEFERRED) != 0);
+    flags = flags & ~IS_PARENT_DEFERRED;
+    m_parent_entry.resolved = parent;
   }
 
   /* Return parent entry.  */
   const cooked_index_entry *get_parent () const
   {
-    return m_parent_entry;
+    gdb_assert ((flags & IS_PARENT_DEFERRED) == 0);
+    return m_parent_entry.resolved;
+  }
+
+  /* Return deferred parent entry.  */
+  CORE_ADDR get_deferred_parent () const
+  {
+    gdb_assert ((flags & IS_PARENT_DEFERRED) != 0);
+    return m_parent_entry.deferred;
   }
 
 private:
@@ -273,7 +312,7 @@ public:
   cooked_index_entry *add (sect_offset die_offset, enum dwarf_tag tag,
 			   cooked_index_flag flags,
 			   const char *name,
-			   const cooked_index_entry *parent_entry,
+			   cooked_index_entry_ref parent_entry,
 			   dwarf2_per_cu_data *per_cu);
 
   /* Install a new fixed addrmap from the given mutable addrmap.  */
@@ -332,7 +371,7 @@ private:
 			      enum dwarf_tag tag,
 			      cooked_index_flag flags,
 			      const char *name,
-			      const cooked_index_entry *parent_entry,
+			      cooked_index_entry_ref parent_entry,
 			      dwarf2_per_cu_data *per_cu)
   {
     return new (&m_storage) cooked_index_entry (die_offset, tag, flags,
