@@ -4468,11 +4468,11 @@ public:
 
   /* Add an entry to the index.  The arguments describe the entry; see
      cooked-index.h.  The new entry is returned.  */
-  const cooked_index_entry *add (sect_offset die_offset, enum dwarf_tag tag,
-				 cooked_index_flag flags,
-				 const char *name,
-				 const cooked_index_entry *parent_entry,
-				 dwarf2_per_cu_data *per_cu)
+  cooked_index_entry *add (sect_offset die_offset, enum dwarf_tag tag,
+			   cooked_index_flag flags,
+			   const char *name,
+			   const cooked_index_entry *parent_entry,
+			   dwarf2_per_cu_data *per_cu)
   {
     return m_index->add (die_offset, tag, flags, name, parent_entry, per_cu);
   }
