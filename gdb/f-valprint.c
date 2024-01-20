@@ -541,6 +541,22 @@ f_language::value_print_inner (struct value *val, struct ui_file *stream,
 	  struct type *field_type
 	    = check_typedef (type->field (index).type ());
 
+	  if (type->field (index).loc_kind () == FIELD_LOC_KIND_BITPOS)
+	    {
+	      LONGEST field_bit_offset = type->field (index).loc_bitpos ();
+	      ULONGEST field_bit_size
+		= (type->field (index).bitsize () != 0
+		   ? type->field (index).bitsize ()
+		   : type->field (index).type ()->length () * 8);
+	      ULONGEST type_bit_size = type->length () * 8;
+	      if (field_bit_offset + field_bit_size > type_bit_size)
+		{
+		  /* The field does not fit in the type size, skip it.	Reading
+		     it may cause out-of-bounds access.	*/
+		  continue;
+		}
+	    }
+
 	  if (field_type->code () != TYPE_CODE_FUNC)
 	    {
 	      const char *field_name = type->field (index).name ();

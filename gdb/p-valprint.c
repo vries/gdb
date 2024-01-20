@@ -555,6 +555,23 @@ pascal_object_print_value_fields (struct value *val, struct ui_file *stream,
 	  if (!options->pascal_static_field_print
 	      && type->field (i).is_static ())
 	    continue;
+
+	  if (type->field (i).loc_kind () == FIELD_LOC_KIND_BITPOS)
+	   {
+	     LONGEST field_bit_offset = type->field (i).loc_bitpos ();
+	     ULONGEST field_bit_size
+	       = (type->field (i).bitsize () != 0
+		  ? type->field (i).bitsize ()
+		  : type->field (i).type ()->length () * 8);
+	     ULONGEST type_bit_size = type->length () * 8;
+	     if (field_bit_offset + field_bit_size > type_bit_size)
+	       {
+		 /* The field does not fit in the type size, skip it.  Reading
+		    it may cause out-of-bounds access.	*/
+		 continue;
+	       }
+	   }
+
 	  if (fields_seen)
 	    gdb_printf (stream, ", ");
 	  else if (n_baseclasses > 0)
