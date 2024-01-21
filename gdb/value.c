@@ -1236,6 +1236,12 @@ value::contents_copy_raw (struct value *dst, LONGEST dst_offset,
   gdb::array_view<const gdb_byte> src_contents
     = contents_all_raw ().slice (src_offset * unit_size,
 				 copy_length * unit_size);
+  if ((src_offset + copy_length) * unit_size > type ()-> length ())
+    {
+      dst->mark_bytes_optimized_out (dst_offset * unit_size,
+				     copy_length * unit_size);
+      return;
+    }
   gdb::copy (src_contents, dst_contents);
 
   /* Copy the meta-data, adjusted.  */
