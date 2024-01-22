@@ -3375,11 +3375,23 @@ linux_nat_wait_1 (ptid_t ptid, struct target_waitstatus *ourstatus,
   if (!target_is_non_stop_p ())
     {
       /* Now stop all other LWP's ...  */
-      iterate_over_lwps (minus_one_ptid, stop_callback);
+      iterate_over_lwps (minus_one_ptid,
+			 [&] (struct lwp_info *info)
+			 {
+			   if (info == lp)
+			     return 0;
+			   return stop_callback (info);
+			 });
 
       /* ... and wait until all of them have reported back that
 	 they're no longer running.  */
-      iterate_over_lwps (minus_one_ptid, stop_wait_callback);
+      iterate_over_lwps (minus_one_ptid,
+			 [&] (struct lwp_info *info)
+			 {
+			   if (info == lp)
+			     return 0;
+			   return stop_wait_callback (info);
+			 });
     }
 
   /* If we're not waiting for a specific LWP, choose an event LWP from
