@@ -21,10 +21,6 @@
 #include "interps.h"
 #include "run-on-main-thread.h"
 
-#ifdef PERF_ATTR_SIZE_VER5_BUNDLE
-extern "C" void __libipt_init(void);
-#endif
-
 int
 main (int argc, char **argv)
 {
@@ -35,10 +31,6 @@ main (int argc, char **argv)
   gdb_assert (is_main_thread ());
 
   struct captured_main_args args;
-
-#ifdef PERF_ATTR_SIZE_VER5_BUNDLE
-  __libipt_init();
-#endif
 
   memset (&args, 0, sizeof args);
   args.argc = argc;
