@@ -77,6 +77,9 @@ def start_json_writer(stream, queue):
             header_bytes = header.encode("ASCII")
             stream.write(header_bytes)
             stream.write(body_bytes)
-            stream.flush()
+            try:
+                stream.flush()
+            except OSError:
+                break
 
     start_thread("JSON writer", _json_writer)
