@@ -1314,6 +1314,8 @@ frame_unwind_register_value (frame_info_ptr next_frame, int regnum)
 
 	  if (value->lazy ())
 	    gdb_printf (&debug_file, " lazy");
+	  else if (!value->entirely_available ())
+	    gdb_printf (&debug_file, " unavailable");
 	  else
 	    {
 	      int i;
