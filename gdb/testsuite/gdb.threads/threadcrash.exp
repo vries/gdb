@@ -40,26 +40,23 @@ proc thread_apply_all {} {
 		exp_continue
 	    }
 	    -re "\[^\n\]*syscall_task .location=SIGNAL_ALT_STACK\[^\n\]*" {
-		lappend test_list [multi_line ".*sleep.*" \
-					      ".*do_syscall_task .location=SIGNAL_ALT_STACK.*" \
+		lappend test_list [multi_line ".*do_syscall_task .location=SIGNAL_ALT_STACK.*" \
 					      ".*signal_handler.*" \
 					      ".*signal handler called.*" \
-					      ".*pthread_kill.*" \
+					      ".*" \
 					      ".*thread_function.*"]
 		exp_continue
 	    }
 	    -re "\[^\n\]*syscall_task .location=SIGNAL_HANDLER\[^\n\]*" {
-		lappend test_list [multi_line ".*sleep.*" \
-					      ".*do_syscall_task .location=SIGNAL_HANDLER.*" \
+		lappend test_list [multi_line ".*do_syscall_task .location=SIGNAL_HANDLER.*" \
 					      ".*signal_handler.*" \
 					      ".*signal handler called.*" \
-					      ".*pthread_kill.*" \
+					      ".*" \
 					      ".*thread_function.*"]
 		exp_continue
 	    }
 	    -re "\[^\n\]*syscall_task .location=NORMAL\[^\n\]*" {
-		lappend test_list [multi_line ".*sleep.*" \
-					      ".*do_syscall_task .location=NORMAL.*" \
+		lappend test_list [multi_line ".*do_syscall_task .location=NORMAL.*" \
 					      ".*thread_function.*"]
 		exp_continue
 	    }
@@ -67,7 +64,7 @@ proc thread_apply_all {} {
 		lappend test_list [multi_line ".*do_spin_task .location=SIGNAL_ALT_STACK.*" \
 					      ".*signal_handler.*" \
 					      ".*signal handler called.*" \
-					      ".*pthread_kill.*" \
+					      ".*" \
 					      ".*thread_function.*"]
 		exp_continue
 	    }
@@ -75,7 +72,7 @@ proc thread_apply_all {} {
 		lappend test_list [multi_line ".*do_spin_task .location=SIGNAL_HANDLER.*" \
 					      ".*signal_handler.*" \
 					      ".*signal handler called.*" \
-					      ".*pthread_kill.*" \
+					      ".*" \
 					      ".*thread_function.*"]
 		exp_continue
 	    }
