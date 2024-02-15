@@ -21,6 +21,7 @@ import queue
 import threading
 import traceback
 import sys
+import io
 
 from enum import IntEnum, auto
 
@@ -148,7 +149,7 @@ class LoggingParam(gdb.Parameter):
 
     lock = threading.Lock()
     with lock:
-        log_file = None
+        log_file = io.StringIO()
 
     def __init__(self):
         super().__init__(
@@ -158,12 +159,19 @@ class LoggingParam(gdb.Parameter):
 
     def get_set_string(self):
         with dap_log.lock:
+            initial_log = None
+            if isinstance(self.log_file, io.StringIO):
+                initial_log = self.log_file.getvalue()
+                self.log_file = None
             # Close any existing log file, no matter what.
             if self.log_file is not None:
                 self.log_file.close()
                 self.log_file = None
             if self.value is not None:
                 self.log_file = open(self.value, "w")
+                if initial_log != None:
+                    print(initial_log, file=self.log_file)
+                    self.log_file.flush()
         return ""
 
 
