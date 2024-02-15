@@ -40,6 +40,10 @@ _gdb_thread = threading.current_thread()
 # The DAP thread.
 _dap_thread = None
 
+# Queue to communicate the dap thread to the gdb thread.
+dap_thread_queue = queue.Queue()
+dap_thread_queue.put_nowait(None)
+
 
 # "Known" exceptions are wrapped in a DAP exception, so that, by
 # default, only rogue exceptions are logged -- this is then used by
@@ -93,6 +97,8 @@ def start_dap(target):
     def really_start_dap():
         global _dap_thread
         _dap_thread = threading.current_thread()
+        dap_thread_queue.get()
+        dap_thread_queue.put_nowait(_dap_thread)
         target()
 
     start_thread("DAP", really_start_dap)
