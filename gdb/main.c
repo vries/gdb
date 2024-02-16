@@ -1313,6 +1313,7 @@ captured_main_1 (struct captured_main_args *context)
     }
 
   /* We are starting an interactive session.  */
+  gdb::observers::gdb_starting_session.notify ();
 
   /* Read in the history.  Note that this is after all the command files have
      been read, so that the user can change the history file via a .gdbinit
