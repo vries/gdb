@@ -2125,6 +2125,38 @@ gdbpy_gdb_exiting (int exit_code)
     gdbpy_print_stack ();
 }
 
+/* Emit a gdb.GdbStartingSessionEvent, return a negative value if there are
+   any errors, otherwise, return 0.  */
+
+static int
+emit_starting_session_event ()
+{
+  if (evregpy_no_listeners_p (gdb_py_events.gdb_starting_session))
+    return 0;
+
+  gdbpy_ref<> event_obj
+    = create_event_object (&gdb_starting_session_event_object_type);
+  if (event_obj == nullptr)
+    return -1;
+
+  return
+    evpy_emit_event (event_obj.get (), gdb_py_events.gdb_starting_session);
+}
+
+/* Callback for the gdb_starting_session observable.  */
+
+static void
+gdbpy_gdb_starting_session ()
+{
+  if (!gdb_python_initialized)
+    return;
+
+  gdbpy_enter enter_py;
+
+  if (emit_starting_session_event () < 0)
+    gdbpy_print_stack ();
+}
+
 static bool
 do_start_initialization ()
 {
@@ -2277,6 +2309,8 @@ init_done:
     return false;
 
   gdb::observers::gdb_exiting.attach (gdbpy_gdb_exiting, "python");
+  gdb::observers::gdb_starting_session.attach (gdbpy_gdb_starting_session,
+					       "python");
 
   /* Release the GIL while gdb runs.  */
   PyEval_SaveThread ();

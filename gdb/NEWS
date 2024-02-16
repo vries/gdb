@@ -113,6 +113,11 @@ show remote thread-options-packet
      domains.  Symbol lookup can now search in multiple domains at
      once, and can also narrowly search for just a type or function.
 
+  ** New gdb.events.gdb_starting_session event.  This event is called with a
+     gdb.GdbStartingSessionEvent object.  This event is triggered once GDB
+     is done processing the command line switches, and is starting an
+     interactive session.  This is not triggered in batch mode.
+
 * Debugger Adapter Protocol changes
 
   ** GDB now emits the "process" event.
