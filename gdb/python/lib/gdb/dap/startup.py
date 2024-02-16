@@ -174,6 +174,11 @@ class LoggingParam(gdb.Parameter):
                     self.log_file.flush()
         return ""
 
+    def starting_session(self):
+        with dap_log.lock:
+            if isinstance(self.log_file, io.StringIO):
+                self.log_file = None
+
 
 dap_log = LoggingParam()
 
