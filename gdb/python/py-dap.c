@@ -61,6 +61,8 @@ public:
     return m_ui_out.get ();
   }
 
+  void pre_command_loop () override;
+
 private:
 
   std::unique_ptr<ui_out> m_ui_out;
@@ -85,6 +87,25 @@ dap_interp::init (bool top_level)
 
   current_ui->input_fd = -1;
   current_ui->m_input_interactive_p = false;
+}
+
+void
+dap_interp::pre_command_loop ()
+{
+  gdbpy_enter enter_py;
+
+  gdbpy_ref<> dap_module (PyImport_ImportModule ("gdb.dap"));
+  if (dap_module == nullptr)
+    gdbpy_handle_exception ();
+
+  gdbpy_ref<> func (PyObject_GetAttrString (dap_module.get (),
+					    "pre_command_loop"));
+  if (func == nullptr)
+    gdbpy_handle_exception ();
+
+  gdbpy_ref<> result_obj (PyObject_CallObject (func.get (), nullptr));
+  if (result_obj == nullptr)
+    gdbpy_handle_exception ();
 }
 
 void _initialize_py_interp ();
