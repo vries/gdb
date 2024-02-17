@@ -223,6 +223,15 @@ def exec_and_log(cmd):
         log_stack()
 
 
+def dap_thread_join():
+    if _dap_thread != None:
+        thread_log("joining dap thread ...")
+        _dap_thread.join()
+        thread_log("joining dap thread done")
+    else:
+        thread_log("no dap thread to join")
+
+
 class Invoker(object):
     """A simple class that can invoke a gdb command."""
 
