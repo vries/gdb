@@ -16,7 +16,7 @@
 import gdb
 
 from .server import send_event
-from .startup import exec_and_log, in_gdb_thread, log
+from .startup import exec_and_log, in_gdb_thread, log, dap_thread_join
 from .modules import is_module, make_module
 
 
@@ -275,6 +275,11 @@ def _on_inferior_call(event):
             send_event("stopped", obj)
 
 
+@in_gdb_thread
+def _on_gdb_exiting(event):
+    dap_thread_join()
+
+
 gdb.events.stop.connect(_on_stop)
 gdb.events.exited.connect(_on_exit)
 gdb.events.new_thread.connect(_new_thread)
@@ -283,3 +288,4 @@ gdb.events.cont.connect(_cont)
 gdb.events.new_objfile.connect(_new_objfile)
 gdb.events.free_objfile.connect(_objfile_removed)
 gdb.events.inferior_call.connect(_on_inferior_call)
+gdb.events.gdb_exiting.connect(_on_gdb_exiting)

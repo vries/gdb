@@ -37,8 +37,13 @@ else:
 _gdb_thread = threading.current_thread()
 
 
-# The DAP thread.
+# The DAP thread, stored in the DAP thread.
 _dap_thread = None
+
+
+# The DAP thread, stored in the GDB main thread.  This to avoid using one
+# variable and having to use a lock to access it.
+_dap_thread_for_gdb_thread = None
 
 
 # "Known" exceptions are wrapped in a DAP exception, so that, by
@@ -94,7 +99,9 @@ def start_dap(target):
         _dap_thread = threading.current_thread()
         target()
 
-    start_thread("DAP", really_start_dap)
+    # Note that we set _dap_thread in both the DAP and the GDB main thread.
+    global _dap_thread_for_gdb_thread
+    _dap_thread_for_gdb_thread = start_thread("DAP", really_start_dap)
 
 
 def in_gdb_thread(func):
@@ -221,6 +228,16 @@ def exec_and_log(cmd):
             log(">>> " + output)
     except gdb.error:
         log_stack()
+
+
+def dap_thread_join():
+    global _dap_thread_for_gdb_thread
+    if _dap_thread_for_gdb_thread != None:
+        thread_log("joining dap thread ...")
+        _dap_thread_for_gdb_thread.join()
+        thread_log("joining dap thread done")
+    else:
+        thread_log("no dap thread to join")
 
 
 class Invoker(object):
