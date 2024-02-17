@@ -93,7 +93,9 @@ def start_dap(target):
         _dap_thread = threading.current_thread()
         target()
 
-    start_thread("DAP", really_start_dap)
+    # Note that we set _dap_thread in both the DAP and the GDB main thread.
+    global _dap_thread
+    _dap_thread = start_thread("DAP", really_start_dap)
 
 
 def in_gdb_thread(func):
@@ -206,6 +208,22 @@ def exec_and_log(cmd):
             log(">>> " + output)
     except gdb.error:
         log_stack()
+
+
+@in_gdb_thread
+def _on_gdb_exiting(event):
+    if _dap_thread is None:
+        # This can happen if the DAP module is imported, but the server not
+        # started.
+        thread_log("no dap thread to join")
+        return
+
+    thread_log("joining dap thread ...")
+    _dap_thread.join()
+    thread_log("joining dap thread done")
+
+
+gdb.events.gdb_exiting.connect(_on_gdb_exiting)
 
 
 class Invoker(object):
