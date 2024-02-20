@@ -239,7 +239,8 @@ aarch64_stopped_data_address (const struct aarch64_debug_reg_state *state,
 	= aarch64_watchpoint_offset (state->dr_ctrl_wp[i]);
       const unsigned int len = aarch64_watchpoint_length (state->dr_ctrl_wp[i]);
       const CORE_ADDR addr_watch = state->dr_addr_wp[i] + offset;
-      const CORE_ADDR addr_watch_aligned = align_down (state->dr_addr_wp[i], 8);
+      const CORE_ADDR addr_watch_aligned
+	= align_down (state->dr_addr_wp[i], 16);
       const CORE_ADDR addr_orig = state->dr_addr_orig_wp[i];
 
       if (state->dr_ref_count_wp[i]
