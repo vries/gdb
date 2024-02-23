@@ -19,6 +19,8 @@ import heapq
 import inspect
 import json
 import threading
+from contextlib import contextmanager
+
 
 from .io import start_json_writer, read_json
 from .startup import (
@@ -61,6 +63,8 @@ class CancellationHandler:
         # The request currently being handled, or None.
         self.in_flight = None
         self.reqs = []
+        self.interruptable = False
+        self.cancel_pending = False
 
     def starting(self, req):
         """Call at the start of the given request.
@@ -77,6 +81,12 @@ class CancellationHandler:
         """Indicate that the request is done."""
         with self.lock:
             self.in_flight = None
+            if self.cancel_pending:
+                # The request is done and a cancel is pending.  This means that
+                # the cancel failed, but since we always return success for the
+                # cancel request, there's nothing to be done here and we just
+                # ignore it.
+                self.cancel_pending = False
 
     def cancel(self, req):
         """Call to cancel a request.
@@ -86,7 +96,10 @@ class CancellationHandler:
         If the request has not yet been seen, the cancellation is queued."""
         with self.lock:
             if req == self.in_flight:
-                gdb.interrupt()
+                if self.interruptable:
+                    gdb.interrupt()
+                else:
+                    self.cancel_pending = True
             else:
                 # We don't actually ignore the request here, but in
                 # the 'starting' method.  This way we don't have to
@@ -95,6 +108,22 @@ class CancellationHandler:
                 # before it is even sent.  It didn't seem worthwhile
                 # to try to check for this.
                 heapq.heappush(self.reqs, req)
+
+    @contextmanager
+    def interruptable_region(self):
+        """Return a new context manager that sets interruptable to True."""
+        with self.lock:
+            if self.cancel_pending:
+                self.cancel_pending = False
+                # A cancel is pending, so let's not enter the interruptable
+                # region, but instead handle the cancel here.
+                raise KeyboardInterrupt()
+            self.interruptable = True
+        try:
+            yield None
+        finally:
+            with self.lock:
+                self.interruptable = False
 
 
 class Server:
@@ -455,7 +484,8 @@ def send_gdb_with_response(fn):
 
     def message():
         try:
-            val = fn()
+            with _server.canceller.interruptable_region():
+                val = fn()
             result_q.put(val)
         except (Exception, KeyboardInterrupt) as e:
             result_q.put(e)
