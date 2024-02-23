@@ -62,6 +62,8 @@ class CancellationHandler:
         # The request currently being handled, or None.
         self.in_flight = None
         self.reqs = []
+        self.interruptable = False
+        self.cancel_pending = False
 
     def starting(self, req):
         """Call at the start of the given request.
@@ -87,7 +89,10 @@ class CancellationHandler:
         If the request has not yet been seen, the cancellation is queued."""
         with self.lock:
             if req == self.in_flight:
-                gdb.interrupt()
+                if self.interruptable:
+                    gdb.interrupt()
+                else:
+                    self.cancel_pending = True
             else:
                 # We don't actually ignore the request here, but in
                 # the 'starting' method.  This way we don't have to
@@ -96,6 +101,29 @@ class CancellationHandler:
                 # before it is even sent.  It didn't seem worthwhile
                 # to try to check for this.
                 heapq.heappush(self.reqs, req)
+
+    def is_cancel_pending(self):
+        """Is a cancellation pending.  This can only be true when not in the
+        interruptable state."""
+        with self.lock:
+            if not self.cancel_pending:
+                return False
+            self.cancel_pending = False
+            return True
+
+    def enter_interruptable(self):
+        """Enter the interruptable state."""
+        with self.lock:
+            if self.cancel_pending:
+                self.cancel_pending = False
+                return False
+            self.interruptable = True
+            return True
+
+    def exit_interruptable(self):
+        """Exit the interruptable state."""
+        with self.lock:
+            self.interruptable = False
 
 
 class Server:
@@ -159,6 +187,9 @@ class Server:
             result["success"] = False
             result["message"] = str(e)
         self.canceller.done(req)
+        if self.canceller.is_cancel_pending():
+            result["success"] = False
+            result["message"] = "cancelled"
         return result
 
     # Read inferior output and sends OutputEvents to the client.  It
@@ -435,12 +466,19 @@ def send_gdb_with_response(fn):
 
     def message():
         try:
-            val = fn()
+            if not _server.canceller.enter_interruptable():
+                raise KeyboardInterrupt()
+            try:
+                val = fn()
+            finally:
+                _server.canceller.exit_interruptable()
             result_q.put(val)
         except (Exception, KeyboardInterrupt) as e:
             result_q.put(e)
 
     send_gdb(message)
+    if _server.canceller.is_cancel_pending():
+        result_q.put(KeyboardInterrupt())
     val = result_q.get()
     if isinstance(val, (Exception, KeyboardInterrupt)):
         raise val
