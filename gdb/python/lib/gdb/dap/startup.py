@@ -235,28 +235,3 @@ def send_gdb(cmd):
     if isinstance(cmd, str):
         cmd = Invoker(cmd)
     gdb.post_event(cmd)
-
-
-def send_gdb_with_response(fn):
-    """Send FN to the gdb thread and return its result.
-    If FN is a string, it is passed to gdb.execute and None is
-    returned as the result.
-    If FN throws an exception, this function will throw the
-    same exception in the calling thread.
-    """
-    if isinstance(fn, str):
-        fn = Invoker(fn)
-    result_q = DAPQueue()
-
-    def message():
-        try:
-            val = fn()
-            result_q.put(val)
-        except (Exception, KeyboardInterrupt) as e:
-            result_q.put(e)
-
-    send_gdb(message)
-    val = result_q.get()
-    if isinstance(val, (Exception, KeyboardInterrupt)):
-        raise val
-    return val

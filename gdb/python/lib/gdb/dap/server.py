@@ -28,7 +28,6 @@ from .startup import (
     in_dap_thread,
     in_gdb_thread,
     send_gdb,
-    send_gdb_with_response,
     start_thread,
     log,
     log_stack,
@@ -421,3 +420,28 @@ def cancel(**args):
     # ... which gdb takes to mean that it is fine for all cancel
     # requests to report success.
     return None
+
+
+def send_gdb_with_response(fn):
+    """Send FN to the gdb thread and return its result.
+    If FN is a string, it is passed to gdb.execute and None is
+    returned as the result.
+    If FN throws an exception, this function will throw the
+    same exception in the calling thread.
+    """
+    if isinstance(fn, str):
+        fn = Invoker(fn)
+    result_q = DAPQueue()
+
+    def message():
+        try:
+            val = fn()
+            result_q.put(val)
+        except (Exception, KeyboardInterrupt) as e:
+            result_q.put(e)
+
+    send_gdb(message)
+    val = result_q.get()
+    if isinstance(val, (Exception, KeyboardInterrupt)):
+        raise val
+    return val
