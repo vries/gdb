@@ -119,7 +119,7 @@ set cont_id [dap_send_request evaluate \
 		      $gdbfile]]
 
 # Wait a little to try to ensure the command is running.
-sleep 0.2
+#sleep 0.2
 set cancel_id [dap_send_request cancel \
 		   [format {o requestId [i %d]} $cont_id]]
 
@@ -140,7 +140,7 @@ set cont_id [dap_send_request evaluate \
 		      $gdbfile]]
 
 # Wait a little to try to ensure the command is running.
-sleep 0.2
+#sleep 0.2
 set cancel_id [dap_send_request cancel \
 		   [format {o requestId [i %d]} $cont_id]]
 
