@@ -195,6 +195,13 @@ gdbpy_err_fetch::to_string () const
      Using str (aka PyObject_Str) will fetch the error message from
      gdb.GdbError ("message").  */
 
+  if (type_matches (gdbpy_gdberror_exc) && m_error_value.get () == nullptr)
+    {
+      /* We have an unnormalized gdb.GdbError with missing message, make sure
+	 gdbpy_handle_exception flags it as such.*/
+      return nullptr;
+    }
+
   if (m_error_value.get () != nullptr && m_error_value.get () != Py_None)
     {
       if ((PyObject *)Py_TYPE (m_error_value.get ()) == m_error_type.get ())
