@@ -640,12 +640,36 @@ public:
 
   gdbpy_err_fetch ()
   {
+#if PY_VERSION_HEX < 0x030c0000
     PyObject *error_type, *error_value, *error_traceback;
 
     PyErr_Fetch (&error_type, &error_value, &error_traceback);
     m_error_type.reset (error_type);
     m_error_value.reset (error_value);
     m_error_traceback.reset (error_traceback);
+#else
+    /* PyErr_Fetch is deprecated in python 3.12, use PyErr_GetRaisedException
+       instead.  */
+    PyObject *exc = PyErr_GetRaisedException ();
+    m_exc.reset (exc);
+    if (exc == nullptr)
+      {
+	m_error_type.reset (nullptr);
+	m_error_value.reset (nullptr);
+	m_error_traceback.reset (nullptr);
+	return;
+      }
+
+    m_error_type = gdbpy_ref<>::new_reference ((PyObject *)Py_TYPE (exc));
+
+    PyObject *args = PyException_GetArgs (exc);
+    if (PyTuple_Size (args) >= 1)
+      m_error_value = gdbpy_ref<>::new_reference (PyTuple_GetItem (args, 0));
+    else
+      m_error_value.reset (nullptr);
+
+    m_error_traceback.reset (PyException_GetTraceback (exc));
+#endif
   }
 
   /* Call PyErr_Restore using the values stashed in this object.
@@ -654,9 +678,18 @@ public:
 
   void restore ()
   {
+#if PY_VERSION_HEX < 0x030c0000
     PyErr_Restore (m_error_type.release (),
 		   m_error_value.release (),
 		   m_error_traceback.release ());
+#else
+    /* PyErr_Restore is deprecated in python 3.12, use PyErr_SetRaisedException
+       instead.  */
+    m_error_type.reset (nullptr);
+    m_error_value.reset (nullptr);
+    m_error_traceback.reset (nullptr);
+    PyErr_SetRaisedException (m_exc.release ());
+#endif
   }
 
   /* Return the string representation of the exception represented by
@@ -688,6 +721,9 @@ public:
 private:
 
   gdbpy_ref<> m_error_type, m_error_value, m_error_traceback;
+#if PY_VERSION_HEX >= 0x030c0000
+  gdbpy_ref<> m_exc;
+#endif
 };
 
 /* Called before entering the Python interpreter to install the
