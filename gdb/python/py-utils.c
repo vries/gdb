@@ -196,7 +196,19 @@ gdbpy_err_fetch::to_string () const
      gdb.GdbError ("message").  */
 
   if (m_error_value.get () != nullptr && m_error_value.get () != Py_None)
-    return gdbpy_obj_to_string (m_error_value.get ());
+    {
+      if ((PyObject *)Py_TYPE (m_error_value.get ()) == m_error_type.get ())
+	{
+	  /* Detected a normalized exception.  */
+	  PyObject *args = PyException_GetArgs (m_error_value.get ());
+	  if (PyTuple_Size (args) == 1)
+	    {
+	      /* Pretend to be looking at an unnormalized exception.  */
+	      return gdbpy_obj_to_string (PyTuple_GetItem (args, 0));
+	    }
+	}
+      return gdbpy_obj_to_string (m_error_value.get ());
+    }
   else
     return gdbpy_obj_to_string (m_error_type.get ());
 }
