@@ -206,6 +206,7 @@ if test "x$with_rpm" != "xno"; then
 #include <rpm/rpmlib.h>
 #include <dlfcn.h>
 #include <errno.h>
+#include <string.h>
   ]], [[
     void *h;
     const char *const *rpmverp;

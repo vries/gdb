@@ -17920,6 +17920,7 @@ else
 #include <rpm/rpmlib.h>
 #include <dlfcn.h>
 #include <errno.h>
+#include <string.h>
 
 int
 main ()
