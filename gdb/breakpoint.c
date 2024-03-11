@@ -14369,6 +14369,10 @@ breakpoint_free_objfile (struct objfile *objfile)
 
 static struct cmd_list_element *enablebreaklist = NULL;
 
+#if HAVE_PYTHON
+extern gdb::observers::token bpfinishpy_handle_thread_exit_observer_token;
+#endif
+
 /* See breakpoint.h.  */
 
 cmd_list_element *commands_cmd_element = nullptr;
@@ -14921,6 +14925,12 @@ This is useful for formatted output in user-defined commands."));
 
   gdb::observers::about_to_proceed.attach (breakpoint_about_to_proceed,
 					   "breakpoint");
+#if HAVE_PYTHON
+  gdb::observers::thread_exit.attach
+    (remove_threaded_breakpoints, "breakpoint",
+     { &bpfinishpy_handle_thread_exit_observer_token });
+#else
   gdb::observers::thread_exit.attach (remove_threaded_breakpoints,
 				      "breakpoint");
+#endif
 }
