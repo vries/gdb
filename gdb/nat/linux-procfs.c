@@ -345,6 +345,23 @@ linux_proc_pid_to_exec_file (int pid)
   char name[PATH_MAX];
   ssize_t len;
 
+  /* FIXME: calling readlink to determine the file to read symbols from is
+     problematic.  Consider the scenario where:
+     - we run an application /foo/bar,
+     - we use gdb to attach to the running application,
+     - gdb calls linux_proc_pid_to_exec_file to the get the filename to read
+       the symbols from,
+     - linux_proc_pid_to_exec_file calls readlink on /proc/PID/exe, and
+       returns /foo/bar,
+     - we remove /foo/bar, and
+     - gdb tries to read the symbols from /foo/bar, and fails.
+     At this point we can still read the symbols from /proc/PID/exe.
+
+     See also:
+     - https://bugzilla.suse.com/show_bug.cgi?id=1216352
+     - https://bugzilla.kernel.org/show_bug.cgi?id=211593
+  */
+
   xsnprintf (name, PATH_MAX, "/proc/%d/exe", pid);
   len = readlink (name, buf, PATH_MAX - 1);
   if (len <= 0)
@@ -352,9 +369,11 @@ linux_proc_pid_to_exec_file (int pid)
   else
     buf[len] = '\0';
 
-  /* Use /proc/PID/exe if the actual file can't be read, but /proc/PID/exe
-     can be.  */
-  if (access (buf, R_OK) != 0 && access (name, R_OK) == 0)
+  /* Use /proc/PID/exe if the actual file can't be read.  Note that we don't
+     check for "access ("/proc/PID/exe", R_OK) == 0".  It possible that this
+     check will fail while we can actually read /proc/PID/exe (
+     https://bugzilla.suse.com/show_bug.cgi?id=1221867 ).  */
+  if (access (buf, R_OK) != 0)
     strcpy (buf, name);
 
   return buf;
