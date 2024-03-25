@@ -342,21 +342,7 @@ const char *
 linux_proc_pid_to_exec_file (int pid)
 {
   static char buf[PATH_MAX];
-  char name[PATH_MAX];
-  ssize_t len;
-
-  xsnprintf (name, PATH_MAX, "/proc/%d/exe", pid);
-  len = readlink (name, buf, PATH_MAX - 1);
-  if (len <= 0)
-    strcpy (buf, name);
-  else
-    buf[len] = '\0';
-
-  /* Use /proc/PID/exe if the actual file can't be read, but /proc/PID/exe
-     can be.  */
-  if (access (buf, R_OK) != 0 && access (name, R_OK) == 0)
-    strcpy (buf, name);
-
+  xsnprintf (buf, PATH_MAX, "/proc/%d/exe", pid);
   return buf;
 }
 

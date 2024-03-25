@@ -1056,6 +1056,28 @@ symbol_file_add_with_addrs (const gdb_bfd_ref_ptr &abfd, const char *name,
   if ((add_flags & SYMFILE_NOT_FILENAME) != 0)
     flags |= OBJF_NOT_FILENAME;
 
+  const char *prefix = "/proc/";
+  const char *postfix = "/exe";
+  if (strncmp (name, prefix, strlen (prefix)) == 0
+      && strstr (name, postfix) != nullptr
+      && strstr (name, postfix)[strlen (postfix)] == '\0')
+    {
+      static char buf[PATH_MAX];
+      ssize_t len;
+
+      len = readlink (name, buf, PATH_MAX - 1);
+      if (len > 0)
+	{
+	  buf[len] = '\0';
+	  const char *deleted_marker = " (deleted)";
+	  if (strstr (buf, deleted_marker) != nullptr
+	      && strstr (buf, deleted_marker)[strlen (deleted_marker)] == '\0')
+	    ;
+	  else
+	    name = buf;
+	}
+    }
+
   /* Give user a chance to burp if ALWAYS_CONFIRM or we'd be
      interactively wiping out any existing symbols.  */
 
