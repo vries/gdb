@@ -46,7 +46,7 @@ void *
 thread_function (void *arg)
 {
   pthread_barrier_wait (&start_threads_barrier);
-  _exit (0);
+  _exit (0); /* Exit in thread.  */
 }
 
 /* The fork child's entry point.  */
@@ -63,7 +63,7 @@ child_function (void)
     pthread_create (&threads[i], NULL, thread_function, NULL);
   pthread_barrier_wait (&start_threads_barrier);
 
-  exit (0);
+  exit (0); /* Exit in child.  */
 }
 
 /* This is defined by the .exp file if testing the multi-process
