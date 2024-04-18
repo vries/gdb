@@ -38,6 +38,7 @@
 #include "location.h"
 #include "block.h"
 #include "valprint.h"
+#include "event-top.h"
 
 #include "ui-out.h"
 #include "interps.h"
@@ -2579,6 +2580,34 @@ shell_internal_fn (struct gdbarch *gdbarch,
     return value::allocate_optimized_out (int_type);
 }
 
+/* Completer for "ignore-errors".  */
+
+static void
+ignore_errors_command_completer (cmd_list_element *ignore,
+				 completion_tracker &tracker,
+				 const char *text, const char * /*word*/)
+{
+  complete_nested_command_line (tracker, text);
+}
+
+/* Implementation of the ignore-errors command.  */
+
+static void
+ignore_errors_command (const char *args, int from_tty)
+{
+  try
+    {
+      execute_command (args, from_tty);
+    }
+  catch (const gdb_exception_error &ex)
+    {
+      exception_print (gdb_stderr, ex);
+
+      /* See also execute_gdb_command.  */
+      async_enable_stdin ();
+    }
+}
+
 void _initialize_cli_cmds ();
 void
 _initialize_cli_cmds ()
@@ -2977,4 +3006,10 @@ when GDB is started."), GDBINIT).release ();
   c = add_cmd ("source", class_support, source_command,
 	       source_help_text, &cmdlist);
   set_cmd_completer (c, filename_completer);
+
+  c = add_cmd ("ignore-errors", class_support, ignore_errors_command,
+	       _("Execute a single command, ignoring all errors.\n"
+		 "Only one-line commands are supported.\n"
+		 "This is primarily useful in scripts."), &cmdlist);
+  set_cmd_completer (c, ignore_errors_command_completer);
 }
