@@ -6919,7 +6919,7 @@ is not writable.
 @tindex gdb.FinishBreakpoint
 
 A finish breakpoint is a temporary breakpoint set at the return address of
-a frame, based on the @code{finish} command.  @code{gdb.FinishBreakpoint}
+a frame.  @code{gdb.FinishBreakpoint}
 extends @code{gdb.Breakpoint}.  The underlying breakpoint will be disabled 
 and deleted when the execution will run out of the breakpoint scope (i.e.@: 
 @code{Breakpoint.stop} or @code{FinishBreakpoint.out_of_scope} triggered).
@@ -6938,7 +6938,9 @@ details about this argument.
 In some circumstances (e.g.@: @code{longjmp}, C@t{++} exceptions, @value{GDBN} 
 @code{return} command, @dots{}), a function may not properly terminate, and
 thus never hit the finish breakpoint.  When @value{GDBN} notices such a
-situation, the @code{out_of_scope} callback will be triggered.
+situation, the @code{out_of_scope} callback will be triggered.  Note
+though that improper function termination does not guarantee that the
+finish breakpoint is not hit.
 
 You may want to sub-class @code{gdb.FinishBreakpoint} and override this
 method:
