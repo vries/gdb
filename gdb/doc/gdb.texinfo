@@ -29508,7 +29508,8 @@ The lines in a command file are generally executed sequentially,
 unless the order of execution is changed by one of the
 @emph{flow-control commands} described below.  The commands are not
 printed as they are executed.  An error in any command terminates
-execution of the command file and control is returned to the console.
+execution of the command file and control is returned to the console,
+unless the line is prefixed with the @code{ignore-errors} command.
 
 @value{GDBN} first searches for @var{filename} in the current directory.
 If the file is not found there, and @var{filename} does not specify a
@@ -29603,6 +29604,11 @@ the controlling expression.
 @item end
 Terminate the block of commands that are the body of @code{if},
 @code{else}, or @code{while} flow-control commands.
+
+@kindex ignore-errors
+@item ignore-errors
+This command executes the command specified by its arguments, but
+doesn't stop execution of the script if the command fails.
 @end table
 
 
