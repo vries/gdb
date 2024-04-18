@@ -433,6 +433,24 @@ bpfinishpy_handle_exit (struct inferior *inf)
     bpfinishpy_detect_out_scope_cb (&bp, nullptr, true);
 }
 
+/* Attached to `thread_exit' notifications, triggers all the necessary out of
+   scope notifications.  */
+
+static void
+bpfinishpy_handle_thread_exit (struct thread_info *tp, std::optional<ULONGEST>, bool)
+{
+  gdbpy_enter enter_py (target_thread_architecture (tp->ptid), current_language);
+
+  for (breakpoint &bp : all_breakpoints_safe ())
+    {
+      if (tp->global_num == bp.thread)
+	bpfinishpy_detect_out_scope_cb (&bp, nullptr, true);
+    }
+}
+
+extern gdb::observers::token bpfinishpy_handle_thread_exit_observer_token;
+gdb::observers::token bpfinishpy_handle_thread_exit_observer_token;
+
 /* Initialize the Python finish breakpoint code.  */
 
 static int CPYCHECKER_NEGATIVE_RESULT_SETS_EXCEPTION
@@ -452,6 +470,8 @@ gdbpy_initialize_finishbreakpoints (void)
 				      "py-finishbreakpoint");
   gdb::observers::inferior_exit.attach (bpfinishpy_handle_exit,
 					"py-finishbreakpoint");
+  gdb::observers::thread_exit.attach
+    (bpfinishpy_handle_thread_exit, "py-finishbreakpoint");
 
   return 0;
 }
