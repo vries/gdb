@@ -15,10 +15,10 @@
 
 # https://bugzilla.redhat.com/show_bug.cgi?id=634108
 
+# Skip all tests if Python scripting is not enabled.
+require allow_python_tests
+
 gdb_exit
 gdb_start
-
-# Skip all tests if Python scripting is not enabled.
-if { [skip_python_tests] } { continue }
 
 gdb_test "python print (gdb.solib_name(0))" "None" "gdb.solib_name exists"
