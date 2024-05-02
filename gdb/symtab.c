@@ -73,7 +73,6 @@
 #include "gdbsupport/gdb_string_view.h"
 #include "gdbsupport/pathstuff.h"
 #include "gdbsupport/common-utils.h"
-#include <optional>
 
 /* Forward declarations for local functions.  */
 
@@ -3328,7 +3327,7 @@ sal_line_symtab_matches_p (const symtab_and_line &sal1,
 
 /* See symtah.h.  */
 
-std::optional<CORE_ADDR>
+gdb::optional<CORE_ADDR>
 find_line_range_start (CORE_ADDR pc)
 {
   struct symtab_and_line current_sal = find_pc_line (pc, 0);

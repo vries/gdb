@@ -38,7 +38,6 @@
 #include "gdb-demangle.h"
 #include "split-name.h"
 #include "frame.h"
-#include <optional>
 
 /* Opaque declarations.  */
 struct ui_file;
@@ -2377,7 +2376,7 @@ extern struct symtab_and_line find_pc_sect_line (CORE_ADDR,
    the starting PC of line X, and the ranges are contiguous.
 */
 
-extern std::optional<CORE_ADDR> find_line_range_start (CORE_ADDR pc);
+extern gdb::optional<CORE_ADDR> find_line_range_start (CORE_ADDR pc);
 
 /* Wrapper around find_pc_line to just return the symtab.  */
 
