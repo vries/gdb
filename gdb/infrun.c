@@ -6897,7 +6897,7 @@ update_line_range_start (CORE_ADDR pc, struct execution_control_state *ecs)
      Given the PC, check the line table and return the PC that corresponds
      to the line table entry for the source line that PC is in.  */
   CORE_ADDR start_line_pc = ecs->event_thread->control.step_range_start;
-  std::optional<CORE_ADDR> real_range_start;
+  gdb::optional<CORE_ADDR> real_range_start;
 
   /* Call find_line_range_start to get the smallest address in the
      linetable for multiple Line X entries in the line table.  */
