@@ -37,7 +37,7 @@ process_stratum_target::thread_address_space (ptid_t ptid)
 		      "address space of thread %s\n"),
 		    target_pid_to_str (ptid).c_str ());
 
-  return inf->aspace;
+  return inf->aspace.get ();
 }
 
 struct gdbarch *

@@ -531,8 +531,8 @@ holding the child stopped.  Try \"set detach-on-fork\" or \
 	    }
 	  else
 	    {
-	      child_inf->aspace = new address_space ();
-	      child_inf->pspace = new program_space (child_inf->aspace);
+	      child_inf->pspace = new program_space (new_address_space ());
+	      child_inf->aspace = child_inf->pspace->aspace;
 	      child_inf->removable = true;
 	      clone_program_space (child_inf->pspace, parent_inf->pspace);
 	    }
@@ -610,8 +610,8 @@ holding the child stopped.  Try \"set detach-on-fork\" or \
 
 	  child_inf->aspace = parent_inf->aspace;
 	  child_inf->pspace = parent_inf->pspace;
-	  parent_inf->aspace = new address_space ();
-	  parent_inf->pspace = new program_space (parent_inf->aspace);
+	  parent_inf->pspace = new program_space (new_address_space ());
+	  parent_inf->aspace = parent_inf->pspace->aspace;
 	  clone_program_space (parent_inf->pspace, child_inf->pspace);
 
 	  /* The parent inferior is still the current one, so keep things
@@ -620,8 +620,8 @@ holding the child stopped.  Try \"set detach-on-fork\" or \
 	}
       else
 	{
-	  child_inf->aspace = new address_space ();
-	  child_inf->pspace = new program_space (child_inf->aspace);
+	  child_inf->pspace = new program_space (new_address_space ());
+	  child_inf->aspace = child_inf->pspace->aspace;
 	  child_inf->removable = true;
 	  child_inf->symfile_flags = SYMFILE_NO_READ;
 	  clone_program_space (child_inf->pspace, parent_inf->pspace);
@@ -1031,7 +1031,6 @@ handle_vfork_child_exec_or_exit (int exec)
       if (vfork_parent->pending_detach)
 	{
 	  struct program_space *pspace;
-	  struct address_space *aspace;
 
 	  /* follow-fork child, detach-on-fork on.  */
 
@@ -1056,9 +1055,8 @@ handle_vfork_child_exec_or_exit (int exec)
 	     of" a hack.  */
 
 	  pspace = inf->pspace;
-	  aspace = inf->aspace;
-	  inf->aspace = nullptr;
 	  inf->pspace = nullptr;
+	  address_space_ref_ptr aspace = std::move (inf->aspace);
 
 	  if (print_inferior_events)
 	    {
@@ -5906,7 +5904,7 @@ handle_inferior_event (struct execution_control_state *ecs)
 	      = get_thread_arch_aspace_regcache (parent_inf,
 						 ecs->ws.child_ptid (),
 						 gdbarch,
-						 parent_inf->aspace);
+						 parent_inf->aspace.get ());
 	    /* Read PC value of parent process.  */
 	    parent_pc = regcache_read_pc (regcache);
 
