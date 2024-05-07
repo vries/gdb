@@ -4365,7 +4365,7 @@ linux_nat_target::thread_address_space (ptid_t ptid)
 
   inf = find_inferior_pid (this, pid);
   gdb_assert (inf != NULL);
-  return inf->aspace;
+  return inf->aspace.get ();
 }
 
 /* Return the cached value of the processor core for thread PTID.  */

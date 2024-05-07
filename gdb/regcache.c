@@ -1628,7 +1628,7 @@ get_thread_arch_aspace_regcache_and_check (inferior *inf_for_target_calls,
      the current inferior's gdbarch.  Also use the current inferior's address
      space.  */
   gdbarch *arch = inf_for_target_calls->gdbarch;
-  address_space *aspace = inf_for_target_calls->aspace;
+  address_space *aspace = inf_for_target_calls->aspace.get ();
   regcache *regcache = get_thread_arch_aspace_regcache (inf_for_target_calls,
 							ptid, arch, aspace);
 
