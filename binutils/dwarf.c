@@ -7979,6 +7979,14 @@ display_debug_str_offsets (struct dwarf_section *section,
 	  entries_end = end;
 	  debug_str_offsets_hdr_len = 0;
 
+	  /* FIXME: We assume 32-bit dwarf here.  According to
+	     https://gcc.gnu.org/wiki/DebugFission:
+	     The size of each entry is 4 bytes for DWARF-32 compilation units,
+	     or 8 bytes for DWARF-64 compilation units, as determined by the
+	     unit_length field of the compilation unit header in the
+	     .debug_info.dwo section.  */
+	  entry_length = 4;
+
 	  printf (_("    Length: %#" PRIx64 "\n"), length);
 	  printf (_("       Index   Offset [String]\n"));
 	}
