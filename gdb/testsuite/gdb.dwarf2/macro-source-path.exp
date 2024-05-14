@@ -126,6 +126,7 @@ proc do_test { test_name lines_version DW_AT_name main_file_idx directories
 			# this is not in the scope of this test.
 			define 0 "ONE 1"
 			define_strp 0 "THREE 3"
+			define_strx 0 "FOUR 4"
 			start_file 0 $::main_file_idx
 			    # A macro defined at line 1 of the main file.
 			    define 1 "TWO 2"
@@ -146,6 +147,7 @@ proc do_test { test_name lines_version DW_AT_name main_file_idx directories
 	    gdb_test "print ONE" " = 1"
 	    gdb_test "print TWO" " = 2"
 	    gdb_test "print THREE" " = 3"
+	    gdb_test "print FOUR" " = 4"
 	}
     }
 }

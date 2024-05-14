@@ -2247,11 +2247,12 @@ namespace eval Dwarf {
 	}
 
 	with_override Dwarf::define_strp Dwarf::_macro_unit_define_strp {
+	with_override Dwarf::define_strx Dwarf::_macro_unit_define_strx {
 	with_override Dwarf::define Dwarf::_macro_unit_define {
 	with_override Dwarf::start_file Dwarf::_macro_unit_start_file {
 	with_override Dwarf::end_file Dwarf::_macro_unit_end_file {
 	    uplevel $body
-	}}}}
+	}}}}}
     }
 
     # Emit a DW_MACRO_define entry.
@@ -2280,6 +2281,30 @@ namespace eval Dwarf {
 	}
 
 	_op_offset $_mu_offset_size "$_strings($text)" "strp: $text"
+    }
+
+    # Emit a DW_MACRO_define_strx entry.
+
+    proc _macro_unit_define_strx { lineno text } {
+	_op .byte 0xb "DW_MACRO_define_strx"
+	_op .uleb128 $lineno "Line number"
+
+	variable _strings
+	variable _mu_offset_size
+
+	if {![info exists _strings($text)]} {
+	    set _strings($text) [new_label strp]
+	    _defer_output .debug_str {
+		define_label $_strings($text)
+		_op .ascii [_quote $text]
+	    }
+	}
+
+	_defer_output .debug_str_offsets {
+	    _op_offset $_mu_offset_size $_strings($text)
+	}
+
+	_op_offset $_mu_offset_size "0" "strx: $text"
     }
 
     # Emit a DW_MACRO_start_file entry.
