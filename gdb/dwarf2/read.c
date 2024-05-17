@@ -21207,6 +21207,7 @@ dwarf_decode_macros (struct dwarf2_cu *cu, unsigned int offset,
   struct dwarf2_section_info *section;
   const char *section_name;
 
+  line_header_up lh_up;
   if (cu->dwo_unit != nullptr)
     {
       if (section_is_gnu)
@@ -21219,6 +21220,21 @@ dwarf_decode_macros (struct dwarf2_cu *cu, unsigned int offset,
 	  section = &cu->dwo_unit->dwo_file->sections.macinfo;
 	  section_name = ".debug_macinfo.dwo";
 	}
+
+      {
+	struct dwarf2_section_info *line_section;
+
+	line_section = &cu->dwo_unit->dwo_file->sections.line;
+	line_section->read (per_objfile->objfile);
+	if (line_section->buffer == NULL)
+	  {
+	    complaint (_("missing .debug_line.dwo section"));
+	    return;
+	  }
+	lh_up = dwarf_decode_line_header ((sect_offset)0, 0, per_objfile,
+					  line_section, &cu->header, nullptr);
+	lh = lh_up.get ();
+      }
     }
   else
     {

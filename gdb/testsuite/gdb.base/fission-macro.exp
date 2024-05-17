@@ -13,8 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-# Gcc 14 is the first release containing the fix for PR debug/111409.
-require {expr [gcc_major_version] >= 14}
+if { [test_compiler_info "gcc-*"] } {
+    # Gcc 14 is the first release containing the fix for PR debug/111409.
+    require {expr [gcc_major_version] >= 14}
+}
 
 standard_testfile .c -2.c .h
 
