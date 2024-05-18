@@ -15,15 +15,5 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#define FIRST 1
-#define SECOND 2
-
-#include "fission-macro.h"
-
-extern int foo (void);
-
-int
-main (void)
-{
-  return foo ();
-}
+#define FIFTH 5
+#define SIXTH 6

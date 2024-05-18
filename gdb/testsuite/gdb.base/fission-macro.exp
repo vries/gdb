@@ -16,7 +16,7 @@
 # Gcc 14 is the first release containing the fix for PR debug/111409.
 require {expr [gcc_major_version] >= 14}
 
-standard_testfile .c -2.c
+standard_testfile .c -2.c .h
 
 proc do_tests { dwarf_version dwarf_bits strict_dwarf } {
     set opts {}
@@ -55,6 +55,20 @@ proc do_tests { dwarf_version dwarf_bits strict_dwarf } {
 
     gdb_test "info macro FIRST" "#define FIRST 1"
     gdb_test "info macro SECOND" "#define SECOND 2"
+
+    gdb_test "p FIFTH" " = 5"
+    gdb_test "p SIXTH" " = 6"
+
+    gdb_test "info macro FIFTH" \
+	[multi_line \
+	     "Defined at \[^\r\n\]*$::srcfile3:$::decimal" \
+	     "  included at \[^\r\n\]*$::srcfile:$::decimal" \
+	     "#define FIFTH 5"]
+    gdb_test "info macro SIXTH" \
+	[multi_line \
+	     "Defined at \[^\r\n\]*$::srcfile3:$::decimal" \
+	     "  included at \[^\r\n\]*$::srcfile:$::decimal" \
+	     "#define SIXTH 6"]
 
     gdb_breakpoint foo
     gdb_continue_to_breakpoint "foo"
