@@ -257,6 +257,7 @@ public:
   bool producer_is_gxx_lt_4_6 : 1;
   bool producer_is_gcc_lt_4_3 : 1;
   bool producer_is_gcc_lt_11 : 1;
+  bool producer_is_gcc_lt_15 : 1;
   bool producer_is_gcc_11 : 1;
   bool producer_is_icc : 1;
   bool producer_is_icc_lt_14 : 1;

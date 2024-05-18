@@ -481,7 +481,8 @@ dwarf_decode_macro_bytes (dwarf2_per_objfile *per_objfile,
       mac_ptr++;
 
       if (section_is_gnu && cu->dwo_unit != nullptr
-	  && cu->per_cu->version () >= 5 && producer_is_gcc_lt_11 (cu))
+	  && ((cu->per_cu->version () <= 4 && producer_is_gcc_lt_15 (cu))
+	      || (cu->per_cu->version () >= 5 && producer_is_gcc_lt_11 (cu))))
 	{
 	  if (macinfo_type == DW_MACRO_define_strp)
 	    macinfo_type = DW_MACRO_define_strx;
@@ -860,7 +861,8 @@ dwarf_decode_macros (dwarf2_per_objfile *per_objfile,
       mac_ptr++;
 
       if (section_is_gnu && cu->dwo_unit != nullptr
-	  && cu->per_cu->version () >= 5 && producer_is_gcc_lt_11 (cu))
+	  && ((cu->per_cu->version () <= 4 && producer_is_gcc_lt_15 (cu))
+	      || (cu->per_cu->version () >= 5 && producer_is_gcc_lt_11 (cu))))
 	{
 	  if (macinfo_type == DW_MACRO_define_strp)
 	    macinfo_type = DW_MACRO_define_strx;

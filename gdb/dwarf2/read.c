@@ -7273,6 +7273,16 @@ producer_is_gcc_lt_11 (struct dwarf2_cu *cu)
 
 /* See dwarf2/read.h.  */
 bool
+producer_is_gcc_lt_15 (struct dwarf2_cu *cu)
+{
+  if (!cu->checked_producer)
+    check_producer (cu);
+
+  return cu->producer_is_gcc_lt_15;
+}
+
+/* See dwarf2/read.h.  */
+bool
 producer_is_clang (struct dwarf2_cu *cu)
 {
   if (!cu->checked_producer)
@@ -11303,6 +11313,7 @@ check_producer (struct dwarf2_cu *cu)
       cu->producer_is_gxx_lt_4_6 = major < 4 || (major == 4 && minor < 6);
       cu->producer_is_gcc_lt_4_3 = major < 4 || (major == 4 && minor < 3);
       cu->producer_is_gcc_lt_11 = major < 11;
+      cu->producer_is_gcc_lt_15 = major < 15;
       cu->producer_is_gcc_11 = major == 11;
     }
   else if (producer_is_icc (cu->producer, &major, &minor))
