@@ -21242,7 +21242,7 @@ dwarf_decode_macros (struct dwarf2_cu *cu, unsigned int offset,
 			       ->sections.str_offsets;
       str_section = &cu->dwo_unit->dwo_file->sections.str;
       if (cu->per_cu->version () <= 4)
-	str_offsets_base = cu->header.addr_size;
+	str_offsets_base = 0;
       else
 	{
 	  bfd *abfd = str_offsets_section->get_bfd_owner ();
