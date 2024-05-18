@@ -67,7 +67,7 @@ proc do_tests { dwarf_version dwarf_bits strict_dwarf } {
 }
 
 foreach_with_prefix dwarf_version {5} {
-    foreach_with_prefix dwarf_bits {32} {
+    foreach_with_prefix dwarf_bits {32 64} {
 	foreach_with_prefix strict_dwarf {0 1} {
 	    do_tests $dwarf_version $dwarf_bits $strict_dwarf
 	}
