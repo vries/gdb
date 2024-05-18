@@ -17497,32 +17497,47 @@ read_dwo_str_index (const struct die_reader_specs *reader, ULONGEST str_index)
       const gdb_byte *p = reader->dwo_file->sections.str_offsets.buffer;
 
       /* Header: Initial length.  */
-      read_initial_length (abfd, p + bytes_read, &bytes_read);
+      LONGEST initial_length
+	= read_initial_length (abfd, p + bytes_read, &bytes_read);
 
-      /* Determine offset_size based on the .debug_str_offsets header.  */
-      const bool dwarf5_is_dwarf64 = bytes_read != 4;
-      offset_size = dwarf5_is_dwarf64 ? 8 : 4;
-
-      /* Header: Version.  */
-      unsigned version = read_2_bytes (abfd, p + bytes_read);
-      bytes_read += 2;
-
-      if (version <= 4)
+      if (initial_length + bytes_read
+	  == reader->dwo_file->sections.str_offsets.size)
 	{
-	  /* We'd like one warning here about ignoring the section, but
-	     because we parse the header more than once (see FIXME above)
-	     we'd have many warnings, so use a complaint instead, which at
-	     least has a limit. */
-	  complaint (_("Section .debug_str_offsets in %s has unsupported"
-		       " version %d, use empty string."),
-		     reader->dwo_file->dwo_name.c_str (), version);
-	  return "";
+	  /* Determine offset_size based on the .debug_str_offsets header.  */
+	  const bool dwarf5_is_dwarf64 = bytes_read != 4;
+	  offset_size = dwarf5_is_dwarf64 ? 8 : 4;
+
+	  /* Header: Version.  */
+	  unsigned version = read_2_bytes (abfd, p + bytes_read);
+	  bytes_read += 2;
+
+	  if (version <= 4)
+	    {
+	      /* We'd like one warning here about ignoring the section, but
+		 because we parse the header more than once (see FIXME above)
+		 we'd have many warnings, so use a complaint instead, which at
+		 least has a limit. */
+	      complaint (_("Section .debug_str_offsets in %s has unsupported"
+			   " version %d, use empty string."),
+			 reader->dwo_file->dwo_name.c_str (), version);
+	      return "";
+	    }
+
+	  /* Header: Padding.  */
+	  bytes_read += 2;
+
+	  str_offsets_base = bytes_read;
 	}
-
-      /* Header: Padding.  */
-      bytes_read += 2;
-
-      str_offsets_base = bytes_read;
+      else
+	{
+	  /* GCC 8 and earlier has a bug that for dwarf5 it produces a
+	     pre-dwarf5 .debug_str_offsets section.  We'd wish we could make
+	     this work-around more precise by checking that producer is gcc and
+	     gcc version <= 8, but that doesn't work if we need this workaround
+	     to read the producer string.  */
+	  offset_size = 4;
+	  str_offsets_base = 0;
+	}
     }
   else
     {
@@ -21232,9 +21247,23 @@ dwarf_decode_macros (struct dwarf2_cu *cu, unsigned int offset,
 	{
 	  bfd *abfd = str_offsets_section->get_bfd_owner ();
 	  unsigned int bytes_read = 0;
-	  read_initial_length (abfd, str_offsets_section->buffer, &bytes_read, false);
-	  const bool is_dwarf64 = bytes_read != 4;
-	  str_offsets_base = is_dwarf64 ? 16 : 8;
+	  LONGEST initial_length
+	    = read_initial_length (abfd, str_offsets_section->buffer,
+				   &bytes_read, false);
+	  if ((bytes_read == 4 || bytes_read == 12)
+	      && initial_length + bytes_read == str_offsets_section->size)
+	    {
+	      const bool is_dwarf64 = bytes_read != 4;
+	      str_offsets_base = is_dwarf64 ? 16 : 8;
+	    }
+	  else
+	    {
+	      /* GCC 8 and earlier has a bug that for dwarf5 it produces a
+		 pre-dwarf5 .debug_str_offsets section.  We use the same test
+		 as in read_dwo_str_index.  */
+	      str_offsets_base = 0;
+	      offset_size = 4;
+	    }
 	}
     }
   else
