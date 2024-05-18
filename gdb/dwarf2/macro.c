@@ -480,6 +480,15 @@ dwarf_decode_macro_bytes (dwarf2_per_objfile *per_objfile,
       macinfo_type = (enum dwarf_macro_record_type) read_1_byte (abfd, mac_ptr);
       mac_ptr++;
 
+      if (section_is_gnu && cu->dwo_unit != nullptr
+	  && cu->per_cu->version () >= 5 && producer_is_gcc_lt_11 (cu))
+	{
+	  if (macinfo_type == DW_MACRO_define_strp)
+	    macinfo_type = DW_MACRO_define_strx;
+	  else if (macinfo_type == DW_MACRO_undef_strp)
+	    macinfo_type = DW_MACRO_undef_strx;
+	}
+
       /* Note that we rely on the fact that the corresponding GNU and
 	 DWARF constants are the same.  */
       DIAGNOSTIC_PUSH
@@ -849,6 +858,15 @@ dwarf_decode_macros (dwarf2_per_objfile *per_objfile,
 
       macinfo_type = (enum dwarf_macro_record_type) read_1_byte (abfd, mac_ptr);
       mac_ptr++;
+
+      if (section_is_gnu && cu->dwo_unit != nullptr
+	  && cu->per_cu->version () >= 5 && producer_is_gcc_lt_11 (cu))
+	{
+	  if (macinfo_type == DW_MACRO_define_strp)
+	    macinfo_type = DW_MACRO_define_strx;
+	  else if (macinfo_type == DW_MACRO_undef_strp)
+	    macinfo_type = DW_MACRO_undef_strx;
+	}
 
       /* Note that we rely on the fact that the corresponding GNU and
 	 DWARF constants are the same.  */

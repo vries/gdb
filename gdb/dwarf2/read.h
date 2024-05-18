@@ -815,6 +815,10 @@ extern void dwarf2_get_section_info (struct objfile *,
 				     asection **, const gdb_byte **,
 				     bfd_size_type *);
 
+/* Return true if the producer of the inferior is gcc, and earlier than
+   gcc 11.  */
+extern bool producer_is_gcc_lt_11 (struct dwarf2_cu *cu);
+
 /* Return true if the producer of the inferior is clang.  */
 extern bool producer_is_clang (struct dwarf2_cu *cu);
 
