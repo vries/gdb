@@ -70,7 +70,6 @@ then
 fi
 
 OBJCOPY=${OBJCOPY:-objcopy}
-READELF=${READELF:-readelf}
 
 DWZ=${DWZ:-dwz}
 DWP=${DWP:-dwp}
@@ -280,15 +279,14 @@ elif [ "$want_multi" = true ]; then
 fi
 
 if [ "$want_dwp" = true ]; then
-    mapfile -t dwo_files \
-	    < \
-	    <($READELF -wi "${output_file}" \
-		  | grep _dwo_name \
-		  | sed -e 's/^.*: //' \
-		  | sort \
-		  | uniq)
+    dwo_files=()
+    for arg in "$@"; do
+	if echo "$arg" | grep -Eq "\.o$"; then
+	    dwo_files=("${dwo_files[@]}" "${arg/.o/.dwo}")
+	fi
+    done
     rc=0
-    if  [ ${#dwo_files[@]} -ne 0 ]; then
+    if [ ${#dwo_files[@]} -ne 0 ]; then
 	$DWP -o "${output_file}.dwp" "${dwo_files[@]}" > /dev/null
 	rc=$?
 	[ $rc != 0 ] && exit $rc
