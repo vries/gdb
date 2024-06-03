@@ -105,16 +105,52 @@ proc test {stop_mode hw} {
     pass $test
     pass $test2
 
-    set wp_str [expr ($hw)?"Hardware watchpoint":"Watchpoint"]
+    set sw_wp_str "Watchpoint"
+    set hw_wp_str "Hardware watchpoint"
 
     # Now set a watchpoint, while the inferior is running.  Since
     # we're watching a global, and we can read global memory while the
     # target is running, this should be able to work.
-    gdb_test_multiple "watch global_var" "" {
-	-re "$wp_str $::decimal: global_var\r\n$::gdb_prompt " {
-	    pass $gdb_test_name
+    set have_hw_watchpoint 0
+    set have_sw_watchpoint 0
+    set test "watch global_var"
+    gdb_test_multiple $test "" {
+	-re -wrap "$hw_wp_str $::decimal: global_var" {
+	    set wp_str $hw_wp_str
+	    set have_hw_watchpoint 1
+	}
+	-re -wrap "$sw_wp_str $::decimal: global_var" {
+	    set have_sw_watchpoint 1
+	    set wp_str $sw_wp_str
 	}
     }
+
+    if { ! $have_hw_watchpoint && ! $have_sw_watchpoint } {
+	# Watchpoint cannot hit, bail out.
+	return
+    }
+
+    if { $hw && $have_sw_watchpoint } {
+	# This can happen.  Even if the target allows hw watchpoint, it's not
+	# guaranteed that it can set a hw watchpoint while the target is
+	# running.
+	pass "$test (requested hw wp, got sw wp)"
+
+	# The sw scenario is already explictly tested, no need to do
+	# it twice.
+	return
+    }
+
+    if { !$hw && $have_hw_watchpoint } {
+	# Should not happen.
+	fail "$test (requested sw wp, got hw wp)"
+
+	# The hw scenario is already explictly tested, no need to do
+	# it twice.
+	return
+    }
+
+    pass $test
 
     # Check that the watchpoint triggers.
 
