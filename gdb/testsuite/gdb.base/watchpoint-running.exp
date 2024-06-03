@@ -26,6 +26,9 @@ if [build_executable "failed to prepare" $testfile $srcfile {debug}] {
     return -1
 }
 
+# The time the usleep in the test-case waits, in miliseconds.
+set usleep 100
+
 # STOP_MODE is either "all-stop" or "non-stop".  HW is true if we are
 # testing hardware watchpoints, and false if we're testing software
 # watchpoints.
@@ -54,14 +57,6 @@ proc test {stop_mode hw} {
 
     delete_breakpoints
 
-    # Continue the program in the background.
-    set test "continue&"
-    gdb_test_multiple "continue&" $test {
-	-re "Continuing\\.\r\n$::gdb_prompt " {
-	    pass $test
-	}
-    }
-
     set val1 ""
     gdb_test_multiple "print global_var" "global_var once" {
 	-re -wrap " = ($::decimal)" {
@@ -70,21 +65,45 @@ proc test {stop_mode hw} {
 	}
     }
 
-    # Sleep for a bit, so the variable is sure to be incremented, if
-    # indeed we managed to get the target running.
-    sleep 1
-
-    set val2 ""
-    gdb_test_multiple "print global_var" "global_var twice" {
-	-re -wrap " = ($::decimal)" {
-	    set val2 $expect_out(1,string)
-	    pass "$gdb_test_name"
+    # Continue the program in the background.
+    set test "continue&"
+    gdb_test_multiple "continue&" $test {
+	-re "Continuing\\.\r\n$::gdb_prompt " {
+	    pass $test
 	}
     }
 
-    # The variable should have incremented.  (Note we didn't give it
-    # sufficient time to ever wrap around.)
-    gdb_assert {$val1 != $val2} "values are different"
+    set test "global_var twice"
+    set test2 "values are different"
+    set iterations 0
+    while { 1 } {
+	set val2 ""
+	gdb_test_multiple "print global_var" $test {
+	    -re -wrap " = ($::decimal)" {
+		set val2 $expect_out(1,string)
+	    }
+	}
+
+	if { $val2 == "" } {
+	    return
+	}
+
+	if { $val1 != $val2 } {
+	    break
+	}
+
+	incr iterations
+	if { $iterations == [expr $::timeout * 1000 / $::usleep] } {
+	    pass $test
+	    fail "$test2 (timeout)"
+	    return
+	}
+
+	# Wait for the same period as the usleep in the test-case.
+	after $::usleep
+    }
+    pass $test
+    pass $test2
 
     set wp_str [expr ($hw)?"Hardware watchpoint":"Watchpoint"]
 

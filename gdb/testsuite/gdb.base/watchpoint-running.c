@@ -34,12 +34,13 @@ main ()
 {
   while (1)
     {
-      usleep (MS_USLEEP);
       global_var++;
 
       /* Time out after 30s.  */
       if (global_var >= (30 * INCREMENTS_PER_SEC))
 	return 1;
+
+      usleep (MS_USLEEP);
     }
 
   return 0;
