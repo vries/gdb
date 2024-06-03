@@ -338,19 +338,29 @@ public:
   bool hwdebug_p ()
   {
     gdb_assert (detected_p ());
-    return *m_interface == HWDEBUG;
+    bool res = *m_interface == HWDEBUG;
+    if (*m_interface == TEMPORARILY_UNAVAILABLE)
+      m_interface.reset ();
+    return res;
   }
 
   bool debugreg_p ()
   {
     gdb_assert (detected_p ());
-    return *m_interface == DEBUGREG;
+    bool res = *m_interface == DEBUGREG;
+    if (*m_interface == TEMPORARILY_UNAVAILABLE)
+      m_interface.reset ();
+    return res;
   }
 
   bool unavailable_p ()
   {
     gdb_assert (detected_p ());
-    return *m_interface == UNAVAILABLE;
+    bool res = (*m_interface == UNAVAILABLE
+		|| *m_interface == TEMPORARILY_UNAVAILABLE);
+    if (*m_interface == TEMPORARILY_UNAVAILABLE)
+      m_interface.reset ();
+    return res;
   }
 
   /* Returns the debug register capabilities of the target.  Should only
@@ -440,7 +450,10 @@ public:
       warning (_("Error when detecting the debug register interface. "
 		 "Debug registers will be unavailable."));
 
-    m_interface.emplace (UNAVAILABLE);
+    if (errno == ESRCH)
+      m_interface.emplace (TEMPORARILY_UNAVAILABLE);
+    else
+      m_interface.emplace (UNAVAILABLE);
     return;
   }
 
@@ -459,6 +472,7 @@ private:
   enum debug_reg_interface
     {
      UNAVAILABLE,
+     TEMPORARILY_UNAVAILABLE,
      HWDEBUG,
      DEBUGREG
     };

@@ -137,8 +137,44 @@ proc test {stop_mode hw} {
 	pass "$test (requested hw wp, got sw wp)"
 
 	# The sw scenario is already explictly tested, no need to do
-	# it twice.
-	return
+	# it twice.  However, what we can do is try again with the target not
+	# running.  If a target does improper caching, that might fail.
+
+	# Delete the watchpoint.
+	delete_breakpoints
+
+	# Stop the target.
+	set re_interrupt \
+	    [string_to_regexp "Program received signal SIGINT, Interrupt."]
+	set re_stopped \
+	    [string_to_regexp "Program stopped."]
+	gdb_test_multiple "interrupt" "" {
+	    -re -wrap "($re_interrupt|$re_stopped)" {
+		pass $gdb_test_name
+	    }
+	    -re "\r\n$::gdb_prompt \r\n($re_interrupt|$re_stopped)" {
+		pass $gdb_test_name
+	    }
+	}
+
+	# Set the watchpoint, again.
+	gdb_test_multiple $test "$test, again" {
+	    -re -wrap "$hw_wp_str $::decimal: global_var" {
+		set wp_str $hw_wp_str
+		set have_hw_watchpoint 1
+	    }
+	}
+
+	if { ! $have_hw_watchpoint } {
+	    return
+	}
+
+	# Continue the target.
+	gdb_test_multiple "continue&" "continue&, again" {
+	    -re "Continuing\\.\r\n$::gdb_prompt " {
+		pass $gdb_test_name
+	    }
+	}
     }
 
     if { !$hw && $have_hw_watchpoint } {
