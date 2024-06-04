@@ -385,6 +385,18 @@ linux_init_ptrace_procfs (pid_t pid, int attached)
   linux_ptrace_init_warnings ();
   linux_proc_init_warnings ();
   proc_mem_file_is_writable ();
+
+  /* Some targets (for instance ppc and arm) may call ptrace to answer a
+     target_can_use_hardware_watchpoint query, and cache the result.  However,
+     the ptrace call will fail with errno ESRCH if the tracee is not
+     ptrace-stopped, making the query fail.  And if the caching mechanism does
+     not disregard an ESRCH result, all subsequent queries will also fail.
+     Call it now, where we known the tracee is ptrace-stopped.
+
+     Other targets (for instance aarch64) do the relevant ptrace call and
+     caching in their implementation of post_attach and post_startup_inferior,
+     in which case this call is expected to have no effect.  */
+  target_can_use_hardware_watchpoint (bp_hardware_watchpoint, 1, 0);
 }
 
 linux_nat_target::~linux_nat_target ()
