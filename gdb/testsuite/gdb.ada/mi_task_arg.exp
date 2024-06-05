@@ -52,5 +52,6 @@ set frame2 "frame=\{level=\"2\",args=\\\[$frame2_args\\\]\}"
 
 set frames "$frame0,$frame1,${frame2}(,.*)?"
 mi_gdb_test "-stack-list-arguments 1" \
-    "\\^done,stack-args=\\\[$frames\\\]" \
+    [string_list_to_regexp \
+	 {^done,stack-args=[} -re $frames {]}] \
     "-stack-list-arguments 1"

@@ -51,9 +51,19 @@ proc multi_line_string_to_regexp { args } {
 
 proc string_list_to_regexp { args } {
     set result ""
+    set re 0
     foreach arg $args {
-	set arg [string_to_regexp $arg]
-       append result $arg
+	if { $arg == "-re" } {
+	    set re 1
+	    continue
+	}
+	if { $re } {
+	    # Already a regexp.
+	    set re 0
+	} else {
+	    set arg [string_to_regexp $arg]
+	}
+	append result $arg
     }
     return $result
 }
