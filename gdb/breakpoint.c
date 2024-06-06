@@ -2792,7 +2792,11 @@ breakpoint_kind (const struct bp_location *bl, CORE_ADDR *addr)
 							 regcache, addr);
     }
   else
-    return gdbarch_breakpoint_kind_from_pc (bl->gdbarch, addr);
+    {
+      if (bl->target_info.kind != 0)
+	return bl->target_info.kind;
+      return gdbarch_breakpoint_kind_from_pc (bl->gdbarch, addr);
+    }
 }
 
 /* Rethrow the currently handled exception, if it's a TARGET_CLOSE_ERROR.
