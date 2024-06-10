@@ -100,6 +100,12 @@
 #define PyEval_ReleaseLock()
 #endif
 
+/* Format string chars as defined here [1], in a readable and intuitive form.
+   [1] https://docs.python.org/3/c-api/arg.html#building-values.  */
+
+#define GDB_PY_INT_ARG "i"
+#define GDB_PY_UNSIGNED_INT_ARG "I"
+
 /* Python supplies HAVE_LONG_LONG and some `long long' support when it
    is available.  These defines let us handle the differences more
    cleanly.
@@ -154,8 +160,10 @@ typedef long Py_hash_t;
 
 template<typename... Args>
 static inline PyObject *
-gdb_PyObject_CallMethod (PyObject *o, const char *method, const char *format,
-			 Args... args) /* ARI: editCase function */
+gdb_compatibility_PyObject_CallMethod (PyObject *o, const char *method,
+				       const char *format,
+				       Args... args) /* ARI: editCase
+							function.  */
 {
   return PyObject_CallMethod (o,
 			      const_cast<char *> (method),
@@ -164,7 +172,54 @@ gdb_PyObject_CallMethod (PyObject *o, const char *method, const char *format,
 }
 
 #undef PyObject_CallMethod
-#define PyObject_CallMethod gdb_PyObject_CallMethod
+#define PyObject_CallMethod gdb_compatibility_PyObject_CallMethod
+
+/* Non-variadic versions of PyObject_CallMethod.  */
+
+static inline PyObject *
+gdb_PyObject_CallMethod (PyObject *obj, const char *name)
+{
+  return PyObject_CallMethod (obj, name, nullptr);
+}
+
+template<typename T>
+inline PyObject *
+gdb_PyObject_CallMethod (PyObject *obj, const char *name, T);
+
+template<>
+inline PyObject *
+gdb_PyObject_CallMethod (PyObject *obj, const char *name, int arg1)
+{
+  return PyObject_CallMethod (obj, name, GDB_PY_INT_ARG, arg1);
+}
+
+template<typename T, typename T2>
+inline PyObject *
+gdb_PyObject_CallMethod (PyObject *obj, const char *name, T, T2);
+
+template<>
+inline PyObject *
+gdb_PyObject_CallMethod (PyObject *obj, const char *name, unsigned int arg1,
+			 gdb_py_longest arg2)
+{
+  return PyObject_CallMethod (obj, name,
+			      GDB_PY_UNSIGNED_INT_ARG GDB_PY_LL_ARG,
+			      arg1, arg2);
+}
+
+template<typename T, typename T2, typename T3>
+inline PyObject *
+gdb_PyObject_CallMethod (PyObject *obj, const char *name, T, T2, T3);
+
+template<>
+inline PyObject *
+gdb_PyObject_CallMethod (PyObject *obj, const char *name, int arg1, int arg2,
+			 int arg3)
+{
+  return PyObject_CallMethod (obj, name,
+			      GDB_PY_INT_ARG GDB_PY_INT_ARG GDB_PY_INT_ARG,
+			      arg1, arg2, arg3);
+}
 
 /* The 'name' parameter of PyErr_NewException was missing the 'const'
    qualifier in Python <= 3.4.  Hence, we wrap it in a function to
