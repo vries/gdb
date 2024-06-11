@@ -998,6 +998,8 @@ value *
 eval_op_f_cmplx (type *expect_type, expression *exp, noside noside,
 		 exp_opcode opcode, value *arg1, value *arg2, type *kind_arg)
 {
+  if (kind_arg->code () == TYPE_CODE_ERROR)
+    error (_("unsupported kind"));
   gdb_assert (kind_arg->code () == TYPE_CODE_COMPLEX);
   if (arg1->type ()->code () == TYPE_CODE_COMPLEX
       || arg2->type ()->code () == TYPE_CODE_COMPLEX)
