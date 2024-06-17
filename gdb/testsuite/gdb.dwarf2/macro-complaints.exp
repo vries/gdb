@@ -31,7 +31,7 @@ set asm_file [standard_output_file $srcfile2]
 set line [gdb_get_line_number "return 0;"]
 
 Dwarf::assemble $asm_file {
-    declare_labels L cu_macro1
+    declare_labels L cu_macro1 cu_macro2
 
     cu {} {
 	DW_TAG_compile_unit {
@@ -92,7 +92,14 @@ Dwarf::assemble $asm_file {
 	    define 1 "M1_13_MALFORMED(ARG,)"
 	    define 1 "M1_14_MALFORMED()1"
 
+	    import $cu_macro2
 	    end_file
+	}
+
+	cu_macro2: unit {
+	} {
+	    define 1 "M2_1_IMPORTED_OK 1"
+	    define 0 "M2_2_IMPORTED_BAD 2"
 	}
     }
 }
@@ -136,6 +143,9 @@ set re_complaint8 \
 	 "macro debug info contains a malformed macro definition:" \
 	 [string_to_regexp "`M1_14_MALFORMED()1'"]]
 
+set re_complaint9 \
+    "debug info gives in-file macro definition with zero line 0: M2_2_IMPORTED_BAD 2"
+
 set prefix \
     "During symbol reading"
 
@@ -149,6 +159,7 @@ set re \
 	 "$prefix: $re_complaint6" \
 	 "$prefix: $re_complaint7" \
 	 "$prefix: $re_complaint8" \
+	 "$prefix: $re_complaint9" \
 	 [string cat [string_to_regexp {$}] "$decimal = \[^\r\n\]+"]]
 
 with_complaints 10 {
@@ -179,7 +190,11 @@ set re_explicit \
 	 "Defined at $srcfile:1" \
 	 [string_to_regexp "#define M1_10_OK(ARG1, ARG2) (ARG1+ARG2)"] \
 	 "Defined at $srcfile:1" \
-	 [string_to_regexp "#define M1_13_MALFORMED(ARG) "]]
+	 [string_to_regexp "#define M1_13_MALFORMED(ARG) "] \
+	 "Defined at $srcfile:1" \
+	 "#define M2_1_IMPORTED_OK 1" \
+	 "Defined at $srcfile:0" \
+	 "-DM2_2_IMPORTED_BAD=2"]
 
 set re_implicit \
     [multi_line \

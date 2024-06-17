@@ -442,11 +442,11 @@ dwarf_decode_macro_bytes (dwarf2_per_objfile *per_objfile,
 			  struct dwarf2_section_info *str_section,
 			  struct dwarf2_section_info *str_offsets_section,
 			  std::optional<ULONGEST> str_offsets_base,
-			  htab_t include_hash, struct dwarf2_cu *cu)
+			  htab_t include_hash, struct dwarf2_cu *cu,
+			  int &at_commandline)
 {
   struct objfile *objfile = per_objfile->objfile;
   enum dwarf_macro_record_type macinfo_type;
-  int at_commandline;
   const gdb_byte *opcode_definitions[256];
 
   mac_ptr = dwarf_parse_macro_header (opcode_definitions, abfd, mac_ptr,
@@ -456,15 +456,6 @@ dwarf_decode_macro_bytes (dwarf2_per_objfile *per_objfile,
       /* We already issued a complaint.  */
       return;
     }
-
-  /* Determines if GDB is still before first DW_MACINFO_start_file.  If true
-     GDB is still reading the definitions from command line.  First
-     DW_MACINFO_start_file will need to be ignored as it was already executed
-     to create CURRENT_FILE for the main source holding also the command line
-     definitions.  On first met DW_MACINFO_start_file this flag is reset to
-     normally execute all the remaining DW_MACINFO_start_file macinfos.  */
-
-  at_commandline = 1;
 
   do
     {
@@ -757,7 +748,8 @@ dwarf_decode_macro_bytes (dwarf2_per_objfile *per_objfile,
 					  current_file, lh, section,
 					  section_is_gnu, is_dwz, offset_size,
 					  str_section, str_offsets_section,
-					  str_offsets_base, include_hash, cu);
+					  str_offsets_base, include_hash, cu,
+					  at_commandline);
 
 		htab_remove_elt (include_hash, (void *) new_mac_ptr);
 	      }
@@ -959,8 +951,18 @@ dwarf_decode_macros (dwarf2_per_objfile *per_objfile,
   mac_ptr = section->buffer + offset;
   slot = htab_find_slot (include_hash.get (), mac_ptr, INSERT);
   *slot = (void *) mac_ptr;
+
+  /* Determines if GDB is still before first DW_MACINFO_start_file.  If true
+     GDB is still reading the definitions from command line.  First
+     DW_MACINFO_start_file will need to be ignored as it was already executed
+     to create CURRENT_FILE for the main source holding also the command line
+     definitions.  On first met DW_MACINFO_start_file this flag is reset to
+     normally execute all the remaining DW_MACINFO_start_file macinfos.  */
+  int at_commandline = 1;
+
   dwarf_decode_macro_bytes (per_objfile, builder, abfd, mac_ptr, mac_end,
 			    current_file, lh, section, section_is_gnu, 0,
 			    offset_size, str_section, str_offsets_section,
-			    str_offsets_base, include_hash.get (), cu);
+			    str_offsets_base, include_hash.get (), cu,
+			    at_commandline);
 }
