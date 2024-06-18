@@ -457,8 +457,11 @@ dwarf_decode_macro_bytes (dwarf2_per_objfile *per_objfile,
       return;
     }
 
+  int prev_at_commandline = at_commandline;
   do
     {
+      int next_at_commandline = at_commandline;
+
       /* Do we at least have room for a macinfo type byte?  */
       if (mac_ptr >= mac_end)
 	{
@@ -637,7 +640,7 @@ dwarf_decode_macro_bytes (dwarf2_per_objfile *per_objfile,
 	    file = read_unsigned_leb128 (abfd, mac_ptr, &bytes_read);
 	    mac_ptr += bytes_read;
 
-	    if ((line == 0 && !at_commandline)
+	    if ((line == 0 && !at_commandline && !prev_at_commandline)
 		|| (line != 0 && at_commandline))
 	      complaint (_("debug info gives source %d included "
 			   "from %s at %s line %d"),
@@ -648,7 +651,7 @@ dwarf_decode_macro_bytes (dwarf2_per_objfile *per_objfile,
 	      {
 		/* This DW_MACRO_start_file was executed in the
 		   pass one.  */
-		at_commandline = 0;
+		next_at_commandline = 0;
 	      }
 	    else
 	      current_file = macro_start_file (builder, file, line,
@@ -782,6 +785,8 @@ dwarf_decode_macro_bytes (dwarf2_per_objfile *per_objfile,
 	  break;
 	}
       DIAGNOSTIC_POP
+      prev_at_commandline = at_commandline;
+      at_commandline = next_at_commandline;
     } while (macinfo_type != 0);
 }
 

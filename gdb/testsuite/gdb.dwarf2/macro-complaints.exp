@@ -55,6 +55,7 @@ Dwarf::assemble $asm_file {
 
     lines {version 2} L {
 	file_name $::srcfile 1
+	file_name stdc-predef.h 1
 	program {
 	    DW_LNE_set_address $::main_start
 	    line $::line
@@ -73,6 +74,9 @@ Dwarf::assemble $asm_file {
 	    define 1 "M1_02_BUILTIN_BADLINE 1"
 
 	    start_file 0 1
+
+	    start_file 0 2
+	    end_file
 
 	    define 1 "M1_03_OK 1"
 	    define 0 "M1_04_BADLINE 1"
