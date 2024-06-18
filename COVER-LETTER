@@ -1,0 +1,36 @@
+[gdb/symtab] Fix some issues with macro complaints
+
+With a minimal test-case test.c:
+...
+int main (void) { return 0; }
+...
+compiled like this:
+...
+$ gcc test.c -g3 -gdwarf-5
+...
+I get:
+...
+$ gdb -q -batch -iex "set complaints 100" a.out -ex "p main"
+During symbol reading: debug info gives source 2 included from file at zero line 0
+During symbol reading: debug info gives command-line macro definition with non-zero line 19: _STDC_PREDEF_H 1
+During symbol reading: debug info gives command-line macro definition with non-zero line 38: __STDC_IEC_559__ 1
+During symbol reading: debug info gives command-line macro definition with non-zero line 39: __STDC_IEC_60559_BFP__ 201404L
+During symbol reading: debug info gives command-line macro definition with non-zero line 48: __STDC_IEC_559_COMPLEX__ 1
+During symbol reading: debug info gives command-line macro definition with non-zero line 49: __STDC_IEC_60559_COMPLEX__ 201404L
+During symbol reading: debug info gives command-line macro definition with non-zero line 62: __STDC_ISO_10646__ 201706L
+$1 = {int (void)} 0x4101ac <main>
+...
+
+These complaints seemed unnecessary to me, so I wrote some patches to get rid of
+these.
+
+There are three patches in the series:
+- [gdb/symtab] Emit malformed macro definition complaint once
+- [gdb/symtab] Fix incorrect complaint for imported definition
+- [gdb/symtab] Don't complain about stdc-predef.h include
+
+The first patch introduces a dwarf assembly test-case testing a fair amount
+of complaints for the .debug_macro section.  That also happens to
+trigger a duplicate complaint, so a fix for that is included.
+
+The last two patches get rid of the complaints shown above.
