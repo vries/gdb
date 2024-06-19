@@ -18,16 +18,12 @@
 #include <unistd.h>
 
 int
-foo (void)
-{
-  return 0; /* set break here */
-}
-
-int
 main (void)
 {
-  foo ();
-  sleep (5);
-  foo ();
+  alarm (60);
+
+  while (1)
+    sleep (1);
+
   return 0;
 }
