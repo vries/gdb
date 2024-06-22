@@ -36,6 +36,31 @@
 #include "complaints.h"
 #include "objfiles.h"
 
+/* Vector of C strings.  Allows to push a string_view-like string while
+   managing the memory required for that.  */
+
+class vector_c_string : public std::vector<const char *>
+{
+public:
+  /* Push a copy of ARG[0..ARG_SIZE-1].  */
+  void push_back (const char *arg, size_t arg_size)
+  {
+    const char *dup = obstack_strndup (&m_obstack, arg, arg_size);
+    std::vector<const char *>::push_back (dup);
+  }
+
+  /* Clear the vector, and de-allocate the copies.  */
+  void clear ()
+  {
+    std::vector<const char *>::clear ();
+    m_obstack.clear ();
+  }
+
+private:
+  /* Used to allocate copies.  */
+  auto_obstack m_obstack;
+};
+
 static void
 dwarf2_macro_malformed_definition_complaint (const char *arg1)
 {
@@ -105,6 +130,9 @@ static void
 parse_macro_definition (struct macro_source_file *file, int line,
 			const char *body)
 {
+  /* By making this static we share allocation between invocations.  */
+  static vector_c_string argv;
+
   const char *p;
 
   /* The body string takes one of two forms.  For object-like macro
@@ -159,9 +187,8 @@ parse_macro_definition (struct macro_source_file *file, int line,
     {
       /* It's a function-like macro.  */
       std::string name (body, p - body);
-      int argc = 0;
-      int argv_size = 1;
-      char **argv = XNEWVEC (char *, argv_size);
+
+      argv.clear ();
 
       p++;
 
@@ -180,14 +207,10 @@ parse_macro_definition (struct macro_source_file *file, int line,
 	    dwarf2_macro_malformed_definition_complaint (body);
 	  else
 	    {
-	      /* Make sure argv has room for the new argument.  */
-	      if (argc >= argv_size)
-		{
-		  argv_size *= 2;
-		  argv = XRESIZEVEC (char *, argv, argv_size);
-		}
-
-	      argv[argc++] = savestring (arg_start, p - arg_start);
+	      /* Push a zero-terminated copy of arg.  This wouldn't be
+		 necessary if macro_define_function handled string views
+		 args.  */
+	      argv.push_back (arg_start, p - arg_start);
 	    }
 
 	  p = consume_improper_spaces (p, body);
@@ -208,15 +231,13 @@ parse_macro_definition (struct macro_source_file *file, int line,
 	  if (*p == ' ')
 	    /* Perfectly formed definition, no complaints.  */
 	    macro_define_function (file, line, name.c_str (),
-				   argc, (const char **) argv,
-				   p + 1);
+				   argv.size (), argv.data (), p + 1);
 	  else if (*p == '\0')
 	    {
 	      /* Complain, but do define it.  */
 	      dwarf2_macro_malformed_definition_complaint (body);
 	      macro_define_function (file, line, name.c_str (),
-				     argc, (const char **) argv,
-				     p);
+				     argv.size (), argv.data (), p);
 	    }
 	  else
 	    /* Just complain.  */
@@ -225,14 +246,6 @@ parse_macro_definition (struct macro_source_file *file, int line,
       else
 	/* Just complain.  */
 	dwarf2_macro_malformed_definition_complaint (body);
-
-      {
-	int i;
-
-	for (i = 0; i < argc; i++)
-	  xfree (argv[i]);
-      }
-      xfree (argv);
     }
   else
     dwarf2_macro_malformed_definition_complaint (body);
