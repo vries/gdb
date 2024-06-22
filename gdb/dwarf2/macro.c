@@ -178,7 +178,10 @@ parse_macro_definition (struct macro_source_file *file, int line,
 	p++;
 
       if (! *p || p == arg_start)
-	dwarf2_macro_malformed_definition_complaint (body);
+	{
+	  dwarf2_macro_malformed_definition_complaint (body);
+	  return;
+	}
       else
 	{
 	  /* Make sure argv has room for the new argument.  */
