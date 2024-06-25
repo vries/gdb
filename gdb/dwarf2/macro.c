@@ -36,6 +36,34 @@
 #include "complaints.h"
 #include "objfiles.h"
 
+/* Vector of C strings.  */
+
+struct vector_c_string
+{
+  vector_c_string () = default;
+  DISABLE_COPY_AND_ASSIGN (vector_c_string);
+
+  ~vector_c_string ()
+  {
+    free_vector_argv (argv);
+  }
+
+  /* Add element to vector.  */
+  void push_back (gdb::unique_xmalloc_ptr<char> &&value)
+  {
+    argv.push_back (value.release ());
+  }
+
+  /* De-allocate elements and clear vector.  */
+  void clear ()
+  {
+    free_vector_argv (argv);
+    argv.clear ();
+  }
+
+  std::vector<char *> argv;
+};
+
 static void
 dwarf2_macro_malformed_definition_complaint (const char *arg1)
 {
@@ -103,7 +131,7 @@ consume_improper_spaces (const char *p, const char *body)
 
 static void
 parse_macro_definition (struct macro_source_file *file, int line,
-			const char *body)
+			const char *body, vector_c_string &tmp)
 {
   const char *p;
 
@@ -159,14 +187,13 @@ parse_macro_definition (struct macro_source_file *file, int line,
 
   /* It's a function-like macro.  */
   gdb_assert (*p == '(');
-  std::string name (body, p - body);
-  int argc = 0;
-  int argv_size = 1;
-  char **argv = XNEWVEC (char *, argv_size);
 
+  std::string name (body, p - body);
   p++;
 
   p = consume_improper_spaces (p, body);
+
+  tmp.clear ();
 
   /* Parse the formal argument list.  */
   while (*p && *p != ')')
@@ -181,14 +208,9 @@ parse_macro_definition (struct macro_source_file *file, int line,
 	dwarf2_macro_malformed_definition_complaint (body);
       else
 	{
-	  /* Make sure argv has room for the new argument.  */
-	  if (argc >= argv_size)
-	    {
-	      argv_size *= 2;
-	      argv = XRESIZEVEC (char *, argv, argv_size);
-	    }
-
-	  argv[argc++] = savestring (arg_start, p - arg_start);
+	  gdb::unique_xmalloc_ptr<char> arg (savestring (arg_start,
+							 p - arg_start));
+	  tmp.push_back (std::move (arg));
 	}
 
       p = consume_improper_spaces (p, body);
@@ -209,15 +231,15 @@ parse_macro_definition (struct macro_source_file *file, int line,
       if (*p == ' ')
 	/* Perfectly formed definition, no complaints.  */
 	macro_define_function (file, line, name.c_str (),
-			       argc, (const char **) argv,
-			       p + 1);
+			       tmp.argv.size (),
+			       (const char **) tmp.argv.data (), p + 1);
       else if (*p == '\0')
 	{
 	  /* Complain, but do define it.  */
 	  dwarf2_macro_malformed_definition_complaint (body);
 	  macro_define_function (file, line, name.c_str (),
-				 argc, (const char **) argv,
-				 p);
+				 tmp.argv.size (),
+				 (const char **) tmp.argv.data (), p);
 	}
       else
 	/* Just complain.  */
@@ -226,11 +248,6 @@ parse_macro_definition (struct macro_source_file *file, int line,
   else
     /* Just complain.  */
     dwarf2_macro_malformed_definition_complaint (body);
-
-  for (int i = 0; i < argc; i++)
-    xfree (argv[i]);
-
-  xfree (argv);
 }
 
 /* Skip some bytes from BYTES according to the form given in FORM.
@@ -446,6 +463,8 @@ dwarf_decode_macro_bytes (dwarf2_per_objfile *per_objfile,
   int at_commandline;
   const gdb_byte *opcode_definitions[256];
 
+  vector_c_string tmp;
+
   mac_ptr = dwarf_parse_macro_header (opcode_definitions, abfd, mac_ptr,
 				      &offset_size, section_is_gnu);
   if (mac_ptr == NULL)
@@ -563,7 +582,7 @@ dwarf_decode_macro_bytes (dwarf2_per_objfile *per_objfile,
 			   line, current_file->filename);
 	      }
 	    else if (is_define)
-	      parse_macro_definition (current_file, line, body);
+	      parse_macro_definition (current_file, line, body, tmp);
 	    else
 	      {
 		gdb_assert (macinfo_type == DW_MACRO_undef
@@ -627,7 +646,7 @@ dwarf_decode_macro_bytes (dwarf2_per_objfile *per_objfile,
 	      }
 
 	    if (macinfo_type == DW_MACRO_define_strx)
-	      parse_macro_definition (current_file, line, body);
+	      parse_macro_definition (current_file, line, body, tmp);
 	    else
 	      macro_undef (current_file, line, body);
 	   }
