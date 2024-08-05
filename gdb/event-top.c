@@ -1130,6 +1130,42 @@ quit_serial_event_fd (void)
   return serial_event_fd (quit_serial_event);
 }
 
+static void
+maintenance_out_of_mem_command (const char *args, int from_tty)
+{
+  if (args == nullptr)
+    error (_("Missing arguments."));
+
+  /* As in with_command_1.  */
+  scoped_restore save_async = make_scoped_restore (&current_ui->async, 0);
+
+  extern bool in_out_of_mem_test;
+  extern unsigned nr_out_of_mem;
+  extern unsigned nr_last_out_of_mem;
+
+  nr_last_out_of_mem = 0;
+  while (1)
+    {
+      try
+	{
+	  nr_out_of_mem = 0;
+	  scoped_restore save_in_out_of_mem_test
+	    = make_scoped_restore (&in_out_of_mem_test, true);
+	  execute_command (args, from_tty);
+	}
+      catch (const gdb_quit_bad_alloc &e)
+	{
+	  gdb_printf ("Caught out of mem, restarting\n");
+
+	  /* COMMAND ran into bad alloc, try again.  */
+	  continue;
+	}
+
+      /* Command finished.  */
+      break;
+    }
+}
+
 /* See defs.h.  */
 
 void
@@ -1465,4 +1501,9 @@ crashes within GDB, not a mechanism for debugging inferiors."),
 			   show_bt_on_fatal_signal,
 			   &maintenance_set_cmdlist,
 			   &maintenance_show_cmdlist);
+
+  add_cmd ("out-of-mem", class_maintenance,
+	   maintenance_out_of_mem_command,
+	   _("Check error handling of the command using out-of-mem."),
+	   &maintenancelist);
 }

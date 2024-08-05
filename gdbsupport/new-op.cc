@@ -25,11 +25,37 @@
 #if !__has_feature(address_sanitizer) && !defined(__SANITIZE_ADDRESS__)
 #include "host-defs.h"
 #include <new>
+#include "scoped_restore.h"
 
 /* These are declared in <new> starting C++14, but removing them
    caused a build failure with clang.  See PR build/31141.  */
 extern void operator delete (void *p, std::size_t) noexcept;
 extern void operator delete[] (void *p, std::size_t) noexcept;
+
+extern bool in_out_of_mem_test;
+bool in_out_of_mem_test;
+
+extern unsigned nr_out_of_mem;
+unsigned nr_out_of_mem;
+
+extern unsigned nr_last_out_of_mem;
+unsigned nr_last_out_of_mem;
+
+extern bool pretend_out_of_mem ();
+bool
+pretend_out_of_mem ()
+{
+  if (!in_out_of_mem_test)
+    return false;
+
+  nr_out_of_mem++;
+
+  if (nr_out_of_mem <= nr_last_out_of_mem)
+    return false;
+
+  nr_last_out_of_mem = nr_out_of_mem;
+  return true;
+}
 
 /* Override operator new / operator new[], in order to internal_error
    on allocation failure and thus query the user for abort/core
@@ -51,6 +77,15 @@ extern void operator delete[] (void *p, std::size_t) noexcept;
 void *
 operator new (std::size_t sz)
 {
+  va_list dummy;
+  if (pretend_out_of_mem ())
+    {
+      scoped_restore save_in_out_of_mem_test
+	= make_scoped_restore (&in_out_of_mem_test, false);
+
+      throw gdb_quit_bad_alloc (gdb_exception_quit ("maint out-of-mem", dummy));
+    }
+
   /* malloc (0) is unpredictable; avoid it.  */
   if (sz == 0)
     sz = 1;
