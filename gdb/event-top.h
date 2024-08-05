@@ -142,4 +142,7 @@ class scoped_segv_handler_restore
   segv_handler_t m_old_handler;
 };
 
+/* Whether to pretend that check_quit_flag is true.  */
+extern bool pretend_quit_flag ();
+
 #endif

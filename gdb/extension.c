@@ -918,6 +918,9 @@ check_quit_flag ()
       result = true;
     }
 
+  if (!result && pretend_quit_flag ())
+    result = true;
+
   return result;
 }
 

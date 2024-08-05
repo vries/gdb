@@ -1130,6 +1130,75 @@ quit_serial_event_fd (void)
   return serial_event_fd (quit_serial_event);
 }
 
+/* Whether cancelation testing is enabled.  */
+static bool in_cancelation_test;
+
+/* The number of cancelations points encountered since the start of the
+   command.  */
+static unsigned nr_cancelation;
+
+/* The number of the cancelation point last triggered.  */
+static unsigned nr_last_cancelation;
+
+/* See event-top.h.  */
+
+bool
+pretend_quit_flag ()
+{
+  if (!in_cancelation_test)
+    return false;
+
+  if (quit_handler != default_quit_handler)
+    return false;
+
+  if (!target_terminal::is_ours ())
+    return false;
+
+  nr_cancelation++;
+
+  if (nr_cancelation <= nr_last_cancelation)
+    return false;
+
+  nr_last_cancelation = nr_cancelation;
+  return true;
+}
+
+/* Implementation of the "maintenance interrupt COMMAND" command.  */
+
+static void
+maintenance_interrupt_command (const char *args, int from_tty)
+{
+  if (args == nullptr)
+    error (_("Missing arguments."));
+
+  /* As in with_command_1.  */
+  scoped_restore save_async = make_scoped_restore (&current_ui->async, 0);
+
+  /* Clear the quit flag on scope exit, if it was still set.  */
+  SCOPE_EXIT { check_quit_flag (); };
+
+  /* Keep running COMMAND until it's not canceled, or runs into an error.  */
+  nr_last_cancelation = 0;
+  while (1)
+    {
+      try
+	{
+	  scoped_restore save_in_cancelation_test
+	    = make_scoped_restore (&in_cancelation_test, true);
+	  nr_cancelation = 0;
+	  execute_command (args, from_tty);
+	}
+      catch (const gdb_exception_quit &e)
+	{
+	  /* COMMAND got canceled, try again.  */
+	  continue;
+	}
+
+      /* Command finished.  */
+      break;
+    }
+}
+
 /* See defs.h.  */
 
 void
@@ -1465,4 +1534,8 @@ crashes within GDB, not a mechanism for debugging inferiors."),
 			   show_bt_on_fatal_signal,
 			   &maintenance_set_cmdlist,
 			   &maintenance_show_cmdlist);
+
+  add_cmd ("interrupt", class_maintenance,
+	   maintenance_interrupt_command,
+	 _("Interrupt the given command."), &maintenancelist);
 }
