@@ -2777,7 +2777,8 @@ build_target_command_list (struct bp_location *bl)
    registers state.  */
 
 static int
-breakpoint_kind (const struct bp_location *bl, CORE_ADDR *addr)
+breakpoint_kind (const struct bp_location *bl, CORE_ADDR *addr,
+		 gdb_addr_info *addr_info = nullptr)
 {
   if (bl->owner->type == bp_single_step)
     {
@@ -2790,7 +2791,8 @@ breakpoint_kind (const struct bp_location *bl, CORE_ADDR *addr)
 							 regcache, addr);
     }
   else
-    return gdbarch_breakpoint_kind_from_pc (bl->gdbarch, addr);
+    return gdbarch_breakpoint_kind_from_pc_v2 (bl->gdbarch, addr,
+					       addr_info);
 }
 
 /* Rethrow the currently handled exception, if it's a TARGET_CLOSE_ERROR.
@@ -11977,7 +11979,8 @@ code_breakpoint::insert_location (struct bp_location *bl)
 {
   CORE_ADDR addr = bl->target_info.reqstd_address;
 
-  bl->target_info.kind = breakpoint_kind (bl, &addr);
+  bl->target_info.kind
+    = breakpoint_kind (bl, &addr, &bl->target_info.addr_info);
   bl->target_info.placed_address = addr;
 
   int result;

@@ -8808,12 +8808,32 @@ static const gdb_byte arm_default_thumb_be_breakpoint[] = THUMB_BE_BREAKPOINT;
 /* Implement the breakpoint_kind_from_pc gdbarch method.  */
 
 static int
-arm_breakpoint_kind_from_pc (struct gdbarch *gdbarch, CORE_ADDR *pcptr)
+arm_breakpoint_kind_from_pc (struct gdbarch *gdbarch, CORE_ADDR *pcptr,
+			     gdb_addr_info *addr_info_ptr = nullptr)
 {
   arm_gdbarch_tdep *tdep = gdbarch_tdep<arm_gdbarch_tdep> (gdbarch);
   enum bfd_endian byte_order_for_code = gdbarch_byte_order_for_code (gdbarch);
 
-  if (arm_pc_is_thumb (gdbarch, *pcptr))
+  bool is_thumb;
+  if (addr_info_ptr == nullptr)
+    is_thumb = arm_pc_is_thumb (gdbarch, *pcptr);
+  else
+    {
+      if (!addr_info_ptr->initialized)
+	{
+	  addr_info_ptr->addr
+	    = (arm_pc_is_thumb (gdbarch, *pcptr)
+	       ? MAKE_THUMB_ADDR (*pcptr)
+	       : UNMAKE_THUMB_ADDR (*pcptr));
+	  addr_info_ptr->initialized = true;
+	}
+
+      gdb_assert (UNMAKE_THUMB_ADDR (addr_info_ptr->addr)
+		  == UNMAKE_THUMB_ADDR (*pcptr));
+      is_thumb = IS_THUMB_ADDR (addr_info_ptr->addr);
+    }
+
+  if (is_thumb)
     {
       *pcptr = UNMAKE_THUMB_ADDR (*pcptr);
 
@@ -10776,7 +10796,7 @@ arm_gdbarch_init (struct gdbarch_info info, struct gdbarch_list *arches)
   set_gdbarch_inner_than (gdbarch, core_addr_lessthan);
 
   /* Breakpoint manipulation.  */
-  set_gdbarch_breakpoint_kind_from_pc (gdbarch, arm_breakpoint_kind_from_pc);
+  set_gdbarch_breakpoint_kind_from_pc_v2 (gdbarch, arm_breakpoint_kind_from_pc);
   set_gdbarch_sw_breakpoint_from_kind (gdbarch, arm_sw_breakpoint_from_kind);
   set_gdbarch_breakpoint_kind_from_current_state (gdbarch,
 						  arm_breakpoint_kind_from_current_state);

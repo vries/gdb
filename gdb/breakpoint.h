@@ -254,6 +254,13 @@ enum condition_status
 struct gdb_addr_info
 {
   bool initialized;
+  union
+  {
+    /* An easy way to store information about an address is to store a
+       canonical form of the address, for instance containing certain
+       bits typically removed by gdbarch_addr_bits_remove.  */
+    CORE_ADDR addr;
+  };
 };
 
 /* Information used by targets to insert and remove breakpoints.  */
@@ -272,6 +279,9 @@ struct bp_target_info
 
   /* Address at which the breakpoint was requested.  */
   CORE_ADDR reqstd_address;
+
+  /* Info paired with reqstd_address.  */
+  gdb_addr_info addr_info;
 
   /* If this is a ranged breakpoint, then this field contains the
      length of the range that will be watched for execution.  */
