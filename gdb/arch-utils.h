@@ -325,4 +325,9 @@ extern enum return_value_convention default_gdbarch_return_value
       struct regcache *regcache, struct value **read_value,
       const gdb_byte *writebuf);
 
+extern int default_breakpoint_kind_from_pc (gdbarch *arch, CORE_ADDR *pcptr);
+
+extern int default_breakpoint_kind_from_pc_v2 (gdbarch *arch, CORE_ADDR *pcptr,
+					       gdb_addr_info *addr_info_ptr);
+
 #endif /* ARCH_UTILS_H */

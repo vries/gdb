@@ -123,7 +123,8 @@ struct gdbarch
   gdbarch_skip_entrypoint_ftype *skip_entrypoint = nullptr;
   gdbarch_inner_than_ftype *inner_than = nullptr;
   gdbarch_breakpoint_from_pc_ftype *breakpoint_from_pc = default_breakpoint_from_pc;
-  gdbarch_breakpoint_kind_from_pc_ftype *breakpoint_kind_from_pc = nullptr;
+  gdbarch_breakpoint_kind_from_pc_ftype *breakpoint_kind_from_pc = default_breakpoint_kind_from_pc;
+  gdbarch_breakpoint_kind_from_pc_v2_ftype *breakpoint_kind_from_pc_v2 = default_breakpoint_kind_from_pc_v2;
   gdbarch_sw_breakpoint_from_kind_ftype *sw_breakpoint_from_kind = NULL;
   gdbarch_breakpoint_kind_from_current_state_ftype *breakpoint_kind_from_current_state = default_breakpoint_kind_from_current_state;
   gdbarch_adjust_breakpoint_address_ftype *adjust_breakpoint_address = nullptr;
@@ -386,8 +387,8 @@ verify_gdbarch (struct gdbarch *gdbarch)
   if (gdbarch->inner_than == 0)
     log.puts ("\n\tinner_than");
   /* Skip verify of breakpoint_from_pc, invalid_p == 0 */
-  if (gdbarch->breakpoint_kind_from_pc == 0)
-    log.puts ("\n\tbreakpoint_kind_from_pc");
+  /* Skip verify of breakpoint_kind_from_pc, invalid_p == 0 */
+  /* Skip verify of breakpoint_kind_from_pc_v2, invalid_p == 0 */
   /* Skip verify of sw_breakpoint_from_kind, invalid_p == 0 */
   /* Skip verify of breakpoint_kind_from_current_state, invalid_p == 0 */
   /* Skip verify of adjust_breakpoint_address, has predicate.  */
@@ -837,6 +838,9 @@ gdbarch_dump (struct gdbarch *gdbarch, struct ui_file *file)
   gdb_printf (file,
 	      "gdbarch_dump: breakpoint_kind_from_pc = <%s>\n",
 	      host_address_to_string (gdbarch->breakpoint_kind_from_pc));
+  gdb_printf (file,
+	      "gdbarch_dump: breakpoint_kind_from_pc_v2 = <%s>\n",
+	      host_address_to_string (gdbarch->breakpoint_kind_from_pc_v2));
   gdb_printf (file,
 	      "gdbarch_dump: sw_breakpoint_from_kind = <%s>\n",
 	      host_address_to_string (gdbarch->sw_breakpoint_from_kind));
@@ -2837,6 +2841,23 @@ set_gdbarch_breakpoint_kind_from_pc (struct gdbarch *gdbarch,
 				     gdbarch_breakpoint_kind_from_pc_ftype breakpoint_kind_from_pc)
 {
   gdbarch->breakpoint_kind_from_pc = breakpoint_kind_from_pc;
+}
+
+int
+gdbarch_breakpoint_kind_from_pc_v2 (struct gdbarch *gdbarch, CORE_ADDR *pcptr, gdb_addr_info *addr_info_ptr)
+{
+  gdb_assert (gdbarch != NULL);
+  gdb_assert (gdbarch->breakpoint_kind_from_pc_v2 != NULL);
+  if (gdbarch_debug >= 2)
+    gdb_printf (gdb_stdlog, "gdbarch_breakpoint_kind_from_pc_v2 called\n");
+  return gdbarch->breakpoint_kind_from_pc_v2 (gdbarch, pcptr, addr_info_ptr);
+}
+
+void
+set_gdbarch_breakpoint_kind_from_pc_v2 (struct gdbarch *gdbarch,
+					gdbarch_breakpoint_kind_from_pc_v2_ftype breakpoint_kind_from_pc_v2)
+{
+  gdbarch->breakpoint_kind_from_pc_v2 = breakpoint_kind_from_pc_v2;
 }
 
 const gdb_byte *

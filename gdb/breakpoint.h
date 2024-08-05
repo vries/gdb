@@ -249,6 +249,13 @@ enum condition_status
     condition_updated
   };
 
+/* Gdbarch-specific info related to an address.  */
+
+struct gdb_addr_info
+{
+  bool initialized;
+};
+
 /* Information used by targets to insert and remove breakpoints.  */
 
 struct bp_target_info

@@ -1040,6 +1040,23 @@ Return the breakpoint kind for this target based on *PCPTR.
     type="int",
     name="breakpoint_kind_from_pc",
     params=[("CORE_ADDR *", "pcptr")],
+    predefault="default_breakpoint_kind_from_pc",
+    invalid=False
+)
+
+Method(
+    comment="""
+Return the breakpoint kind for this target based on *PCPTR.  If
+ADDR_INFO_PTR->initialized == false, optionally write gdbarch-specific
+information about *PCPTR that is expensive to calculate to *ADDR_INFO_PTR, and
+set ADDR_INFO_PTR->initialized to true.  If ADDR_INFO_PTR->initialized == true,
+use *ADDR_INFO_PTR to avoid the expensive calculation.
+""",
+    type="int",
+    name="breakpoint_kind_from_pc_v2",
+    params=[("CORE_ADDR *", "pcptr"), ("gdb_addr_info *", "addr_info_ptr")],
+    predefault="default_breakpoint_kind_from_pc_v2",
+    invalid=False
 )
 
 Method(

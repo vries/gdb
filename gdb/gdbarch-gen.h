@@ -561,6 +561,16 @@ typedef int (gdbarch_breakpoint_kind_from_pc_ftype) (struct gdbarch *gdbarch, CO
 extern int gdbarch_breakpoint_kind_from_pc (struct gdbarch *gdbarch, CORE_ADDR *pcptr);
 extern void set_gdbarch_breakpoint_kind_from_pc (struct gdbarch *gdbarch, gdbarch_breakpoint_kind_from_pc_ftype *breakpoint_kind_from_pc);
 
+/* Return the breakpoint kind for this target based on *PCPTR.  If
+   ADDR_INFO_PTR->initialized == false, optionally write gdbarch-specific
+   information about *PCPTR that is expensive to calculate to *ADDR_INFO_PTR, and
+   set ADDR_INFO_PTR->initialized to true.  If ADDR_INFO_PTR->initialized == true,
+   use *ADDR_INFO_PTR to avoid the expensive calculation. */
+
+typedef int (gdbarch_breakpoint_kind_from_pc_v2_ftype) (struct gdbarch *gdbarch, CORE_ADDR *pcptr, gdb_addr_info *addr_info_ptr);
+extern int gdbarch_breakpoint_kind_from_pc_v2 (struct gdbarch *gdbarch, CORE_ADDR *pcptr, gdb_addr_info *addr_info_ptr);
+extern void set_gdbarch_breakpoint_kind_from_pc_v2 (struct gdbarch *gdbarch, gdbarch_breakpoint_kind_from_pc_v2_ftype *breakpoint_kind_from_pc_v2);
+
 /* Return the software breakpoint from KIND.  KIND can have target
    specific meaning like the Z0 kind parameter.
    SIZE is set to the software breakpoint's length in memory. */

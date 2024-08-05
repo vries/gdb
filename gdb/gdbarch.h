@@ -59,6 +59,7 @@ struct ui_out;
 struct inferior;
 struct x86_xsave_layout;
 struct solib_ops;
+struct gdb_addr_info;
 
 #include "regcache.h"
 

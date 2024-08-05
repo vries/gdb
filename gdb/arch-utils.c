@@ -1212,6 +1212,32 @@ default_gdbarch_return_value
 				readbuf, writebuf);
 }
 
+/* Default implementation of gdbarch_breakpoint_kind_from_pc.  */
+
+int
+default_breakpoint_kind_from_pc (gdbarch *arch, CORE_ADDR *pcptr)
+{
+  /* Fall back on v2, unless it's the default that falls back on this
+     function.  */
+  gdb_assert (arch->breakpoint_kind_from_pc_v2
+	      != default_breakpoint_kind_from_pc_v2);
+  return gdbarch_breakpoint_kind_from_pc_v2 (arch, pcptr, nullptr);
+}
+
+/* Default implementation of gdbarch_breakpoint_kind_from_pc_v2.  */
+
+int
+default_breakpoint_kind_from_pc_v2
+  (gdbarch *arch, CORE_ADDR *pcptr,
+   gdb_addr_info *addr_info_ptr ATTRIBUTE_UNUSED)
+{
+  /* Fall back on v1, unless it's the default that falls back on this
+     function.  */
+  gdb_assert (arch->breakpoint_kind_from_pc
+	      != default_breakpoint_kind_from_pc);
+  return gdbarch_breakpoint_kind_from_pc (arch, pcptr);
+}
+
 obstack *gdbarch_obstack (gdbarch *arch)
 {
   return &arch->obstack;
