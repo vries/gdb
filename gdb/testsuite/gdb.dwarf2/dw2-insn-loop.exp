@@ -1,0 +1,109 @@
+# This testcase is part of GDB, the GNU debugger.
+
+# Copyright 2024 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+load_lib dwarf.exp
+
+require dwarf2_support
+
+standard_testfile .c .S
+
+get_func_info main
+get_func_info foo
+
+set foo_start_line [gdb_get_line_number "foo start."]
+set foo_return_line [gdb_get_line_number "foo return."]
+
+set main_start_line [gdb_get_line_number "main start."]
+set main_loop_line [gdb_get_line_number "main while loop."]
+set main_return_line [gdb_get_line_number "main return."]
+
+set asm_file [standard_output_file $srcfile2]
+
+Dwarf::assemble $asm_file {
+    declare_labels lines_unit
+
+    cu {} {
+	DW_TAG_compile_unit {
+	    {DW_AT_name $::srcfile}
+	    {DW_AT_stmt_list $lines_unit DW_FORM_sec_offset}
+	} {
+	    DW_TAG_subprogram {
+		{ DW_AT_name foo }
+		{ DW_AT_low_pc $::foo_start DW_FORM_addr }
+		{ DW_AT_high_pc $::foo_end DW_FORM_addr }
+	    }
+
+	    DW_TAG_subprogram {
+		{ DW_AT_name main }
+		{ DW_AT_low_pc $::main_start DW_FORM_addr }
+		{ DW_AT_high_pc $::main_end DW_FORM_addr }
+	    }
+	}
+    }
+
+    lines {} lines_unit {
+	file_name $::srcfile 1
+	program {
+	    DW_LNE_set_address $::foo_start
+	    line $::foo_start_line
+	    DW_LNS_copy
+
+	    DW_LNE_set_address foo_label
+	    line $::foo_return_line
+	    DW_LNS_copy
+
+	    DW_LNE_set_address $::foo_end
+	    DW_LNE_end_sequence
+
+	    DW_LNE_set_address $::main_start
+	    line $::main_start_line
+	    DW_LNS_copy
+
+	    DW_LNE_set_address main_label
+	    line $::main_loop_line
+	    DW_LNS_copy
+
+	    DW_LNE_set_address main_label_2
+	    line $::main_return_line
+	    DW_LNS_copy
+
+	    DW_LNE_set_address $::main_end
+	    DW_LNE_end_sequence
+	}
+    }
+}
+
+if { [prepare_for_testing "failed to prepare" $testfile \
+	  [list $srcfile $asm_file] {nodebug}] } {
+    return
+}
+
+if {![runto_main]} {
+    return
+}
+
+set re [string_to_regexp "/* foo return.  */"]
+
+gdb_test step $re \
+    "step into foo"
+
+gdb_test step $re \
+    "step back into foo using step"
+
+# Regression test for PR32000.  This should not step out of the loop.
+gdb_test next $re \
+    "step back into foo using next"
