@@ -10626,7 +10626,25 @@ watch_command_1 (const char *arg, int accessflag, int from_tty,
 
   /* Finally update the new watchpoint.  This creates the locations
      that should be inserted.  */
-  update_watchpoint (w.get (), true /* reparse */);
+  try
+    {
+      update_watchpoint (w.get (), true /* reparse */);
+    }
+  catch (...)
+    {
+      if (scope_breakpoint != NULL)
+	{
+	  /* Decouple the scope breakpoint.  */
+	  w->related_breakpoint = w.get ();
+	  scope_breakpoint->related_breakpoint = scope_breakpoint;
+
+	  /* Clean up the scope breakpoint.  The watchpoint is cleaned up on
+	     scope exit.  */
+	  delete_breakpoint (scope_breakpoint);
+	}
+
+      throw;
+    }
 
   install_breakpoint (internal, std::move (w), 1);
 }
