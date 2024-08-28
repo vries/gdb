@@ -7288,9 +7288,16 @@ int
 breakpoint_address_match (const address_space *aspace1, CORE_ADDR addr1,
 			  const address_space *aspace2, CORE_ADDR addr2)
 {
-  return ((gdbarch_has_global_breakpoints (current_inferior ()->arch ())
-	   || aspace1 == aspace2)
-	  && addr1 == addr2);
+  struct gdbarch *gdbarch = current_inferior ()->arch ();
+
+  bool same_aspace = (aspace1 == aspace2
+		      || gdbarch_has_global_breakpoints (gdbarch));
+  if (!same_aspace)
+    return false;
+
+  addr1 = gdbarch_addr_bits_remove (gdbarch, addr1);
+  addr2 = gdbarch_addr_bits_remove (gdbarch, addr2);
+  return addr1 == addr2;
 }
 
 /* Returns true if {ASPACE2,ADDR2} falls within the range determined by
@@ -7304,9 +7311,16 @@ breakpoint_address_match_range (const address_space *aspace1,
 				int len1, const address_space *aspace2,
 				CORE_ADDR addr2)
 {
-  return ((gdbarch_has_global_breakpoints (current_inferior ()->arch ())
-	   || aspace1 == aspace2)
-	  && addr2 >= addr1 && addr2 < addr1 + len1);
+  struct gdbarch *gdbarch = current_inferior ()->arch ();
+
+  bool same_aspace = (aspace1 == aspace2
+		      || gdbarch_has_global_breakpoints (gdbarch));
+  if (!same_aspace)
+    return false;
+
+  addr1 = gdbarch_addr_bits_remove (gdbarch, addr1);
+  addr2 = gdbarch_addr_bits_remove (gdbarch, addr2);
+  return addr2 >= addr1 && addr2 < addr1 + len1;
 }
 
 /* Returns true if {ASPACE,ADDR} matches the breakpoint BL.  BL may be

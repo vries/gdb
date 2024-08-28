@@ -1,0 +1,71 @@
+# Copyright 2024 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+require is_aarch32_target
+
+standard_testfile
+
+if { [build_executable "failed to prepare" $testfile $srcfile {nodebug}] } {
+    return -1
+}
+
+# Generate $binfile.stripped.
+set objcopy_program [gdb_find_objcopy]
+set objcopy_args "--strip-all --keep-symbol=bar"
+set cmd "$objcopy_program $objcopy_args $binfile $binfile.stripped"
+set result [catch "exec $cmd" output]
+if { $result != 0 } {
+    verbose -log "result is $result"
+    verbose -log "output is $output"
+    return -1
+}
+
+clean_restart $binfile.stripped
+
+# We're able to set a breakpoint on bar because we didn't strip that symbol.
+# Bar is an arm function.  This prevents "arm fallback-mode auto" from
+# magically declaring addresses to be thumb, at least while we're in that
+# frame.
+if { ![runto bar] } {
+    return -1
+}
+
+# Get the link register, pointing to foo, a thumb function.
+set lr ""
+gdb_test_multiple {p /x $lr} "" {
+    -re -wrap "= ($hex)" {
+	set lr $expect_out(1,string)
+	pass $gdb_test_name
+    }
+}
+
+if { $lr == "" } {
+    return -1
+}
+
+# Assert that $lr is a thumb address.
+gdb_assert { [expr $lr & 1 == 1] }
+
+# Set a breakpoint on $lr.
+gdb_breakpoint "*$lr"
+
+# With unstripped $binfile, the thumb bit would have been dropped by
+# arm_adjust_breakpoint_address.  Check that the breakpoint address still
+# contains the thumb bit.  This was a necessary condition to trigger the hang.
+set re_lr [regsub 0x0* $lr ""]
+gdb_test "info break" $re_lr.*
+
+# Now check that the breakpoint actually works.  This used to hang.
+gdb_continue_to_breakpoint "foo"
