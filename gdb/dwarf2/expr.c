@@ -862,6 +862,34 @@ dwarf_expr_context::read_mem (gdb_byte *buf, CORE_ADDR addr,
 
 /* See expr.h.  */
 
+value *
+dwarf_expr_context::deref (CORE_ADDR addr, int size, struct type *type)
+{
+  gdb_byte *buf = (gdb_byte *) alloca (size);
+  this->read_mem (buf, addr, size);
+
+  if (type == nullptr)
+    type = this->address_type ();
+
+  /* If the size of the object read from memory is different
+     from the type length, we need to zero-extend it.  */
+  if (type->length () != size)
+    {
+      gdbarch *arch = this->m_per_objfile->objfile->arch ();
+      bfd_endian byte_order = gdbarch_byte_order (arch);
+      ULONGEST datum
+	= extract_unsigned_integer (buf, size, byte_order);
+
+      buf = (gdb_byte *) alloca (type->length ());
+      store_unsigned_integer (buf, type->length (),
+			      byte_order, datum);
+    }
+
+  return value_from_contents_and_address (type, buf, addr);
+}
+
+/* See expr.h.  */
+
 void
 dwarf_expr_context::push_dwarf_reg_entry_value (call_site_parameter_kind kind,
 						call_site_parameter_u kind_u,
@@ -1894,7 +1922,6 @@ dwarf_expr_context::execute_stack_op (const gdb_byte *op_ptr,
 	case DW_OP_GNU_deref_type:
 	  {
 	    int addr_size = (op == DW_OP_deref ? this->m_addr_size : *op_ptr++);
-	    gdb_byte *buf = (gdb_byte *) alloca (addr_size);
 	    CORE_ADDR addr = fetch_address (0);
 	    struct type *type;
 
@@ -1909,21 +1936,7 @@ dwarf_expr_context::execute_stack_op (const gdb_byte *op_ptr,
 	    else
 	      type = address_type;
 
-	    this->read_mem (buf, addr, addr_size);
-
-	    /* If the size of the object read from memory is different
-	       from the type length, we need to zero-extend it.  */
-	    if (type->length () != addr_size)
-	      {
-		ULONGEST datum =
-		  extract_unsigned_integer (buf, addr_size, byte_order);
-
-		buf = (gdb_byte *) alloca (type->length ());
-		store_unsigned_integer (buf, type->length (),
-					byte_order, datum);
-	      }
-
-	    result_val = value_from_contents_and_address (type, buf, addr);
+	    result_val = this->deref (addr, addr_size, type);
 	    break;
 	  }
 
@@ -2252,6 +2265,18 @@ dwarf_expr_context::execute_stack_op (const gdb_byte *op_ptr,
 	    if (kind_u.dwarf_reg != -1)
 	      {
 		op_ptr += len;
+
+		if (m_frame == get_current_frame ()
+		    && find_function_type (get_frame_pc (m_frame)) != nullptr)
+		  {
+		    /* We're stopped at the start of the function.
+		       Handle as DW_OP_regx.  */
+		    result_val
+		      = value_from_ulongest (address_type, kind_u.dwarf_reg);
+		    this->m_location = DWARF_VALUE_REGISTER;
+		    break;
+		  }
+
 		this->push_dwarf_reg_entry_value (CALL_SITE_PARAMETER_DWARF_REG,
 						  kind_u,
 						  -1 /* deref_size */);
@@ -2266,6 +2291,18 @@ dwarf_expr_context::execute_stack_op (const gdb_byte *op_ptr,
 		if (deref_size == -1)
 		  deref_size = this->m_addr_size;
 		op_ptr += len;
+
+		if (m_frame == get_current_frame ()
+		    && find_function_type (get_frame_pc (m_frame)) != nullptr)
+		  {
+		    /* We're stopped at the start of the function.
+		       Handle as DW_OP_bregx;DW_OP_deref_size.  */
+		    CORE_ADDR addr
+		      = read_addr_from_reg (this->m_frame, kind_u.dwarf_reg);
+		    result_val = this->deref (addr, deref_size);
+		    break;
+		  }
+
 		this->push_dwarf_reg_entry_value (CALL_SITE_PARAMETER_DWARF_REG,
 						  kind_u, deref_size);
 		goto no_push;
