@@ -2252,6 +2252,19 @@ dwarf_expr_context::execute_stack_op (const gdb_byte *op_ptr,
 	    if (kind_u.dwarf_reg != -1)
 	      {
 		op_ptr += len;
+
+		if (m_frame == get_current_frame ()
+		    && find_function_type (get_frame_pc (m_frame)) != nullptr)
+		  {
+		    /* If we're stopped at the start of the function, then
+		       this is simply a register read.  Handle as
+		       DW_OP_regx.  */
+		    result_val
+		      = value_from_ulongest (address_type, kind_u.dwarf_reg);
+		    this->m_location = DWARF_VALUE_REGISTER;
+		    break;
+		  }
+
 		this->push_dwarf_reg_entry_value (CALL_SITE_PARAMETER_DWARF_REG,
 						  kind_u,
 						  -1 /* deref_size */);

@@ -1280,6 +1280,16 @@ namespace eval Dwarf {
 		    _op .uleb128 $argvec(register)
 		}
 
+		DW_OP_entry_value {
+		    _get_args $line $opcode body
+		    set l1 [new_label "expr_start"]
+		    set l2 [new_label "expr_end"]
+		    _op .uleb128 "$l2 - $l1" "expression"
+		    define_label $l1
+		    _location $argvec(body) $dwarf_version $addr_size $offset_size
+		    define_label $l2
+		}
+
 		DW_OP_pick -
 		DW_OP_const1u -
 		DW_OP_const1s {
