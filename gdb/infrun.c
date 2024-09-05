@@ -8183,6 +8183,14 @@ process_event_stop_test (struct execution_control_state *ecs)
     = (ecs->event_thread->current_line != stop_pc_sal.line
        || ecs->event_thread->current_symtab != stop_pc_sal.symtab);
 
+  if (different_line && execution_direction == EXEC_FORWARD
+      && ecs->event_thread->control.step_over_calls == STEP_OVER_ALL)
+    {
+      /* Stepped out of line, degrade next to step.  */
+      ecs->event_thread->control.step_over_calls
+	= STEP_OVER_UNDEBUGGABLE;
+    }
+
   bool refresh_step_info = true;
   if (different_line && ecs->event_thread->stop_pc () == stop_pc_sal.pc)
     {

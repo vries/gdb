@@ -65,3 +65,17 @@ gdb_test_multiple step "step out of foo using step" {
 	pass $gdb_test_name
     }
 }
+
+if { ! $in_foo } {
+    return
+}
+
+gdb_test_multiple next "step out of foo using next" {
+    -re -wrap $re_foo {
+	pass $gdb_test_name
+    }
+    -re -wrap $re_main_return {
+	# Behaviour in gdb 15 and earlier.
+	fail $gdb_test_name
+    }
+}
