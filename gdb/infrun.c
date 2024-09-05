@@ -8179,12 +8179,14 @@ process_event_stop_test (struct execution_control_state *ecs)
       return;
     }
 
+  bool different_line
+    = (ecs->event_thread->current_line != stop_pc_sal.line
+       || ecs->event_thread->current_symtab != stop_pc_sal.symtab);
+
   bool refresh_step_info = true;
-  if ((ecs->event_thread->stop_pc () == stop_pc_sal.pc)
-      && (ecs->event_thread->current_line != stop_pc_sal.line
-	  || ecs->event_thread->current_symtab != stop_pc_sal.symtab))
+  if (different_line && ecs->event_thread->stop_pc () == stop_pc_sal.pc)
     {
-      /* We are at a different line.  */
+      /* We are at a different line, at the start of a line entry.  */
 
       if (stop_pc_sal.is_stmt)
 	{
@@ -8243,6 +8245,25 @@ process_event_stop_test (struct execution_control_state *ecs)
 	  stop_pc_sal.line = 0;
 	  infrun_debug_printf ("stepped to a different frame, but "
 			       "it's not the start of a statement");
+	}
+    }
+  else if (different_line)
+    {
+      /* We are at a different line, but not at the start of a line entry.  */
+
+      if (execution_direction == EXEC_FORWARD)
+	{
+	  /* Keep going until we are at the start of a line entry, but:
+	     - update the stepping frame to notice stepping into a function,
+	       and
+	     - make the stepping range empty to prevent stepping back into the
+	       stepping range.  */
+	  ecs->event_thread->control.step_stack_frame_id
+	    = get_stack_frame_id (frame);
+	  ecs->event_thread->control.step_range_start
+	    = ecs->event_thread->control.step_range_end;
+	  keep_going (ecs);
+	  return;
 	}
     }
 
