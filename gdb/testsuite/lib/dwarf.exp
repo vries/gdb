@@ -1226,7 +1226,7 @@ namespace eval Dwarf {
     # suitable for use in the attributes to a DIE.  Its output is
     # prefixed with "=" to make it automatically use DW_FORM_block.
     #
-    # BODY is split by lines, and each line is taken to be a list.
+    # LINE is a location expression.
     #
     # DWARF_VERSION is the DWARF version for the section where the location
     # description is found.
@@ -1245,167 +1245,181 @@ namespace eval Dwarf {
     # forms are accepted.
     # FIXME argument handling
     # FIXME move docs
-    proc _location { body dwarf_version addr_size offset_size } {
+    proc _location_line { line dwarf_version addr_size offset_size } {
 	variable _constants
 
-	foreach line [split $body \n] {
-	    # Ignore blank lines, and allow embedded comments.
-	    if {[lindex $line 0] == "" || [regexp -- {^[ \t]*#} $line]} {
-		continue
+	# Ignore blank lines, and allow embedded comments.
+	if {[lindex $line 0] == "" || [regexp -- {^[ \t]*#} $line]} {
+	    return
+	}
+	set opcode [_map_name [lindex $line 0] _OP]
+	_op .byte $_constants($opcode) $opcode
+
+	array unset argvec *
+	switch -exact -- $opcode {
+	    DW_OP_addr {
+		_get_args $line $opcode size
+		_op .${addr_size}byte $argvec(size)
 	    }
-	    set opcode [_map_name [lindex $line 0] _OP]
-	    _op .byte $_constants($opcode) $opcode
 
-	    array unset argvec *
-	    switch -exact -- $opcode {
-		DW_OP_addr {
-		    _get_args $line $opcode size
-		    _op .${addr_size}byte $argvec(size)
+	    DW_OP_GNU_addr_index {
+		variable _debug_addr_index
+		variable _cu_addr_size
+
+		_op .uleb128 ${_debug_addr_index}
+		incr _debug_addr_index
+
+		_defer_output .debug_addr {
+		    _op .${_cu_addr_size}byte [lindex $line 1]
 		}
+	    }
 
-		DW_OP_GNU_addr_index {
-		    variable _debug_addr_index
-		    variable _cu_addr_size
+	    DW_OP_regx {
+		_get_args $line $opcode register
+		_op .uleb128 $argvec(register)
+	    }
 
-		    _op .uleb128 ${_debug_addr_index}
-		    incr _debug_addr_index
+	    DW_OP_pick -
+	    DW_OP_const1u -
+	    DW_OP_const1s {
+		_get_args $line $opcode const
+		_op .byte $argvec(const)
+	    }
 
-		    _defer_output .debug_addr {
-			_op .${_cu_addr_size}byte [lindex $line 1]
-		    }
-		}
+	    DW_OP_const2u -
+	    DW_OP_const2s {
+		_get_args $line $opcode const
+		_op .2byte $argvec(const)
+	    }
 
-		DW_OP_regx {
-		    _get_args $line $opcode register
-		    _op .uleb128 $argvec(register)
-		}
+	    DW_OP_const4u -
+	    DW_OP_const4s {
+		_get_args $line $opcode const
+		_op .4byte $argvec(const)
+	    }
 
-		DW_OP_pick -
-		DW_OP_const1u -
-		DW_OP_const1s {
-		    _get_args $line $opcode const
-		    _op .byte $argvec(const)
-		}
+	    DW_OP_const8u -
+	    DW_OP_const8s {
+		_get_args $line $opcode const
+		_op .8byte $argvec(const)
+	    }
 
-		DW_OP_const2u -
-		DW_OP_const2s {
-		    _get_args $line $opcode const
-		    _op .2byte $argvec(const)
-		}
+	    DW_OP_constu {
+		_get_args $line $opcode const
+		_op .uleb128 $argvec(const)
+	    }
+	    DW_OP_consts {
+		_get_args $line $opcode const
+		_op .sleb128 $argvec(const)
+	    }
 
-		DW_OP_const4u -
-		DW_OP_const4s {
-		    _get_args $line $opcode const
-		    _op .4byte $argvec(const)
-		}
+	    DW_OP_plus_uconst {
+		_get_args $line $opcode const
+		_op .uleb128 $argvec(const)
+	    }
 
-		DW_OP_const8u -
-		DW_OP_const8s {
-		    _get_args $line $opcode const
-		    _op .8byte $argvec(const)
-		}
+	    DW_OP_piece {
+		_get_args $line $opcode size
+		_op .uleb128 $argvec(size)
+	    }
 
-		DW_OP_constu {
-		    _get_args $line $opcode const
-		    _op .uleb128 $argvec(const)
-		}
-		DW_OP_consts {
-		    _get_args $line $opcode const
-		    _op .sleb128 $argvec(const)
-		}
+	    DW_OP_bit_piece {
+		_get_args $line $opcode size offset
+		_op .uleb128 $argvec(size)
+		_op .uleb128 $argvec(offset)
+	    }
 
-		DW_OP_plus_uconst {
-		    _get_args $line $opcode const
-		    _op .uleb128 $argvec(const)
-		}
+	    DW_OP_skip -
+	    DW_OP_bra {
+		_get_args $line $opcode label
+		_op .2byte $argvec(label)
+	    }
 
-		DW_OP_piece {
-		    _get_args $line $opcode size
-		    _op .uleb128 $argvec(size)
-		}
-
-		DW_OP_bit_piece {
-		    _get_args $line $opcode size offset
-		    _op .uleb128 $argvec(size)
-		    _op .uleb128 $argvec(offset)
-		}
-
-		DW_OP_skip -
-		DW_OP_bra {
-		    _get_args $line $opcode label
-		    _op .2byte $argvec(label)
-		}
-
-		DW_OP_implicit_value {
-		    set l1 [new_label "value_start"]
-		    set l2 [new_label "value_end"]
-		    _op .uleb128 "$l2 - $l1"
-		    define_label $l1
-		    foreach value [lrange $line 1 end] {
-			switch -regexp -- $value {
-			    {^0x[[:xdigit:]]{1,2}$} {_op .byte $value}
-			    {^0x[[:xdigit:]]{4}$} {_op .2byte $value}
-			    {^0x[[:xdigit:]]{8}$} {_op .4byte $value}
-			    {^0x[[:xdigit:]]{16}$} {_op .8byte $value}
-			    default {
-				error "bad value '$value' in DW_OP_implicit_value"
-			    }
+	    DW_OP_implicit_value {
+		set l1 [new_label "value_start"]
+		set l2 [new_label "value_end"]
+		_op .uleb128 "$l2 - $l1"
+		define_label $l1
+		foreach value [lrange $line 1 end] {
+		    switch -regexp -- $value {
+			{^0x[[:xdigit:]]{1,2}$} {_op .byte $value}
+			{^0x[[:xdigit:]]{4}$} {_op .2byte $value}
+			{^0x[[:xdigit:]]{8}$} {_op .4byte $value}
+			{^0x[[:xdigit:]]{16}$} {_op .8byte $value}
+			default {
+			    error "bad value '$value' in DW_OP_implicit_value"
 			}
 		    }
-		    define_label $l2
 		}
+		define_label $l2
+	    }
 
-		DW_OP_implicit_pointer -
-		DW_OP_GNU_implicit_pointer {
-		    _get_args $line $opcode label offset
+	    DW_OP_implicit_pointer -
+	    DW_OP_GNU_implicit_pointer {
+		_get_args $line $opcode label offset
 
-		    # Here label is a section offset.
-		    if { $dwarf_version == 2 } {
-			_op .${addr_size}byte $argvec(label)
-		    } else {
-			_op_offset $offset_size $argvec(label)
-		    }
-		    _op .sleb128 $argvec(offset)
+		# Here label is a section offset.
+		if { $dwarf_version == 2 } {
+		    _op .${addr_size}byte $argvec(label)
+		} else {
+		    _op_offset $offset_size $argvec(label)
 		}
+		_op .sleb128 $argvec(offset)
+	    }
 
-		DW_OP_GNU_variable_value {
-		    _get_args $line $opcode label
+	    DW_OP_GNU_variable_value {
+		_get_args $line $opcode label
 
-		    # Here label is a section offset.
-		    if { $dwarf_version == 2 } {
-			_op .${addr_size}byte $argvec(label)
-		    } else {
-			_op_offset $offset_size $argvec(label)
-		    }
+		# Here label is a section offset.
+		if { $dwarf_version == 2 } {
+		    _op .${addr_size}byte $argvec(label)
+		} else {
+		    _op_offset $offset_size $argvec(label)
 		}
+	    }
 
-		DW_OP_deref_size {
-		    _get_args $line $opcode size
-		    _op .byte $argvec(size)
-		}
+	    DW_OP_deref_size {
+		_get_args $line $opcode size
+		_op .byte $argvec(size)
+	    }
 
-		DW_OP_bregx {
-		    _get_args $line $opcode register offset
-		    _op .uleb128 $argvec(register)
-		    _op .sleb128 $argvec(offset)
-		}
+	    DW_OP_bregx {
+		_get_args $line $opcode register offset
+		_op .uleb128 $argvec(register)
+		_op .sleb128 $argvec(offset)
+	    }
 
-		DW_OP_fbreg {
-		    _get_args $line $opcode offset
-		    _op .sleb128 $argvec(offset)
-		}
+	    DW_OP_fbreg {
+		_get_args $line $opcode offset
+		_op .sleb128 $argvec(offset)
+	    }
 
-		DW_OP_fbreg {
-		    _op .sleb128 [lindex $line 1]
-		}
+	    DW_OP_fbreg {
+		_op .sleb128 [lindex $line 1]
+	    }
 
-		default {
-		    if {[llength $line] > 1} {
-			error "Unimplemented: operands in location for $opcode"
-		    }
+	    default {
+		if {[llength $line] > 1} {
+		    error "Unimplemented: operands in location for $opcode"
 		}
 	    }
 	}
+    }
+
+    # BODY is a list, and each list item is handled by _location_line.
+    proc _location_no_split { body args } {
+	variable _constants
+
+	foreach line $body {
+	    _location_line $line {*}$args
+	}
+    }
+
+    # BODY is split by lines, and each line is handled by _location_line.
+    proc _location { body args } {
+	variable _constants
+
+	_location_no_split [split $body \n] {*}$args
     }
 
     # Return a label that references the current position in the
