@@ -4472,14 +4472,15 @@ private:
 				 bool for_scanning);
 
   /* Index DIEs in the READER starting at INFO_PTR.  PARENT_ENTRY is
-     the entry for the enclosing scope (nullptr at top level).  FULLY
-     is true when a full scan must be done -- in some languages,
-     function scopes must be fully explored in order to find nested
-     functions.  This returns a pointer to just after the spot where
-     reading stopped.  */
+     the entry for the enclosing scope (nullptr at top level), or PARENT_DEFER
+     indicates where to find that entry.  FULLY is true when a full scan must
+     be done -- in some languages, function scopes must be fully explored in
+     order to find nested functions.  This returns a pointer to just after the
+     spot where reading stopped.  */
   const gdb_byte *index_dies (cutu_reader *reader,
 			      const gdb_byte *info_ptr,
 			      const cooked_index_entry *parent_entry,
+			      parent_map::addr_type parent_defer,
 			      bool fully);
 
   /* Scan the attributes for a given DIE and update the out
@@ -4510,6 +4511,7 @@ private:
   const gdb_byte *recurse (cutu_reader *reader,
 			   const gdb_byte *info_ptr,
 			   const cooked_index_entry *parent_entry,
+			   parent_map::addr_type parent_defer,
 			   bool fully);
 
   /* The storage object, where the results are kept.  */
@@ -16382,7 +16384,7 @@ cooked_indexer::index_imported_unit (cutu_reader *reader,
 					      is_dwz, true);
   if (new_reader != nullptr)
     {
-      index_dies (new_reader, new_reader->info_ptr, nullptr, false);
+      index_dies (new_reader, new_reader->info_ptr, nullptr, {}, false);
 
       reader->cu->add_dependence (new_reader->cu->per_cu);
     }
@@ -16394,9 +16396,10 @@ const gdb_byte *
 cooked_indexer::recurse (cutu_reader *reader,
 			 const gdb_byte *info_ptr,
 			 const cooked_index_entry *parent_entry,
+			 parent_map::addr_type parent_defer,
 			 bool fully)
 {
-  info_ptr = index_dies (reader, info_ptr, parent_entry, fully);
+  info_ptr = index_dies (reader, info_ptr, parent_entry, parent_defer, fully);
 
   if (parent_entry != nullptr)
     {
@@ -16418,6 +16421,7 @@ const gdb_byte *
 cooked_indexer::index_dies (cutu_reader *reader,
 			    const gdb_byte *info_ptr,
 			    const cooked_index_entry *parent_entry,
+			    parent_map::addr_type parent_defer,
 			    bool fully)
 {
   const gdb_byte *end_ptr = (reader->buffer
@@ -16444,7 +16448,9 @@ cooked_indexer::index_dies (cutu_reader *reader,
 	{
 	  info_ptr = skip_one_die (reader, info_ptr, abbrev, !fully);
 	  if (fully && abbrev->has_children)
-	    info_ptr = index_dies (reader, info_ptr, parent_entry, fully);
+	    info_ptr
+	      = index_dies (reader, info_ptr, parent_entry, parent_defer,
+			    fully);
 	  continue;
 	}
 
@@ -16486,6 +16492,12 @@ cooked_indexer::index_dies (cutu_reader *reader,
       cooked_index_entry *this_entry = nullptr;
       if (name != nullptr)
 	{
+	  if (parent_defer)
+	    {
+	      gdb_assert (defer == 0);
+	      defer = parent_defer;
+	    }
+
 	  if (defer != 0)
 	    this_entry
 	      = m_index_storage->add (this_die, abbrev->tag,
@@ -16524,7 +16536,7 @@ cooked_indexer::index_dies (cutu_reader *reader,
 	    case DW_TAG_union_type:
 	      if (m_language != language_c && this_entry != nullptr)
 		{
-		  info_ptr = recurse (reader, info_ptr, this_entry, fully);
+		  info_ptr = recurse (reader, info_ptr, this_entry, {}, fully);
 		  continue;
 		}
 	      break;
@@ -16536,9 +16548,23 @@ cooked_indexer::index_dies (cutu_reader *reader,
 		 the enum itself as the parent, yielding names like
 		 "enum_class::enumerator"; otherwise we inject the
 		 names into our own parent scope.  */
-	      info_ptr = recurse (reader, info_ptr,
-				  is_enum_class ? this_entry : parent_entry,
-				  fully);
+	      {
+		const cooked_index_entry *recurse_parent_entry = nullptr;
+		parent_map::addr_type recurse_parent_defer {};
+		if (is_enum_class)
+		  {
+		    gdb_assert (this_entry != nullptr);
+		    recurse_parent_entry = this_entry;
+		  }
+		else if (defer != 0)
+		  recurse_parent_defer = defer;
+		else
+		  recurse_parent_entry = parent_entry;
+
+		info_ptr = recurse (reader, info_ptr,
+				    recurse_parent_entry, recurse_parent_defer,
+				    fully);
+	      }
 	      continue;
 
 	    case DW_TAG_module:
@@ -16548,7 +16574,7 @@ cooked_indexer::index_dies (cutu_reader *reader,
 	    case DW_TAG_namespace:
 	      /* We don't check THIS_ENTRY for a namespace, to handle
 		 the ancient G++ workaround pointed out above.  */
-	      info_ptr = recurse (reader, info_ptr, this_entry, fully);
+	      info_ptr = recurse (reader, info_ptr, this_entry, {}, fully);
 	      continue;
 
 	    case DW_TAG_subprogram:
@@ -16556,7 +16582,7 @@ cooked_indexer::index_dies (cutu_reader *reader,
 		   || m_language == language_ada)
 		  && this_entry != nullptr)
 		{
-		  info_ptr = recurse (reader, info_ptr, this_entry, true);
+		  info_ptr = recurse (reader, info_ptr, this_entry, {}, true);
 		  continue;
 		}
 	      break;
@@ -16589,7 +16615,7 @@ cooked_indexer::make_index (cutu_reader *reader)
   find_file_and_directory (reader->comp_unit_die, reader->cu);
   if (!reader->comp_unit_die->has_children)
     return;
-  index_dies (reader, reader->info_ptr, nullptr, false);
+  index_dies (reader, reader->info_ptr, nullptr, {}, false);
 }
 
 struct compunit_symtab *
