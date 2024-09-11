@@ -96,6 +96,7 @@
 #include "run-on-main-thread.h"
 #include "dwarf2/parent-map.h"
 #include "dwarf2/error.h"
+#include <variant>
 
 /* When == 1, print basic high level tracing messages.
    When > 1, be more verbose.
@@ -4486,7 +4487,7 @@ private:
 				 bool is_dwz,
 				 bool for_scanning);
 
-  /* Index DIEs in the READER starting at INFO_PTR.  PARENT_ENTRY is
+  /* Index DIEs in the READER starting at INFO_PTR.  PARENT is
      the entry for the enclosing scope (nullptr at top level).  FULLY
      is true when a full scan must be done -- in some languages,
      function scopes must be fully explored in order to find nested
@@ -4494,7 +4495,8 @@ private:
      reading stopped.  */
   const gdb_byte *index_dies (cutu_reader *reader,
 			      const gdb_byte *info_ptr,
-			      const cooked_index_entry *parent_entry,
+			      std::variant<const cooked_index_entry *,
+					   parent_map::addr_type> parent,
 			      bool fully);
 
   /* Scan the attributes for a given DIE and update the out
@@ -4524,7 +4526,8 @@ private:
      m_die_range_map and then calling index_dies.  */
   const gdb_byte *recurse (cutu_reader *reader,
 			   const gdb_byte *info_ptr,
-			   const cooked_index_entry *parent_entry,
+			   std::variant<const cooked_index_entry *,
+					parent_map::addr_type> parent_entry,
 			   bool fully);
 
   /* The storage object, where the results are kept.  */
@@ -16417,10 +16420,15 @@ cooked_indexer::index_imported_unit (cutu_reader *reader,
 const gdb_byte *
 cooked_indexer::recurse (cutu_reader *reader,
 			 const gdb_byte *info_ptr,
-			 const cooked_index_entry *parent_entry,
+			 std::variant<const cooked_index_entry *,
+				      parent_map::addr_type> parent,
 			 bool fully)
 {
-  info_ptr = index_dies (reader, info_ptr, parent_entry, fully);
+  info_ptr = index_dies (reader, info_ptr, parent, fully);
+
+  if (parent.index () != 0)
+    return info_ptr;
+  const cooked_index_entry *parent_entry = std::get<0> (parent);
 
   if (parent_entry != nullptr)
     {
@@ -16441,7 +16449,8 @@ cooked_indexer::recurse (cutu_reader *reader,
 const gdb_byte *
 cooked_indexer::index_dies (cutu_reader *reader,
 			    const gdb_byte *info_ptr,
-			    const cooked_index_entry *parent_entry,
+			    std::variant<const cooked_index_entry *,
+					 parent_map::addr_type> parent,
 			    bool fully)
 {
   const gdb_byte *end_ptr = (reader->buffer
@@ -16468,15 +16477,20 @@ cooked_indexer::index_dies (cutu_reader *reader,
 	{
 	  info_ptr = skip_one_die (reader, info_ptr, abbrev, !fully);
 	  if (fully && abbrev->has_children)
-	    info_ptr = index_dies (reader, info_ptr, parent_entry, fully);
+	    info_ptr = index_dies (reader, info_ptr, parent, fully);
 	  continue;
 	}
 
       const char *name = nullptr;
       const char *linkage_name = nullptr;
       parent_map::addr_type defer {};
+      if (parent.index () == 1)
+	defer = std::get<1> (parent);
       cooked_index_flag flags = IS_STATIC;
       sect_offset sibling {};
+      const cooked_index_entry *parent_entry = nullptr;
+      if (parent.index () == 0)
+	parent_entry = std::get<0> (parent);
       const cooked_index_entry *this_parent_entry = parent_entry;
       bool is_enum_class = false;
 
@@ -16560,9 +16574,21 @@ cooked_indexer::index_dies (cutu_reader *reader,
 		 the enum itself as the parent, yielding names like
 		 "enum_class::enumerator"; otherwise we inject the
 		 names into our own parent scope.  */
-	      info_ptr = recurse (reader, info_ptr,
-				  is_enum_class ? this_entry : parent_entry,
-				  fully);
+	      {
+		std::variant<const cooked_index_entry *,
+			     parent_map::addr_type> recurse_parent;
+		if (is_enum_class)
+		  {
+		    gdb_assert (this_entry != nullptr);
+		    recurse_parent = this_entry;
+		  }
+		else if (defer != 0)
+		  recurse_parent = defer;
+		else
+		  recurse_parent = parent_entry;
+
+		info_ptr = recurse (reader, info_ptr, recurse_parent, fully);
+	      }
 	      continue;
 
 	    case DW_TAG_module:
