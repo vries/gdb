@@ -16238,10 +16238,12 @@ cooked_indexer::scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
     {
       /* We always want to recurse into some types, but we may not
 	 want to treat them as definitions.  */
-      if ((abbrev->tag == DW_TAG_class_type
-	   || abbrev->tag == DW_TAG_structure_type
-	   || abbrev->tag == DW_TAG_union_type)
-	  && abbrev->has_children)
+      if (((abbrev->tag == DW_TAG_class_type
+	    || abbrev->tag == DW_TAG_structure_type
+	    || abbrev->tag == DW_TAG_union_type
+	    || abbrev->tag == DW_TAG_namespace)
+	   && abbrev->has_children)
+	  || abbrev->tag == DW_TAG_enumeration_type)
 	*flags |= IS_TYPE_DECLARATION;
       else
 	{
@@ -16333,6 +16335,10 @@ cooked_indexer::scan_attributes (dwarf2_per_cu_data *scanning_per_cu,
 
       if (abbrev->tag == DW_TAG_namespace && *name == nullptr)
 	*name = "(anonymous namespace)";
+
+      if (abbrev->tag == DW_TAG_enumeration_type && *name == nullptr
+	  && (*flags & IS_TYPE_DECLARATION))
+	*name = "(anonymous enum)";
 
       if (m_language == language_cplus
 	  && (abbrev->tag == DW_TAG_class_type
@@ -16559,7 +16565,7 @@ cooked_indexer::index_dies (cutu_reader *reader,
 		else if (defer != 0)
 		  recurse_parent_defer = defer;
 		else
-		  recurse_parent_entry = parent_entry;
+		  recurse_parent_entry = this_parent_entry;
 
 		info_ptr = recurse (reader, info_ptr,
 				    recurse_parent_entry, recurse_parent_defer,
