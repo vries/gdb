@@ -3108,10 +3108,11 @@ namespace eval Dwarf {
        }
 	variable _debug_names
 	set _debug_names []
-	proc _debug_names_name { name tag cu hash } {
+	proc _debug_names_name { name tag cu hash lang } {
 	    variable _debug_names
 	    declare_labels entry_pool_offset
-	    lappend _debug_names [list $name $tag $cu $hash $entry_pool_offset]
+	    lappend _debug_names \
+		[list $name $tag $cu $hash $entry_pool_offset $lang]
 	}
 	with_override Dwarf::cu Dwarf::_debug_names_cu {
 	with_override Dwarf::tu Dwarf::_debug_names_tu {
@@ -3235,10 +3236,13 @@ namespace eval Dwarf {
 
 	    _op .byte $abbrev "abbrev $abbrev"
 	    _op .uleb128 $_constants(DW_TAG_$tag) "DW_TAG_$tag"
-	    _op .byte $attr_val  "DW_IDX_$attr_name (attribute)"
-	    _op .byte 0x0f "DW_FORM_udata (form)"
-	    _op .byte 0  "abbrev terminator (attribute)"
-	    _op .byte 0  "abbrev terminator (form)"
+	    _op .uleb128 $attr_val  "DW_IDX_$attr_name (attribute)"
+	    _op .uleb128 0x0f "DW_FORM_udata (form)"
+	    _op .uleb128 $_constants(DW_IDX_GNU_language) \
+		"DW_IDX_GNU_language (attribute)"
+	    _op .uleb128 0x0f "DW_FORM_udata (form)"
+	    _op .uleb128 0  "abbrev terminator (attribute)"
+	    _op .uleb128 0  "abbrev terminator (form)"
 	    incr abbrev
 	}
 	_op .byte 0 "Abbreviations Table terminator"
@@ -3250,6 +3254,7 @@ namespace eval Dwarf {
 	    set name [lindex $idx 0]
 	    set cu [lindex $idx 2]
 	    set label [lindex $idx 4]
+	    set lang [lindex $idx 5]
 
 	    if { [regexp "^CU-($decimal)$" $cu dummy cu_index] } {
 		set comment "$name: CU index"
@@ -3267,6 +3272,7 @@ namespace eval Dwarf {
 	    define_label $label
 	    _op .byte $abbrev "$name: abbrev"
 	    _op .uleb128 $cu_index $comment
+	    _op .uleb128 $_constants($lang) "name: $lang"
 	    _op .byte 0 "$name: terminator"
 	    incr abbrev
 	}

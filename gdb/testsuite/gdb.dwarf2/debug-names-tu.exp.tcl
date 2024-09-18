@@ -71,8 +71,8 @@ Dwarf::assemble {
     debug_names {} {
 	cu cu_label
 	tu tu_label
-	name _start subprogram cu_label 0xEDDB6232
-	name struct_with_int_member structure_type tu_label 0x53A2AE86
+	name _start subprogram cu_label 0xEDDB6232 DW_LANG_C
+	name struct_with_int_member structure_type tu_label 0x53A2AE86 DW_LANG_C
     }
 }
 

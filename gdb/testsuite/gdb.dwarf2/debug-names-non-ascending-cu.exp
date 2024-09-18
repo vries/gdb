@@ -57,8 +57,8 @@ Dwarf::assemble {
     debug_names {} {
 	cu cu_label_2
 	cu cu_label
-	name _start subprogram cu_label 0xEDDB6232
-	name int base_type cu_label 0xB888030
+	name _start subprogram cu_label 0xEDDB6232 DW_LANG_C
+	name int base_type cu_label 0xB888030 DW_LANG_C
     }
 }
 
