@@ -125,9 +125,9 @@ private:
   unsigned char m_dwarf_version = 0;
 
 public:
-  /* Non-zero if this CU is from .debug_types.
-     Struct dwarf2_per_cu_data is contained in struct signatured_type iff
-     this is non-zero.  */
+  /* Non-zero if this CU is from .debug_types, or it is a CU from .debug_info
+     with unit type DW_UT_type.  Struct dwarf2_per_cu_data is contained in
+     struct signatured_type iff this is non-zero.  */
   unsigned int is_debug_types : 1;
 
   /* Non-zero if this CU is from the .dwz file.  */
