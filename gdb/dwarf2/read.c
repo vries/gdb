@@ -5116,9 +5116,13 @@ finalize_all_units (dwarf2_per_bfd *per_bfd)
 {
   size_t nr_tus = per_bfd->tu_stats.nr_tus;
   size_t nr_cus = per_bfd->all_units.size () - nr_tus;
-  gdb::array_view<dwarf2_per_cu_data_up> tmp = per_bfd->all_units;
-  per_bfd->all_comp_units = tmp.slice (0, nr_cus);
-  per_bfd->all_type_units = tmp.slice (nr_cus, nr_tus);
+  for (auto &per_cu : per_bfd->all_units)
+    if (per_cu->is_debug_types)
+      per_bfd->all_type_units.push_back (per_cu.get ());
+    else
+      per_bfd->all_comp_units.push_back (per_cu.get ());
+  gdb_assert (nr_cus == per_bfd->all_comp_units.size ());
+  gdb_assert (nr_tus == per_bfd->all_type_units.size ());
 }
 
 /* See read.h.  */
