@@ -4897,7 +4897,7 @@ private:
   void done_reading ();
 
   /* An iterator for the comp units.  */
-  typedef std::vector<dwarf2_per_cu_data_up>::iterator unit_iterator;
+  typedef std::vector<dwarf2_per_cu_data *>::iterator unit_iterator;
 
   /* Process a batch of CUs.  This may be called multiple times in
      separate threads.  TASK_NUMBER indicates which task this is --
@@ -4924,7 +4924,7 @@ cooked_index_debug_info::process_cus (size_t task_number, unit_iterator first,
   cooked_index_storage thread_storage;
   for (auto inner = first; inner != end; ++inner)
     {
-      dwarf2_per_cu_data *per_cu = inner->get ();
+      dwarf2_per_cu_data *per_cu = *inner;
       try
 	{
 	  process_psymtab_comp_unit (per_cu, m_per_objfile, &thread_storage);
@@ -4992,7 +4992,7 @@ cooked_index_debug_info::do_reading ()
      heuristic works well for typical compiler output.  */
 
   size_t total_size = 0;
-  for (const auto &per_cu : per_bfd->all_units)
+  for (const auto &per_cu : per_bfd->all_comp_units)
     total_size += per_cu->length ();
 
   /* How many worker threads we plan to use.  We may not actually use
@@ -5012,9 +5012,9 @@ cooked_index_debug_info::do_reading ()
     this->done_reading ();
   });
 
-  auto end = per_bfd->all_units.end ();
+  auto end = per_bfd->all_comp_units.end ();
   size_t task_count = 0;
-  for (auto iter = per_bfd->all_units.begin (); iter != end; )
+  for (auto iter = per_bfd->all_comp_units.begin (); iter != end; )
     {
       auto last = iter;
       /* Put all remaining CUs into the last task.  */
