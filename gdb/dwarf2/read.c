@@ -4489,8 +4489,14 @@ parent_map_map::dump () const
 {
   for (const auto &iter : m_maps)
     {
-      gdb_printf (gdb_stdlog, "map start:\n");
-      dump_parent_map (iter);
+      auto section = iter.first;
+      gdb_printf (gdb_stdlog, "section %s:\n", section->get_name ());
+      auto const parent_map = iter.second;
+      for (const auto &iter2 : parent_map)
+	{
+	  gdb_printf (gdb_stdlog, "map start:\n");
+	  dump_parent_map (iter2);
+	}
     }
 }
 
@@ -4953,7 +4959,8 @@ cooked_index_debug_info::done_reading ()
   for (auto &one_result : m_results)
     {
       indexes.push_back (std::move (std::get<0> (one_result)));
-      m_all_parents_map.add_map (std::get<3> (one_result));
+      m_all_parents_map.add_map (&m_per_objfile->per_bfd->info,
+				 std::get<3> (one_result));
     }
 
   /* This has to wait until we read the CUs, we need the list of DWOs.  */
@@ -4962,7 +4969,8 @@ cooked_index_debug_info::done_reading ()
   indexes.push_back (m_index_storage.release ());
   indexes.shrink_to_fit ();
 
-  m_all_parents_map.add_map (m_index_storage.release_parent_map ());
+  m_all_parents_map.add_map (&m_per_objfile->per_bfd->types[0],
+			     m_index_storage.release_parent_map ());
 
   dwarf2_per_bfd *per_bfd = m_per_objfile->per_bfd;
   cooked_index *table

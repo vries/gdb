@@ -384,7 +384,8 @@ cooked_index_shard::finalize (const parent_map_map *parent_maps)
       if ((entry->flags & IS_PARENT_DEFERRED) != 0)
 	{
 	  const cooked_index_entry *new_parent
-	    = parent_maps->find (entry->get_deferred_parent ());
+	    = parent_maps->find (entry->per_cu->section,
+				 entry->get_deferred_parent ());
 	  entry->resolve_parent (new_parent);
 	}
 

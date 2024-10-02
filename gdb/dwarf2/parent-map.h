@@ -126,15 +126,16 @@ public:
 
   /* Add a parent_map to this map.  Note that a copy of MAP is made --
      modifications to MAP after this call will have no effect.  */
-  void add_map (const parent_map &map)
+  void add_map (struct dwarf2_section_info *section, const parent_map &map)
   {
-    m_maps.push_back (map.to_fixed (&m_storage));
+    m_maps[section].push_back (map.to_fixed (&m_storage));
   }
 
   /* Look up an entry in this map.  */
-  const cooked_index_entry *find (parent_map::addr_type search) const
+  const cooked_index_entry *find (struct dwarf2_section_info *section,
+				  parent_map::addr_type search) const
   {
-    for (const auto &iter : m_maps)
+    for (const auto &iter : m_maps.at (section))
       {
 	const cooked_index_entry *result
 	  = static_cast<const cooked_index_entry *> (iter->find (search));
@@ -157,7 +158,8 @@ private:
      because we want to allow concurrent lookups, but a mutable
      addrmap is based on a splay-tree, which is not thread-safe, even
      for nominally read-only lookups.  */
-  std::vector<addrmap_fixed *> m_maps;
+  std::unordered_map<dwarf2_section_info *, std::vector<addrmap_fixed *>>
+    m_maps;
 };
 
 #endif /* GDB_DWARF2_PARENT_MAP_H */
