@@ -26,9 +26,40 @@ cache_dir=$scriptdir/../../.git
 cache_file=wikipedia-common-misspellings.txt
 dictionary=$cache_dir/$cache_file
 
-# Separators: space, slash, tab.
-grep_separator=" |/|	"
-sed_separator=" \|/\|\t"
+local_dictionary=$scriptdir/common-misspellings.txt
+
+# Separators: space, slash, tab, colon, comma.
+grep_separators=(" " "/" "	" ":" ",")
+grep_or="|"
+sed_separators=(" " "/" "\t" ":" ",")
+sed_or="\|"
+
+join ()
+{
+    local or
+    or="$1"
+    shift
+
+    local res
+    res=""
+
+    local first
+    first=true
+
+    for item in "$@"; do
+	if $first; then
+	    first=false
+	    res="$item"
+	else
+	    res="$res$or$item"
+	fi
+    done
+
+    echo "$res"
+}
+
+grep_separator=$(join $grep_or ${grep_separators[@]})
+sed_separator=$(join $sed_or ${sed_separators[@]})
 
 usage ()
 {
@@ -114,9 +145,9 @@ parse_dictionary ()
 {
     # Parse dictionary.
     mapfile -t words \
-	    < <(awk -F '->' '{print $1}' "$dictionary")
+	    < <(awk -F '->' '{print $1}' <(cat "$dictionary" "$local_dictionary"))
     mapfile -t replacements \
-	    < <(awk -F '->' '{print $2}' "$dictionary")
+	    < <(awk -F '->' '{print $2}' <(cat "$dictionary" "$local_dictionary"))
 }
 
 find_files_matching_words ()
