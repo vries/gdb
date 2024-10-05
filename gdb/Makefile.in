@@ -622,6 +622,11 @@ CFLAGS = @CFLAGS@
 CXXFLAGS = @CXXFLAGS@
 CPPFLAGS = @CPPFLAGS@
 
+ifneq ($(filter -fsanitizer=thread,$(CFLAGS) $(CXXFLAGS)),)
+CFLAGS = $(CFLAGS) -fno-hoist-adjacent-loads
+CXXFLAGS = $(CXXFLAGS) -fno-hoist-adjacent-loads
+endif
+
 # Set by configure, for e.g. expat.  Python installations are such that
 # C headers are included using their basename (for example, we #include
 # <Python.h> rather than, say, <python/Python.h>).  Since the file names
