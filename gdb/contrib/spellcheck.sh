@@ -181,6 +181,10 @@ parse_args ()
 		check=true
 		shift
 		;;
+	    " --staged ")
+		staged=true
+		shift
+		;;
 	    *)
 		break
 		;;
@@ -489,6 +493,7 @@ main ()
     declare -a unique_files
     check=false
     print_dictionary=false
+    staged=false
     parse_args "$@"
 
     get_dictionary
@@ -502,9 +507,46 @@ main ()
 	exit 0
     fi
 
-    # Reduce set of files for sed to operate on.
     local files_matching_words
     declare -a files_matching_words
+
+    if $staged; then
+	declare -a tmpfiles
+	tmpfiles=()
+	trap 'rm -f "${tmpfiles[@]}"' EXIT
+
+	local orgfiles
+	declare -A orgfiles
+
+	for f in "${unique_files[@]}"; do
+	    local tmp
+	    tmp=$(mktemp)
+	    tmpfiles=("${tmpfiles[@]}" "$tmp")
+	    orgfiles[$tmp]="$f"
+
+	    git diff --staged --minimal "$f" \
+		| tail -n +5 \
+		| grep -E "^\+" \
+		| sed 's/^\+//' \
+		      > "$tmp"
+	done
+
+	mapfile -t files_matching_words \
+		< <(find_files_matching_words "${tmpfiles[@]}")
+
+	if [ ${#files_matching_words[@]} -eq 0 ]; then
+	    ret=0
+	else
+	    for f in "${files_matching_words[@]}"; do
+		echo "Spell check failed in ${orgfiles[$f]}"
+	    done
+	    ret=1
+	fi
+
+	exit $ret
+    fi
+
+    # Reduce set of files for sed to operate on.
     mapfile -t files_matching_words \
 	    < <(find_files_matching_words "${unique_files[@]}")
 

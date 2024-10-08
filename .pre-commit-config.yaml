@@ -59,3 +59,10 @@ repos:
     - id: isort
       types_or: [file]
       files: 'gdb/.*\.py(\.in)?$'
+  - repo: local
+    hooks:
+    - id: spell-check
+      name: spell check
+      language: script
+      entry: ./gdb/contrib/spellcheck.sh --staged
+      files: ^(gdb|gdbsupport|gdbserver)/
