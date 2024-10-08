@@ -144,7 +144,7 @@ sed_join ()
 
 usage ()
 {
-    echo "usage: $(basename "$0") [--check] <file|dir>+"
+    echo "usage: $(basename "$0") [--check] [--pre-commit] <file|dir>+"
     echo "       $(basename "$0") --print-dictionary"
 }
 
@@ -179,6 +179,10 @@ parse_args ()
 	case " $1 " in
 	    " --check ")
 		check=true
+		shift
+		;;
+	    " --staged ")
+		staged=true
 		shift
 		;;
 	    *)
@@ -452,11 +456,20 @@ replace_word_in_files ()
 	return
     fi
 
+    local replace_files
+    declare -a replace_files
+    for f in "${files_matching_word[@]}"; do
+	if $staged; then
+	    f=${org_files[$f]}
+	fi
+	replace_files=("${replace_files[@]}" "$f")
+    done
+
     declare -A md5sums
 
     local changed f before after
     changed=false
-    for f in "${files_matching_word[@]}"; do
+    for f in "${replace_files[@]}"; do
 	if [ "${md5sums[$f]}" = "" ]; then
 	    md5sums[$f]=$(md5sum "$f")
 	fi
@@ -480,7 +493,7 @@ replace_word_in_files ()
 	echo "$id"
     fi
 
-    find_files_matching_word "$word" "${files_matching_word[@]}" \
+    find_files_matching_word "$word" "${replace_files[@]}" \
 	| awk "{ printf \"TODO: $id: replacement failed: %s\n\", \$0}"
 }
 
@@ -489,6 +502,7 @@ main ()
     declare -a unique_files
     check=false
     print_dictionary=false
+    staged=false
     parse_args "$@"
 
     get_dictionary
@@ -502,18 +516,56 @@ main ()
 	exit 0
     fi
 
-    # Reduce set of files for sed to operate on.
     local files_matching_words
     declare -a files_matching_words
-    mapfile -t files_matching_words \
-	    < <(find_files_matching_words "${unique_files[@]}")
 
-    if [ ${#files_matching_words[@]} -eq 0 ]; then
-	return
-    fi
+    if $staged; then
+	declare -a tmpfiles
+	tmpfiles=()
+	trap 'rm -f "${tmpfiles[@]}"' EXIT
 
-    if $check; then
-	exit 1
+	declare -A org_files
+
+	for f in "${unique_files[@]}"; do
+	    local tmp
+	    tmp=$(mktemp)
+	    tmpfiles=("${tmpfiles[@]}" "$tmp")
+	    org_files[$tmp]="$f"
+
+	    git diff --staged --minimal "$f" \
+		| tail -n +5 \
+		| grep -E "^\+" \
+		| sed 's/^\+//' \
+		      > "$tmp"
+	done
+
+	mapfile -t files_matching_words \
+		< <(find_files_matching_words "${tmpfiles[@]}")
+
+	if [ ${#files_matching_words[@]} -eq 0 ]; then
+	    ret=0
+	else
+	    for f in "${files_matching_words[@]}"; do
+		echo "Spell check failed in ${org_files[$f]}"
+	    done
+	    ret=1
+	fi
+
+	if $check || [ $ret -eq 0 ]; then
+	    exit $ret
+	fi
+    else
+	# Reduce set of files for sed to operate on.
+	mapfile -t files_matching_words \
+		< <(find_files_matching_words "${unique_files[@]}")
+
+	if [ ${#files_matching_words[@]} -eq 0 ]; then
+	    return
+	fi
+
+	if $check; then
+	    exit 1
+	fi
     fi
 
     local i word replacement
