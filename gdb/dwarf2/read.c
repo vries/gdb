@@ -5012,7 +5012,14 @@ cooked_index_debug_info::do_reading ()
   /* Work is done in a task group.  */
   gdb::task_group workers ([this] ()
   {
-    this->done_reading ();
+    try
+      {
+	this->done_reading ();
+      }
+    catch (const gdb_exception &exc)
+      {
+	this->m_failed = exc;
+      }
   });
 
   auto end = per_bfd->all_units.end ();
