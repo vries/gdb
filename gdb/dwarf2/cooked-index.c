@@ -468,20 +468,28 @@ cooked_index_shard::find (const std::string &name, bool completing) const
 void
 cooked_index_worker::start ()
 {
-  gdb::thread_pool::g_thread_pool->post_task ([=] ()
-  {
-    try
+  try
+    {
+      gdb::thread_pool::g_thread_pool->post_task ([=] ()
       {
-	do_reading ();
-      }
-    catch (const gdb_exception &exc)
-      {
-	m_failed = exc;
-	set (cooked_state::CACHE_DONE);
-      }
+	try
+	  {
+	    do_reading ();
+	  }
+	catch (const gdb_exception &exc)
+	  {
+	    m_failed = exc;
+	    set (cooked_state::CACHE_DONE);
+	  }
 
-    bfd_thread_cleanup ();
-  });
+	bfd_thread_cleanup ();
+      });
+    }
+  catch (const gdb_exception &exc)
+    {
+      m_failed = exc;
+      set (cooked_state::CACHE_DONE);
+    }
 }
 
 /* See cooked-index.h.  */
