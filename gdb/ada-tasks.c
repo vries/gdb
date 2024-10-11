@@ -1447,7 +1447,11 @@ ada_task_list_changed (struct inferior *inf)
 static void
 ada_tasks_invalidate_pspace_data (struct program_space *pspace)
 {
-  get_ada_tasks_pspace_data (pspace)->initialized_p = 0;
+  auto data = ada_tasks_pspace_data_handle.get (pspace);
+  if (data == nullptr)
+    return;
+
+  data->initialized_p = 0;
 }
 
 /* Invalidate the per-inferior data.  */
@@ -1455,7 +1459,10 @@ ada_tasks_invalidate_pspace_data (struct program_space *pspace)
 static void
 ada_tasks_invalidate_inferior_data (struct inferior *inf)
 {
-  struct ada_tasks_inferior_data *data = get_ada_tasks_inferior_data (inf);
+  struct ada_tasks_inferior_data *data
+    = ada_tasks_inferior_data_handle.get (inf);
+  if (data == nullptr)
+    return;
 
   data->known_tasks_kind = ADA_TASKS_UNKNOWN;
   data->task_list_valid_p = false;

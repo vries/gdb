@@ -1756,7 +1756,8 @@ symtab_all_objfiles_removed (program_space *pspace)
   symbol_cache_flush (pspace);
 
   /* Forget everything we know about the main function.  */
-  set_main_name (pspace, nullptr, language_unknown);
+  if (main_progspace_key.get (pspace) != nullptr)
+    set_main_name (pspace, nullptr, language_unknown);
 }
 
 /* This module's 'free_objfile' observer.  */
