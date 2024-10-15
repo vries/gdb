@@ -93,6 +93,9 @@ if ![runto_main] {
     return -1
 }
 
+set index [have_index $binfile]
+set readnow [readnow]
+
 # Print the type of global_var.  This type information is entirely
 # fictional, it only exists in the DWARF, but it contains lots of nice
 # field names, all of which are stored in the .debug_str section.
@@ -133,29 +136,31 @@ gdb_test_no_output "maint set dwarf synchronous on"
 set line1 "Reading symbols from \[^\r\n\]+"
 set dwarf_error "DWARF Error: DW_FORM_strp used without required section"
 
-# This pattern is hit when GDB does not use -readnow (i.e. the default
-# behaviour).
-set pattern1 \
-    [multi_line \
-         $line1 \
-         $dwarf_error \
-        "\\(No debugging symbols \[^\r\n\]+\\)"]
-
-# This pattern is hit when GDB does use -readnow (e.g. running with
-# --target_board=readnow).
-set pattern2 \
-    [multi_line \
-        $line1 \
-        "Expanding full symbols from \[^\r\n\]+" \
-        $dwarf_error]
-
-# This pattern is hit when gcc adds an index (e.g. running with
-# --target_board=cc-with-gdb-index).
-set pattern3 \
-    [multi_line \
-        $line1 \
-        $dwarf_error]
+set hs \[^\r\n\]+
+set print_pattern " = $hs $hex <main>"
+if { $readnow } {
+    set file_pattern \
+	[multi_line \
+	     $line1 \
+	     "Expanding full symbols from \[^\r\n\]+" \
+	     $dwarf_error]
+} elseif { $index == "" } {
+    set file_pattern \
+	[multi_line \
+	     $line1 \
+	     $dwarf_error]
+} elseif { $index == "debug_names" } {
+    set file_pattern \
+	[multi_line \
+	     $line1 \
+	     $dwarf_error]
+} elseif { $index == "gdb_index" } {
+    set file_pattern $line1
+    set print_pattern $dwarf_error
+}
 
 # Load the executable, we expect an error from the DWARF parser.
-gdb_test "file $binfile_no_debug_str" "($pattern1|$pattern2|$pattern3)" \
+gdb_test "file $binfile_no_debug_str" "$file_pattern" \
     "file $testfile"
+
+gdb_test "p main" $print_pattern
