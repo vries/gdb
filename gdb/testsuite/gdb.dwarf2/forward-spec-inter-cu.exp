@@ -16,6 +16,8 @@
 # Check that the DWARF reader works with a a DW_AT_specification that
 # refers to a later DIE.  Inter-cu variant of forward-spec.exp.
 
+require !readnow
+
 load_lib dwarf.exp
 
 # This test can only be run on targets which support DWARF-2 and use gas.
@@ -97,6 +99,8 @@ foreach_with_prefix worker_threads $worker_threads_list {
     }
 
     gdb_load $binfile
+
+    require {string equal [have_index $binfile] ""}
 
     gdb_test "pipe maint print objfiles | grep ns::v" \
 	"$ws+qualified:$ws+ns::v" \
