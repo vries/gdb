@@ -16524,7 +16524,18 @@ cooked_indexer::index_dies (cutu_reader *reader,
 	  continue;
 	}
 
-      if (!abbrev->interesting)
+      parent_map::addr_type defer {};
+      if (std::holds_alternative<parent_map::addr_type> (parent))
+	defer = std::get<parent_map::addr_type> (parent);
+      const cooked_index_entry *parent_entry = nullptr;
+      if (std::holds_alternative<const cooked_index_entry *> (parent))
+	parent_entry = std::get<const cooked_index_entry *> (parent);
+
+      if (!abbrev->interesting
+	  || (parent_entry != nullptr
+	      && parent_entry->tag == DW_TAG_subprogram
+	      && abbrev->tag != DW_TAG_subprogram
+	      && abbrev->tag != DW_TAG_entry_point))
 	{
 	  info_ptr = skip_one_die (reader, info_ptr, abbrev, !fully);
 	  if (fully && abbrev->has_children)
@@ -16534,14 +16545,8 @@ cooked_indexer::index_dies (cutu_reader *reader,
 
       const char *name = nullptr;
       const char *linkage_name = nullptr;
-      parent_map::addr_type defer {};
-      if (std::holds_alternative<parent_map::addr_type> (parent))
-	defer = std::get<parent_map::addr_type> (parent);
       cooked_index_flag flags = IS_STATIC;
       sect_offset sibling {};
-      const cooked_index_entry *parent_entry = nullptr;
-      if (std::holds_alternative<const cooked_index_entry *> (parent))
-	parent_entry = std::get<const cooked_index_entry *> (parent);
       const cooked_index_entry *this_parent_entry = parent_entry;
       bool is_enum_class = false;
 
