@@ -43,27 +43,29 @@ namespace gdb
 
    You could wrap it by writing the wrapped form:
 
-   ssize_t ret = gdb::handle_eintr (-1, ::write, pipe[1], "+", 1);
+   ssize_t ret = gdb::handle_eintr<-1> ([&]
+     {
+       return ::write (pipe[1], "+", 1);
+     });
 
    ERRVAL specifies the failure value indicating that the call to the
    F function with ARGS... arguments was possibly interrupted with a
    signal.  */
 
-template<typename ErrorValType, typename Fun, typename... Args>
-inline auto
-handle_eintr (ErrorValType errval, const Fun &f, const Args &... args)
-  -> decltype (f (args...))
+template <auto val, typename F>
+static auto
+handle_eintr (F &&f)
 {
-  decltype (f (args...)) ret;
-
-  do
+  while (true)
     {
       errno = 0;
-      ret = f (args...);
-    }
-  while (ret == errval && errno == EINTR);
 
-  return ret;
+      auto ret = f ();
+      if (ret == val && errno == EINTR)
+	continue;
+
+      return ret;
+    }
 }
 
 } /* namespace gdb */

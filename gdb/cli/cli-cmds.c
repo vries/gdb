@@ -923,7 +923,10 @@ run_under_shell (const char *arg, int from_tty)
 
   if (pid != -1)
     {
-      int ret = gdb::handle_eintr (-1, ::waitpid, pid, &status, 0);
+      int ret = gdb::handle_eintr<-1> ([&]
+	{
+	  return ::waitpid (pid, &status, 0);
+	});
       if (ret == -1)
 	perror_with_name ("Cannot get status of shell command");
     }
