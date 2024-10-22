@@ -46,6 +46,7 @@
 #include "gdbsupport/scoped_fd.h"
 #include "gdbsupport/pathstuff.h"
 #include "gdbsupport/buildargv.h"
+#include "gdbsupport/eintr.h"
 #include "cli/cli-style.h"
 
 /* This module provides the interface between GDB and the
@@ -2063,7 +2064,10 @@ wait_again:
 	      int wait_retval;
 
 	      /* /proc file not found; presumably child has terminated.  */
-	      wait_retval = ::wait (&wstat); /* "wait" for the child's exit.  */
+	      wait_retval = gdb::handle_eintr<-1> ([&]
+		{
+		  return wait (&wstat); /* "wait" for the child's exit.  */
+		});
 
 	      /* Wrong child?  */
 	      if (wait_retval != inf->pid)
@@ -2560,9 +2564,15 @@ unconditionally_kill_inferior (procinfo *pi)
 #if 0
       int status, ret;
 
-      ret = waitpid (pi->pid, &status, 0);
+      ret = gdb::handle_eintr<-1> ([&]
+	{
+	  return waitpid (pi->pid, &status, 0);
+	});
 #else
-      wait (NULL);
+      gdb::handle_eintr<-1> ([]
+	{
+	  return wait (NULL);
+	});
 #endif
     }
 }

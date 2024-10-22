@@ -19,6 +19,7 @@
 #include "linux-ptrace.h"
 #include "linux-procfs.h"
 #include "linux-waitpid.h"
+#include "gdbsupport/eintr.h"
 #ifdef HAVE_SYS_PROCFS_H
 #include <sys/procfs.h>
 #endif
@@ -177,7 +178,10 @@ linux_ptrace_test_ret_to_nx (void)
     }
 
   errno = 0;
-  got_pid = waitpid (child, &status, 0);
+  got_pid = gdb::handle_eintr<-1> ([&]
+    {
+      return waitpid (child, &status, 0);
+    });
   if (got_pid != child)
     {
       warning (_("linux_ptrace_test_ret_to_nx: waitpid returned %ld: %s"),

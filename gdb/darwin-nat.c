@@ -70,6 +70,7 @@
 #include "gdbsupport/scoped_fd.h"
 #include "gdbsupport/scoped_restore.h"
 #include "nat/fork-inferior.h"
+#include "gdbsupport/eintr.h"
 
 /* Quick overview.
    Darwin kernel is Mach + BSD derived kernel.  Note that they share the
@@ -1604,7 +1605,10 @@ darwin_attach_pid (struct inferior *inf)
 	  if (!inf->attach_flag)
 	    {
 	      kill (inf->pid, 9);
-	      waitpid (inf->pid, &status, 0);
+	      gdb::handle_eintr<-1> ([&]
+		{
+		  return waitpid (inf->pid, &status, 0);
+		});
 	    }
 
 	  error

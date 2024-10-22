@@ -23,6 +23,7 @@
 #include "gdbthread.h"
 #include "fnmatch.h"
 #include "gdb_bfd.h"
+#include "gdbsupport/eintr.h"
 #ifdef HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
 #endif /* HAVE_SYS_RESOURCE_H */
@@ -3483,7 +3484,10 @@ wait_to_die_with_timeout (pid_t pid, int *status, int timeout)
       alarm (timeout);
 #endif
 
-      waitpid_result = waitpid (pid, status, 0);
+      waitpid_result = gdb::handle_eintr<-1> ([&]
+	{
+	  return waitpid (pid, status, 0);
+	});
 
 #ifdef SIGALRM
       alarm (0);
@@ -3495,7 +3499,10 @@ wait_to_die_with_timeout (pid_t pid, int *status, int timeout)
 #endif
     }
   else
-    waitpid_result = waitpid (pid, status, WNOHANG);
+    waitpid_result = gdb::handle_eintr<-1> ([&]
+      {
+	return waitpid (pid, status, WNOHANG);
+      });
 
   if (waitpid_result == pid)
     return pid;

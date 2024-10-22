@@ -33,6 +33,7 @@
 #include "exec.h"
 #include "observable.h"
 #include "xcoffread.h"
+#include "gdbsupport/eintr.h"
 
 #include <sys/ptrace.h>
 #include <sys/reg.h>
@@ -865,12 +866,11 @@ rs6000_nat_target::wait (ptid_t ptid, struct target_waitstatus *ourstatus,
     {
       set_sigint_trap ();
 
-      do
+      pid = gdb::handle_eintr<-1> ([&]
 	{
-	  pid = waitpid (ptid.pid (), &status, 0);
-	  save_errno = errno;
-	}
-      while (pid == -1 && errno == EINTR);
+	  return waitpid (ptid.pid (), &status, 0);
+	});
+      save_errno = errno;
 
       clear_sigint_trap ();
 
