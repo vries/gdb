@@ -25,6 +25,7 @@
 #include "inferior.h"
 #include "gdbarch.h"
 #include "gdbsupport/buildargv.h"
+#include "gdbsupport/eintr.h"
 
 #include <sys/types.h>
 #include <sys/ptrace.h>
@@ -547,12 +548,11 @@ nbsd_wait (ptid_t ptid, struct target_waitstatus *ourstatus,
 
   set_sigint_trap ();
 
-  do
+  pid = gdb::handle_eintr<-1> ([&]
     {
       /* The common code passes WNOHANG that leads to crashes, overwrite it.  */
-      pid = waitpid (ptid.pid (), &status, 0);
-    }
-  while (pid == -1 && errno == EINTR);
+      return waitpid (ptid.pid (), &status, 0);
+    });
 
   clear_sigint_trap ();
 

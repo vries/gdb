@@ -24,6 +24,7 @@
 #include <sys/types.h>
 #include <sys/ptrace.h>
 #include "gdbsupport/gdb_wait.h"
+#include "gdbsupport/eintr.h"
 
 #include "inf-ptrace.h"
 #include "obsd-nat.h"
@@ -105,7 +106,10 @@ obsd_nat_target::wait (ptid_t ptid, struct target_waitstatus *ourstatus,
 	  ourstatus->set_forked (ptid_t (pe.pe_other_pid));
 
 	  /* Make sure the other end of the fork is stopped too.  */
-	  pid_t fpid = waitpid (pe.pe_other_pid, nullptr, 0);
+	  pid_t fpid = gdb::handle_eintr<-1> ([&]
+	    {
+	      return waitpid (pe.pe_other_pid, nullptr, 0);
+	    });
 	  if (fpid == -1)
 	    perror_with_name (("waitpid"));
 
