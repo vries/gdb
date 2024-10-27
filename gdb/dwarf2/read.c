@@ -324,6 +324,9 @@ struct dwo_unit
 
   /* For types, offset in the type's DIE of the type defined by this TU.  */
   cu_offset type_offset_in_tu;
+
+  /* DWARF standard version of this DWO unit.  */
+  unsigned char dwarf_version;
 };
 
 /* include/dwarf2.h defines the DWP section codes.
@@ -3449,6 +3452,7 @@ create_debug_type_hash_table (dwarf2_per_objfile *per_objfile,
       dwo_tu->section = section;
       dwo_tu->sect_off = sect_off;
       dwo_tu->length = length;
+      dwo_tu->dwarf_version = header.version;
 
       slot = htab_find_slot (types_htab.get (), dwo_tu, INSERT);
       gdb_assert (slot != NULL);
@@ -3545,6 +3549,7 @@ fill_in_sig_entry_from_dwo_entry (dwarf2_per_objfile *per_objfile,
   sig_entry->per_bfd = per_bfd;
   sig_entry->type_offset_in_tu = dwo_entry->type_offset_in_tu;
   sig_entry->dwo_unit = dwo_entry;
+  sig_entry->set_version (dwo_entry->dwarf_version);
 }
 
 /* Subroutine of lookup_signatured_type.
