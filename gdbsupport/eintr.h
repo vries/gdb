@@ -21,6 +21,11 @@
 #define GDBSUPPORT_EINTR_H
 
 #include <cerrno>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 namespace gdb
 {
@@ -67,5 +72,31 @@ handle_eintr (ErrorValType errval, const Fun &f, const Args &... args)
 }
 
 } /* namespace gdb */
+
+/* Syscall wrappers that care of EINTR.  */
+
+inline pid_t
+gdb_waitpid (pid_t pid, int *wstatus, int options)
+{
+  return gdb::handle_eintr (-1, ::waitpid, pid, wstatus, options);
+}
+
+inline int
+gdb_open (const char *pathname, int flags)
+{
+  return gdb::handle_eintr (-1, ::open, pathname, flags);
+}
+
+inline int
+gdb_close (int fd)
+{
+  return gdb::handle_eintr (-1, ::close, fd);
+}
+
+inline ssize_t
+gdb_read (int fd, void *buf, size_t count)
+{
+  return gdb::handle_eintr (-1, ::read, fd, buf, count);
+}
 
 #endif /* GDBSUPPORT_EINTR_H */
