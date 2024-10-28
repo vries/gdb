@@ -14019,7 +14019,7 @@ read_subroutine_type (struct die_info *die, struct dwarf2_cu *cu)
   if (type->code () == TYPE_CODE_VOID
       && !type->is_stub ()
       && die->child == nullptr
-      && (cu->per_cu->version () == 2
+      && (cu->header.version == 2
 	  || producer_is_gas_2_39 (cu)))
     {
       /* Work around PR gas/29517, pretend we have an DW_TAG_unspecified_type
