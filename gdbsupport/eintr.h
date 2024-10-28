@@ -87,6 +87,12 @@ gdb_open (const char *pathname, int flags)
   return gdb::handle_eintr (-1, ::open, pathname, flags);
 }
 
+inline pid_t
+gdb_wait (int *wstatus)
+{
+  return gdb::handle_eintr (-1, ::wait, wstatus);
+}
+
 inline int
 gdb_close (int fd)
 {
