@@ -1610,25 +1610,29 @@ call_function_by_hand_dummy (struct value *function,
 
 	    maybe_remove_breakpoints ();
 
-	    gdb_assert (retval != NULL);
-
 	    /* Destruct the pass-by-ref argument clones.  */
 	    call_destructors (dtors_to_invoke, default_return_type);
 
-	    return retval;
+	    if (e.reason >= 0)
+	      {
+		gdb_assert (retval != NULL);
+		return retval;
+	      }
 	  }
 	else
-	  infcall_debug_printf ("call did not complete");
+	  {
+	    infcall_debug_printf ("call did not complete");
 
-	/* Didn't complete.  Clean up / destroy the call FSM, and restore the
-	   previous state machine, and handle the error.  */
-	{
-	  std::unique_ptr<thread_fsm> finalizing
-	    = call_thread->release_thread_fsm ();
-	  call_thread->set_thread_fsm (std::move (saved_sm));
+	    /* Didn't complete.  Clean up / destroy the call FSM, and restore
+	       the previous state machine, and handle the error.  */
+	    {
+	      std::unique_ptr<thread_fsm> finalizing
+		= call_thread->release_thread_fsm ();
+	      call_thread->set_thread_fsm (std::move (saved_sm));
 
-	  finalizing->clean_up (call_thread.get ());
-	}
+	      finalizing->clean_up (call_thread.get ());
+	    }
+	  }
       }
   }
 
@@ -1638,8 +1642,8 @@ call_function_by_hand_dummy (struct value *function,
     {
       const char *name = get_function_name (funaddr,
 					    name_buf, sizeof (name_buf));
-
-      discard_infcall_control_state (inf_status.release ());
+      if (inf_status != nullptr)
+	discard_infcall_control_state (inf_status.release ());
 
       /* We could discard the dummy frame here if the program exited,
 	 but it will get garbage collected the next time the program is
