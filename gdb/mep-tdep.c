@@ -2105,7 +2105,7 @@ mep_extract_return_value (struct gdbarch *arch,
     offset = 0;
 
   /* Return values that do fit in a single register are returned in R0.  */
-  regcache->cooked_read_part (MEP_R0_REGNUM, offset, type->length (),
+  regcache->deprecated_cooked_read_part (MEP_R0_REGNUM, offset, type->length (),
 			      valbuf);
 }
 

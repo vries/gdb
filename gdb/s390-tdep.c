@@ -2030,7 +2030,7 @@ s390_register_return_value (struct gdbarch *gdbarch, struct type *type,
       if (in != NULL)
 	regcache->cooked_write_part (S390_F0_REGNUM, 0, length, in);
       else
-	regcache->cooked_read_part (S390_F0_REGNUM, 0, length, out);
+	regcache->deprecated_cooked_read_part (S390_F0_REGNUM, 0, length, out);
     }
   else if (code == TYPE_CODE_ARRAY)
     {
@@ -2038,13 +2038,13 @@ s390_register_return_value (struct gdbarch *gdbarch, struct type *type,
       if (in != NULL)
 	regcache->cooked_write_part (S390_V24_REGNUM, 0, length, in);
       else
-	regcache->cooked_read_part (S390_V24_REGNUM, 0, length, out);
+	regcache->deprecated_cooked_read_part (S390_V24_REGNUM, 0, length, out);
     }
   else if (length <= word_size)
     {
       /* Integer: zero- or sign-extended in r2.  */
       if (out != NULL)
-	regcache->cooked_read_part (S390_R2_REGNUM, word_size - length, length,
+	regcache->deprecated_cooked_read_part (S390_R2_REGNUM, word_size - length, length,
 				    out);
       else if (type->is_unsigned ())
 	regcache_cooked_write_unsigned

@@ -544,10 +544,10 @@ z80_return_value (struct gdbarch *gdbarch, struct value *function,
     {
       if (len > 2)
 	{
-	  regcache->cooked_read_part (Z80_DE_REGNUM, 0, len - 2, readbuf+2);
+	  regcache->deprecated_cooked_read_part (Z80_DE_REGNUM, 0, len - 2, readbuf+2);
 	  len = 2;
 	}
-      regcache->cooked_read_part (Z80_HL_REGNUM, 0, len, readbuf);
+      regcache->deprecated_cooked_read_part (Z80_HL_REGNUM, 0, len, readbuf);
     }
 
   return RETURN_VALUE_REGISTER_CONVENTION;

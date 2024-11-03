@@ -449,7 +449,7 @@ m32c_part_read (struct m32c_reg *reg, readable_regcache *cache, gdb_byte *buf)
 
   memset (buf, 0, reg->type->length ());
   m32c_find_part (reg, &offset, &len);
-  return cache->cooked_read_part (reg->rx->num, offset, len, buf);
+  return cache->deprecated_cooked_read_part (reg->rx->num, offset, len, buf);
 }
 
 

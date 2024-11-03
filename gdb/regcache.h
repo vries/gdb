@@ -329,7 +329,7 @@ public:
 				    gdb::array_view<gdb_byte> dst);
 
   /* Deprecated overload of the above.  */
-  register_status cooked_read_part (int regnum, int offset, int len, gdb_byte *src)
+  register_status deprecated_cooked_read_part (int regnum, int offset, int len, gdb_byte *src)
   { return cooked_read_part (regnum, offset, gdb::make_array_view (src, len)); }
 
   /* Read register REGNUM from the regcache and return a new value.  This

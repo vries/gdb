@@ -1132,7 +1132,7 @@ hppa32_return_value (struct gdbarch *gdbarch, struct value *function,
       if (part > 0)
 	{
 	  if (readbuf != NULL)
-	    regcache->cooked_read_part (reg, 4 - part, part, readbuf);
+	    regcache->deprecated_cooked_read_part (reg, 4 - part, part, readbuf);
 	  if (writebuf != NULL)
 	    regcache->cooked_write_part (reg, 4 - part, part, writebuf);
 	  reg++;
@@ -1221,7 +1221,7 @@ hppa64_return_value (struct gdbarch *gdbarch, struct value *function,
     {
       while (len > 0)
 	{
-	  regcache->cooked_read_part (regnum, offset, std::min (len, 8),
+	  regcache->deprecated_cooked_read_part (regnum, offset, std::min (len, 8),
 				      readbuf);
 	  readbuf += std::min (len, 8);
 	  len -= std::min (len, 8);
