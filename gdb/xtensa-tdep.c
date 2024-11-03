@@ -648,7 +648,7 @@ xtensa_pseudo_register_write (struct gdbarch *gdbarch,
   /* We can always write 'core' registers.
      Note: We might have converted Ax->ARy.  */
   if (regnum >= 0 && regnum < gdbarch_num_regs (gdbarch))
-    regcache->raw_write (regnum, buffer);
+    regcache->deprecated_raw_write (regnum, buffer);
 
   /* We have to find out how to deal with privileged registers.
      Let's treat them as pseudo-registers, but we cannot read/write them.  */
@@ -703,7 +703,7 @@ xtensa_pseudo_register_write (struct gdbarch *gdbarch,
 	}
 
       /* Assume that we can write the register.  */
-      regcache->raw_write (regnum, buffer);
+      regcache->deprecated_raw_write (regnum, buffer);
     }
   else
     internal_error (_("invalid register number %d"), regnum);
@@ -1628,7 +1628,7 @@ xtensa_store_return_value (struct type *type,
       if (len < 4)
 	regcache->raw_write_part (areg, offset, len, valbuf);
       else
-	regcache->raw_write (areg, valbuf);
+	regcache->deprecated_raw_write (areg, valbuf);
     }
 }
 

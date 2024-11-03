@@ -1257,7 +1257,7 @@ m68hc11_store_return_value (struct type *type, struct regcache *regcache,
   else if (len <= 4)
     {
       regcache->raw_write_part (HARD_X_REGNUM, 4 - len, len - 2, valbuf);
-      regcache->raw_write (HARD_D_REGNUM, valbuf + (len - 2));
+      regcache->deprecated_raw_write (HARD_D_REGNUM, valbuf + (len - 2));
     }
   else
     error (_("return of value > 4 is not supported."));

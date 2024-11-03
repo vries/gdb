@@ -1235,7 +1235,7 @@ mep_pseudo_cr64_write (struct gdbarch *gdbarch,
 		     int cookednum,
 		     const gdb_byte *buf)
 {
-  regcache->raw_write (mep_pseudo_to_raw[cookednum], buf);
+  regcache->deprecated_raw_write (mep_pseudo_to_raw[cookednum], buf);
 }
 
 
@@ -1254,7 +1254,7 @@ mep_pseudo_register_write (struct gdbarch *gdbarch,
 	   || IS_FP_CR64_REGNUM (cookednum))
     mep_pseudo_cr64_write (gdbarch, regcache, cookednum, buf);
   else if (IS_CCR_REGNUM (cookednum))
-    regcache->raw_write (mep_pseudo_to_raw[cookednum], buf);
+    regcache->deprecated_raw_write (mep_pseudo_to_raw[cookednum], buf);
   else
     gdb_assert_not_reached ("unexpected pseudo register");
 }

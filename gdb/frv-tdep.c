@@ -334,8 +334,8 @@ frv_pseudo_register_write (struct gdbarch *gdbarch, struct regcache *regcache,
 {
   if (reg == iacc0_regnum)
     {
-      regcache->raw_write (iacc0h_regnum, buffer);
-      regcache->raw_write (iacc0l_regnum, (bfd_byte *) buffer + 4);
+      regcache->deprecated_raw_write (iacc0h_regnum, buffer);
+      regcache->deprecated_raw_write (iacc0l_regnum, (bfd_byte *) buffer + 4);
     }
   else if (accg0_regnum <= reg && reg <= accg7_regnum)
     {

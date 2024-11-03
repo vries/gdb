@@ -1153,7 +1153,7 @@ v850_store_return_value (struct type *type, struct regcache *regcache,
     {
       int i, regnum = E_V0_REGNUM;
       for (i = 0; i < len; i += 4)
-	regcache->raw_write (regnum++, valbuf + i);
+	regcache->deprecated_raw_write (regnum++, valbuf + i);
     }
 }
 

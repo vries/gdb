@@ -240,7 +240,7 @@ tilegx_store_return_value (struct type *type, struct regcache *regcache,
       int i, regnum = TILEGX_R0_REGNUM;
 
       for (i = 0; i < len; i += tilegx_reg_size)
-	regcache->raw_write (regnum++, (gdb_byte *) valbuf + i);
+	regcache->deprecated_raw_write (regnum++, (gdb_byte *) valbuf + i);
     }
 }
 

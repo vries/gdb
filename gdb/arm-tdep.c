@@ -9900,8 +9900,8 @@ arm_neon_quad_write (struct gdbarch *gdbarch, struct regcache *regcache,
   double_regnum = user_reg_map_name_to_regnum (gdbarch, name_buf,
 					       strlen (name_buf));
 
-  regcache->raw_write (double_regnum, buf);
-  regcache->raw_write (double_regnum + 1, buf + 8);
+  regcache->deprecated_raw_write (double_regnum, buf);
+  regcache->deprecated_raw_write (double_regnum + 1, buf + 8);
 }
 
 static void

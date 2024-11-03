@@ -894,7 +894,7 @@ regcache::raw_write (int regnum, gdb::array_view<const gdb_byte> src)
 }
 
 void
-regcache::raw_write (int regnum, const gdb_byte *src)
+regcache::deprecated_raw_write (int regnum, const gdb_byte *src)
 {
   assert_regnum (regnum);
 

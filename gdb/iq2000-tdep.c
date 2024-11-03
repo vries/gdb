@@ -740,8 +740,8 @@ iq2000_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 		 (must start with an even-numbered reg).  */
 	      if (((argreg - E_1ST_ARGREG) % 2) != 0)
 		argreg++;
-	      regcache->raw_write (argreg++, val);
-	      regcache->raw_write (argreg++, val + 4);
+	      regcache->deprecated_raw_write (argreg++, val);
+	      regcache->deprecated_raw_write (argreg++, val + 4);
 	    }
 	  else
 	    {

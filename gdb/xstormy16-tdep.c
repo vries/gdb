@@ -184,7 +184,7 @@ xstormy16_store_return_value (struct type *type, struct regcache *regcache,
       int i, regnum = E_1ST_ARG_REGNUM;
 
       for (i = 0; i < len; i += xstormy16_reg_size)
-	regcache->raw_write (regnum++, valbuf + i);
+	regcache->deprecated_raw_write (regnum++, valbuf + i);
     }
 }
 
