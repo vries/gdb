@@ -218,7 +218,7 @@ public:
 			 gdb::array_view<gdb_byte> dst) const;
 
   /* Deprecated overload of the above.  */
-  void raw_collect_part (int regnum, int offset, int len, gdb_byte *dst) const
+  void deprecated_raw_collect_part (int regnum, int offset, int len, gdb_byte *dst) const
   { raw_collect_part (regnum, offset, gdb::make_array_view (dst, len)); }
 
   /* See gdbsupport/common-regcache.h.  */
