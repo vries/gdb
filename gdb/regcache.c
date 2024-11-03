@@ -924,7 +924,7 @@ regcache::cooked_write (int regnum, gdb::array_view<const gdb_byte> src)
 /* See regcache.h.  */
 
 void
-regcache::cooked_write (int regnum, const gdb_byte *src)
+regcache::deprecated_cooked_write (int regnum, const gdb_byte *src)
 {
   gdb_assert (regnum >= 0);
   gdb_assert (regnum < m_descr->nr_cooked_registers);

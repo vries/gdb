@@ -1224,7 +1224,7 @@ sparc64_store_floating_fields (struct regcache *regcache, struct type *type,
 	  len = 8;
 	}
       for (int n = 0; n < (len + 3) / 4; n++)
-	regcache->cooked_write (regnum + n, valbuf + n * 4);
+	regcache->deprecated_cooked_write (regnum + n, valbuf + n * 4);
     }
   else if (sparc64_floating_p (type)
       || (sparc64_complex_floating_p (type) && len <= 16))
@@ -1237,7 +1237,7 @@ sparc64_store_floating_fields (struct regcache *regcache, struct type *type,
 	  gdb_assert ((element % 2) == 0);
 
 	  regnum = gdbarch_num_regs (gdbarch) + SPARC64_Q0_REGNUM + element / 2;
-	  regcache->cooked_write (regnum, valbuf);
+	  regcache->deprecated_cooked_write (regnum, valbuf);
 	}
       else if (len == 8)
 	{
@@ -1245,7 +1245,7 @@ sparc64_store_floating_fields (struct regcache *regcache, struct type *type,
 
 	  regnum = gdbarch_num_regs (gdbarch) + SPARC64_D0_REGNUM
 		   + element + bitpos / 64;
-	  regcache->cooked_write (regnum, valbuf + (bitpos / 8));
+	  regcache->deprecated_cooked_write (regnum, valbuf + (bitpos / 8));
 	}
       else
 	{
@@ -1253,7 +1253,7 @@ sparc64_store_floating_fields (struct regcache *regcache, struct type *type,
 	  gdb_assert (bitpos % 32 == 0 && bitpos >= 0 && bitpos < 128);
 
 	  regnum = SPARC_F0_REGNUM + element * 2 + bitpos / 32;
-	  regcache->cooked_write (regnum, valbuf + (bitpos / 8));
+	  regcache->deprecated_cooked_write (regnum, valbuf + (bitpos / 8));
 	}
     }
   else if (sparc64_structure_or_union_p (type))
@@ -1283,7 +1283,7 @@ sparc64_store_floating_fields (struct regcache *regcache, struct type *type,
 	  struct type *subtype = check_typedef (type->field (0).type ());
 
 	  if (sparc64_floating_p (subtype) && subtype->length () == 4)
-	    regcache->cooked_write (SPARC_F1_REGNUM, valbuf);
+	    regcache->deprecated_cooked_write (SPARC_F1_REGNUM, valbuf);
 	}
     }
 }
@@ -1505,7 +1505,7 @@ sparc64_store_arguments (struct regcache *regcache, int nargs,
 	    {
 	      regnum = SPARC_O0_REGNUM + element;
 	      if (len > 8 && element < 5)
-		regcache->cooked_write (regnum + 1, valbuf + 8);
+		regcache->deprecated_cooked_write (regnum + 1, valbuf + 8);
 	    }
 
 	  if (element < 16)
@@ -1521,9 +1521,9 @@ sparc64_store_arguments (struct regcache *regcache, int nargs,
 	      if (len == 16)
 		{
 		  if (regnum < gdbarch_num_regs (gdbarch) + SPARC64_D30_REGNUM)
-		    regcache->cooked_write (regnum + 1, valbuf + 8);
+		    regcache->deprecated_cooked_write (regnum + 1, valbuf + 8);
 		  if (regnum < gdbarch_num_regs (gdbarch) + SPARC64_D10_REGNUM)
-		    regcache->cooked_write (SPARC_O0_REGNUM + element + 1,
+		    regcache->deprecated_cooked_write (SPARC_O0_REGNUM + element + 1,
 					    valbuf + 8);
 		}
 	    }
@@ -1572,7 +1572,7 @@ sparc64_store_arguments (struct regcache *regcache, int nargs,
 
       if (regnum != -1)
 	{
-	  regcache->cooked_write (regnum, valbuf);
+	  regcache->deprecated_cooked_write (regnum, valbuf);
 
 	  /* If we're storing the value in a floating-point register,
 	     also store it in the corresponding %0 register(s).  */
@@ -1584,14 +1584,14 @@ sparc64_store_arguments (struct regcache *regcache, int nargs,
 		{
 		  gdb_assert (element < 6);
 		  regnum = SPARC_O0_REGNUM + element;
-		  regcache->cooked_write (regnum, valbuf);
+		  regcache->deprecated_cooked_write (regnum, valbuf);
 		}
 	      else if (regnum >= SPARC64_Q0_REGNUM && regnum <= SPARC64_Q8_REGNUM)
 		{
 		  gdb_assert (element < 5);
 		  regnum = SPARC_O0_REGNUM + element;
-		  regcache->cooked_write (regnum, valbuf);
-		  regcache->cooked_write (regnum + 1, valbuf + 8);
+		  regcache->deprecated_cooked_write (regnum, valbuf);
+		  regcache->deprecated_cooked_write (regnum + 1, valbuf + 8);
 		}
 	    }
 	}
@@ -1714,7 +1714,7 @@ sparc64_store_return_value (struct type *type, struct regcache *regcache,
       memset (buf, 0, sizeof (buf));
       memcpy (buf, valbuf, len);
       for (i = 0; i < ((len + 7) / 8); i++)
-	regcache->cooked_write (SPARC_O0_REGNUM + i, buf + i * 8);
+	regcache->deprecated_cooked_write (SPARC_O0_REGNUM + i, buf + i * 8);
       if (type->code () != TYPE_CODE_UNION)
 	sparc64_store_floating_fields (regcache, type, buf, 0, 0);
     }
@@ -1723,7 +1723,7 @@ sparc64_store_return_value (struct type *type, struct regcache *regcache,
       /* Floating return values.  */
       memcpy (buf, valbuf, len);
       for (i = 0; i < len / 4; i++)
-	regcache->cooked_write (SPARC_F0_REGNUM + i, buf + i * 4);
+	regcache->deprecated_cooked_write (SPARC_F0_REGNUM + i, buf + i * 4);
     }
   else if (type->code () == TYPE_CODE_ARRAY)
     {
@@ -1733,7 +1733,7 @@ sparc64_store_return_value (struct type *type, struct regcache *regcache,
       memset (buf, 0, sizeof (buf));
       memcpy (buf, valbuf, len);
       for (i = 0; i < ((len + 7) / 8); i++)
-	regcache->cooked_write (SPARC_O0_REGNUM + i, buf + i * 8);
+	regcache->deprecated_cooked_write (SPARC_O0_REGNUM + i, buf + i * 8);
     }
   else
     {

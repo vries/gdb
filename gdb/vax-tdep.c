@@ -237,7 +237,7 @@ vax_return_value (struct gdbarch *gdbarch, struct value *function,
       memcpy (buf, writebuf, len);
       regcache->cooked_write (VAX_R0_REGNUM, buf);
       if (len > 4)
-	regcache->cooked_write (VAX_R1_REGNUM, buf + 4);
+	regcache->deprecated_cooked_write (VAX_R1_REGNUM, buf + 4);
     }
 
   return RETURN_VALUE_REGISTER_CONVENTION;

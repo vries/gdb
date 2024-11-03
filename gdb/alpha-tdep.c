@@ -450,9 +450,9 @@ alpha_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
   /* Load the argument registers.  */
   for (i = 0; i < required_arg_regs; i++)
     {
-      regcache->cooked_write (ALPHA_A0_REGNUM + i,
+      regcache->deprecated_cooked_write (ALPHA_A0_REGNUM + i,
 			      arg_reg_buffer + i * ALPHA_REGISTER_SIZE);
-      regcache->cooked_write (ALPHA_FPA0_REGNUM + i,
+      regcache->deprecated_cooked_write (ALPHA_FPA0_REGNUM + i,
 			      arg_reg_buffer + i * ALPHA_REGISTER_SIZE);
     }
 
@@ -551,7 +551,7 @@ alpha_store_return_value (struct type *valtype, struct regcache *regcache,
 	  break;
 
 	case 8:
-	  regcache->cooked_write (ALPHA_FP0_REGNUM, valbuf);
+	  regcache->deprecated_cooked_write (ALPHA_FP0_REGNUM, valbuf);
 	  break;
 
 	case 16:
@@ -570,12 +570,12 @@ alpha_store_return_value (struct type *valtype, struct regcache *regcache,
 	{
 	case 8:
 	  /* ??? This isn't correct wrt the ABI, but it's what GCC does.  */
-	  regcache->cooked_write (ALPHA_FP0_REGNUM, valbuf);
+	  regcache->deprecated_cooked_write (ALPHA_FP0_REGNUM, valbuf);
 	  break;
 
 	case 16:
-	  regcache->cooked_write (ALPHA_FP0_REGNUM, valbuf);
-	  regcache->cooked_write (ALPHA_FP0_REGNUM + 1, valbuf + 8);
+	  regcache->deprecated_cooked_write (ALPHA_FP0_REGNUM, valbuf);
+	  regcache->deprecated_cooked_write (ALPHA_FP0_REGNUM + 1, valbuf + 8);
 	  break;
 
 	case 32:

@@ -2702,7 +2702,7 @@ aarch64_store_return_value (struct type *type, struct regcache *regs,
 
 	  while (len > 0)
 	    {
-	      regs->cooked_write (regno++, valbuf);
+	      regs->deprecated_cooked_write (regno++, valbuf);
 	      len -= X_REGISTER_SIZE;
 	      valbuf += X_REGISTER_SIZE;
 	    }

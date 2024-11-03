@@ -2757,7 +2757,7 @@ i386_thiscall_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 
   /* The 'this' pointer needs to be in ECX.  */
   if (thiscall)
-    regcache->cooked_write (I386_ECX_REGNUM,
+    regcache->deprecated_cooked_write (I386_ECX_REGNUM,
 			    args[0]->contents_all ().data ());
 
   /* If the PLT is position-independent, the SYSTEM V ABI requires %ebx to be

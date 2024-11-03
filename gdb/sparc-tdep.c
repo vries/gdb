@@ -683,9 +683,9 @@ sparc32_store_arguments (struct regcache *regcache, int nargs,
 	{
 	  int regnum = SPARC_O0_REGNUM + element;
 
-	  regcache->cooked_write (regnum, valbuf);
+	  regcache->deprecated_cooked_write (regnum, valbuf);
 	  if (len > 4 && element < 5)
-	    regcache->cooked_write (regnum + 1, valbuf + 4);
+	    regcache->deprecated_cooked_write (regnum + 1, valbuf + 4);
 	}
 
       /* Always store the argument in memory.  */
@@ -1459,18 +1459,18 @@ sparc32_store_return_value (struct type *type, struct regcache *regcache,
       memcpy (buf, valbuf, len);
       regcache->cooked_write (SPARC_F0_REGNUM, buf);
       if (len > 4)
-	regcache->cooked_write (SPARC_F1_REGNUM, buf + 4);
+	regcache->deprecated_cooked_write (SPARC_F1_REGNUM, buf + 4);
       if (len > 8)
 	{
-	  regcache->cooked_write (SPARC_F2_REGNUM, buf + 8);
-	  regcache->cooked_write (SPARC_F3_REGNUM, buf + 12);
+	  regcache->deprecated_cooked_write (SPARC_F2_REGNUM, buf + 8);
+	  regcache->deprecated_cooked_write (SPARC_F3_REGNUM, buf + 12);
 	}
       if (len > 16)
 	{
-	  regcache->cooked_write (SPARC_F4_REGNUM, buf + 16);
-	  regcache->cooked_write (SPARC_F5_REGNUM, buf + 20);
-	  regcache->cooked_write (SPARC_F6_REGNUM, buf + 24);
-	  regcache->cooked_write (SPARC_F7_REGNUM, buf + 28);
+	  regcache->deprecated_cooked_write (SPARC_F4_REGNUM, buf + 16);
+	  regcache->deprecated_cooked_write (SPARC_F5_REGNUM, buf + 20);
+	  regcache->deprecated_cooked_write (SPARC_F6_REGNUM, buf + 24);
+	  regcache->deprecated_cooked_write (SPARC_F7_REGNUM, buf + 28);
 	}
     }
   else
@@ -1482,7 +1482,7 @@ sparc32_store_return_value (struct type *type, struct regcache *regcache,
 	{
 	  gdb_assert (len == 8);
 	  memcpy (buf, valbuf, 8);
-	  regcache->cooked_write (SPARC_O1_REGNUM, buf + 4);
+	  regcache->deprecated_cooked_write (SPARC_O1_REGNUM, buf + 4);
 	}
       else
 	{

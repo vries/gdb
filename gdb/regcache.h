@@ -389,7 +389,7 @@ public:
   void cooked_write (int regnum, gdb::array_view<const gdb_byte> src);
 
   /* Deprecated overload of the above.  */
-  void cooked_write (int regnum, const gdb_byte *src);
+  void deprecated_cooked_write (int regnum, const gdb_byte *src);
 
   template<typename T, typename = RequireLongest<T>>
   void cooked_write (int regnum, T val);

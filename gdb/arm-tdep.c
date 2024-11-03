@@ -4763,7 +4763,7 @@ arm_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 				 reg_char, reg_scaled + i);
 		      regnum = user_reg_map_name_to_regnum (gdbarch, name_buf,
 							    strlen (name_buf));
-		      regcache->cooked_write (regnum, val + i * unit_length);
+		      regcache->deprecated_cooked_write (regnum, val + i * unit_length);
 		    }
 		}
 	      continue;
@@ -9154,9 +9154,9 @@ arm_store_return_value (struct type *type, struct regcache *regs,
 	  /* ARM_FLOAT_VFP can arise if this is a variadic function so
 	     not using the VFP ABI code.  */
 	case ARM_FLOAT_VFP:
-	  regs->cooked_write (ARM_A1_REGNUM, valbuf);
+	  regs->deprecated_cooked_write (ARM_A1_REGNUM, valbuf);
 	  if (type->length () > 4)
-	    regs->cooked_write (ARM_A1_REGNUM + 1,
+	    regs->deprecated_cooked_write (ARM_A1_REGNUM + 1,
 				valbuf + ARM_INT_REGISTER_SIZE);
 	  break;
 
@@ -9205,7 +9205,7 @@ arm_store_return_value (struct type *type, struct regcache *regs,
 
 	  while (len > 0)
 	    {
-	      regs->cooked_write (regno++, valbuf);
+	      regs->deprecated_cooked_write (regno++, valbuf);
 	      len -= ARM_INT_REGISTER_SIZE;
 	      valbuf += ARM_INT_REGISTER_SIZE;
 	    }
@@ -9279,7 +9279,7 @@ arm_return_value (struct gdbarch *gdbarch, struct value *function,
 	      regnum = user_reg_map_name_to_regnum (gdbarch, name_buf,
 						    strlen (name_buf));
 	      if (writebuf)
-		regcache->cooked_write (regnum, writebuf + i * unit_length);
+		regcache->deprecated_cooked_write (regnum, writebuf + i * unit_length);
 	      if (readbuf)
 		regcache->cooked_read (regnum, readbuf + i * unit_length);
 	    }

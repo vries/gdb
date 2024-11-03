@@ -1824,7 +1824,7 @@ xtensa_push_dummy_call (struct gdbarch *gdbarch,
   if (return_method == return_method_struct)
     {
       store_unsigned_integer (buf, REGISTER_SIZE, byte_order, struct_addr);
-      regcache->cooked_write (ARG_1ST (tdep), buf);
+      regcache->deprecated_cooked_write (ARG_1ST (tdep), buf);
     }
 
   for (int i = 0; i < nargs; i++)
@@ -1866,7 +1866,7 @@ xtensa_push_dummy_call (struct gdbarch *gdbarch,
 	      v = v >> ((REGISTER_SIZE - n) * TARGET_CHAR_BIT);
 
 	      store_unsigned_integer (buf, REGISTER_SIZE, byte_order, v);
-	      regcache->cooked_write (r, buf);
+	      regcache->deprecated_cooked_write (r, buf);
 
 	      cp += REGISTER_SIZE;
 	      n -= REGISTER_SIZE;
@@ -1875,7 +1875,7 @@ xtensa_push_dummy_call (struct gdbarch *gdbarch,
 	  else
 	    while (n > 0)
 	      {
-		regcache->cooked_write (r, cp);
+		regcache->deprecated_cooked_write (r, cp);
 
 		cp += REGISTER_SIZE;
 		n -= REGISTER_SIZE;

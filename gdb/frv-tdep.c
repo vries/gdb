@@ -1328,8 +1328,8 @@ frv_store_return_value (struct type *type, struct regcache *regcache,
     }
   else if (len == 8)
     {
-      regcache->cooked_write (8, valbuf);
-      regcache->cooked_write (9, (bfd_byte *) valbuf + 4);
+      regcache->deprecated_cooked_write (8, valbuf);
+      regcache->deprecated_cooked_write (9, (bfd_byte *) valbuf + 4);
     }
   else
     internal_error (_("Don't know how to return a %d-byte value."), len);

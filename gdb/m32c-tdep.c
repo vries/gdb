@@ -512,13 +512,13 @@ m32c_cat_write (struct m32c_reg *reg, struct regcache *cache,
 
   if (gdbarch_byte_order (reg->arch) == BFD_ENDIAN_BIG)
     {
-      cache->cooked_write (reg->rx->num, buf);
-      cache->cooked_write (reg->ry->num, buf + high_bytes);
+      cache->deprecated_cooked_write (reg->rx->num, buf);
+      cache->deprecated_cooked_write (reg->ry->num, buf + high_bytes);
     }
   else
     {
-      cache->cooked_write (reg->rx->num, buf + low_bytes);
-      cache->cooked_write (reg->ry->num, buf);
+      cache->deprecated_cooked_write (reg->rx->num, buf + low_bytes);
+      cache->deprecated_cooked_write (reg->ry->num, buf);
     }
 
   return REG_VALID;
@@ -574,17 +574,17 @@ m32c_r3r2r1r0_write (struct m32c_reg *reg, struct regcache *cache,
 
   if (gdbarch_byte_order (reg->arch) == BFD_ENDIAN_BIG)
     {
-      cache->cooked_write (tdep->r0->num, buf + len * 3);
-      cache->cooked_write (tdep->r1->num, buf + len * 2);
-      cache->cooked_write (tdep->r2->num, buf + len * 1);
-      cache->cooked_write (tdep->r3->num, buf);
+      cache->deprecated_cooked_write (tdep->r0->num, buf + len * 3);
+      cache->deprecated_cooked_write (tdep->r1->num, buf + len * 2);
+      cache->deprecated_cooked_write (tdep->r2->num, buf + len * 1);
+      cache->deprecated_cooked_write (tdep->r3->num, buf);
     }
   else
     {
-      cache->cooked_write (tdep->r0->num, buf);
-      cache->cooked_write (tdep->r1->num, buf + len * 1);
-      cache->cooked_write (tdep->r2->num, buf + len * 2);
-      cache->cooked_write (tdep->r3->num, buf + len * 3);
+      cache->deprecated_cooked_write (tdep->r0->num, buf);
+      cache->deprecated_cooked_write (tdep->r1->num, buf + len * 1);
+      cache->deprecated_cooked_write (tdep->r2->num, buf + len * 2);
+      cache->deprecated_cooked_write (tdep->r3->num, buf + len * 3);
     }
 
   return REG_VALID;
@@ -2090,7 +2090,7 @@ m32c_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 	       && arg_size == 2
 	       && i < num_prototyped_args
 	       && m32c_reg_arg_type (arg_type))
-	regcache->cooked_write (tdep->r2->num, arg_bits);
+	regcache->deprecated_cooked_write (tdep->r2->num, arg_bits);
 
       /* Everything else goes on the stack.  */
       else

@@ -1846,9 +1846,9 @@ s390_handle_arg (struct s390_arg_state *as, struct value *arg,
 	{
 	  if (write_mode)
 	    {
-	      as->regcache->cooked_write (S390_R0_REGNUM + as->gr,
+	      as->regcache->deprecated_cooked_write (S390_R0_REGNUM + as->gr,
 					  arg->contents ().data ());
-	      as->regcache->cooked_write
+	      as->regcache->deprecated_cooked_write
 		(S390_R0_REGNUM + as->gr + 1,
 		 arg->contents ().data () + word_size);
 	    }
@@ -2060,8 +2060,8 @@ s390_register_return_value (struct gdbarch *gdbarch, struct type *type,
       /* Double word: in r2 and r3.  */
       if (in != NULL)
 	{
-	  regcache->cooked_write (S390_R2_REGNUM, in);
-	  regcache->cooked_write (S390_R3_REGNUM, in + word_size);
+	  regcache->deprecated_cooked_write (S390_R2_REGNUM, in);
+	  regcache->deprecated_cooked_write (S390_R3_REGNUM, in + word_size);
 	}
       else
 	{
