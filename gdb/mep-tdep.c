@@ -1153,7 +1153,7 @@ mep_pseudo_cr64_read (struct gdbarch *gdbarch,
 		      int cookednum,
 		      gdb_byte *buf)
 {
-  return regcache->raw_read (mep_pseudo_to_raw[cookednum], buf);
+  return regcache->deprecated_raw_read (mep_pseudo_to_raw[cookednum], buf);
 }
 
 
@@ -1165,7 +1165,7 @@ mep_pseudo_register_read (struct gdbarch *gdbarch,
 {
   if (IS_CSR_REGNUM (cookednum)
       || IS_CCR_REGNUM (cookednum))
-    return regcache->raw_read (mep_pseudo_to_raw[cookednum], buf);
+    return regcache->deprecated_raw_read (mep_pseudo_to_raw[cookednum], buf);
   else if (IS_CR32_REGNUM (cookednum)
 	   || IS_FP_CR32_REGNUM (cookednum))
     return mep_pseudo_cr32_read (gdbarch, regcache, cookednum, buf);

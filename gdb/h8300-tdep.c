@@ -1191,7 +1191,7 @@ h8300_pseudo_register_read (struct gdbarch *gdbarch,
 				       regno, E_EXR_REGNUM);
     }
   else
-    return regcache->raw_read (regno, buf);
+    return regcache->deprecated_raw_read (regno, buf);
 }
 
 static void

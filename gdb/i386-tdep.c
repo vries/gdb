@@ -2849,7 +2849,7 @@ i386_extract_return_value (struct gdbarch *gdbarch, struct type *type,
   if (((type->code () == TYPE_CODE_FLT) && len == 2)
       || ((type->code () == TYPE_CODE_COMPLEX) && len == 4))
     {
-	regcache->raw_read (I387_XMM0_REGNUM (tdep), valbuf);
+	regcache->deprecated_raw_read (I387_XMM0_REGNUM (tdep), valbuf);
 	return;
     }
   else if (type->code () == TYPE_CODE_FLT)

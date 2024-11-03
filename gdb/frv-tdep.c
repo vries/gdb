@@ -299,9 +299,9 @@ frv_pseudo_register_read (struct gdbarch *gdbarch, readable_regcache *regcache,
 
   if (reg == iacc0_regnum)
     {
-      status = regcache->raw_read (iacc0h_regnum, buffer);
+      status = regcache->deprecated_raw_read (iacc0h_regnum, buffer);
       if (status == REG_VALID)
-	status = regcache->raw_read (iacc0l_regnum, (bfd_byte *) buffer + 4);
+	status = regcache->deprecated_raw_read (iacc0l_regnum, (bfd_byte *) buffer + 4);
     }
   else if (accg0_regnum <= reg && reg <= accg7_regnum)
     {

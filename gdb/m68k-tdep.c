@@ -302,7 +302,7 @@ m68k_extract_return_value (struct type *type, struct regcache *regcache,
     {
       struct gdbarch *gdbarch = regcache->arch ();
       m68k_gdbarch_tdep *tdep = gdbarch_tdep<m68k_gdbarch_tdep> (gdbarch);
-      regcache->raw_read (tdep->pointer_result_regnum, valbuf);
+      regcache->deprecated_raw_read (tdep->pointer_result_regnum, valbuf);
     }
   else if (len <= 4)
     {
@@ -313,7 +313,7 @@ m68k_extract_return_value (struct type *type, struct regcache *regcache,
     {
       regcache->raw_read (M68K_D0_REGNUM, buf);
       memcpy (valbuf, buf + (8 - len), len - 4);
-      regcache->raw_read (M68K_D1_REGNUM, valbuf + (len - 4));
+      regcache->deprecated_raw_read (M68K_D1_REGNUM, valbuf + (len - 4));
     }
   else
     internal_error (_("Cannot extract return value of %d bytes long."), len);

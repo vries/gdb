@@ -529,9 +529,9 @@ sparc32_pseudo_register_read (struct gdbarch *gdbarch,
   gdb_assert (regnum >= SPARC32_D0_REGNUM && regnum <= SPARC32_D30_REGNUM);
 
   regnum = SPARC_F0_REGNUM + 2 * (regnum - SPARC32_D0_REGNUM);
-  status = regcache->raw_read (regnum, buf);
+  status = regcache->deprecated_raw_read (regnum, buf);
   if (status == REG_VALID)
-    status = regcache->raw_read (regnum + 1, buf + 4);
+    status = regcache->deprecated_raw_read (regnum + 1, buf + 4);
   return status;
 }
 

@@ -1377,9 +1377,9 @@ s390_pseudo_register_read (struct gdbarch *gdbarch, readable_regcache *regcache,
 
       regnum -= tdep->v0_full_regnum;
 
-      status = regcache->raw_read (S390_F0_REGNUM + regnum, buf);
+      status = regcache->deprecated_raw_read (S390_F0_REGNUM + regnum, buf);
       if (status == REG_VALID)
-	status = regcache->raw_read (S390_V0_LOWER_REGNUM + regnum, buf + 8);
+	status = regcache->deprecated_raw_read (S390_V0_LOWER_REGNUM + regnum, buf + 8);
       return status;
     }
 

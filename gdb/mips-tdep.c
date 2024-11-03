@@ -773,7 +773,7 @@ mips_pseudo_register_read (struct gdbarch *gdbarch, readable_regcache *regcache,
   gdb_assert (cookednum >= gdbarch_num_regs (gdbarch)
 	      && cookednum < 2 * gdbarch_num_regs (gdbarch));
   if (register_size (gdbarch, rawnum) == register_size (gdbarch, cookednum))
-    return regcache->raw_read (rawnum, buf);
+    return regcache->deprecated_raw_read (rawnum, buf);
   else if (register_size (gdbarch, rawnum) >
 	   register_size (gdbarch, cookednum))
     {

@@ -628,7 +628,7 @@ readable_regcache::raw_read (int regnum, gdb::array_view<gdb_byte> dst)
 }
 
 register_status
-readable_regcache::raw_read (int regnum, gdb_byte *dst)
+readable_regcache::deprecated_raw_read (int regnum, gdb_byte *dst)
 {
   assert_regnum (regnum);
   int size = m_descr->sizeof_register[regnum];
