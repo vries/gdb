@@ -813,7 +813,7 @@ mips_pseudo_register_write (struct gdbarch *gdbarch,
       mips_gdbarch_tdep *tdep = gdbarch_tdep<mips_gdbarch_tdep> (gdbarch);
 
       if (tdep->mips64_transfers_32bit_regs_p)
-	regcache->raw_write_part (rawnum, 0, 4, buf);
+	regcache->deprecated_raw_write_part (rawnum, 0, 4, buf);
       else
 	{
 	  /* Sign extend the shortened version of the register prior

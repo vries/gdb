@@ -3137,7 +3137,7 @@ efp_pseudo_register_write (struct gdbarch *gdbarch, struct regcache *regcache,
     }
 
   /* Write the portion that overlaps the VMX register.  */
-  regcache->raw_write_part (vr0 + reg_index, offset,
+  regcache->deprecated_raw_write_part (vr0 + reg_index, offset,
 			    register_size (gdbarch, reg_nr), buffer);
 }
 

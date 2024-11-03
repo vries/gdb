@@ -402,7 +402,7 @@ public:
 		       gdb::array_view<const gdb_byte> src);
 
   /* Deprecated overload of the above.  */
-  void raw_write_part (int regnum, int offset, int len, const gdb_byte *src)
+  void deprecated_raw_write_part (int regnum, int offset, int len, const gdb_byte *src)
   { raw_write_part (regnum, offset, gdb::make_array_view (src, len)); }
 
   /* Partial transfer of a cooked register.  Perform read, modify, write style
