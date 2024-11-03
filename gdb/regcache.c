@@ -1199,7 +1199,7 @@ reg_buffer::raw_collect (int regnum, gdb::array_view<gdb_byte> dst) const
 /* See regcache.h.  */
 
 void
-reg_buffer::raw_collect (int regnum, void *dst) const
+reg_buffer::deprecated_raw_collect (int regnum, void *dst) const
 {
   assert_regnum (regnum);
 

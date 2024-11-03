@@ -1502,13 +1502,13 @@ alpha_fill_int_regs (const struct regcache *regcache,
 
   for (i = 0; i < 31; ++i)
     if (regno == i || regno == -1)
-      regcache->raw_collect (i, regs + i * 8);
+      regcache->deprecated_raw_collect (i, regs + i * 8);
 
   if (regno == ALPHA_PC_REGNUM || regno == -1)
-    regcache->raw_collect (ALPHA_PC_REGNUM, pc);
+    regcache->deprecated_raw_collect (ALPHA_PC_REGNUM, pc);
 
   if (unique && (regno == ALPHA_UNIQUE_REGNUM || regno == -1))
-    regcache->raw_collect (ALPHA_UNIQUE_REGNUM, unique);
+    regcache->deprecated_raw_collect (ALPHA_UNIQUE_REGNUM, unique);
 }
 
 void
@@ -1535,10 +1535,10 @@ alpha_fill_fp_regs (const struct regcache *regcache,
 
   for (i = ALPHA_FP0_REGNUM; i < ALPHA_FP0_REGNUM + 31; ++i)
     if (regno == i || regno == -1)
-      regcache->raw_collect (i, regs + (i - ALPHA_FP0_REGNUM) * 8);
+      regcache->deprecated_raw_collect (i, regs + (i - ALPHA_FP0_REGNUM) * 8);
 
   if (regno == ALPHA_FPCR_REGNUM || regno == -1)
-    regcache->raw_collect (ALPHA_FPCR_REGNUM, fpcr);
+    regcache->deprecated_raw_collect (ALPHA_FPCR_REGNUM, fpcr);
 }
 
 

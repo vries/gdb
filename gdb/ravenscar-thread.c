@@ -579,7 +579,7 @@ ravenscar_arch_ops::store_one_register (struct regcache *regcache, int regnum,
   struct gdbarch *gdbarch = regcache->arch ();
   int size = register_size (gdbarch, regnum);
   gdb_byte *buf = (gdb_byte *) alloca (size);
-  regcache->raw_collect (regnum, buf);
+  regcache->deprecated_raw_collect (regnum, buf);
   write_memory (addr, buf, size);
 }
 

@@ -2022,31 +2022,31 @@ sparc64_collect_gregset (const struct sparc_gregmap *gregmap,
 	}
 
       if (regnum == SPARC32_PC_REGNUM || regnum == -1)
-	regcache->raw_collect (SPARC32_PC_REGNUM,
+	regcache->deprecated_raw_collect (SPARC32_PC_REGNUM,
 			       regs + gregmap->r_pc_offset + 4);
 
       if (regnum == SPARC32_NPC_REGNUM || regnum == -1)
-	regcache->raw_collect (SPARC32_NPC_REGNUM,
+	regcache->deprecated_raw_collect (SPARC32_NPC_REGNUM,
 			       regs + gregmap->r_npc_offset + 4);
 
       if (regnum == SPARC32_Y_REGNUM || regnum == -1)
 	{
 	  int offset = gregmap->r_y_offset + 8 - gregmap->r_y_size;
-	  regcache->raw_collect (SPARC32_Y_REGNUM, regs + offset);
+	  regcache->deprecated_raw_collect (SPARC32_Y_REGNUM, regs + offset);
 	}
     }
   else
     {
       if (regnum == SPARC64_STATE_REGNUM || regnum == -1)
-	regcache->raw_collect (SPARC64_STATE_REGNUM,
+	regcache->deprecated_raw_collect (SPARC64_STATE_REGNUM,
 			       regs + gregmap->r_tstate_offset);
 
       if (regnum == SPARC64_PC_REGNUM || regnum == -1)
-	regcache->raw_collect (SPARC64_PC_REGNUM,
+	regcache->deprecated_raw_collect (SPARC64_PC_REGNUM,
 			       regs + gregmap->r_pc_offset);
 
       if (regnum == SPARC64_NPC_REGNUM || regnum == -1)
-	regcache->raw_collect (SPARC64_NPC_REGNUM,
+	regcache->deprecated_raw_collect (SPARC64_NPC_REGNUM,
 			       regs + gregmap->r_npc_offset);
 
       if (regnum == SPARC64_Y_REGNUM || regnum == -1)
@@ -2060,7 +2060,7 @@ sparc64_collect_gregset (const struct sparc_gregmap *gregmap,
 
       if ((regnum == SPARC64_FPRS_REGNUM || regnum == -1)
 	  && gregmap->r_fprs_offset != -1)
-	regcache->raw_collect (SPARC64_FPRS_REGNUM,
+	regcache->deprecated_raw_collect (SPARC64_FPRS_REGNUM,
 			       regs + gregmap->r_fprs_offset);
 
     }
@@ -2076,7 +2076,7 @@ sparc64_collect_gregset (const struct sparc_gregmap *gregmap,
       for (i = SPARC_G1_REGNUM; i <= SPARC_O7_REGNUM; i++)
 	{
 	  if (regnum == i || regnum == -1)
-	    regcache->raw_collect (i, regs + offset);
+	    regcache->deprecated_raw_collect (i, regs + offset);
 	  offset += 8;
 	}
     }
@@ -2095,7 +2095,7 @@ sparc64_collect_gregset (const struct sparc_gregmap *gregmap,
 	  for (i = SPARC_L0_REGNUM; i <= SPARC_I7_REGNUM; i++)
 	    {
 	      if (regnum == i || regnum == -1)
-		regcache->raw_collect (i, regs + offset);
+		regcache->deprecated_raw_collect (i, regs + offset);
 	      offset += 8;
 	    }
 	}
@@ -2152,14 +2152,14 @@ sparc64_collect_fpregset (const struct sparc_fpregmap *fpregmap,
   for (i = 0; i < 32; i++)
     {
       if (regnum == (SPARC_F0_REGNUM + i) || regnum == -1)
-	regcache->raw_collect (SPARC_F0_REGNUM + i,
+	regcache->deprecated_raw_collect (SPARC_F0_REGNUM + i,
 			       regs + fpregmap->r_f0_offset + (i * 4));
     }
 
   if (sparc32)
     {
       if (regnum == SPARC32_FSR_REGNUM || regnum == -1)
-	regcache->raw_collect (SPARC32_FSR_REGNUM,
+	regcache->deprecated_raw_collect (SPARC32_FSR_REGNUM,
 			       regs + fpregmap->r_fsr_offset);
     }
   else
@@ -2167,13 +2167,13 @@ sparc64_collect_fpregset (const struct sparc_fpregmap *fpregmap,
       for (i = 0; i < 16; i++)
 	{
 	  if (regnum == (SPARC64_F32_REGNUM + i) || regnum == -1)
-	    regcache->raw_collect (SPARC64_F32_REGNUM + i,
+	    regcache->deprecated_raw_collect (SPARC64_F32_REGNUM + i,
 				   (regs + fpregmap->r_f0_offset
 				    + (32 * 4) + (i * 8)));
 	}
 
       if (regnum == SPARC64_FSR_REGNUM || regnum == -1)
-	regcache->raw_collect (SPARC64_FSR_REGNUM,
+	regcache->deprecated_raw_collect (SPARC64_FSR_REGNUM,
 			       regs + fpregmap->r_fsr_offset);
     }
 }

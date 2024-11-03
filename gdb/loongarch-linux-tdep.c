@@ -88,17 +88,17 @@ loongarch_fill_gregset (const struct regset *regset,
       for (int i = 0; i < 32; i++)
 	{
 	  buf = (gdb_byte *) gprs + regsize * i;
-	  regcache->raw_collect (i, (void *) buf);
+	  regcache->deprecated_raw_collect (i, (void *) buf);
 	}
 
       buf = (gdb_byte *) gprs + regsize * LOONGARCH_ORIG_A0_REGNUM;
-      regcache->raw_collect (LOONGARCH_ORIG_A0_REGNUM, (void *) buf);
+      regcache->deprecated_raw_collect (LOONGARCH_ORIG_A0_REGNUM, (void *) buf);
 
       buf = (gdb_byte *) gprs + regsize * LOONGARCH_PC_REGNUM;
-      regcache->raw_collect (LOONGARCH_PC_REGNUM, (void *) buf);
+      regcache->deprecated_raw_collect (LOONGARCH_PC_REGNUM, (void *) buf);
 
       buf = (gdb_byte *) gprs + regsize * LOONGARCH_BADV_REGNUM;
-      regcache->raw_collect (LOONGARCH_BADV_REGNUM, (void *) buf);
+      regcache->deprecated_raw_collect (LOONGARCH_BADV_REGNUM, (void *) buf);
     }
   else if ((regnum >= 0 && regnum < 32)
 	   || regnum == LOONGARCH_ORIG_A0_REGNUM
@@ -106,7 +106,7 @@ loongarch_fill_gregset (const struct regset *regset,
 	   || regnum == LOONGARCH_BADV_REGNUM)
     {
       buf = (gdb_byte *) gprs + regsize * regnum;
-      regcache->raw_collect (regnum, (void *) buf);
+      regcache->deprecated_raw_collect (regnum, (void *) buf);
     }
 }
 
@@ -180,34 +180,34 @@ loongarch_fill_fpregset (const struct regset *r,
       for (int i = 0; i < LOONGARCH_LINUX_NUM_FPREGSET; i++)
 	{
 	  buf = (gdb_byte *)fprs + fprsize * i;
-	  regcache->raw_collect (LOONGARCH_FIRST_FP_REGNUM + i, (void *)buf);
+	  regcache->deprecated_raw_collect (LOONGARCH_FIRST_FP_REGNUM + i, (void *)buf);
 	}
       for (int i = 0; i < LOONGARCH_LINUX_NUM_FCC; i++)
 	{
 	  buf = (gdb_byte *)fprs + fprsize * LOONGARCH_LINUX_NUM_FPREGSET +
 	    fccsize * i;
-	  regcache->raw_collect (LOONGARCH_FIRST_FCC_REGNUM + i, (void *)buf);
+	  regcache->deprecated_raw_collect (LOONGARCH_FIRST_FCC_REGNUM + i, (void *)buf);
 	}
       buf = (gdb_byte *)fprs + fprsize * LOONGARCH_LINUX_NUM_FPREGSET +
 	fccsize * LOONGARCH_LINUX_NUM_FCC;
-      regcache->raw_collect (LOONGARCH_FCSR_REGNUM, (void *)buf);
+      regcache->deprecated_raw_collect (LOONGARCH_FCSR_REGNUM, (void *)buf);
     }
   else if (regnum >= LOONGARCH_FIRST_FP_REGNUM && regnum < LOONGARCH_FIRST_FCC_REGNUM)
     {
       buf = (gdb_byte *)fprs + fprsize * (regnum - LOONGARCH_FIRST_FP_REGNUM);
-      regcache->raw_collect (regnum, (void *)buf);
+      regcache->deprecated_raw_collect (regnum, (void *)buf);
     }
   else if (regnum >= LOONGARCH_FIRST_FCC_REGNUM && regnum < LOONGARCH_FCSR_REGNUM)
     {
       buf = (gdb_byte *)fprs + fprsize * LOONGARCH_LINUX_NUM_FPREGSET +
 	fccsize * (regnum - LOONGARCH_FIRST_FCC_REGNUM);
-      regcache->raw_collect (regnum, (void *)buf);
+      regcache->deprecated_raw_collect (regnum, (void *)buf);
     }
   else if (regnum == LOONGARCH_FCSR_REGNUM)
     {
       buf = (gdb_byte *)fprs + fprsize * LOONGARCH_LINUX_NUM_FPREGSET +
 	fccsize * LOONGARCH_LINUX_NUM_FCC;
-      regcache->raw_collect (regnum, (void *)buf);
+      regcache->deprecated_raw_collect (regnum, (void *)buf);
     }
 }
 
@@ -260,13 +260,13 @@ loongarch_fill_lsxregset (const struct regset *regset,
       for (int i = 0; i < LOONGARCH_LINUX_NUM_LSXREGSET; i++)
 	{
 	  buf = (gdb_byte *) lsxrs + lsxrsize * i;
-	  regcache->raw_collect (LOONGARCH_FIRST_LSX_REGNUM + i, (void *) buf);
+	  regcache->deprecated_raw_collect (LOONGARCH_FIRST_LSX_REGNUM + i, (void *) buf);
 	}
     }
   else if (regnum >= LOONGARCH_FIRST_LSX_REGNUM && regnum < LOONGARCH_FIRST_LASX_REGNUM)
     {
       buf = (gdb_byte *) lsxrs + lsxrsize * (regnum - LOONGARCH_FIRST_LSX_REGNUM);
-      regcache->raw_collect (regnum, (void *) buf);
+      regcache->deprecated_raw_collect (regnum, (void *) buf);
     }
 }
 
@@ -321,7 +321,7 @@ loongarch_fill_lasxregset (const struct regset *regset,
       for (int i = 0; i < LOONGARCH_LINUX_NUM_LASXREGSET; i++)
 	{
 	  buf = (gdb_byte *) lasxrs + lasxrsize * i;
-	  regcache->raw_collect (LOONGARCH_FIRST_LASX_REGNUM + i, (void *) buf);
+	  regcache->deprecated_raw_collect (LOONGARCH_FIRST_LASX_REGNUM + i, (void *) buf);
 	}
     }
   else if (regnum >= LOONGARCH_FIRST_LASX_REGNUM
@@ -329,7 +329,7 @@ loongarch_fill_lasxregset (const struct regset *regset,
 
     {
       buf = (gdb_byte *) lasxrs + lasxrsize * (regnum - LOONGARCH_FIRST_LASX_REGNUM);
-      regcache->raw_collect (regnum, (void *) buf);
+      regcache->deprecated_raw_collect (regnum, (void *) buf);
     }
 }
 
@@ -407,30 +407,30 @@ loongarch_fill_lbtregset (const struct regset *regset,
       for (int i = 0; i < LOONGARCH_LINUX_NUM_SCR; i++)
 	{
 	  buf = (gdb_byte *) regs + scrsize * i;
-	  regcache->raw_collect (LOONGARCH_FIRST_SCR_REGNUM + i, (void *) buf);
+	  regcache->deprecated_raw_collect (LOONGARCH_FIRST_SCR_REGNUM + i, (void *) buf);
 	}
 
       buf = (gdb_byte *) regs + scrsize * LOONGARCH_LINUX_NUM_SCR;
-      regcache->raw_collect (LOONGARCH_EFLAGS_REGNUM, (void *) buf);
+      regcache->deprecated_raw_collect (LOONGARCH_EFLAGS_REGNUM, (void *) buf);
 
       buf = (gdb_byte *) regs + scrsize * LOONGARCH_LINUX_NUM_SCR + eflagssize;
-      regcache->raw_collect (LOONGARCH_FTOP_REGNUM, (void *) buf);
+      regcache->deprecated_raw_collect (LOONGARCH_FTOP_REGNUM, (void *) buf);
     }
   else if (regnum >= LOONGARCH_FIRST_SCR_REGNUM
 	   && regnum <= LOONGARCH_LAST_SCR_REGNUM)
     {
       buf = (gdb_byte *) regs + scrsize * (regnum - LOONGARCH_FIRST_SCR_REGNUM);
-      regcache->raw_collect (regnum, (void *) buf);
+      regcache->deprecated_raw_collect (regnum, (void *) buf);
     }
   else if (regnum == LOONGARCH_EFLAGS_REGNUM)
     {
       buf = (gdb_byte *) regs + scrsize * LOONGARCH_LINUX_NUM_SCR;
-      regcache->raw_collect (regnum, (void *) buf);
+      regcache->deprecated_raw_collect (regnum, (void *) buf);
     }
   else if (regnum == LOONGARCH_FTOP_REGNUM)
     {
       buf = (gdb_byte *) regs + scrsize * LOONGARCH_LINUX_NUM_SCR + eflagssize;
-      regcache->raw_collect (regnum, (void *) buf);
+      regcache->deprecated_raw_collect (regnum, (void *) buf);
     }
 }
 

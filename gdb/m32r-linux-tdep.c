@@ -422,11 +422,11 @@ m32r_linux_collect_gregset (const struct regset *regset,
 	case CBR_REGNUM:
 	  break;
 	case M32R_SP_REGNUM:
-	  regcache->raw_collect
+	  regcache->deprecated_raw_collect
 	    (i, regs + ((psw & 0x80) ? SPU_OFFSET : SPI_OFFSET));
 	  break;
 	default:
-	  regcache->raw_collect (i, regs + m32r_pt_regs_offset[i]);
+	  regcache->deprecated_raw_collect (i, regs + m32r_pt_regs_offset[i]);
 	}
     }
 }

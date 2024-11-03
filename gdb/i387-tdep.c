@@ -525,7 +525,7 @@ i387_collect_fsave (const struct regcache *regcache, int regnum, void *fsave)
 	    memcpy (FSAVE_ADDR (tdep, regs, i), buf, 2);
 	  }
 	else
-	  regcache->raw_collect (i, FSAVE_ADDR (tdep, regs, i));
+	  regcache->deprecated_raw_collect (i, FSAVE_ADDR (tdep, regs, i));
       }
 }
 
@@ -723,11 +723,11 @@ i387_collect_fxsave (const struct regcache *regcache, int regnum, void *fxsave)
 	    memcpy (FXSAVE_ADDR (tdep, regs, i), buf, 2);
 	  }
 	else
-	  regcache->raw_collect (i, FXSAVE_ADDR (tdep, regs, i));
+	  regcache->deprecated_raw_collect (i, FXSAVE_ADDR (tdep, regs, i));
       }
 
   if (regnum == I387_MXCSR_REGNUM (tdep) || regnum == -1)
-    regcache->raw_collect (I387_MXCSR_REGNUM (tdep),
+    regcache->deprecated_raw_collect (I387_MXCSR_REGNUM (tdep),
 			  FXSAVE_MXCSR_ADDR (regs));
 }
 
