@@ -1310,7 +1310,7 @@ ppc64_sysv_abi_push_val (struct gdbarch *gdbarch,
   if (len > 0)
     {
       if (argpos->regcache && argpos->greg <= 10)
-	argpos->regcache->cooked_write_part
+	argpos->regcache->deprecated_cooked_write_part
 	  (tdep->ppc_gp0_regnum + argpos->greg, offset, len, val);
       argpos->greg++;
     }
@@ -1375,7 +1375,7 @@ ppc64_sysv_abi_push_freg (struct gdbarch *gdbarch,
 	  if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
 	    offset = 8 - type->length ();
 
-	  argpos->regcache->cooked_write_part (regnum, offset,
+	  argpos->regcache->deprecated_cooked_write_part (regnum, offset,
 					       type->length (), val);
 	}
 
@@ -1883,7 +1883,7 @@ ppc64_sysv_abi_return_value_base (struct gdbarch *gdbarch, struct type *valtype,
 	offset = 8 - valtype->length ();
 
       if (writebuf != NULL)
-	regcache->cooked_write_part (regnum, offset, valtype->length (),
+	regcache->deprecated_cooked_write_part (regnum, offset, valtype->length (),
 				     writebuf);
       if (readbuf != NULL)
 	regcache->deprecated_cooked_read_part (regnum, offset, valtype->length (),
@@ -1965,7 +1965,7 @@ ppc64_sysv_abi_return_value_base (struct gdbarch *gdbarch, struct type *valtype,
 	offset = 8 - valtype->length ();
 
       if (writebuf != NULL)
-	regcache->cooked_write_part (regnum, offset, valtype->length (),
+	regcache->deprecated_cooked_write_part (regnum, offset, valtype->length (),
 				     writebuf);
       if (readbuf != NULL)
 	regcache->deprecated_cooked_read_part (regnum, offset, valtype->length (),
@@ -2070,7 +2070,7 @@ ppc64_sysv_abi_return_value (struct gdbarch *gdbarch, struct value *function,
       int offset = (register_size (gdbarch, regnum) - valtype->length ());
 
       if (writebuf != NULL)
-	regcache->cooked_write_part (regnum, offset, valtype->length (),
+	regcache->deprecated_cooked_write_part (regnum, offset, valtype->length (),
 				     writebuf);
       if (readbuf != NULL)
 	regcache->deprecated_cooked_read_part (regnum, offset, valtype->length (),

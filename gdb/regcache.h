@@ -411,7 +411,7 @@ public:
 			  gdb::array_view<const gdb_byte> src);
 
   /* Deprecated overload of the above.  */
-  void cooked_write_part (int regnum, int offset, int len, const gdb_byte *src)
+  void deprecated_cooked_write_part (int regnum, int offset, int len, const gdb_byte *src)
   { cooked_write_part (regnum, offset, gdb::make_array_view (src, len)); }
 
   /* Transfer a set of registers (as described by REGSET) between

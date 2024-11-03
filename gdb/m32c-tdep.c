@@ -464,7 +464,7 @@ m32c_part_write (struct m32c_reg *reg, struct regcache *cache,
   int offset, len;
 
   m32c_find_part (reg, &offset, &len);
-  cache->cooked_write_part (reg->rx->num, offset, len, buf);
+  cache->deprecated_cooked_write_part (reg->rx->num, offset, len, buf);
 
   return REG_VALID;
 }
