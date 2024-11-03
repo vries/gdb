@@ -780,7 +780,7 @@ mips_pseudo_register_read (struct gdbarch *gdbarch, readable_regcache *regcache,
       mips_gdbarch_tdep *tdep = gdbarch_tdep<mips_gdbarch_tdep> (gdbarch);
 
       if (tdep->mips64_transfers_32bit_regs_p)
-	return regcache->raw_read_part (rawnum, 0, 4, buf);
+	return regcache->deprecated_raw_read_part (rawnum, 0, 4, buf);
       else
 	{
 	  enum bfd_endian byte_order = gdbarch_byte_order (gdbarch);

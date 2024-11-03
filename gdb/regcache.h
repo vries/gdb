@@ -309,8 +309,8 @@ public:
 				 gdb::array_view<gdb_byte> dst);
 
   /* Deprecated overload of the above.  */
-  register_status raw_read_part (int regnum, int offset, int len,
-				 gdb_byte *dst)
+  register_status deprecated_raw_read_part (int regnum, int offset, int len,
+					    gdb_byte *dst)
   { return raw_read_part (regnum, offset, gdb::make_array_view (dst, len)); }
 
   /* Make certain that the register REGNUM is up-to-date.  */
