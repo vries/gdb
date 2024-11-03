@@ -1106,10 +1106,10 @@ s390_guess_tracepoint_registers (struct gdbarch *gdbarch,
     }
 
   store_unsigned_integer (reg, sz, gdbarch_byte_order (gdbarch), pswa);
-  regcache->raw_supply (S390_PSWA_REGNUM, reg);
+  regcache->deprecated_raw_supply (S390_PSWA_REGNUM, reg);
 
   store_unsigned_integer (reg, sz, gdbarch_byte_order (gdbarch), pswm);
-  regcache->raw_supply (S390_PSWM_REGNUM, reg);
+  regcache->deprecated_raw_supply (S390_PSWM_REGNUM, reg);
 }
 
 /* Return the name of register REGNO.  Return the empty string for

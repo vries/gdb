@@ -454,7 +454,7 @@ i387_supply_fsave (struct regcache *regcache, int regnum, const void *fsave)
       {
 	if (fsave == NULL)
 	  {
-	    regcache->raw_supply (i, NULL);
+	    regcache->deprecated_raw_supply (i, NULL);
 	    continue;
 	  }
 
@@ -472,13 +472,13 @@ i387_supply_fsave (struct regcache *regcache, int regnum, const void *fsave)
 	    regcache->raw_supply (i, val);
 	  }
 	else
-	  regcache->raw_supply (i, FSAVE_ADDR (tdep, regs, i));
+	  regcache->deprecated_raw_supply (i, FSAVE_ADDR (tdep, regs, i));
       }
 
   /* Provide dummy values for the SSE registers.  */
   for (i = I387_XMM0_REGNUM (tdep); i < I387_MXCSR_REGNUM (tdep); i++)
     if (regnum == -1 || regnum == i)
-      regcache->raw_supply (i, NULL);
+      regcache->deprecated_raw_supply (i, NULL);
   if (regnum == -1 || regnum == I387_MXCSR_REGNUM (tdep))
     {
       gdb_byte buf[4];
@@ -603,7 +603,7 @@ i387_supply_fxsave (struct regcache *regcache, int regnum, const void *fxsave)
       {
 	if (regs == NULL)
 	  {
-	    regcache->raw_supply (i, NULL);
+	    regcache->deprecated_raw_supply (i, NULL);
 	    continue;
 	  }
 
@@ -653,15 +653,15 @@ i387_supply_fxsave (struct regcache *regcache, int regnum, const void *fxsave)
 	    regcache->raw_supply (i, val);
 	  }
 	else
-	  regcache->raw_supply (i, FXSAVE_ADDR (tdep, regs, i));
+	  regcache->deprecated_raw_supply (i, FXSAVE_ADDR (tdep, regs, i));
       }
 
   if (regnum == I387_MXCSR_REGNUM (tdep) || regnum == -1)
     {
       if (regs == NULL)
-	regcache->raw_supply (I387_MXCSR_REGNUM (tdep), NULL);
+	regcache->deprecated_raw_supply (I387_MXCSR_REGNUM (tdep), NULL);
       else
-	regcache->raw_supply (I387_MXCSR_REGNUM (tdep),
+	regcache->deprecated_raw_supply (I387_MXCSR_REGNUM (tdep),
 			     FXSAVE_MXCSR_ADDR (regs));
     }
 }
@@ -1104,14 +1104,14 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
       if ((clear_bv & X86_XSTATE_PKRU))
 	regcache->raw_supply (regnum, zero);
       else
-	regcache->raw_supply (regnum, XSAVE_PKEYS_ADDR (tdep, regs, regnum));
+	regcache->deprecated_raw_supply (regnum, XSAVE_PKEYS_ADDR (tdep, regs, regnum));
       return;
 
     case avx512_zmm0_h:
       if ((clear_bv & X86_XSTATE_ZMM_H))
 	regcache->raw_supply (regnum, zero);
       else
-	regcache->raw_supply (regnum,
+	regcache->deprecated_raw_supply (regnum,
 			      XSAVE_AVX512_ZMM0_H_ADDR (tdep, regs, regnum));
       return;
 
@@ -1119,7 +1119,7 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
       if ((clear_bv & X86_XSTATE_ZMM))
 	regcache->raw_supply (regnum, zero);
       else
-	regcache->raw_supply (regnum,
+	regcache->deprecated_raw_supply (regnum,
 			      XSAVE_AVX512_ZMM16_H_ADDR (tdep, regs, regnum));
       return;
 
@@ -1127,14 +1127,14 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
       if ((clear_bv & X86_XSTATE_K))
 	regcache->raw_supply (regnum, zero);
       else
-	regcache->raw_supply (regnum, XSAVE_AVX512_K_ADDR (tdep, regs, regnum));
+	regcache->deprecated_raw_supply (regnum, XSAVE_AVX512_K_ADDR (tdep, regs, regnum));
       return;
 
     case avx512_ymmh_avx512:
       if ((clear_bv & X86_XSTATE_ZMM))
 	regcache->raw_supply (regnum, zero);
       else
-	regcache->raw_supply (regnum,
+	regcache->deprecated_raw_supply (regnum,
 			      XSAVE_YMM_H_AVX512_ADDR (tdep, regs, regnum));
       return;
 
@@ -1142,7 +1142,7 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
       if ((clear_bv & X86_XSTATE_ZMM))
 	regcache->raw_supply (regnum, zero);
       else
-	regcache->raw_supply (regnum,
+	regcache->deprecated_raw_supply (regnum,
 			      XSAVE_XMM_AVX512_ADDR (tdep, regs, regnum));
       return;
 
@@ -1150,21 +1150,21 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
       if ((clear_bv & X86_XSTATE_AVX))
 	regcache->raw_supply (regnum, zero);
       else
-	regcache->raw_supply (regnum, XSAVE_AVXH_ADDR (tdep, regs, regnum));
+	regcache->deprecated_raw_supply (regnum, XSAVE_AVXH_ADDR (tdep, regs, regnum));
       return;
 
     case sse:
       if ((clear_bv & X86_XSTATE_SSE))
 	regcache->raw_supply (regnum, zero);
       else
-	regcache->raw_supply (regnum, FXSAVE_ADDR (tdep, regs, regnum));
+	regcache->deprecated_raw_supply (regnum, FXSAVE_ADDR (tdep, regs, regnum));
       return;
 
     case x87:
       if ((clear_bv & X86_XSTATE_X87))
 	regcache->raw_supply (regnum, zero);
       else
-	regcache->raw_supply (regnum, FXSAVE_ADDR (tdep, regs, regnum));
+	regcache->deprecated_raw_supply (regnum, FXSAVE_ADDR (tdep, regs, regnum));
       return;
 
     case all:
@@ -1183,7 +1183,7 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
 	      for (i = I387_PKRU_REGNUM (tdep);
 		   i < I387_PKEYSEND_REGNUM (tdep);
 		   i++)
-		regcache->raw_supply (i, XSAVE_PKEYS_ADDR (tdep, regs, i));
+		regcache->deprecated_raw_supply (i, XSAVE_PKEYS_ADDR (tdep, regs, i));
 	    }
 	}
 
@@ -1198,7 +1198,7 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
 	  else
 	    {
 	      for (i = I387_ZMM0H_REGNUM (tdep); i < zmm_endlo_regnum; i++)
-		regcache->raw_supply (i,
+		regcache->deprecated_raw_supply (i,
 				      XSAVE_AVX512_ZMM0_H_ADDR (tdep, regs, i));
 	    }
 	}
@@ -1218,7 +1218,7 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
 	      for (i = I387_K0_REGNUM (tdep);
 		   i < I387_KEND_REGNUM (tdep);
 		   i++)
-		regcache->raw_supply (i, XSAVE_AVX512_K_ADDR (tdep, regs, i));
+		regcache->deprecated_raw_supply (i, XSAVE_AVX512_K_ADDR (tdep, regs, i));
 	    }
 	}
 
@@ -1243,17 +1243,17 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
 	    {
 	      for (i = I387_ZMM16H_REGNUM (tdep);
 		   i < I387_ZMMENDH_REGNUM (tdep); i++)
-		regcache->raw_supply (i,
+		regcache->deprecated_raw_supply (i,
 				      XSAVE_AVX512_ZMM16_H_ADDR (tdep, regs, i));
 	      for (i = I387_YMM16H_REGNUM (tdep);
 		   i < I387_YMMH_AVX512_END_REGNUM (tdep);
 		   i++)
-		regcache->raw_supply (i,
+		regcache->deprecated_raw_supply (i,
 				      XSAVE_YMM_H_AVX512_ADDR (tdep, regs, i));
 	      for (i = I387_XMM16_REGNUM (tdep);
 		   i < I387_XMM_AVX512_END_REGNUM (tdep);
 		   i++)
-		regcache->raw_supply (i, XSAVE_XMM_AVX512_ADDR (tdep, regs, i));
+		regcache->deprecated_raw_supply (i, XSAVE_XMM_AVX512_ADDR (tdep, regs, i));
 	    }
 	}
       /* Handle the upper YMM registers.  */
@@ -1271,7 +1271,7 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
 	      for (i = I387_YMM0H_REGNUM (tdep);
 		   i < I387_YMMENDH_REGNUM (tdep);
 		   i++)
-		regcache->raw_supply (i, XSAVE_AVXH_ADDR (tdep, regs, i));
+		regcache->deprecated_raw_supply (i, XSAVE_AVXH_ADDR (tdep, regs, i));
 	    }
 	}
 
@@ -1289,7 +1289,7 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
 	    {
 	      for (i = I387_XMM0_REGNUM (tdep);
 		   i < I387_MXCSR_REGNUM (tdep); i++)
-		regcache->raw_supply (i, FXSAVE_ADDR (tdep, regs, i));
+		regcache->deprecated_raw_supply (i, FXSAVE_ADDR (tdep, regs, i));
 	    }
 	}
 
@@ -1308,7 +1308,7 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
 	      for (i = I387_ST0_REGNUM (tdep);
 		   i < I387_FCTRL_REGNUM (tdep);
 		   i++)
-		regcache->raw_supply (i, FXSAVE_ADDR (tdep, regs, i));
+		regcache->deprecated_raw_supply (i, FXSAVE_ADDR (tdep, regs, i));
 	    }
 	}
       break;
@@ -1384,7 +1384,7 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
 	    regcache->raw_supply (i, val);
 	  }
 	else
-	  regcache->raw_supply (i, FXSAVE_ADDR (tdep, regs, i));
+	  regcache->deprecated_raw_supply (i, FXSAVE_ADDR (tdep, regs, i));
       }
 
   if (regnum == I387_MXCSR_REGNUM (tdep) || regnum == -1)
@@ -1400,7 +1400,7 @@ i387_supply_xsave (struct regcache *regcache, int regnum,
 	  regcache->raw_supply (I387_MXCSR_REGNUM (tdep), buf);
 	}
       else
-	regcache->raw_supply (I387_MXCSR_REGNUM (tdep),
+	regcache->deprecated_raw_supply (I387_MXCSR_REGNUM (tdep),
 			      FXSAVE_MXCSR_ADDR (regs));
     }
 }

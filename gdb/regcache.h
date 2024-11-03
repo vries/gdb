@@ -225,7 +225,7 @@ public:
   void raw_supply (int regnum, gdb::array_view<const gdb_byte> src) override;
 
   /* Deprecated overload of the above.  */
-  void raw_supply (int regnum, const void *src);
+  void deprecated_raw_supply (int regnum, const void *src);
 
   void raw_supply (int regnum, const reg_buffer &src)
   { raw_supply (regnum, src.register_buffer (regnum)); }

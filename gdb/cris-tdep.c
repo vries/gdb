@@ -3782,7 +3782,7 @@ cris_supply_gregset (const struct regset *regset, struct regcache *regcache,
   for (i = 0; i < NUM_GENREGS + NUM_SPECREGS; i++)
     {
       if (regnum == -1 || regnum == i)
-	regcache->raw_supply (i, (char *)&regp[i]);
+	regcache->deprecated_raw_supply (i, (char *)&regp[i]);
     }
 
   if (tdep->cris_version == 32 && (regnum == -1 || regnum == ERP_REGNUM))
@@ -3790,7 +3790,7 @@ cris_supply_gregset (const struct regset *regset, struct regcache *regcache,
       /* Needed to set pseudo-register PC for CRISv32.  */
       /* FIXME: If ERP is in a delay slot at this point then the PC will
 	 be wrong.  Issue a warning to alert the user.  */
-      regcache->raw_supply (gdbarch_pc_regnum (gdbarch),
+      regcache->deprecated_raw_supply (gdbarch_pc_regnum (gdbarch),
 			    (char *)&regp[ERP_REGNUM]);
 
       if (*(char *)&regp[ERP_REGNUM] & 0x1)

@@ -105,7 +105,7 @@ amd64_supply_native_gregset (struct regcache *regcache,
 	  int offset = amd64_native_gregset_reg_offset (gdbarch, i);
 
 	  if (offset != -1)
-	    regcache->raw_supply (i, regs + offset);
+	    regcache->deprecated_raw_supply (i, regs + offset);
 	}
     }
 }

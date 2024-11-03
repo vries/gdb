@@ -1155,7 +1155,7 @@ reg_buffer::raw_supply (int regnum, gdb::array_view<const gdb_byte> src)
 /* See regcache.h.  */
 
 void
-reg_buffer::raw_supply (int regnum, const void *src)
+reg_buffer::deprecated_raw_supply (int regnum, const void *src)
 {
   assert_regnum (regnum);
 

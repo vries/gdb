@@ -2096,19 +2096,19 @@ sparc32_supply_gregset (const struct sparc_gregmap *gregmap,
   int i;
 
   if (regnum == SPARC32_PSR_REGNUM || regnum == -1)
-    regcache->raw_supply (SPARC32_PSR_REGNUM, regs + gregmap->r_psr_offset);
+    regcache->deprecated_raw_supply (SPARC32_PSR_REGNUM, regs + gregmap->r_psr_offset);
 
   if (regnum == SPARC32_PC_REGNUM || regnum == -1)
-    regcache->raw_supply (SPARC32_PC_REGNUM, regs + gregmap->r_pc_offset);
+    regcache->deprecated_raw_supply (SPARC32_PC_REGNUM, regs + gregmap->r_pc_offset);
 
   if (regnum == SPARC32_NPC_REGNUM || regnum == -1)
-    regcache->raw_supply (SPARC32_NPC_REGNUM, regs + gregmap->r_npc_offset);
+    regcache->deprecated_raw_supply (SPARC32_NPC_REGNUM, regs + gregmap->r_npc_offset);
 
   if (regnum == SPARC32_Y_REGNUM || regnum == -1)
-    regcache->raw_supply (SPARC32_Y_REGNUM, regs + gregmap->r_y_offset);
+    regcache->deprecated_raw_supply (SPARC32_Y_REGNUM, regs + gregmap->r_y_offset);
 
   if (regnum == SPARC_G0_REGNUM || regnum == -1)
-    regcache->raw_supply (SPARC_G0_REGNUM, &zero);
+    regcache->deprecated_raw_supply (SPARC_G0_REGNUM, &zero);
 
   if ((regnum >= SPARC_G1_REGNUM && regnum <= SPARC_O7_REGNUM) || regnum == -1)
     {
@@ -2117,7 +2117,7 @@ sparc32_supply_gregset (const struct sparc_gregmap *gregmap,
       for (i = SPARC_G1_REGNUM; i <= SPARC_O7_REGNUM; i++)
 	{
 	  if (regnum == i || regnum == -1)
-	    regcache->raw_supply (i, regs + offset);
+	    regcache->deprecated_raw_supply (i, regs + offset);
 	  offset += 4;
 	}
     }
@@ -2140,7 +2140,7 @@ sparc32_supply_gregset (const struct sparc_gregmap *gregmap,
 	  for (i = SPARC_L0_REGNUM; i <= SPARC_I7_REGNUM; i++)
 	    {
 	      if (regnum == i || regnum == -1)
-		regcache->raw_supply (i, regs + offset);
+		regcache->deprecated_raw_supply (i, regs + offset);
 	      offset += 4;
 	    }
 	}
@@ -2209,12 +2209,12 @@ sparc32_supply_fpregset (const struct sparc_fpregmap *fpregmap,
   for (i = 0; i < 32; i++)
     {
       if (regnum == (SPARC_F0_REGNUM + i) || regnum == -1)
-	regcache->raw_supply (SPARC_F0_REGNUM + i,
+	regcache->deprecated_raw_supply (SPARC_F0_REGNUM + i,
 			      regs + fpregmap->r_f0_offset + (i * 4));
     }
 
   if (regnum == SPARC32_FSR_REGNUM || regnum == -1)
-    regcache->raw_supply (SPARC32_FSR_REGNUM, regs + fpregmap->r_fsr_offset);
+    regcache->deprecated_raw_supply (SPARC32_FSR_REGNUM, regs + fpregmap->r_fsr_offset);
 }
 
 void
