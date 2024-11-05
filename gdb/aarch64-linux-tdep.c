@@ -939,7 +939,7 @@ supply_sve_regset (const struct regset *regset,
       gdb_byte vg_target[8];
       store_integer ((gdb_byte *)&vg_target, sizeof (uint64_t), byte_order,
 		     sve_vg_from_vl (vl));
-      regcache->raw_supply (AARCH64_SVE_VG_REGNUM, &vg_target);
+      regcache->deprecated_raw_supply (AARCH64_SVE_VG_REGNUM, &vg_target);
     }
 
   if (flags & SVE_HEADER_FLAG_SVE)
@@ -1176,14 +1176,14 @@ aarch64_linux_supply_ssve_regset (const struct regset *regset,
      SSVE section, we need to initialize it to zero first, so that it doesn't
      carry garbage data.  */
   ULONGEST svcr = 0;
-  regcache->raw_supply (tdep->sme_svcr_regnum, &svcr);
+  regcache->deprecated_raw_supply (tdep->sme_svcr_regnum, &svcr);
 
   /* Is streaming mode enabled?  */
   if (flags & SVE_HEADER_FLAG_SVE)
     {
       /* Streaming mode is active, so flip the SM bit.  */
       svcr = SVCR_SM_BIT;
-      regcache->raw_supply (tdep->sme_svcr_regnum, &svcr);
+      regcache->deprecated_raw_supply (tdep->sme_svcr_regnum, &svcr);
 
       /* Fetch the SVE data from the SSVE section.  */
       supply_sve_regset (regset, regcache, regnum, buf, size);
@@ -1255,7 +1255,7 @@ aarch64_linux_supply_za_regset (const struct regset *regset,
     = sve_vg_from_vl (extract_unsigned_integer (header + SVE_HEADER_VL_OFFSET,
 						SVE_HEADER_VL_LENGTH,
 						byte_order));
-  regcache->raw_supply (tdep->sme_svg_regnum, &svg);
+  regcache->deprecated_raw_supply (tdep->sme_svg_regnum, &svg);
 
   size_t data_size
     = extract_unsigned_integer (header + SVE_HEADER_SIZE_OFFSET,
@@ -1276,7 +1276,7 @@ aarch64_linux_supply_za_regset (const struct regset *regset,
     svcr &= ~SVCR_ZA_BIT;
 
   /* Update SVCR in the register buffer.  */
-  regcache->raw_supply (tdep->sme_svcr_regnum, &svcr);
+  regcache->deprecated_raw_supply (tdep->sme_svcr_regnum, &svcr);
 
   /* Populate the register cache with ZA register contents, if we have any.  */
   buf = has_za_payload ? (gdb_byte *) buf + SVE_HEADER_SIZE : nullptr;
@@ -1294,7 +1294,7 @@ aarch64_linux_supply_za_regset (const struct regset *regset,
 		 pulongest (size), pulongest (SVE_HEADER_SIZE + za_bytes));
 	}
 
-      regcache->raw_supply (tdep->sme_za_regnum, buf);
+      regcache->deprecated_raw_supply (tdep->sme_za_regnum, buf);
     }
   else
     {
@@ -1397,7 +1397,7 @@ aarch64_linux_supply_zt_regset (const struct regset *regset,
     = gdbarch_tdep<aarch64_gdbarch_tdep> (regcache->arch ());
 
   /* Supply the ZT0 register contents.  */
-  regcache->raw_supply (tdep->sme2_zt0_regnum, buf);
+  regcache->deprecated_raw_supply (tdep->sme2_zt0_regnum, buf);
 }
 
 /* Collect register REGNUM from REGCACHE to BUF, using the register

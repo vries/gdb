@@ -8572,7 +8572,7 @@ remote_target::process_stop_reply (stop_reply_up stop_reply,
 
 	  for (cached_reg_t &reg : stop_reply->regcache)
 	    {
-	      regcache->raw_supply (reg.num, reg.data.get ());
+	      regcache->deprecated_raw_supply (reg.num, reg.data.get ());
 	      rs->last_seen_expedited_registers.insert (reg.num);
 	    }
 	}
@@ -8900,7 +8900,7 @@ remote_target::fetch_register_using_p (struct regcache *regcache,
   /* If this register is unfetchable, tell the regcache.  */
   if (buf[0] == 'x')
     {
-      regcache->raw_supply (reg->regnum, NULL);
+      regcache->deprecated_raw_supply (reg->regnum, NULL);
       return 1;
     }
 
@@ -8915,7 +8915,7 @@ remote_target::fetch_register_using_p (struct regcache *regcache,
       regp[i++] = fromhex (p[0]) * 16 + fromhex (p[1]);
       p += 2;
     }
-  regcache->raw_supply (reg->regnum, regp);
+  regcache->deprecated_raw_supply (reg->regnum, regp);
   return 1;
 }
 
@@ -9052,10 +9052,10 @@ remote_target::process_g_packet (struct regcache *regcache)
 	      gdb_assert (r->offset * 2 < strlen (rs->buf.data ()));
 	      /* The register isn't available, mark it as such (at
 		 the same time setting the value to zero).  */
-	      regcache->raw_supply (r->regnum, NULL);
+	      regcache->deprecated_raw_supply (r->regnum, NULL);
 	    }
 	  else
-	    regcache->raw_supply (r->regnum, regs + r->offset);
+	    regcache->deprecated_raw_supply (r->regnum, regs + r->offset);
 	}
     }
 }
@@ -9122,7 +9122,7 @@ remote_target::fetch_registers (struct regcache *regcache, int regnum)
 	return;
 
       /* This register is not available.  */
-      regcache->raw_supply (reg->regnum, NULL);
+      regcache->deprecated_raw_supply (reg->regnum, NULL);
 
       return;
     }
@@ -9134,7 +9134,7 @@ remote_target::fetch_registers (struct regcache *regcache, int regnum)
       if (!fetch_register_using_p (regcache, &rsa->regs[i]))
 	{
 	  /* This register is not available.  */
-	  regcache->raw_supply (i, NULL);
+	  regcache->deprecated_raw_supply (i, NULL);
 	}
 }
 

@@ -824,36 +824,36 @@ xtensa_supply_gregset (const struct regset *regset,
   DEBUGTRACE ("xtensa_supply_gregset (..., regnum==%d, ...)\n", regnum);
 
   if (regnum == gdbarch_pc_regnum (gdbarch) || regnum == -1)
-    rc->raw_supply (gdbarch_pc_regnum (gdbarch), (char *) &regs->pc);
+    rc->deprecated_raw_supply (gdbarch_pc_regnum (gdbarch), (char *) &regs->pc);
   if (regnum == gdbarch_ps_regnum (gdbarch) || regnum == -1)
-    rc->raw_supply (gdbarch_ps_regnum (gdbarch), (char *) &regs->ps);
+    rc->deprecated_raw_supply (gdbarch_ps_regnum (gdbarch), (char *) &regs->ps);
   if (regnum == tdep->wb_regnum || regnum == -1)
-    rc->raw_supply (tdep->wb_regnum,
+    rc->deprecated_raw_supply (tdep->wb_regnum,
 		    (char *) &regs->windowbase);
   if (regnum == tdep->ws_regnum || regnum == -1)
-    rc->raw_supply (tdep->ws_regnum,
+    rc->deprecated_raw_supply (tdep->ws_regnum,
 		    (char *) &regs->windowstart);
   if (regnum == tdep->lbeg_regnum || regnum == -1)
-    rc->raw_supply (tdep->lbeg_regnum,
+    rc->deprecated_raw_supply (tdep->lbeg_regnum,
 		    (char *) &regs->lbeg);
   if (regnum == tdep->lend_regnum || regnum == -1)
-    rc->raw_supply (tdep->lend_regnum,
+    rc->deprecated_raw_supply (tdep->lend_regnum,
 		    (char *) &regs->lend);
   if (regnum == tdep->lcount_regnum || regnum == -1)
-    rc->raw_supply (tdep->lcount_regnum,
+    rc->deprecated_raw_supply (tdep->lcount_regnum,
 		    (char *) &regs->lcount);
   if (regnum == tdep->sar_regnum || regnum == -1)
-    rc->raw_supply (tdep->sar_regnum,
+    rc->deprecated_raw_supply (tdep->sar_regnum,
 		    (char *) &regs->sar);
   if (regnum >=tdep->ar_base
       && regnum < tdep->ar_base
 		    + tdep->num_aregs)
-    rc->raw_supply
+    rc->deprecated_raw_supply
       (regnum, (char *) &regs->ar[regnum - tdep->ar_base]);
   else if (regnum == -1)
     {
       for (i = 0; i < tdep->num_aregs; ++i)
-	rc->raw_supply (tdep->ar_base + i,
+	rc->deprecated_raw_supply (tdep->ar_base + i,
 			(char *) &regs->ar[i]);
     }
 }

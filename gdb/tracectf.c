@@ -1270,12 +1270,12 @@ ctf_target::fetch_registers (struct regcache *regcache, int regno)
 	    {
 	      if (regno == regn)
 		{
-		  regcache->raw_supply (regno, regs + offset);
+		  regcache->deprecated_raw_supply (regno, regs + offset);
 		  break;
 		}
 	      else if (regno == -1)
 		{
-		  regcache->raw_supply (regn, regs + offset);
+		  regcache->deprecated_raw_supply (regn, regs + offset);
 		}
 	    }
 	  offset += regsize;

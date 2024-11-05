@@ -49,17 +49,17 @@ loongarch_supply_gregset (const struct regset *regset,
       for (int i = 1; i < 32; i++)
 	{
 	  buf = (const gdb_byte*) gprs + regsize * i;
-	  regcache->raw_supply (i, (const void *) buf);
+	  regcache->deprecated_raw_supply (i, (const void *) buf);
 	}
 
       buf = (const gdb_byte*) gprs + regsize * LOONGARCH_ORIG_A0_REGNUM;
-      regcache->raw_supply (LOONGARCH_ORIG_A0_REGNUM, (const void *) buf);
+      regcache->deprecated_raw_supply (LOONGARCH_ORIG_A0_REGNUM, (const void *) buf);
 
       buf = (const gdb_byte*) gprs + regsize * LOONGARCH_PC_REGNUM;
-      regcache->raw_supply (LOONGARCH_PC_REGNUM, (const void *) buf);
+      regcache->deprecated_raw_supply (LOONGARCH_PC_REGNUM, (const void *) buf);
 
       buf = (const gdb_byte*) gprs + regsize * LOONGARCH_BADV_REGNUM;
-      regcache->raw_supply (LOONGARCH_BADV_REGNUM, (const void *) buf);
+      regcache->deprecated_raw_supply (LOONGARCH_BADV_REGNUM, (const void *) buf);
     }
   else if (regnum == 0)
     regcache->raw_supply_zeroed (0);
@@ -69,7 +69,7 @@ loongarch_supply_gregset (const struct regset *regset,
 	   || regnum == LOONGARCH_BADV_REGNUM)
     {
       buf = (const gdb_byte*) gprs + regsize * regnum;
-      regcache->raw_supply (regnum, (const void *) buf);
+      regcache->deprecated_raw_supply (regnum, (const void *) buf);
     }
 }
 
@@ -134,34 +134,34 @@ loongarch_supply_fpregset (const struct regset *r,
       for (int i = 0; i < LOONGARCH_LINUX_NUM_FPREGSET; i++)
 	{
 	  buf = (const gdb_byte *)fprs + fprsize * i;
-	  regcache->raw_supply (LOONGARCH_FIRST_FP_REGNUM + i, (const void *)buf);
+	  regcache->deprecated_raw_supply (LOONGARCH_FIRST_FP_REGNUM + i, (const void *)buf);
 	}
       for (int i = 0; i < LOONGARCH_LINUX_NUM_FCC; i++)
 	{
 	  buf = (const gdb_byte *)fprs + fprsize * LOONGARCH_LINUX_NUM_FPREGSET +
 	    fccsize * i;
-	  regcache->raw_supply (LOONGARCH_FIRST_FCC_REGNUM + i, (const void *)buf);
+	  regcache->deprecated_raw_supply (LOONGARCH_FIRST_FCC_REGNUM + i, (const void *)buf);
 	}
       buf = (const gdb_byte *)fprs + fprsize * LOONGARCH_LINUX_NUM_FPREGSET +
 	fccsize * LOONGARCH_LINUX_NUM_FCC;
-      regcache->raw_supply (LOONGARCH_FCSR_REGNUM, (const void *)buf);
+      regcache->deprecated_raw_supply (LOONGARCH_FCSR_REGNUM, (const void *)buf);
     }
   else if (regnum >= LOONGARCH_FIRST_FP_REGNUM && regnum < LOONGARCH_FIRST_FCC_REGNUM)
     {
       buf = (const gdb_byte *)fprs + fprsize * (regnum - LOONGARCH_FIRST_FP_REGNUM);
-      regcache->raw_supply (regnum, (const void *)buf);
+      regcache->deprecated_raw_supply (regnum, (const void *)buf);
     }
   else if (regnum >= LOONGARCH_FIRST_FCC_REGNUM && regnum < LOONGARCH_FCSR_REGNUM)
     {
       buf = (const gdb_byte *)fprs + fprsize * LOONGARCH_LINUX_NUM_FPREGSET +
 	fccsize * (regnum - LOONGARCH_FIRST_FCC_REGNUM);
-      regcache->raw_supply (regnum, (const void *)buf);
+      regcache->deprecated_raw_supply (regnum, (const void *)buf);
     }
   else if (regnum == LOONGARCH_FCSR_REGNUM)
     {
       buf = (const gdb_byte *)fprs + fprsize * LOONGARCH_LINUX_NUM_FPREGSET +
 	fccsize * LOONGARCH_LINUX_NUM_FCC;
-      regcache->raw_supply (regnum, (const void *)buf);
+      regcache->deprecated_raw_supply (regnum, (const void *)buf);
     }
 }
 
@@ -234,14 +234,14 @@ loongarch_supply_lsxregset (const struct regset *regset,
       for (int i = 0; i < LOONGARCH_LINUX_NUM_LSXREGSET; i++)
 	{
 	  buf = (const gdb_byte*) lsxrs + lsxrsize * i;
-	  regcache->raw_supply (LOONGARCH_FIRST_LSX_REGNUM + i, (const void *) buf);
+	  regcache->deprecated_raw_supply (LOONGARCH_FIRST_LSX_REGNUM + i, (const void *) buf);
 	}
 
     }
   else if (regnum >= LOONGARCH_FIRST_LSX_REGNUM && regnum < LOONGARCH_FIRST_LASX_REGNUM)
     {
       buf = (const gdb_byte*) lsxrs + lsxrsize * (regnum - LOONGARCH_FIRST_LSX_REGNUM);
-      regcache->raw_supply (regnum, (const void *) buf);
+      regcache->deprecated_raw_supply (regnum, (const void *) buf);
     }
 }
 
@@ -294,7 +294,7 @@ loongarch_supply_lasxregset (const struct regset *regset,
       for (int i = 0; i < LOONGARCH_LINUX_NUM_LASXREGSET; i++)
 	{
 	  buf = (const gdb_byte*) lasxrs + lasxrsize * i;
-	  regcache->raw_supply (LOONGARCH_FIRST_LASX_REGNUM + i, (const void *) buf);
+	  regcache->deprecated_raw_supply (LOONGARCH_FIRST_LASX_REGNUM + i, (const void *) buf);
 	}
 
     }
@@ -302,7 +302,7 @@ loongarch_supply_lasxregset (const struct regset *regset,
 	   && regnum < LOONGARCH_FIRST_LASX_REGNUM + LOONGARCH_LINUX_NUM_LASXREGSET)
     {
       buf = (const gdb_byte*) lasxrs + lasxrsize * (regnum - LOONGARCH_FIRST_LASX_REGNUM);
-      regcache->raw_supply (regnum, (const void *) buf);
+      regcache->deprecated_raw_supply (regnum, (const void *) buf);
     }
 }
 
@@ -358,36 +358,36 @@ loongarch_supply_lbtregset (const struct regset *regset,
       for (int i = 0; i < LOONGARCH_LINUX_NUM_SCR; i++)
 	{
 	  buf = (const gdb_byte *) regs + scrsize * i;
-	  regcache->raw_supply (LOONGARCH_FIRST_SCR_REGNUM + i,
+	  regcache->deprecated_raw_supply (LOONGARCH_FIRST_SCR_REGNUM + i,
 				(const void *) buf);
 	}
 
       buf = (const gdb_byte*) regs + scrsize * LOONGARCH_LINUX_NUM_SCR;
-      regcache->raw_supply (LOONGARCH_EFLAGS_REGNUM, (const void *) buf);
+      regcache->deprecated_raw_supply (LOONGARCH_EFLAGS_REGNUM, (const void *) buf);
 
       buf = (const gdb_byte*) regs
 	    + scrsize * LOONGARCH_LINUX_NUM_SCR
 	    + eflagssize;
-      regcache->raw_supply (LOONGARCH_FTOP_REGNUM, (const void *) buf);
+      regcache->deprecated_raw_supply (LOONGARCH_FTOP_REGNUM, (const void *) buf);
     }
   else if (regnum >= LOONGARCH_FIRST_SCR_REGNUM
 	   && regnum <= LOONGARCH_LAST_SCR_REGNUM)
     {
       buf = (const gdb_byte*) regs
 	    + scrsize * (regnum - LOONGARCH_FIRST_SCR_REGNUM);
-      regcache->raw_supply (regnum, (const void *) buf);
+      regcache->deprecated_raw_supply (regnum, (const void *) buf);
     }
   else if (regnum == LOONGARCH_EFLAGS_REGNUM)
     {
       buf = (const gdb_byte*) regs + scrsize * LOONGARCH_LINUX_NUM_SCR;
-      regcache->raw_supply (regnum, (const void *) buf);
+      regcache->deprecated_raw_supply (regnum, (const void *) buf);
     }
   else if (regnum == LOONGARCH_FTOP_REGNUM)
     {
       buf = (const gdb_byte*) regs
 	    + scrsize * LOONGARCH_LINUX_NUM_SCR
 	    + eflagssize;
-      regcache->raw_supply (regnum, (const void *) buf);
+      regcache->deprecated_raw_supply (regnum, (const void *) buf);
     }
 }
 

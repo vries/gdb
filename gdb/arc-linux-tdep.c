@@ -544,7 +544,7 @@ supply_register (struct regcache *regcache, int regnum, const gdb_byte *buf)
   if ((arc_linux_core_reg_offsets[regnum] == ARC_OFFSET_NO_REGISTER))
     return;
 
-  regcache->raw_supply (regnum, buf + arc_linux_core_reg_offsets[regnum]);
+  regcache->deprecated_raw_supply (regnum, buf + arc_linux_core_reg_offsets[regnum]);
 }
 
 void
@@ -576,11 +576,11 @@ arc_linux_supply_v2_regset (const struct regset *regset,
 
   /* user_regs_arcv2 is defined in linux arch/arc/include/uapi/asm/ptrace.h.  */
   if (regnum == -1 || regnum == ARC_R30_REGNUM)
-    regcache->raw_supply (ARC_R30_REGNUM, buf);
+    regcache->deprecated_raw_supply (ARC_R30_REGNUM, buf);
   if (regnum == -1 || regnum == ARC_R58_REGNUM)
-    regcache->raw_supply (ARC_R58_REGNUM, buf + REGOFF (1));
+    regcache->deprecated_raw_supply (ARC_R58_REGNUM, buf + REGOFF (1));
   if (regnum == -1 || regnum == ARC_R59_REGNUM)
-    regcache->raw_supply (ARC_R59_REGNUM, buf + REGOFF (2));
+    regcache->deprecated_raw_supply (ARC_R59_REGNUM, buf + REGOFF (2));
 }
 
 /* Populate BUF with register REGNUM from the REGCACHE.  */

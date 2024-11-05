@@ -956,7 +956,7 @@ jit_unwind_reg_set_impl (struct gdb_unwind_callbacks *cb, int dwarf_regnum,
       return;
     }
 
-  priv->regcache->raw_supply (gdb_reg, value->value);
+  priv->regcache->deprecated_raw_supply (gdb_reg, value->value);
   value->free (value);
 }
 

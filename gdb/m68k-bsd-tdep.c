@@ -66,7 +66,7 @@ m68kbsd_supply_fpregset (const struct regset *regset,
   for (i = M68K_FP0_REGNUM; i <= M68K_PC_REGNUM; i++)
     {
       if (regnum == i || regnum == -1)
-	regcache->raw_supply (i, regs + m68kbsd_fpreg_offset (gdbarch, i));
+	regcache->deprecated_raw_supply (i, regs + m68kbsd_fpreg_offset (gdbarch, i));
     }
 }
 
@@ -87,7 +87,7 @@ m68kbsd_supply_gregset (const struct regset *regset,
   for (i = M68K_D0_REGNUM; i <= M68K_PC_REGNUM; i++)
     {
       if (regnum == i || regnum == -1)
-	regcache->raw_supply (i, regs + i * 4);
+	regcache->deprecated_raw_supply (i, regs + i * 4);
     }
 
   if (len >= M68KBSD_SIZEOF_GREGS + M68KBSD_SIZEOF_FPREGS)

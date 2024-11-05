@@ -1618,7 +1618,7 @@ record_btrace_target::fetch_registers (struct regcache *regcache, int regno)
       insn = btrace_insn_get (replay);
       gdb_assert (insn != NULL);
 
-      regcache->raw_supply (regno, &insn->pc);
+      regcache->deprecated_raw_supply (regno, &insn->pc);
     }
   else
     this->beneath ()->fetch_registers (regcache, regno);
