@@ -415,7 +415,7 @@ amd64_windows_return_value (struct gdbarch *gdbarch, struct value *function,
       if (read_value != nullptr)
 	{
 	  *read_value = value::allocate (type);
-	  regcache->raw_read_part (regnum, 0, len,
+	  regcache->deprecated_raw_read_part (regnum, 0, len,
 				   (*read_value)->contents_raw ().data ());
 	}
       if (writebuf)

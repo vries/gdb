@@ -984,7 +984,7 @@ riscv_pseudo_register_read (struct gdbarch *gdbarch,
       /* Read the first byte of the fcsr register, this contains both frm
 	 and fflags.  */
       enum register_status status
-	= regcache->raw_read_part (RISCV_CSR_FCSR_REGNUM, 0, 1, buf);
+	= regcache->deprecated_raw_read_part (RISCV_CSR_FCSR_REGNUM, 0, 1, buf);
 
       if (status != REG_VALID)
 	return status;

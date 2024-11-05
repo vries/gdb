@@ -3101,7 +3101,7 @@ efp_pseudo_register_read (struct gdbarch *gdbarch, readable_regcache *regcache,
   int offset = gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG ? 0 : 8;
 
   /* Read the portion that overlaps the VMX register.  */
-  return regcache->raw_read_part (vr0 + reg_index, offset,
+  return regcache->deprecated_raw_read_part (vr0 + reg_index, offset,
 				  register_size (gdbarch, reg_nr),
 				  buffer);
 }

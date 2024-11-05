@@ -1576,7 +1576,7 @@ xtensa_extract_return_value (struct type *type,
   for (; len > 0; len -= 4, areg++, valbuf += 4)
     {
       if (len < 4)
-	regcache->raw_read_part (areg, offset, len, valbuf);
+	regcache->deprecated_raw_read_part (areg, offset, len, valbuf);
       else
 	regcache->deprecated_raw_read (areg, valbuf);
     }

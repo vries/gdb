@@ -357,9 +357,21 @@ DIAGNOSTIC_POP
 				 gdb::array_view<gdb_byte> dst);
 
   /* Deprecated overload of the above.  */
+  [[deprecated]]
   register_status raw_read_part (int regnum, int offset, int len,
 				 gdb_byte *dst)
   { return raw_read_part (regnum, offset, gdb::make_array_view (dst, len)); }
+
+  /* Wrapper for deprecated raw_read_part that silences warnings for
+     deprecated declarations.  */
+  register_status deprecated_raw_read_part (int regnum, int offset, int len,
+					    gdb_byte *dst)
+  {
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_DEPRECATED_DECLARATIONS
+    return raw_read_part (regnum, offset, len, dst);
+DIAGNOSTIC_POP
+  }
 
   /* Make certain that the register REGNUM is up-to-date.  */
   virtual void raw_update (int regnum) = 0;
