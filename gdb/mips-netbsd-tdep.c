@@ -64,7 +64,7 @@ mipsnbsd_supply_fpregset (const struct regset *regset,
   for (i = MIPS_FP0_REGNUM; i <= MIPS_FSR_REGNUM; i++)
     {
       if (regnum == i || regnum == -1)
-	regcache->raw_supply (i, regs + (i - MIPS_FP0_REGNUM) * regsize);
+	regcache->deprecated_raw_supply (i, regs + (i - MIPS_FP0_REGNUM) * regsize);
     }
 }
 
@@ -86,7 +86,7 @@ mipsnbsd_supply_gregset (const struct regset *regset,
   for (i = 0; i <= MIPS_PC_REGNUM; i++)
     {
       if (regnum == i || regnum == -1)
-	regcache->raw_supply (i, regs + i * regsize);
+	regcache->deprecated_raw_supply (i, regs + i * regsize);
     }
 
   if (len >= (MIPSNBSD_NUM_GREGS + MIPSNBSD_NUM_FPREGS) * regsize)
@@ -144,9 +144,9 @@ mipsnbsd_supply_reg (struct regcache *regcache, const char *regs, int regno)
       if (regno == i || regno == -1)
 	{
 	  if (gdbarch_cannot_fetch_register (gdbarch, i))
-	    regcache->raw_supply (i, NULL);
+	    regcache->deprecated_raw_supply (i, NULL);
 	  else
-	    regcache->raw_supply
+	    regcache->deprecated_raw_supply
 	      (i, regs + (i * mips_isa_regsize (gdbarch)));
 	}
     }
@@ -178,9 +178,9 @@ mipsnbsd_supply_fpreg (struct regcache *regcache,
       if (regno == i || regno == -1)
 	{
 	  if (gdbarch_cannot_fetch_register (gdbarch, i))
-	    regcache->raw_supply (i, NULL);
+	    regcache->deprecated_raw_supply (i, NULL);
 	  else
-	    regcache->raw_supply (i,
+	    regcache->deprecated_raw_supply (i,
 				 fpregs
 				 + ((i - gdbarch_fp0_regnum (gdbarch))
 				    * mips_isa_regsize (gdbarch)));

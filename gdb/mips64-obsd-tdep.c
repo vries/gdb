@@ -47,7 +47,7 @@ mips64obsd_supply_gregset (const struct regset *regset,
   for (i = 0; i < MIPS64OBSD_NUM_REGS; i++)
     {
       if (regnum == i || regnum == -1)
-	regcache->raw_supply (i, regs + i * 8);
+	regcache->deprecated_raw_supply (i, regs + i * 8);
     }
 }
 

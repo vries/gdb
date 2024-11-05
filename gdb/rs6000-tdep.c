@@ -427,7 +427,7 @@ ppc_supply_reg (struct regcache *regcache, int regnum,
 	      && gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
 	    offset += regsize - gdb_regsize;
 	}
-      regcache->raw_supply (regnum, regs + offset);
+      regcache->deprecated_raw_supply (regnum, regs + offset);
     }
 }
 

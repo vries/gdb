@@ -533,7 +533,7 @@ ravenscar_arch_ops::supply_one_register (struct regcache *regcache,
   int size = register_size (gdbarch, regnum);
   gdb_byte *buf = (gdb_byte *) alloca (size);
   read_memory (addr, buf, size);
-  regcache->raw_supply (regnum, buf);
+  regcache->deprecated_raw_supply (regnum, buf);
 }
 
 void

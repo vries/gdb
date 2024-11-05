@@ -57,11 +57,11 @@ alphanbsd_supply_fpregset (const struct regset *regset,
   for (i = ALPHA_FP0_REGNUM; i < ALPHA_FP0_REGNUM + 31; i++)
     {
       if (regnum == i || regnum == -1)
-	regcache->raw_supply (i, regs + (i - ALPHA_FP0_REGNUM) * 8);
+	regcache->deprecated_raw_supply (i, regs + (i - ALPHA_FP0_REGNUM) * 8);
     }
 
   if (regnum == ALPHA_FPCR_REGNUM || regnum == -1)
-    regcache->raw_supply (ALPHA_FPCR_REGNUM, regs + 32 * 8);
+    regcache->deprecated_raw_supply (ALPHA_FPCR_REGNUM, regs + 32 * 8);
 }
 
 /* Supply register REGNUM from the buffer specified by GREGS and LEN
@@ -94,11 +94,11 @@ alphanbsd_aout_supply_gregset (const struct regset *regset,
   for (i = 0; i < ARRAY_SIZE(regmap); i++)
     {
       if (regnum == i || regnum == -1)
-	regcache->raw_supply (i, regs + regmap[i] * 8);
+	regcache->deprecated_raw_supply (i, regs + regmap[i] * 8);
     }
 
   if (regnum == ALPHA_PC_REGNUM || regnum == -1)
-    regcache->raw_supply (ALPHA_PC_REGNUM, regs + 31 * 8);
+    regcache->deprecated_raw_supply (ALPHA_PC_REGNUM, regs + 31 * 8);
 
   if (len >= ALPHANBSD_SIZEOF_GREGS + ALPHANBSD_SIZEOF_FPREGS)
     {
@@ -129,11 +129,11 @@ alphanbsd_supply_gregset (const struct regset *regset,
   for (i = 0; i < ALPHA_ZERO_REGNUM; i++)
     {
       if (regnum == i || regnum == -1)
-	regcache->raw_supply (i, regs + i * 8);
+	regcache->deprecated_raw_supply (i, regs + i * 8);
     }
 
   if (regnum == ALPHA_PC_REGNUM || regnum == -1)
-    regcache->raw_supply (ALPHA_PC_REGNUM, regs + 31 * 8);
+    regcache->deprecated_raw_supply (ALPHA_PC_REGNUM, regs + 31 * 8);
 }
 
 /* NetBSD/alpha register sets.  */

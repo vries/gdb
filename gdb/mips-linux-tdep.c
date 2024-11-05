@@ -284,9 +284,9 @@ supply_64bit_reg (struct regcache *regcache, int regnum,
   struct gdbarch *gdbarch = regcache->arch ();
   if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG
       && register_size (gdbarch, regnum) == 4)
-    regcache->raw_supply (regnum, buf + 4);
+    regcache->deprecated_raw_supply (regnum, buf + 4);
   else
-    regcache->raw_supply (regnum, buf);
+    regcache->deprecated_raw_supply (regnum, buf);
 }
 
 /* Unpack a 64-bit elf_gregset_t into GDB's register cache.  */
@@ -424,11 +424,11 @@ mips64_supply_fpregset (struct regcache *regcache,
 	  = (const gdb_byte *) (*fpregsetp + (regi & ~1));
 	if ((gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG) != (regi & 1))
 	  reg_ptr += 4;
-	regcache->raw_supply (gdbarch_fp0_regnum (gdbarch) + regi, reg_ptr);
+	regcache->deprecated_raw_supply (gdbarch_fp0_regnum (gdbarch) + regi, reg_ptr);
       }
   else
     for (regi = 0; regi < 32; regi++)
-      regcache->raw_supply (gdbarch_fp0_regnum (gdbarch) + regi,
+      regcache->deprecated_raw_supply (gdbarch_fp0_regnum (gdbarch) + regi,
 			    (const char *) (*fpregsetp + regi));
 
   supply_32bit_reg (regcache, mips_regnum (gdbarch)->fp_control_status,

@@ -1263,7 +1263,7 @@ regcache::transfer_regset_register (struct regcache *out_regcache, int regnum,
   else
     {
       /* Invalidate the register.  */
-      out_regcache->raw_supply (regnum, {});
+      out_regcache->deprecated_raw_supply (regnum, {});
     }
 }
 

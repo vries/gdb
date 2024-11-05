@@ -154,7 +154,7 @@ fetch_gregs_from_thread (struct regcache *regcache)
       int regno;
 
       for (regno = AARCH64_X0_REGNUM; regno <= AARCH64_CPSR_REGNUM; regno++)
-	regcache->raw_supply (regno, &regs[regno - AARCH64_X0_REGNUM]);
+	regcache->deprecated_raw_supply (regno, &regs[regno - AARCH64_X0_REGNUM]);
     }
 }
 
@@ -240,10 +240,10 @@ fetch_fpregs_from_thread (struct regcache *regcache)
 	perror_with_name (_("Unable to fetch vFP/SIMD registers"));
 
       for (regno = AARCH64_V0_REGNUM; regno <= AARCH64_V31_REGNUM; regno++)
-	regcache->raw_supply (regno, &regs.vregs[regno - AARCH64_V0_REGNUM]);
+	regcache->deprecated_raw_supply (regno, &regs.vregs[regno - AARCH64_V0_REGNUM]);
 
-      regcache->raw_supply (AARCH64_FPSR_REGNUM, &regs.fpsr);
-      regcache->raw_supply (AARCH64_FPCR_REGNUM, &regs.fpcr);
+      regcache->deprecated_raw_supply (AARCH64_FPSR_REGNUM, &regs.fpsr);
+      regcache->deprecated_raw_supply (AARCH64_FPCR_REGNUM, &regs.fpcr);
     }
 }
 
@@ -423,9 +423,9 @@ fetch_pauth_masks_from_thread (struct regcache *regcache)
   if (ret != 0)
     perror_with_name (_("unable to fetch pauth registers"));
 
-  regcache->raw_supply (AARCH64_PAUTH_DMASK_REGNUM (tdep->pauth_reg_base),
+  regcache->deprecated_raw_supply (AARCH64_PAUTH_DMASK_REGNUM (tdep->pauth_reg_base),
 			&pauth_regset[0]);
-  regcache->raw_supply (AARCH64_PAUTH_CMASK_REGNUM (tdep->pauth_reg_base),
+  regcache->deprecated_raw_supply (AARCH64_PAUTH_CMASK_REGNUM (tdep->pauth_reg_base),
 			&pauth_regset[1]);
 }
 
@@ -451,7 +451,7 @@ fetch_mteregs_from_thread (struct regcache *regcache)
   if (ptrace (PTRACE_GETREGSET, tid, NT_ARM_TAGGED_ADDR_CTRL, &iovec) != 0)
       perror_with_name (_("unable to fetch MTE registers"));
 
-  regcache->raw_supply (regno, &tag_ctl);
+  regcache->deprecated_raw_supply (regno, &tag_ctl);
 }
 
 /* Store to the current thread the valid MTE register set in the GDB's
@@ -507,7 +507,7 @@ fetch_tlsregs_from_thread (struct regcache *regcache)
       perror_with_name (_("unable to fetch TLS registers"));
 
   for (int i = 0; i < tdep->tls_register_count; i++)
-    regcache->raw_supply (regno + i, &tpidrs[i]);
+    regcache->deprecated_raw_supply (regno + i, &tpidrs[i]);
 }
 
 /* Store to the current thread the valid TLS register set in GDB's

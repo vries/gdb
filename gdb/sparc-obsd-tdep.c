@@ -169,7 +169,7 @@ sparc32obsd_supply_uthread (struct regcache *regcache,
   if (regnum == SPARC_SP_REGNUM || regnum == -1)
     {
       store_unsigned_integer (buf, 4, byte_order, fp);
-      regcache->raw_supply (SPARC_SP_REGNUM, buf);
+      regcache->deprecated_raw_supply (SPARC_SP_REGNUM, buf);
 
       if (regnum == SPARC_SP_REGNUM)
 	return;
@@ -184,12 +184,12 @@ sparc32obsd_supply_uthread (struct regcache *regcache,
       if (regnum == SPARC32_PC_REGNUM || regnum == -1)
 	{
 	  store_unsigned_integer (buf, 4, byte_order, i7 + 8);
-	  regcache->raw_supply (SPARC32_PC_REGNUM, buf);
+	  regcache->deprecated_raw_supply (SPARC32_PC_REGNUM, buf);
 	}
       if (regnum == SPARC32_NPC_REGNUM || regnum == -1)
 	{
 	  store_unsigned_integer (buf, 4, byte_order, i7 + 12);
-	  regcache->raw_supply (SPARC32_NPC_REGNUM, buf);
+	  regcache->deprecated_raw_supply (SPARC32_NPC_REGNUM, buf);
 	}
 
       if (regnum == SPARC32_PC_REGNUM || regnum == SPARC32_NPC_REGNUM)

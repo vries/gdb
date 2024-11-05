@@ -79,7 +79,7 @@ csky_supply_gregset (const struct regset *regset,
     {
       if ((regnum == csky_gregset_offset[i] || regnum == -1)
 	  && csky_gregset_offset[i] != -1)
-	regcache->raw_supply (csky_gregset_offset[i], gregs + 4 * i);
+	regcache->deprecated_raw_supply (csky_gregset_offset[i], gregs + 4 * i);
     }
 }
 
@@ -128,7 +128,7 @@ csky_supply_fregset (const struct regset *regset,
 	    {
 	      int num = csky_fregset_offset[i];
 	      offset += register_size (gdbarch, num);
-	      regcache->raw_supply (csky_fregset_offset[i], fregs + offset);
+	      regcache->deprecated_raw_supply (csky_fregset_offset[i], fregs + offset);
 	    }
 	}
     }
@@ -157,7 +157,7 @@ csky_supply_fregset (const struct regset *regset,
 	  if (*gdbarch_register_name (gdbarch, (CSKY_VR0_REGNUM + i)) != '\0')
 	    {
 	      offset = 16 * i;
-	      regcache->raw_supply (CSKY_VR0_REGNUM + i, fregs + offset);
+	      regcache->deprecated_raw_supply (CSKY_VR0_REGNUM + i, fregs + offset);
 	    }
 	}
       /* Supply fr0~fr15.  */
@@ -166,7 +166,7 @@ csky_supply_fregset (const struct regset *regset,
 	  if (*gdbarch_register_name (gdbarch, (CSKY_FR0_REGNUM + i)) != '\0')
 	    {
 	      offset = 16 * i;
-	      regcache->raw_supply (CSKY_FR0_REGNUM + i, fregs + offset);
+	      regcache->deprecated_raw_supply (CSKY_FR0_REGNUM + i, fregs + offset);
 	    }
 	}
       /* Supply fr16~fr31.  */
@@ -175,7 +175,7 @@ csky_supply_fregset (const struct regset *regset,
 	  if (*gdbarch_register_name (gdbarch, (CSKY_FR16_REGNUM + i)) != '\0')
 	    {
 	      offset = (16 * 16) + (8 * i);
-	      regcache->raw_supply (CSKY_FR16_REGNUM + i, fregs + offset);
+	      regcache->deprecated_raw_supply (CSKY_FR16_REGNUM + i, fregs + offset);
 	    }
 	}
      /* Supply fcr, fesr, fid.  */
@@ -184,7 +184,7 @@ csky_supply_fregset (const struct regset *regset,
 	  if (*gdbarch_register_name (gdbarch, fcr_regno[i]) != '\0')
 	    {
 	      offset = (16 * 16) + (16 * 8) + (4 * i);
-	      regcache->raw_supply (fcr_regno[i], fregs + offset);
+	      regcache->deprecated_raw_supply (fcr_regno[i], fregs + offset);
 	    }
 	}
     }

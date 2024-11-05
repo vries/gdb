@@ -185,7 +185,7 @@ ia64_linux_supply_fpregset (const struct regset *regset,
   if (regnum == -1 || regnum == IA64_FR0_REGNUM)
     regcache->raw_supply_zeroed (IA64_FR0_REGNUM);
   if (regnum == -1 || regnum == IA64_FR1_REGNUM)
-    regcache->raw_supply (IA64_FR1_REGNUM, f_one);
+    regcache->deprecated_raw_supply (IA64_FR1_REGNUM, f_one);
 }
 
 static const struct regset ia64_linux_gregset =

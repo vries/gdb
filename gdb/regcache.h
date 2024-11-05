@@ -248,7 +248,18 @@ DIAGNOSTIC_POP
   void raw_supply (int regnum, gdb::array_view<const gdb_byte> src) override;
 
   /* Deprecated overload of the above.  */
+  [[deprecated]]
   void raw_supply (int regnum, const void *src);
+
+  /* Wrapper for deprecated raw_supply that silences warnings for deprecated
+     declarations.  */
+  void deprecated_raw_supply (int regnum, const void *src)
+  {
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_DEPRECATED_DECLARATIONS
+    raw_supply (regnum, src);
+DIAGNOSTIC_POP
+  }
 
   void raw_supply (int regnum, const reg_buffer &src)
   { raw_supply (regnum, src.register_buffer (regnum)); }

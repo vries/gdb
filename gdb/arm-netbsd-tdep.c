@@ -59,26 +59,26 @@ arm_nbsd_supply_gregset (const struct regset *regset, struct regcache *regcache,
   /* Integer registers.  */
   for (int i = ARM_A1_REGNUM; i < ARM_SP_REGNUM; i++)
     if (regnum == -1 || regnum == i)
-      regcache->raw_supply (i, (char *) &gregset->reg[i]);
+      regcache->deprecated_raw_supply (i, (char *) &gregset->reg[i]);
 
   if (regnum == -1 || regnum == ARM_SP_REGNUM)
-    regcache->raw_supply (ARM_SP_REGNUM, (char *) &gregset->sp);
+    regcache->deprecated_raw_supply (ARM_SP_REGNUM, (char *) &gregset->sp);
 
   if (regnum == -1 || regnum == ARM_LR_REGNUM)
-    regcache->raw_supply (ARM_LR_REGNUM, (char *) &gregset->lr);
+    regcache->deprecated_raw_supply (ARM_LR_REGNUM, (char *) &gregset->lr);
 
   if (regnum == -1 || regnum == ARM_PC_REGNUM)
     {
       CORE_ADDR r_pc = gdbarch_addr_bits_remove (regcache->arch (), gregset->pc);
-      regcache->raw_supply (ARM_PC_REGNUM, (char *) &r_pc);
+      regcache->deprecated_raw_supply (ARM_PC_REGNUM, (char *) &r_pc);
     }
 
   if (regnum == -1 || regnum == ARM_PS_REGNUM)
     {
       if (arm_apcs_32)
-	regcache->raw_supply (ARM_PS_REGNUM, (char *) &gregset->cpsr);
+	regcache->deprecated_raw_supply (ARM_PS_REGNUM, (char *) &gregset->cpsr);
       else
-	regcache->raw_supply (ARM_PS_REGNUM, (char *) &gregset->pc);
+	regcache->deprecated_raw_supply (ARM_PS_REGNUM, (char *) &gregset->pc);
     }
 }
 

@@ -489,15 +489,15 @@ arm_linux_supply_gregset (const struct regset *regset,
 
   for (regno = ARM_A1_REGNUM; regno < ARM_PC_REGNUM; regno++)
     if (regnum == -1 || regnum == regno)
-      regcache->raw_supply (regno, gregs + ARM_INT_REGISTER_SIZE * regno);
+      regcache->deprecated_raw_supply (regno, gregs + ARM_INT_REGISTER_SIZE * regno);
 
   if (regnum == ARM_PS_REGNUM || regnum == -1)
     {
       if (arm_apcs_32)
-	regcache->raw_supply (ARM_PS_REGNUM,
+	regcache->deprecated_raw_supply (ARM_PS_REGNUM,
 			      gregs + ARM_INT_REGISTER_SIZE * ARM_CPSR_GREGNUM);
       else
-	regcache->raw_supply (ARM_PS_REGNUM,
+	regcache->deprecated_raw_supply (ARM_PS_REGNUM,
 			     gregs + ARM_INT_REGISTER_SIZE * ARM_PC_REGNUM);
     }
 
@@ -509,7 +509,7 @@ arm_linux_supply_gregset (const struct regset *regset,
       reg_pc = gdbarch_addr_bits_remove (gdbarch, reg_pc);
       store_unsigned_integer (pc_buf, ARM_INT_REGISTER_SIZE, byte_order,
 			      reg_pc);
-      regcache->raw_supply (ARM_PC_REGNUM, pc_buf);
+      regcache->deprecated_raw_supply (ARM_PC_REGNUM, pc_buf);
     }
 }
 
@@ -580,7 +580,7 @@ supply_nwfpe_register (struct regcache *regcache, int regno,
       break;
     }
 
-  regcache->raw_supply (regno, buf);
+  regcache->deprecated_raw_supply (regno, buf);
 }
 
 void
@@ -629,7 +629,7 @@ arm_linux_supply_nwfpe (const struct regset *regset,
   int regno;
 
   if (regnum == ARM_FPS_REGNUM || regnum == -1)
-    regcache->raw_supply (ARM_FPS_REGNUM,
+    regcache->deprecated_raw_supply (ARM_FPS_REGNUM,
 			 regs + NWFPE_FPSR_OFFSET);
 
   for (regno = ARM_F0_REGNUM; regno <= ARM_F7_REGNUM; regno++)
@@ -667,11 +667,11 @@ arm_linux_supply_vfp (const struct regset *regset,
   int regno;
 
   if (regnum == ARM_FPSCR_REGNUM || regnum == -1)
-    regcache->raw_supply (ARM_FPSCR_REGNUM, regs + 32 * 8);
+    regcache->deprecated_raw_supply (ARM_FPSCR_REGNUM, regs + 32 * 8);
 
   for (regno = ARM_D0_REGNUM; regno <= ARM_D31_REGNUM; regno++)
     if (regnum == -1 || regnum == regno)
-      regcache->raw_supply (regno, regs + (regno - ARM_D0_REGNUM) * 8);
+      regcache->deprecated_raw_supply (regno, regs + (regno - ARM_D0_REGNUM) * 8);
 }
 
 static void
