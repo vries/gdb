@@ -9186,7 +9186,7 @@ remote_target::store_register_using_P (const struct regcache *regcache,
 
   xsnprintf (buf, get_remote_packet_size (), "P%s=", phex_nz (reg->pnum, 0));
   p = buf + strlen (buf);
-  regcache->raw_collect (reg->regnum, regp);
+  regcache->deprecated_raw_collect (reg->regnum, regp);
   bin2hex (regp, p, register_size (gdbarch, reg->regnum));
   putpkt (rs->buf);
   getpkt (&rs->buf);
@@ -9229,7 +9229,7 @@ remote_target::store_registers_using_G (const struct regcache *regcache)
 	struct packet_reg *r = &rsa->regs[i];
 
 	if (r->in_g_packet)
-	  regcache->raw_collect (r->regnum, regs + r->offset);
+	  regcache->deprecated_raw_collect (r->regnum, regs + r->offset);
       }
   }
 

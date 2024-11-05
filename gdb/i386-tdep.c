@@ -3696,7 +3696,7 @@ i386_collect_gregset (const struct regset *regset,
     {
       if ((regnum == i || regnum == -1)
 	  && tdep->gregset_reg_offset[i] != -1)
-	regcache->raw_collect (i, regs + tdep->gregset_reg_offset[i]);
+	regcache->deprecated_raw_collect (i, regs + tdep->gregset_reg_offset[i]);
     }
 }
 

@@ -202,7 +202,18 @@ public:
   void raw_collect (int regnum, gdb::array_view<gdb_byte> dst) const override;
 
   /* Deprecated overload of the above.  */
+  [[deprecated]]
   void raw_collect (int regnum, void *dst) const;
+
+  /* Wrapper for deprecated raw_collect that silences warnings for deprecated
+     declarations.  */
+  void deprecated_raw_collect (int regnum, void *dst) const
+  {
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_DEPRECATED_DECLARATIONS
+    raw_collect (regnum, dst);
+DIAGNOSTIC_POP
+  }
 
   /* Collect register REGNUM from REGCACHE.  Store collected value as an integer
      at address ADDR, in target endian, with length ADDR_LEN and sign IS_SIGNED.

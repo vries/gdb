@@ -1000,7 +1000,7 @@ collect_inactive_sve_regset (const struct regcache *regcache,
 
   /* Dump the vector length.  */
   ULONGEST vg = 0;
-  regcache->raw_collect (vg_regnum, &vg);
+  regcache->deprecated_raw_collect (vg_regnum, &vg);
   uint16_t vl = sve_vl_from_vg (vg);
   store_unsigned_integer (header + SVE_HEADER_VL_OFFSET, SVE_HEADER_VL_LENGTH,
 			  byte_order, vl);
@@ -1031,8 +1031,8 @@ collect_inactive_sve_regset (const struct regcache *regcache,
 
   /* Dump FPSR and FPCR.  */
   header += 32 * V_REGISTER_SIZE;
-  regcache->raw_collect (AARCH64_FPSR_REGNUM, header);
-  regcache->raw_collect (AARCH64_FPCR_REGNUM, header + 4);
+  regcache->deprecated_raw_collect (AARCH64_FPSR_REGNUM, header);
+  regcache->deprecated_raw_collect (AARCH64_FPCR_REGNUM, header + 4);
 
   /* Dump two reserved empty fields of 4 bytes.  */
   header += 8;
@@ -1100,7 +1100,7 @@ aarch64_linux_supply_sve_regset (const struct regset *regset,
   if (tdep->has_sme ())
     {
       ULONGEST svcr = 0;
-      regcache->raw_collect (tdep->sme_svcr_regnum, &svcr);
+      regcache->deprecated_raw_collect (tdep->sme_svcr_regnum, &svcr);
 
       /* Is streaming mode enabled?  */
       if (svcr & SVCR_SM_BIT)
@@ -1129,7 +1129,7 @@ aarch64_linux_collect_sve_regset (const struct regset *regset,
   if (tdep->has_sme ())
     {
       ULONGEST svcr = 0;
-      regcache->raw_collect (tdep->sme_svcr_regnum, &svcr);
+      regcache->deprecated_raw_collect (tdep->sme_svcr_regnum, &svcr);
 
       /* Is streaming mode enabled?  */
       if (svcr & SVCR_SM_BIT)
@@ -1202,7 +1202,7 @@ aarch64_linux_collect_ssve_regset (const struct regset *regset,
   struct gdbarch *gdbarch = regcache->arch ();
   aarch64_gdbarch_tdep *tdep = gdbarch_tdep<aarch64_gdbarch_tdep> (gdbarch);
   ULONGEST svcr = 0;
-  regcache->raw_collect (tdep->sme_svcr_regnum, &svcr);
+  regcache->deprecated_raw_collect (tdep->sme_svcr_regnum, &svcr);
 
   /* Is streaming mode enabled?  */
   if (svcr & SVCR_SM_BIT)
@@ -1265,7 +1265,7 @@ aarch64_linux_supply_za_regset (const struct regset *regset,
   /* Populate SVCR.  */
   bool has_za_payload = (data_size > 0);
   ULONGEST svcr;
-  regcache->raw_collect (tdep->sme_svcr_regnum, &svcr);
+  regcache->deprecated_raw_collect (tdep->sme_svcr_regnum, &svcr);
 
   /* If we have a ZA payload, enable bit 2 of SVCR, otherwise clear it.  This
      register gets updated by the SVE/SSVE-handling functions as well, as they
@@ -1328,7 +1328,7 @@ aarch64_linux_collect_za_regset (const struct regset *regset,
 
   /* Determine if we have ZA state from the SVCR register ZA bit.  */
   ULONGEST svcr;
-  regcache->raw_collect (tdep->sme_svcr_regnum, &svcr);
+  regcache->deprecated_raw_collect (tdep->sme_svcr_regnum, &svcr);
 
   /* Check the ZA payload.  */
   bool has_za_payload = (svcr & SVCR_ZA_BIT) != 0;

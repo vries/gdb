@@ -403,7 +403,7 @@ m32r_linux_collect_gregset (const struct regset *regset,
   ULONGEST psw;
   gdb_byte buf[4];
 
-  regcache->raw_collect (PSW_REGNUM, buf);
+  regcache->deprecated_raw_collect (PSW_REGNUM, buf);
   psw = extract_unsigned_integer (buf, 4, byte_order);
 
   for (i = 0; i < ARRAY_SIZE (m32r_pt_regs_offset); i++)
@@ -422,11 +422,11 @@ m32r_linux_collect_gregset (const struct regset *regset,
 	case CBR_REGNUM:
 	  break;
 	case M32R_SP_REGNUM:
-	  regcache->raw_collect
+	  regcache->deprecated_raw_collect
 	    (i, regs + ((psw & 0x80) ? SPU_OFFSET : SPI_OFFSET));
 	  break;
 	default:
-	  regcache->raw_collect (i, regs + m32r_pt_regs_offset[i]);
+	  regcache->deprecated_raw_collect (i, regs + m32r_pt_regs_offset[i]);
 	}
     }
 }

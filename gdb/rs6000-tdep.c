@@ -456,7 +456,7 @@ ppc_collect_reg (const struct regcache *regcache, int regnum,
 			regsize - gdb_regsize);
 	    }
 	}
-      regcache->raw_collect (regnum, regs + offset);
+      regcache->deprecated_raw_collect (regnum, regs + offset);
     }
 }
     

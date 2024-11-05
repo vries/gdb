@@ -217,7 +217,7 @@ sparc32obsd_collect_uthread(const struct regcache *regcache,
     {
       CORE_ADDR fp_addr = addr + SPARC32OBSD_UTHREAD_FP_OFFSET;
 
-      regcache->raw_collect (SPARC_SP_REGNUM, buf);
+      regcache->deprecated_raw_collect (SPARC_SP_REGNUM, buf);
       write_memory (fp_addr,buf, 4);
     }
 
@@ -225,7 +225,7 @@ sparc32obsd_collect_uthread(const struct regcache *regcache,
     {
       CORE_ADDR i7, i7_addr = addr + SPARC32OBSD_UTHREAD_PC_OFFSET;
 
-      regcache->raw_collect (SPARC32_PC_REGNUM, buf);
+      regcache->deprecated_raw_collect (SPARC32_PC_REGNUM, buf);
       i7 = extract_unsigned_integer (buf, 4, byte_order) - 8;
       write_memory_unsigned_integer (i7_addr, 4, byte_order, i7);
 
@@ -233,7 +233,7 @@ sparc32obsd_collect_uthread(const struct regcache *regcache,
 	return;
     }
 
-  regcache->raw_collect (SPARC_SP_REGNUM, buf);
+  regcache->deprecated_raw_collect (SPARC_SP_REGNUM, buf);
   sp = extract_unsigned_integer (buf, 4, byte_order);
   sparc_collect_rwindow (regcache, sp, regnum);
 }
