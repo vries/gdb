@@ -229,8 +229,20 @@ DIAGNOSTIC_POP
 			 gdb::array_view<gdb_byte> dst) const;
 
   /* Deprecated overload of the above.  */
+  [[deprecated]]
   void raw_collect_part (int regnum, int offset, int len, gdb_byte *dst) const
   { raw_collect_part (regnum, offset, gdb::make_array_view (dst, len)); }
+
+  /* Wrapper for deprecated raw_collect_part that silences warnings for
+     deprecated declarations.  */
+  void deprecated_raw_collect_part (int regnum, int offset, int len,
+				    gdb_byte *dst) const
+  {
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_DEPRECATED_DECLARATIONS
+    raw_collect_part (regnum, offset, len, dst);
+DIAGNOSTIC_POP
+  }
 
   /* See gdbsupport/common-regcache.h.  */
   void raw_supply (int regnum, gdb::array_view<const gdb_byte> src) override;
