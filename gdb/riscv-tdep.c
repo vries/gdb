@@ -3672,7 +3672,7 @@ riscv_return_value (struct gdbarch  *gdbarch,
 	    if (readbuf)
 	      {
 		gdb_byte *ptr = readbuf + info.argloc[0].c_offset;
-		regcache->cooked_read_part (regnum, 0,
+		regcache->deprecated_cooked_read_part (regnum, 0,
 					    info.argloc[0].c_length,
 					    ptr);
 	      }
@@ -3702,7 +3702,7 @@ riscv_return_value (struct gdbarch  *gdbarch,
 		    if (readbuf)
 		      {
 			readbuf += info.argloc[1].c_offset;
-			regcache->cooked_read_part (regnum, 0,
+			regcache->deprecated_cooked_read_part (regnum, 0,
 						    info.argloc[1].c_length,
 						    readbuf);
 		      }
