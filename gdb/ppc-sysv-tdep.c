@@ -142,7 +142,7 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 		      struct type *regtype
 			= register_type (gdbarch, tdep->ppc_fp0_regnum + freg);
 		      target_float_convert (val, type, regval, regtype);
-		      regcache->cooked_write (tdep->ppc_fp0_regnum + freg,
+		      regcache->deprecated_cooked_write (tdep->ppc_fp0_regnum + freg,
 					      regval);
 		    }
 		  freg++;
@@ -178,8 +178,8 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 		{
 		  if (write_pass)
 		    {
-		      regcache->cooked_write (tdep->ppc_fp0_regnum + freg, val);
-		      regcache->cooked_write (tdep->ppc_fp0_regnum + freg + 1,
+		      regcache->deprecated_cooked_write (tdep->ppc_fp0_regnum + freg, val);
+		      regcache->deprecated_cooked_write (tdep->ppc_fp0_regnum + freg + 1,
 					      val + 8);
 		    }
 		  freg += 2;
@@ -220,9 +220,9 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 		    greg++;
 		  if (write_pass)
 		    {
-		      regcache->cooked_write (tdep->ppc_gp0_regnum + greg + 0,
+		      regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + greg + 0,
 					      val + 0);
-		      regcache->cooked_write (tdep->ppc_gp0_regnum + greg + 1,
+		      regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + greg + 1,
 					      val + 4);
 		    }
 		  greg += 2;
@@ -250,13 +250,13 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 		{
 		  if (write_pass)
 		    {
-		      regcache->cooked_write (tdep->ppc_gp0_regnum + greg + 0,
+		      regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + greg + 0,
 					      val + 0);
-		      regcache->cooked_write (tdep->ppc_gp0_regnum + greg + 1,
+		      regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + greg + 1,
 					      val + 4);
-		      regcache->cooked_write (tdep->ppc_gp0_regnum + greg + 2,
+		      regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + greg + 2,
 					      val + 8);
-		      regcache->cooked_write (tdep->ppc_gp0_regnum + greg + 3,
+		      regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + greg + 3,
 					      val + 12);
 		    }
 		  greg += 4;
@@ -285,7 +285,7 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 		      else
 			p = val;
 
-		      regcache->cooked_write (tdep->ppc_fp0_regnum + freg, p);
+		      regcache->deprecated_cooked_write (tdep->ppc_fp0_regnum + freg, p);
 		    }
 
 		  freg++;
@@ -314,8 +314,8 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 
 		  if (write_pass)
 		    {
-		      regcache->cooked_write (tdep->ppc_fp0_regnum + freg, val);
-		      regcache->cooked_write (tdep->ppc_fp0_regnum + freg + 1,
+		      regcache->deprecated_cooked_write (tdep->ppc_fp0_regnum + freg, val);
+		      regcache->deprecated_cooked_write (tdep->ppc_fp0_regnum + freg + 1,
 					      val + 8);
 		    }
 		}
@@ -361,7 +361,7 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 				= register_type (gdbarch, regnum);
 			      target_float_convert (elval, eltype,
 						    regval, regtype);
-			      regcache->cooked_write (regnum, regval);
+			      regcache->deprecated_cooked_write (regnum, regval);
 			    }
 			  freg++;
 			}
@@ -393,8 +393,8 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 			  if (write_pass)
 			    {
 			      int regnum = tdep->ppc_gp0_regnum + greg;
-			      regcache->cooked_write (regnum + 0, elval + 0);
-			      regcache->cooked_write (regnum + 1, elval + 4);
+			      regcache->deprecated_cooked_write (regnum + 0, elval + 0);
+			      regcache->deprecated_cooked_write (regnum + 1, elval + 4);
 			    }
 			  greg += 2;
 			}
@@ -408,7 +408,7 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 		      if (greg <= 10)
 			{
 			  if (write_pass)
-			    regcache->cooked_write (tdep->ppc_gp0_regnum + greg,
+			    regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + greg,
 						    word);
 			  greg++;
 			}
@@ -438,7 +438,7 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 		  if (vreg <= 13)
 		    {
 		      if (write_pass)
-			regcache->cooked_write (tdep->ppc_vr0_regnum + vreg,
+			regcache->deprecated_cooked_write (tdep->ppc_vr0_regnum + vreg,
 						elval);
 		      vreg++;
 		    }
@@ -466,7 +466,7 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 	      if (vreg <= 13)
 		{
 		  if (write_pass)
-		    regcache->cooked_write (tdep->ppc_vr0_regnum + vreg, val);
+		    regcache->deprecated_cooked_write (tdep->ppc_vr0_regnum + vreg, val);
 		  vreg++;
 		}
 	      else
@@ -492,7 +492,7 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 	      if (greg <= 10)
 		{
 		  if (write_pass)
-		    regcache->cooked_write (tdep->ppc_ev0_regnum + greg, val);
+		    regcache->deprecated_cooked_write (tdep->ppc_ev0_regnum + greg, val);
 		  greg++;
 		}
 	      else
@@ -542,7 +542,7 @@ ppc_sysv_abi_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 	      if (greg <= 10)
 		{
 		  if (write_pass)
-		    regcache->cooked_write (tdep->ppc_gp0_regnum + greg, word);
+		    regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + greg, word);
 		  greg++;
 		}
 	      else
@@ -625,7 +625,7 @@ get_decimal_float_return_value (struct gdbarch *gdbarch, struct type *valtype,
 	  else
 	    p = writebuf;
 
-	  regcache->cooked_write (tdep->ppc_fp0_regnum + 1, p);
+	  regcache->deprecated_cooked_write (tdep->ppc_fp0_regnum + 1, p);
 	}
       if (readbuf != NULL)
 	{
@@ -646,7 +646,7 @@ get_decimal_float_return_value (struct gdbarch *gdbarch, struct type *valtype,
 	  for (i = 0; i < 2; i++)
 	    {
 	      if (writebuf != NULL)
-		regcache->cooked_write (tdep->ppc_fp0_regnum + 2 + i,
+		regcache->deprecated_cooked_write (tdep->ppc_fp0_regnum + 2 + i,
 					writebuf + i * 8);
 	      if (readbuf != NULL)
 		regcache->cooked_read (tdep->ppc_fp0_regnum + 2 + i,
@@ -709,7 +709,7 @@ do_ppc_sysv_return_value (struct gdbarch *gdbarch, struct type *func_type,
 	  gdb_byte regval[PPC_MAX_REGISTER_SIZE];
 	  struct type *regtype = register_type (gdbarch, tdep->ppc_fp0_regnum);
 	  target_float_convert (writebuf, type, regval, regtype);
-	  regcache->cooked_write (tdep->ppc_fp0_regnum + 1, regval);
+	  regcache->deprecated_cooked_write (tdep->ppc_fp0_regnum + 1, regval);
 	}
       return RETURN_VALUE_REGISTER_CONVENTION;
     }
@@ -727,8 +727,8 @@ do_ppc_sysv_return_value (struct gdbarch *gdbarch, struct type *func_type,
 	}
       if (writebuf)
 	{
-	  regcache->cooked_write (tdep->ppc_fp0_regnum + 1, writebuf);
-	  regcache->cooked_write (tdep->ppc_fp0_regnum + 2, writebuf + 8);
+	  regcache->deprecated_cooked_write (tdep->ppc_fp0_regnum + 1, writebuf);
+	  regcache->deprecated_cooked_write (tdep->ppc_fp0_regnum + 2, writebuf + 8);
 	}
       return RETURN_VALUE_REGISTER_CONVENTION;
     }
@@ -749,10 +749,10 @@ do_ppc_sysv_return_value (struct gdbarch *gdbarch, struct type *func_type,
 	}
       if (writebuf)
 	{
-	  regcache->cooked_write (tdep->ppc_gp0_regnum + 3, writebuf);
-	  regcache->cooked_write (tdep->ppc_gp0_regnum + 4, writebuf + 4);
-	  regcache->cooked_write (tdep->ppc_gp0_regnum + 5, writebuf + 8);
-	  regcache->cooked_write (tdep->ppc_gp0_regnum + 6, writebuf + 12);
+	  regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 3, writebuf);
+	  regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 4, writebuf + 4);
+	  regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 5, writebuf + 8);
+	  regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 6, writebuf + 12);
 	}
       return RETURN_VALUE_REGISTER_CONVENTION;
     }
@@ -772,8 +772,8 @@ do_ppc_sysv_return_value (struct gdbarch *gdbarch, struct type *func_type,
 	{
 	  /* A long long, double or _Decimal64 stored in the 32 bit
 	     r3/r4.  */
-	  regcache->cooked_write (tdep->ppc_gp0_regnum + 3, writebuf + 0);
-	  regcache->cooked_write (tdep->ppc_gp0_regnum + 4, writebuf + 4);
+	  regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 3, writebuf + 0);
+	  regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 4, writebuf + 4);
 	}
       return RETURN_VALUE_REGISTER_CONVENTION;
     }
@@ -832,7 +832,7 @@ do_ppc_sysv_return_value (struct gdbarch *gdbarch, struct type *func_type,
 		{
 		  target_float_convert (writebuf + offset, eltype,
 					regval, regtype);
-		  regcache->cooked_write (regnum, regval);
+		  regcache->deprecated_cooked_write (regnum, regval);
 		}
 	      if (readbuf != NULL)
 		{
@@ -878,7 +878,7 @@ do_ppc_sysv_return_value (struct gdbarch *gdbarch, struct type *func_type,
 	  int regnum = tdep->ppc_vr0_regnum + 2 + i;
 
 	  if (writebuf != NULL)
-	    regcache->cooked_write (regnum, writebuf + offset);
+	    regcache->deprecated_cooked_write (regnum, writebuf + offset);
 	  if (readbuf != NULL)
 	    regcache->cooked_read (regnum, readbuf + offset);
 	}
@@ -898,7 +898,7 @@ do_ppc_sysv_return_value (struct gdbarch *gdbarch, struct type *func_type,
       if (writebuf)
 	{
 	  /* Altivec places the return value in "v2".  */
-	  regcache->cooked_write (tdep->ppc_vr0_regnum + 2, writebuf);
+	  regcache->deprecated_cooked_write (tdep->ppc_vr0_regnum + 2, writebuf);
 	}
       return RETURN_VALUE_REGISTER_CONVENTION;
     }
@@ -919,10 +919,10 @@ do_ppc_sysv_return_value (struct gdbarch *gdbarch, struct type *func_type,
 	}
       if (writebuf)
 	{
-	  regcache->cooked_write (tdep->ppc_gp0_regnum + 3, writebuf + 0);
-	  regcache->cooked_write (tdep->ppc_gp0_regnum + 4, writebuf + 4);
-	  regcache->cooked_write (tdep->ppc_gp0_regnum + 5, writebuf + 8);
-	  regcache->cooked_write (tdep->ppc_gp0_regnum + 6, writebuf + 12);
+	  regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 3, writebuf + 0);
+	  regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 4, writebuf + 4);
+	  regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 5, writebuf + 8);
+	  regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 6, writebuf + 12);
 	}
       return RETURN_VALUE_REGISTER_CONVENTION;
     }
@@ -939,7 +939,7 @@ do_ppc_sysv_return_value (struct gdbarch *gdbarch, struct type *func_type,
       if (readbuf)
 	regcache->cooked_read (tdep->ppc_ev0_regnum + 3, readbuf);
       if (writebuf)
-	regcache->cooked_write (tdep->ppc_ev0_regnum + 3, writebuf);
+	regcache->deprecated_cooked_write (tdep->ppc_ev0_regnum + 3, writebuf);
       return RETURN_VALUE_REGISTER_CONVENTION;
     }
   if (broken_gcc && type->length () <= 8)
@@ -964,10 +964,10 @@ do_ppc_sysv_return_value (struct gdbarch *gdbarch, struct type *func_type,
 	{
 	  memset (regvals, 0, sizeof regvals);
 	  memcpy (regvals + offset, writebuf, len);
-	  regcache->cooked_write (tdep->ppc_gp0_regnum + 3,
+	  regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 3,
 				  regvals + 0 * tdep->wordsize);
 	  if (len > tdep->wordsize)
-	    regcache->cooked_write (tdep->ppc_gp0_regnum + 4,
+	    regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 4,
 				    regvals + 1 * tdep->wordsize);
 	}
 
@@ -996,10 +996,10 @@ do_ppc_sysv_return_value (struct gdbarch *gdbarch, struct type *func_type,
 	  gdb_byte regvals[PPC_MAX_REGISTER_SIZE * 2];
 	  memset (regvals, 0, sizeof regvals);
 	  memcpy (regvals, writebuf, type->length ());
-	  regcache->cooked_write (tdep->ppc_gp0_regnum + 3,
+	  regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 3,
 				  regvals + 0 * tdep->wordsize);
 	  if (type->length () > tdep->wordsize)
-	    regcache->cooked_write (tdep->ppc_gp0_regnum + 4,
+	    regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + 4,
 				    regvals + 1 * tdep->wordsize);
 	}
       return RETURN_VALUE_REGISTER_CONVENTION;
@@ -1300,7 +1300,7 @@ ppc64_sysv_abi_push_val (struct gdbarch *gdbarch,
   while (len >= tdep->wordsize)
     {
       if (argpos->regcache && argpos->greg <= 10)
-	argpos->regcache->cooked_write (tdep->ppc_gp0_regnum + argpos->greg,
+	argpos->regcache->deprecated_cooked_write (tdep->ppc_gp0_regnum + argpos->greg,
 					val);
       argpos->greg++;
       len -= tdep->wordsize;
@@ -1357,7 +1357,7 @@ ppc64_sysv_abi_push_freg (struct gdbarch *gdbarch,
 	  gdb_byte regval[PPC_MAX_REGISTER_SIZE];
 
 	  target_float_convert (val, type, regval, regtype);
-	  argpos->regcache->cooked_write (regnum, regval);
+	  argpos->regcache->deprecated_cooked_write (regnum, regval);
 	}
 
       argpos->freg++;
@@ -1391,9 +1391,9 @@ ppc64_sysv_abi_push_freg (struct gdbarch *gdbarch,
 	{
 	  int regnum = tdep->ppc_fp0_regnum + argpos->freg;
 
-	  argpos->regcache->cooked_write (regnum, val);
+	  argpos->regcache->deprecated_cooked_write (regnum, val);
 	  if (argpos->freg <= 12)
-	    argpos->regcache->cooked_write (regnum + 1, val + 8);
+	    argpos->regcache->deprecated_cooked_write (regnum + 1, val + 8);
 	}
 
       argpos->freg += 2;
@@ -1411,8 +1411,8 @@ ppc64_sysv_abi_push_freg (struct gdbarch *gdbarch,
 	  int lopart = gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG ? 8 : 0;
 	  int hipart = gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG ? 0 : 8;
 
-	  argpos->regcache->cooked_write (regnum, val + hipart);
-	  argpos->regcache->cooked_write (regnum + 1, val + lopart);
+	  argpos->regcache->deprecated_cooked_write (regnum, val + hipart);
+	  argpos->regcache->deprecated_cooked_write (regnum + 1, val + lopart);
 	}
 
       argpos->freg += 2;
@@ -1429,7 +1429,7 @@ ppc64_sysv_abi_push_vreg (struct gdbarch *gdbarch, const bfd_byte *val,
   ppc_gdbarch_tdep *tdep = gdbarch_tdep<ppc_gdbarch_tdep> (gdbarch);
 
   if (argpos->regcache && argpos->vreg <= 13)
-    argpos->regcache->cooked_write (tdep->ppc_vr0_regnum + argpos->vreg, val);
+    argpos->regcache->deprecated_cooked_write (tdep->ppc_vr0_regnum + argpos->vreg, val);
 
   argpos->vreg++;
 }
@@ -1861,7 +1861,7 @@ ppc64_sysv_abi_return_value_base (struct gdbarch *gdbarch, struct type *valtype,
       if (writebuf != NULL)
 	{
 	  target_float_convert (writebuf, valtype, regval, regtype);
-	  regcache->cooked_write (regnum, regval);
+	  regcache->deprecated_cooked_write (regnum, regval);
 	}
       if (readbuf != NULL)
 	{
@@ -1901,8 +1901,8 @@ ppc64_sysv_abi_return_value_base (struct gdbarch *gdbarch, struct type *valtype,
 
       if (writebuf != NULL)
 	{
-	  regcache->cooked_write (regnum, writebuf);
-	  regcache->cooked_write (regnum + 1, writebuf + 8);
+	  regcache->deprecated_cooked_write (regnum, writebuf);
+	  regcache->deprecated_cooked_write (regnum + 1, writebuf + 8);
 	}
       if (readbuf != NULL)
 	{
@@ -1923,8 +1923,8 @@ ppc64_sysv_abi_return_value_base (struct gdbarch *gdbarch, struct type *valtype,
 
       if (writebuf != NULL)
 	{
-	  regcache->cooked_write (regnum, writebuf + hipart);
-	  regcache->cooked_write (regnum + 1, writebuf + lopart);
+	  regcache->deprecated_cooked_write (regnum, writebuf + hipart);
+	  regcache->deprecated_cooked_write (regnum + 1, writebuf + lopart);
 	}
       if (readbuf != NULL)
 	{
@@ -1948,7 +1948,7 @@ ppc64_sysv_abi_return_value_base (struct gdbarch *gdbarch, struct type *valtype,
       int regnum = tdep->ppc_vr0_regnum + 2 + index;
 
       if (writebuf != NULL)
-	regcache->cooked_write (regnum, writebuf);
+	regcache->deprecated_cooked_write (regnum, writebuf);
       if (readbuf != NULL)
 	regcache->cooked_read (regnum, readbuf);
       return 1;
@@ -2053,7 +2053,7 @@ ppc64_sysv_abi_return_value (struct gdbarch *gdbarch, struct value *function,
       int regnum = tdep->ppc_gp0_regnum + 3;
 
       if (writebuf != NULL)
-	regcache->cooked_write (regnum, writebuf);
+	regcache->deprecated_cooked_write (regnum, writebuf);
       if (readbuf != NULL)
 	regcache->cooked_read (regnum, readbuf);
       return RETURN_VALUE_REGISTER_CONVENTION;
@@ -2139,7 +2139,7 @@ ppc64_sysv_abi_return_value (struct gdbarch *gdbarch, struct value *function,
 		memcpy (regval + tdep->wordsize - len, writebuf, len);
 	      else
 		memcpy (regval, writebuf + offset, len);
-	      regcache->cooked_write (regnum, regval);
+	      regcache->deprecated_cooked_write (regnum, regval);
 	    }
 	  if (readbuf != NULL)
 	    {

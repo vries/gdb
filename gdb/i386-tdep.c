@@ -2750,14 +2750,14 @@ i386_thiscall_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 
   /* Finally, update the stack pointer...  */
   store_unsigned_integer (buf, 4, byte_order, sp);
-  regcache->cooked_write (I386_ESP_REGNUM, buf);
+  regcache->deprecated_cooked_write (I386_ESP_REGNUM, buf);
 
   /* ...and fake a frame pointer.  */
-  regcache->cooked_write (I386_EBP_REGNUM, buf);
+  regcache->deprecated_cooked_write (I386_EBP_REGNUM, buf);
 
   /* The 'this' pointer needs to be in ECX.  */
   if (thiscall)
-    regcache->cooked_write (I386_ECX_REGNUM,
+    regcache->deprecated_cooked_write (I386_ECX_REGNUM,
 			    args[0]->contents_all ().data ());
 
   /* If the PLT is position-independent, the SYSTEM V ABI requires %ebx to be
@@ -2793,7 +2793,7 @@ i386_thiscall_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 	{
 	  /* Store the section address in %ebx.  */
 	  store_unsigned_integer (buf, 4, byte_order, osect->addr ());
-	  regcache->cooked_write (I386_EBX_REGNUM, buf);
+	  regcache->deprecated_cooked_write (I386_EBX_REGNUM, buf);
 	}
       else
 	{

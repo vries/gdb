@@ -2690,7 +2690,7 @@ aarch64_store_return_value (struct type *type, struct regcache *regs,
 	  LONGEST val = unpack_long (type, valbuf);
 
 	  store_signed_integer (tmpbuf, X_REGISTER_SIZE, byte_order, val);
-	  regs->cooked_write (AARCH64_X0_REGNUM, tmpbuf);
+	  regs->deprecated_cooked_write (AARCH64_X0_REGNUM, tmpbuf);
 	}
       else
 	{
@@ -2702,7 +2702,7 @@ aarch64_store_return_value (struct type *type, struct regcache *regs,
 
 	  while (len > 0)
 	    {
-	      regs->cooked_write (regno++, valbuf);
+	      regs->deprecated_cooked_write (regno++, valbuf);
 	      len -= X_REGISTER_SIZE;
 	      valbuf += X_REGISTER_SIZE;
 	    }
@@ -2721,7 +2721,7 @@ aarch64_store_return_value (struct type *type, struct regcache *regs,
 	{
 	  memcpy (tmpbuf, valbuf,
 		  len > X_REGISTER_SIZE ? X_REGISTER_SIZE : len);
-	  regs->cooked_write (regno++, tmpbuf);
+	  regs->deprecated_cooked_write (regno++, tmpbuf);
 	  len -= X_REGISTER_SIZE;
 	  valbuf += X_REGISTER_SIZE;
 	}

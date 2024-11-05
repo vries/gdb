@@ -3386,7 +3386,7 @@ riscv_regcache_cooked_write (int regnum, const gdb_byte *data, int len,
   else
     memset (tmp, 0, sizeof (tmp));
   memcpy (tmp, data, len);
-  regcache->cooked_write (regnum, tmp);
+  regcache->deprecated_cooked_write (regnum, tmp);
 }
 
 /* Implement the push dummy call gdbarch callback.  */
@@ -3483,7 +3483,7 @@ riscv_push_dummy_call (struct gdbarch *gdbarch,
       gdb_byte buf[sizeof (LONGEST)];
 
       store_unsigned_integer (buf, call_info.xlen, byte_order, struct_addr);
-      regcache->cooked_write (RISCV_A0_REGNUM, buf);
+      regcache->deprecated_cooked_write (RISCV_A0_REGNUM, buf);
     }
 
   for (i = 0; i < nargs; ++i)

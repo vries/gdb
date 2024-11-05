@@ -570,7 +570,7 @@ m68k_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
   if (return_method == return_method_struct)
     {
       store_unsigned_integer (buf, 4, byte_order, struct_addr);
-      regcache->cooked_write (tdep->struct_value_regnum, buf);
+      regcache->deprecated_cooked_write (tdep->struct_value_regnum, buf);
     }
 
   /* Store return address.  */
@@ -580,10 +580,10 @@ m68k_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 
   /* Finally, update the stack pointer...  */
   store_unsigned_integer (buf, 4, byte_order, sp);
-  regcache->cooked_write (M68K_SP_REGNUM, buf);
+  regcache->deprecated_cooked_write (M68K_SP_REGNUM, buf);
 
   /* ...and fake a frame pointer.  */
-  regcache->cooked_write (M68K_FP_REGNUM, buf);
+  regcache->deprecated_cooked_write (M68K_FP_REGNUM, buf);
 
   /* DWARF2/GCC uses the stack address *before* the function call as a
      frame's CFA.  */

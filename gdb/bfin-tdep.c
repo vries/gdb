@@ -648,7 +648,7 @@ bfin_store_return_value (struct type *type,
 
   while (len > 0)
     {
-      regs->cooked_write (regno++, valbuf);
+      regs->deprecated_cooked_write (regno++, valbuf);
       len -= 4;
       valbuf += 4;
     }

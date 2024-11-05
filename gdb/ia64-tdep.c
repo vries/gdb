@@ -3272,7 +3272,7 @@ ia64_store_return_value (struct type *type, struct regcache *regcache,
 	{
 	  target_float_convert (valbuf + offset, float_elt_type,
 				to, ia64_ext_type (gdbarch));
-	  regcache->cooked_write (regnum, to);
+	  regcache->deprecated_cooked_write (regnum, to);
 	  offset += float_elt_type->length ();
 	  regnum++;
 	}
@@ -3822,7 +3822,7 @@ ia64_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 	      target_float_convert (arg->contents ().data () + argoffset,
 				    float_elt_type, to,
 				    ia64_ext_type (gdbarch));
-	      regcache->cooked_write (floatreg, to);
+	      regcache->deprecated_cooked_write (floatreg, to);
 	      floatreg++;
 	      argoffset += float_elt_type->length ();
 	      len -= float_elt_type->length ();

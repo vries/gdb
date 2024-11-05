@@ -472,7 +472,18 @@ DIAGNOSTIC_POP
   void cooked_write (int regnum, gdb::array_view<const gdb_byte> src);
 
   /* Deprecated overload of the above.  */
+  [[deprecated]]
   void cooked_write (int regnum, const gdb_byte *src);
+
+  /* Wrapper for deprecated cooked_write that silences warnings for deprecated
+     declarations.  */
+  void deprecated_cooked_write (int regnum, const gdb_byte *src)
+  {
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_DEPRECATED_DECLARATIONS
+    cooked_write (regnum, src);
+DIAGNOSTIC_POP
+  }
 
   template<typename T, typename = RequireLongest<T>>
   void cooked_write (int regnum, T val);
