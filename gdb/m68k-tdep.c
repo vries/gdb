@@ -302,18 +302,18 @@ m68k_extract_return_value (struct type *type, struct regcache *regcache,
     {
       struct gdbarch *gdbarch = regcache->arch ();
       m68k_gdbarch_tdep *tdep = gdbarch_tdep<m68k_gdbarch_tdep> (gdbarch);
-      regcache->raw_read (tdep->pointer_result_regnum, valbuf);
+      regcache->deprecated_raw_read (tdep->pointer_result_regnum, valbuf);
     }
   else if (len <= 4)
     {
-      regcache->raw_read (M68K_D0_REGNUM, buf);
+      regcache->deprecated_raw_read (M68K_D0_REGNUM, buf);
       memcpy (valbuf, buf + (4 - len), len);
     }
   else if (len <= 8)
     {
-      regcache->raw_read (M68K_D0_REGNUM, buf);
+      regcache->deprecated_raw_read (M68K_D0_REGNUM, buf);
       memcpy (valbuf, buf + (8 - len), len - 4);
-      regcache->raw_read (M68K_D1_REGNUM, valbuf + (len - 4));
+      regcache->deprecated_raw_read (M68K_D1_REGNUM, valbuf + (len - 4));
     }
   else
     internal_error (_("Cannot extract return value of %d bytes long."), len);
@@ -330,7 +330,7 @@ m68k_svr4_extract_return_value (struct type *type, struct regcache *regcache,
   if (tdep->float_return && type->code () == TYPE_CODE_FLT)
     {
       struct type *fpreg_type = register_type (gdbarch, M68K_FP0_REGNUM);
-      regcache->raw_read (M68K_FP0_REGNUM, buf);
+      regcache->deprecated_raw_read (M68K_FP0_REGNUM, buf);
       target_float_convert (buf, fpreg_type, valbuf, type);
     }
   else

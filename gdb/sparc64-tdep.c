@@ -907,27 +907,27 @@ sparc64_pseudo_register_read (struct gdbarch *gdbarch,
   if (regnum >= SPARC64_D0_REGNUM && regnum <= SPARC64_D30_REGNUM)
     {
       regnum = SPARC_F0_REGNUM + 2 * (regnum - SPARC64_D0_REGNUM);
-      status = regcache->raw_read (regnum, buf);
+      status = regcache->deprecated_raw_read (regnum, buf);
       if (status == REG_VALID)
-	status = regcache->raw_read (regnum + 1, buf + 4);
+	status = regcache->deprecated_raw_read (regnum + 1, buf + 4);
       return status;
     }
   else if (regnum >= SPARC64_D32_REGNUM && regnum <= SPARC64_D62_REGNUM)
     {
       regnum = SPARC64_F32_REGNUM + (regnum - SPARC64_D32_REGNUM);
-      return regcache->raw_read (regnum, buf);
+      return regcache->deprecated_raw_read (regnum, buf);
     }
   else if (regnum >= SPARC64_Q0_REGNUM && regnum <= SPARC64_Q28_REGNUM)
     {
       regnum = SPARC_F0_REGNUM + 4 * (regnum - SPARC64_Q0_REGNUM);
 
-      status = regcache->raw_read (regnum, buf);
+      status = regcache->deprecated_raw_read (regnum, buf);
       if (status == REG_VALID)
-	status = regcache->raw_read (regnum + 1, buf + 4);
+	status = regcache->deprecated_raw_read (regnum + 1, buf + 4);
       if (status == REG_VALID)
-	status = regcache->raw_read (regnum + 2, buf + 8);
+	status = regcache->deprecated_raw_read (regnum + 2, buf + 8);
       if (status == REG_VALID)
-	status = regcache->raw_read (regnum + 3, buf + 12);
+	status = regcache->deprecated_raw_read (regnum + 3, buf + 12);
 
       return status;
     }
@@ -935,9 +935,9 @@ sparc64_pseudo_register_read (struct gdbarch *gdbarch,
     {
       regnum = SPARC64_F32_REGNUM + 2 * (regnum - SPARC64_Q32_REGNUM);
 
-      status = regcache->raw_read (regnum, buf);
+      status = regcache->deprecated_raw_read (regnum, buf);
       if (status == REG_VALID)
-	status = regcache->raw_read (regnum + 1, buf + 8);
+	status = regcache->deprecated_raw_read (regnum + 1, buf + 8);
 
       return status;
     }

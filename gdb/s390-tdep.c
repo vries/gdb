@@ -1377,9 +1377,9 @@ s390_pseudo_register_read (struct gdbarch *gdbarch, readable_regcache *regcache,
 
       regnum -= tdep->v0_full_regnum;
 
-      status = regcache->raw_read (S390_F0_REGNUM + regnum, buf);
+      status = regcache->deprecated_raw_read (S390_F0_REGNUM + regnum, buf);
       if (status == REG_VALID)
-	status = regcache->raw_read (S390_V0_LOWER_REGNUM + regnum, buf + 8);
+	status = regcache->deprecated_raw_read (S390_V0_LOWER_REGNUM + regnum, buf + 8);
       return status;
     }
 
@@ -2860,7 +2860,7 @@ s390_record_calc_disp_vsce (struct gdbarch *gdbarch, struct regcache *regcache,
   if (vx < 16)
     regcache->cooked_read (tdep->v0_full_regnum + vx, buf);
   else
-    regcache->raw_read (S390_V16_REGNUM + vx - 16, buf);
+    regcache->deprecated_raw_read (S390_V16_REGNUM + vx - 16, buf);
   x = extract_unsigned_integer (buf + el * es, es, byte_order);
   *res = s390_record_calc_disp_common (gdbarch, regcache, x, bd, dh);
   return 0;

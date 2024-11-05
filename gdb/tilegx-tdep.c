@@ -215,7 +215,7 @@ tilegx_extract_return_value (struct type *type, struct regcache *regcache,
   int i, regnum = TILEGX_R0_REGNUM;
 
   for (i = 0; i < len; i += tilegx_reg_size)
-    regcache->raw_read (regnum++, valbuf + i);
+    regcache->deprecated_raw_read (regnum++, valbuf + i);
 }
 
 /* Copy the function return value from VALBUF into the proper

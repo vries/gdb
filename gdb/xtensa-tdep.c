@@ -560,7 +560,7 @@ xtensa_pseudo_register_read (struct gdbarch *gdbarch,
 
   /* We can always read non-pseudo registers.  */
   if (regnum >= 0 && regnum < gdbarch_num_regs (gdbarch))
-    return regcache->raw_read (regnum, buffer);
+    return regcache->deprecated_raw_read (regnum, buffer);
 
   /* We have to find out how to deal with privileged registers.
      Let's treat them as pseudo-registers, but we cannot read/write them.  */
@@ -615,7 +615,7 @@ xtensa_pseudo_register_read (struct gdbarch *gdbarch,
 	return xtensa_register_read_masked (regcache, reg, buffer);
 
       /* Assume that we can read the register.  */
-      return regcache->raw_read (regnum, buffer);
+      return regcache->deprecated_raw_read (regnum, buffer);
     }
   else
     internal_error (_("invalid register number %d"), regnum);
@@ -1578,7 +1578,7 @@ xtensa_extract_return_value (struct type *type,
       if (len < 4)
 	regcache->raw_read_part (areg, offset, len, valbuf);
       else
-	regcache->raw_read (areg, valbuf);
+	regcache->deprecated_raw_read (areg, valbuf);
     }
 }
 
@@ -1906,7 +1906,7 @@ xtensa_push_dummy_call (struct gdbarch *gdbarch,
 	 to modify WINDOWSTART register to make it look like there
 	 is only one register window corresponding to WINDOWEBASE.  */
 
-      regcache->raw_read (tdep->wb_regnum, buf);
+      regcache->deprecated_raw_read (tdep->wb_regnum, buf);
       regcache_cooked_write_unsigned
 	(regcache, tdep->ws_regnum,
 	 1 << extract_unsigned_integer (buf, 4, byte_order));

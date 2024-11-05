@@ -9799,12 +9799,12 @@ arm_neon_quad_read (struct gdbarch *gdbarch, readable_regcache *regcache,
   double_regnum = user_reg_map_name_to_regnum (gdbarch, name_buf,
 					       strlen (name_buf));
 
-  status = regcache->raw_read (double_regnum, reg_buf);
+  status = regcache->deprecated_raw_read (double_regnum, reg_buf);
   if (status != REG_VALID)
     return status;
   memcpy (buf, reg_buf, 8);
 
-  status = regcache->raw_read (double_regnum + 1, reg_buf);
+  status = regcache->deprecated_raw_read (double_regnum + 1, reg_buf);
   if (status != REG_VALID)
     return status;
   memcpy (buf + 8, reg_buf, 8);

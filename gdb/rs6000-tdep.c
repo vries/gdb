@@ -2857,17 +2857,17 @@ e500_pseudo_register_read (struct gdbarch *gdbarch, readable_regcache *regcache,
 
   if (gdbarch_byte_order (arch) == BFD_ENDIAN_BIG)
     {
-      status = regcache->raw_read (tdep->ppc_ev0_upper_regnum + reg_index,
+      status = regcache->deprecated_raw_read (tdep->ppc_ev0_upper_regnum + reg_index,
 				   buffer);
       if (status == REG_VALID)
-	status = regcache->raw_read (tdep->ppc_gp0_regnum + reg_index,
+	status = regcache->deprecated_raw_read (tdep->ppc_gp0_regnum + reg_index,
 				     buffer + 4);
     }
   else
     {
-      status = regcache->raw_read (tdep->ppc_gp0_regnum + reg_index, buffer);
+      status = regcache->deprecated_raw_read (tdep->ppc_gp0_regnum + reg_index, buffer);
       if (status == REG_VALID)
-	status = regcache->raw_read (tdep->ppc_ev0_upper_regnum + reg_index,
+	status = regcache->deprecated_raw_read (tdep->ppc_ev0_upper_regnum + reg_index,
 				     buffer + 4);
     }
 
@@ -2908,16 +2908,16 @@ dfp_pseudo_register_read (struct gdbarch *gdbarch, readable_regcache *regcache,
   if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
     {
       /* Read two FP registers to form a whole dl register.  */
-      status = regcache->raw_read (fp0 + 2 * reg_index, buffer);
+      status = regcache->deprecated_raw_read (fp0 + 2 * reg_index, buffer);
       if (status == REG_VALID)
-	status = regcache->raw_read (fp0 + 2 * reg_index + 1,
+	status = regcache->deprecated_raw_read (fp0 + 2 * reg_index + 1,
 				     buffer + 8);
     }
   else
     {
-      status = regcache->raw_read (fp0 + 2 * reg_index + 1, buffer);
+      status = regcache->deprecated_raw_read (fp0 + 2 * reg_index + 1, buffer);
       if (status == REG_VALID)
-	status = regcache->raw_read (fp0 + 2 * reg_index, buffer + 8);
+	status = regcache->deprecated_raw_read (fp0 + 2 * reg_index, buffer + 8);
     }
 
   return status;
@@ -2968,7 +2968,7 @@ v_alias_pseudo_register_read (struct gdbarch *gdbarch,
   ppc_gdbarch_tdep *tdep = gdbarch_tdep<ppc_gdbarch_tdep> (gdbarch);
   gdb_assert (IS_V_ALIAS_PSEUDOREG (tdep, reg_nr));
 
-  return regcache->raw_read (tdep->ppc_vr0_regnum
+  return regcache->deprecated_raw_read (tdep->ppc_vr0_regnum
 			     + (reg_nr - tdep->ppc_v0_alias_regnum),
 			     buffer);
 }
@@ -3015,21 +3015,21 @@ vsx_pseudo_register_read (struct gdbarch *gdbarch, readable_regcache *regcache,
 
   /* Read the portion that overlaps the VMX registers.  */
   if (reg_index > 31)
-    status = regcache->raw_read (vr0 + reg_index - 32, buffer);
+    status = regcache->deprecated_raw_read (vr0 + reg_index - 32, buffer);
   else
     /* Read the portion that overlaps the FPR registers.  */
     if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
       {
-	status = regcache->raw_read (fp0 + reg_index, buffer);
+	status = regcache->deprecated_raw_read (fp0 + reg_index, buffer);
 	if (status == REG_VALID)
-	  status = regcache->raw_read (vsr0_upper + reg_index,
+	  status = regcache->deprecated_raw_read (vsr0_upper + reg_index,
 				       buffer + 8);
       }
     else
       {
-	status = regcache->raw_read (fp0 + reg_index, buffer + 8);
+	status = regcache->deprecated_raw_read (fp0 + reg_index, buffer + 8);
 	if (status == REG_VALID)
-	  status = regcache->raw_read (vsr0_upper + reg_index, buffer);
+	  status = regcache->deprecated_raw_read (vsr0_upper + reg_index, buffer);
       }
 
   return status;

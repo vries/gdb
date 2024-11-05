@@ -1273,7 +1273,7 @@ m68hc11_extract_return_value (struct type *type, struct regcache *regcache,
 {
   gdb_byte buf[M68HC11_REG_SIZE];
 
-  regcache->raw_read (HARD_D_REGNUM, buf);
+  regcache->deprecated_raw_read (HARD_D_REGNUM, buf);
   switch (type->length ())
     {
     case 1:
@@ -1286,13 +1286,13 @@ m68hc11_extract_return_value (struct type *type, struct regcache *regcache,
 
     case 3:
       memcpy ((char*) valbuf + 1, buf, 2);
-      regcache->raw_read (HARD_X_REGNUM, buf);
+      regcache->deprecated_raw_read (HARD_X_REGNUM, buf);
       memcpy (valbuf, buf + 1, 1);
       break;
 
     case 4:
       memcpy ((char*) valbuf + 2, buf, 2);
-      regcache->raw_read (HARD_X_REGNUM, buf);
+      regcache->deprecated_raw_read (HARD_X_REGNUM, buf);
       memcpy (valbuf, buf, 2);
       break;
 

@@ -432,7 +432,7 @@ moxie_software_single_step (struct regcache *regcache)
 
 	case 0x19: /* jsr */
 	case 0x25: /* jmp */
-	  regcache->raw_read ((inst >> 4) & 0xf, (gdb_byte *) & tmpu32);
+	  regcache->deprecated_raw_read ((inst >> 4) & 0xf, (gdb_byte *) & tmpu32);
 	  next_pcs.push_back (tmpu32);
 	  break;
 
@@ -709,7 +709,7 @@ moxie_process_record (struct gdbarch *gdbarch, struct regcache *regcache,
 	  break;
 	case 0x03: /* jsra */
 	  {
-	    regcache->raw_read (
+	    regcache->deprecated_raw_read (
 			       MOXIE_SP_REGNUM, (gdb_byte *) & tmpu32);
 	    tmpu32 = extract_unsigned_integer ((gdb_byte *) & tmpu32, 
 					       4, byte_order);
@@ -738,7 +738,7 @@ moxie_process_record (struct gdbarch *gdbarch, struct regcache *regcache,
 	case 0x06: /* push */
 	  {
 	    int reg = (inst >> 4) & 0xf;
-	    regcache->raw_read (reg, (gdb_byte *) & tmpu32);
+	    regcache->deprecated_raw_read (reg, (gdb_byte *) & tmpu32);
 	    tmpu32 = extract_unsigned_integer ((gdb_byte *) & tmpu32, 
 					       4, byte_order);
 	    if (record_full_arch_list_add_reg (regcache, reg)
@@ -780,7 +780,7 @@ moxie_process_record (struct gdbarch *gdbarch, struct regcache *regcache,
 	case 0x0b: /* st.l */
 	  {
 	    int reg = (inst >> 4) & 0xf;
-	    regcache->raw_read (reg, (gdb_byte *) & tmpu32);
+	    regcache->deprecated_raw_read (reg, (gdb_byte *) & tmpu32);
 	    tmpu32 = extract_unsigned_integer ((gdb_byte *) & tmpu32, 
 					       4, byte_order);
 	    if (record_full_arch_list_add_mem (tmpu32, 4))
@@ -799,7 +799,7 @@ moxie_process_record (struct gdbarch *gdbarch, struct regcache *regcache,
 	    int reg = (inst >> 4) & 0xf;
 	    uint32_t offset = (((int16_t) moxie_process_readu (addr+2, buf, 2,
 							       byte_order)) << 16 ) >> 16;
-	    regcache->raw_read (reg, (gdb_byte *) & tmpu32);
+	    regcache->deprecated_raw_read (reg, (gdb_byte *) & tmpu32);
 	    tmpu32 = extract_unsigned_integer ((gdb_byte *) & tmpu32, 
 					       4, byte_order);
 	    tmpu32 += offset;
@@ -839,7 +839,7 @@ moxie_process_record (struct gdbarch *gdbarch, struct regcache *regcache,
 	  }
 	case 0x19: /* jsr */
 	  {
-	    regcache->raw_read (
+	    regcache->deprecated_raw_read (
 			       MOXIE_SP_REGNUM, (gdb_byte *) & tmpu32);
 	    tmpu32 = extract_unsigned_integer ((gdb_byte *) & tmpu32, 
 					       4, byte_order);
@@ -867,7 +867,7 @@ moxie_process_record (struct gdbarch *gdbarch, struct regcache *regcache,
 	case 0x1e: /* st.b */
 	  {
 	    int reg = (inst >> 4) & 0xf;
-	    regcache->raw_read (reg, (gdb_byte *) & tmpu32);
+	    regcache->deprecated_raw_read (reg, (gdb_byte *) & tmpu32);
 	    tmpu32 = extract_unsigned_integer ((gdb_byte *) & tmpu32, 
 					       4, byte_order);
 	    if (record_full_arch_list_add_mem (tmpu32, 1))
@@ -893,7 +893,7 @@ moxie_process_record (struct gdbarch *gdbarch, struct regcache *regcache,
 	case 0x23: /* st.s */
 	  {
 	    int reg = (inst >> 4) & 0xf;
-	    regcache->raw_read (reg, (gdb_byte *) & tmpu32);
+	    regcache->deprecated_raw_read (reg, (gdb_byte *) & tmpu32);
 	    tmpu32 = extract_unsigned_integer ((gdb_byte *) & tmpu32, 
 					       4, byte_order);
 	    if (record_full_arch_list_add_mem (tmpu32, 2))
@@ -953,12 +953,12 @@ moxie_process_record (struct gdbarch *gdbarch, struct regcache *regcache,
 		  uint32_t length, ptr;
 
 		  /* Read buffer pointer is in $r1.  */
-		  regcache->raw_read (3, (gdb_byte *) & ptr);
+		  regcache->deprecated_raw_read (3, (gdb_byte *) & ptr);
 		  ptr = extract_unsigned_integer ((gdb_byte *) & ptr, 
 						  4, byte_order);
 
 		  /* String length is at 0x12($fp).  */
-		  regcache->raw_read (
+		  regcache->deprecated_raw_read (
 				     MOXIE_FP_REGNUM, (gdb_byte *) & tmpu32);
 		  tmpu32 = extract_unsigned_integer ((gdb_byte *) & tmpu32, 
 						     4, byte_order);
@@ -1004,7 +1004,7 @@ moxie_process_record (struct gdbarch *gdbarch, struct regcache *regcache,
 	    int reg = (inst >> 4) & 0xf;
 	    uint32_t offset = (((int16_t) moxie_process_readu (addr+2, buf, 2,
 							       byte_order)) << 16 ) >> 16;
-	    regcache->raw_read (reg, (gdb_byte *) & tmpu32);
+	    regcache->deprecated_raw_read (reg, (gdb_byte *) & tmpu32);
 	    tmpu32 = extract_unsigned_integer ((gdb_byte *) & tmpu32, 
 					       4, byte_order);
 	    tmpu32 += offset;
@@ -1024,7 +1024,7 @@ moxie_process_record (struct gdbarch *gdbarch, struct regcache *regcache,
 	    int reg = (inst >> 4) & 0xf;
 	    uint32_t offset = (((int16_t) moxie_process_readu (addr+2, buf, 2,
 							       byte_order)) << 16 ) >> 16;
-	    regcache->raw_read (reg, (gdb_byte *) & tmpu32);
+	    regcache->deprecated_raw_read (reg, (gdb_byte *) & tmpu32);
 	    tmpu32 = extract_unsigned_integer ((gdb_byte *) & tmpu32, 
 					       4, byte_order);
 	    tmpu32 += offset;
