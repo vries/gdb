@@ -1772,7 +1772,7 @@ s390_handle_arg (struct s390_arg_state *as, struct value *arg,
 	  /* When we store a single-precision value in an FP register,
 	     it occupies the leftmost bits.  */
 	  if (write_mode)
-	    as->regcache->cooked_write_part (S390_F0_REGNUM + as->fr, 0, length,
+	    as->regcache->deprecated_cooked_write_part (S390_F0_REGNUM + as->fr, 0, length,
 					     arg->contents ().data ());
 	  as->fr += 2;
 	}
@@ -1796,7 +1796,7 @@ s390_handle_arg (struct s390_arg_state *as, struct value *arg,
 	  int regnum = S390_V24_REGNUM + use_vr[as->vr] - 24;
 
 	  if (write_mode)
-	    as->regcache->cooked_write_part (regnum, 0, length,
+	    as->regcache->deprecated_cooked_write_part (regnum, 0, length,
 					     arg->contents ().data ());
 	  as->vr++;
 	}
@@ -2028,7 +2028,7 @@ s390_register_return_value (struct gdbarch *gdbarch, struct type *type,
     {
       /* Float-like value: left-aligned in f0.  */
       if (in != NULL)
-	regcache->cooked_write_part (S390_F0_REGNUM, 0, length, in);
+	regcache->deprecated_cooked_write_part (S390_F0_REGNUM, 0, length, in);
       else
 	regcache->deprecated_cooked_read_part (S390_F0_REGNUM, 0, length, out);
     }
@@ -2036,7 +2036,7 @@ s390_register_return_value (struct gdbarch *gdbarch, struct type *type,
     {
       /* Vector: left-aligned in v24.  */
       if (in != NULL)
-	regcache->cooked_write_part (S390_V24_REGNUM, 0, length, in);
+	regcache->deprecated_cooked_write_part (S390_V24_REGNUM, 0, length, in);
       else
 	regcache->deprecated_cooked_read_part (S390_V24_REGNUM, 0, length, out);
     }

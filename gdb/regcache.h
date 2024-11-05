@@ -514,8 +514,20 @@ DIAGNOSTIC_POP
 			  gdb::array_view<const gdb_byte> src);
 
   /* Deprecated overload of the above.  */
+  [[deprecated]]
   void cooked_write_part (int regnum, int offset, int len, const gdb_byte *src)
   { cooked_write_part (regnum, offset, gdb::make_array_view (src, len)); }
+
+  /* Wrapper for deprecated cooked_write_part that silences warnings for
+     deprecated declarations.  */
+  void deprecated_cooked_write_part (int regnum, int offset, int len,
+				     const gdb_byte *src)
+  {
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_DEPRECATED_DECLARATIONS
+    cooked_write_part (regnum, offset, len, src);
+DIAGNOSTIC_POP
+  }
 
   /* Transfer a set of registers (as described by REGSET) between
      REGCACHE and BUF.  If REGNUM == -1, transfer all registers

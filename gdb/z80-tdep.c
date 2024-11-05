@@ -534,10 +534,10 @@ z80_return_value (struct gdbarch *gdbarch, struct value *function,
     {
       if (len > 2)
 	{
-	  regcache->cooked_write_part (Z80_DE_REGNUM, 0, len - 2, writebuf+2);
+	  regcache->deprecated_cooked_write_part (Z80_DE_REGNUM, 0, len - 2, writebuf+2);
 	  len = 2;
 	}
-      regcache->cooked_write_part (Z80_HL_REGNUM, 0, len, writebuf);
+      regcache->deprecated_cooked_write_part (Z80_HL_REGNUM, 0, len, writebuf);
     }
 
   if (readbuf != NULL)

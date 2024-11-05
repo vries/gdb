@@ -1024,7 +1024,7 @@ hppa64_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 		     passed in floating-point registers, are passed in
 		     the right halves of the floating point registers;
 		     the left halves are unused."  */
-		  regcache->cooked_write_part (regnum, offset % 8, len,
+		  regcache->deprecated_cooked_write_part (regnum, offset % 8, len,
 					       arg->contents ().data ());
 		}
 	    }
@@ -1066,7 +1066,7 @@ hppa64_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
       regnum = HPPA_ARG0_REGNUM - offset / 8;
       while (regnum > HPPA_ARG0_REGNUM - 8 && len > 0)
 	{
-	  regcache->cooked_write_part (regnum, offset % 8, std::min (len, 8),
+	  regcache->deprecated_cooked_write_part (regnum, offset % 8, std::min (len, 8),
 				       valbuf);
 	  offset += std::min (len, 8);
 	  valbuf += std::min (len, 8);
@@ -1134,7 +1134,7 @@ hppa32_return_value (struct gdbarch *gdbarch, struct value *function,
 	  if (readbuf != NULL)
 	    regcache->deprecated_cooked_read_part (reg, 4 - part, part, readbuf);
 	  if (writebuf != NULL)
-	    regcache->cooked_write_part (reg, 4 - part, part, writebuf);
+	    regcache->deprecated_cooked_write_part (reg, 4 - part, part, writebuf);
 	  reg++;
 	}
       /* Now transfer the remaining register values.  */
@@ -1233,7 +1233,7 @@ hppa64_return_value (struct gdbarch *gdbarch, struct value *function,
     {
       while (len > 0)
 	{
-	  regcache->cooked_write_part (regnum, offset, std::min (len, 8),
+	  regcache->deprecated_cooked_write_part (regnum, offset, std::min (len, 8),
 				       writebuf);
 	  writebuf += std::min (len, 8);
 	  len -= std::min (len, 8);
