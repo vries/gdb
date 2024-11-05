@@ -389,8 +389,20 @@ DIAGNOSTIC_POP
 				    gdb::array_view<gdb_byte> dst);
 
   /* Deprecated overload of the above.  */
+  [[deprecated]]
   register_status cooked_read_part (int regnum, int offset, int len, gdb_byte *src)
   { return cooked_read_part (regnum, offset, gdb::make_array_view (src, len)); }
+
+  /* Wrapper for deprecated cooked_read_part that silences warnings for
+     deprecated declarations.  */
+  register_status deprecated_cooked_read_part (int regnum, int offset, int len,
+					       gdb_byte *src)
+  {
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_DEPRECATED_DECLARATIONS
+    return cooked_read_part (regnum, offset, len, src);
+DIAGNOSTIC_POP
+  }
 
   /* Read register REGNUM from the regcache and return a new value.  This
      will call mark_value_bytes_unavailable as appropriate.  */
