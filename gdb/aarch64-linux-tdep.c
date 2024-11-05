@@ -1026,7 +1026,7 @@ collect_inactive_sve_regset (const struct regcache *regcache,
   /* Dump the first 128 bits of each of the Z registers.  */
   header += AARCH64_SVE_CONTEXT_REGS_OFFSET;
   for (int i = 0; i < AARCH64_SVE_Z_REGS_NUM; i++)
-    regcache->raw_collect_part (AARCH64_SVE_Z0_REGNUM + i, 0, V_REGISTER_SIZE,
+    regcache->deprecated_raw_collect_part (AARCH64_SVE_Z0_REGNUM + i, 0, V_REGISTER_SIZE,
 				header + V_REGISTER_SIZE * i);
 
   /* Dump FPSR and FPCR.  */
