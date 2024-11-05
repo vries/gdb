@@ -2837,7 +2837,7 @@ e500_move_ev_register (move_ev_register_func move,
 static enum register_status
 do_regcache_raw_write (struct regcache *regcache, int regnum, void *buffer)
 {
-  regcache->raw_write (regnum, (const gdb_byte *) buffer);
+  regcache->deprecated_raw_write (regnum, (const gdb_byte *) buffer);
 
   return REG_VALID;
 }
@@ -2948,13 +2948,13 @@ dfp_pseudo_register_write (struct gdbarch *gdbarch, struct regcache *regcache,
     {
       /* Write each half of the dl register into a separate
 	 FP register.  */
-      regcache->raw_write (fp0 + 2 * reg_index, buffer);
-      regcache->raw_write (fp0 + 2 * reg_index + 1, buffer + 8);
+      regcache->deprecated_raw_write (fp0 + 2 * reg_index, buffer);
+      regcache->deprecated_raw_write (fp0 + 2 * reg_index + 1, buffer + 8);
     }
   else
     {
-      regcache->raw_write (fp0 + 2 * reg_index + 1, buffer);
-      regcache->raw_write (fp0 + 2 * reg_index, buffer + 8);
+      regcache->deprecated_raw_write (fp0 + 2 * reg_index + 1, buffer);
+      regcache->deprecated_raw_write (fp0 + 2 * reg_index, buffer + 8);
     }
 }
 
@@ -2983,7 +2983,7 @@ v_alias_pseudo_register_write (struct gdbarch *gdbarch,
   ppc_gdbarch_tdep *tdep = gdbarch_tdep<ppc_gdbarch_tdep> (gdbarch);
   gdb_assert (IS_V_ALIAS_PSEUDOREG (tdep, reg_nr));
 
-  regcache->raw_write (tdep->ppc_vr0_regnum
+  regcache->deprecated_raw_write (tdep->ppc_vr0_regnum
 		       + (reg_nr - tdep->ppc_v0_alias_regnum), buffer);
 }
 
@@ -3062,18 +3062,18 @@ vsx_pseudo_register_write (struct gdbarch *gdbarch, struct regcache *regcache,
 
   /* Write the portion that overlaps the VMX registers.  */
   if (reg_index > 31)
-    regcache->raw_write (vr0 + reg_index - 32, buffer);
+    regcache->deprecated_raw_write (vr0 + reg_index - 32, buffer);
   else
     /* Write the portion that overlaps the FPR registers.  */
     if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_BIG)
       {
-	regcache->raw_write (fp0 + reg_index, buffer);
-	regcache->raw_write (vsr0_upper + reg_index, buffer + 8);
+	regcache->deprecated_raw_write (fp0 + reg_index, buffer);
+	regcache->deprecated_raw_write (vsr0_upper + reg_index, buffer + 8);
       }
     else
       {
-	regcache->raw_write (fp0 + reg_index, buffer + 8);
-	regcache->raw_write (vsr0_upper + reg_index, buffer);
+	regcache->deprecated_raw_write (fp0 + reg_index, buffer + 8);
+	regcache->deprecated_raw_write (vsr0_upper + reg_index, buffer);
       }
 }
 

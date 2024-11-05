@@ -1225,7 +1225,7 @@ mep_pseudo_cr32_write (struct gdbarch *gdbarch,
   /* Slow, but legible.  */
   store_unsigned_integer (buf64, 8, byte_order,
 			  extract_unsigned_integer (buf, 4, byte_order));
-  regcache->raw_write (rawnum, buf64);
+  regcache->deprecated_raw_write (rawnum, buf64);
 }
 
 
@@ -1235,7 +1235,7 @@ mep_pseudo_cr64_write (struct gdbarch *gdbarch,
 		     int cookednum,
 		     const gdb_byte *buf)
 {
-  regcache->raw_write (mep_pseudo_to_raw[cookednum], buf);
+  regcache->deprecated_raw_write (mep_pseudo_to_raw[cookednum], buf);
 }
 
 
@@ -1254,7 +1254,7 @@ mep_pseudo_register_write (struct gdbarch *gdbarch,
 	   || IS_FP_CR64_REGNUM (cookednum))
     mep_pseudo_cr64_write (gdbarch, regcache, cookednum, buf);
   else if (IS_CCR_REGNUM (cookednum))
-    regcache->raw_write (mep_pseudo_to_raw[cookednum], buf);
+    regcache->deprecated_raw_write (mep_pseudo_to_raw[cookednum], buf);
   else
     gdb_assert_not_reached ("unexpected pseudo register");
 }

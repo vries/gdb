@@ -810,8 +810,8 @@ amd64_return_value (struct gdbarch *gdbarch, struct value *function,
       if (writebuf)
 	{
 	  i387_return_value (gdbarch, regcache);
-	  regcache->raw_write (AMD64_ST0_REGNUM, writebuf);
-	  regcache->raw_write (AMD64_ST1_REGNUM, writebuf + 16);
+	  regcache->deprecated_raw_write (AMD64_ST0_REGNUM, writebuf);
+	  regcache->deprecated_raw_write (AMD64_ST1_REGNUM, writebuf + 16);
 
 	  /* Fix up the tag word such that both %st(0) and %st(1) are
 	     marked as valid.  */

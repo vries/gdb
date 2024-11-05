@@ -495,7 +495,7 @@ nds32_pseudo_register_write (struct gdbarch *gdbarch,
       fdr_regnum = NDS32_FD0_REGNUM + (regnum >> 1);
       regcache->deprecated_raw_read (fdr_regnum, reg_buf);
       memcpy (reg_buf + offset, buf, 4);
-      regcache->raw_write (fdr_regnum, reg_buf);
+      regcache->deprecated_raw_write (fdr_regnum, reg_buf);
       return;
     }
 

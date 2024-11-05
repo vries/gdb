@@ -2657,7 +2657,7 @@ csky_pseudo_register_write (struct gdbarch *gdbarch, struct regcache *regcache,
 
       regcache->deprecated_raw_read (gdb_regnum, reg_buf);
       memcpy (reg_buf + offset, buf, 4);
-      regcache->raw_write (gdb_regnum, reg_buf);
+      regcache->deprecated_raw_write (gdb_regnum, reg_buf);
       return;
     }
 

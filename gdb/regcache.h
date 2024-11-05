@@ -449,7 +449,18 @@ public:
   void raw_write (int regnum, gdb::array_view<const gdb_byte> src);
 
   /* Deprecated overload of the above.  */
+  [[deprecated]]
   void raw_write (int regnum, const gdb_byte *src);
+
+  /* Wrapper for deprecated raw_write that silences warnings for deprecated
+     declarations.  */
+  void deprecated_raw_write (int regnum, const gdb_byte *src)
+  {
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_DEPRECATED_DECLARATIONS
+    raw_write (regnum, src);
+DIAGNOSTIC_POP
+  }
 
   template<typename T, typename = RequireLongest<T>>
   void raw_write (int regnum, T val);

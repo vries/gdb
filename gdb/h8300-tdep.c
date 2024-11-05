@@ -1204,7 +1204,7 @@ h8300_pseudo_register_write (struct gdbarch *gdbarch,
   else if (regno == E_PSEUDO_EXR_REGNUM (gdbarch))
     raw_from_pseudo_register (gdbarch, regcache, buf, E_EXR_REGNUM, regno);
   else
-    regcache->raw_write (regno, buf);
+    regcache->deprecated_raw_write (regno, buf);
 }
 
 static int
