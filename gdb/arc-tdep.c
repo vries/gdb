@@ -807,7 +807,7 @@ arc_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 
 	  /* Note we don't use write_unsigned here, since that would convert
 	     the byte order, but we are already in the correct byte order.  */
-	  regcache->cooked_write (arg_reg, data);
+	  regcache->deprecated_cooked_write (arg_reg, data);
 
 	  data += ARC_REGISTER_SIZE;
 	  total_space -= ARC_REGISTER_SIZE;

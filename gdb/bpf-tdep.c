@@ -283,7 +283,7 @@ bpf_store_return_value (struct type *type, struct regcache *regcache,
   gdb_assert (len <= 8);
   memset (vbuf, 0, sizeof (vbuf));
   memcpy (vbuf + 8 - len, valbuf, len);
-  regcache->cooked_write (BPF_R0_REGNUM, vbuf);
+  regcache->deprecated_cooked_write (BPF_R0_REGNUM, vbuf);
 }
 
 /* Handle function's return value.  */

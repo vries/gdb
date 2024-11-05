@@ -230,13 +230,13 @@ nios2_store_return_value (struct gdbarch *gdbarch, struct type *valtype,
 
   /* Return values of up to 8 bytes are returned in $r2 $r3.  */
   if (len <= register_size (gdbarch, NIOS2_R2_REGNUM))
-    regcache->cooked_write (NIOS2_R2_REGNUM, valbuf);
+    regcache->deprecated_cooked_write (NIOS2_R2_REGNUM, valbuf);
   else
     {
       gdb_assert (len <= (register_size (gdbarch, NIOS2_R2_REGNUM)
 			  + register_size (gdbarch, NIOS2_R3_REGNUM)));
-      regcache->cooked_write (NIOS2_R2_REGNUM, valbuf);
-      regcache->cooked_write (NIOS2_R3_REGNUM, valbuf + 4);
+      regcache->deprecated_cooked_write (NIOS2_R2_REGNUM, valbuf);
+      regcache->deprecated_cooked_write (NIOS2_R3_REGNUM, valbuf + 4);
     }
 }
 

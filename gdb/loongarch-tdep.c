@@ -475,7 +475,7 @@ static void
 pass_in_gar (struct regcache *regcache, unsigned int gar, const gdb_byte *val)
 {
   unsigned int regnum = LOONGARCH_ARG_REGNUM - gar + LOONGARCH_A0_REGNUM;
-  regcache->cooked_write (regnum, val);
+  regcache->deprecated_cooked_write (regnum, val);
 }
 
 /* Write the contents of buffer VAL into the floating-point argument
@@ -491,7 +491,7 @@ static void
 pass_in_far (struct regcache *regcache, unsigned int far, const gdb_byte *val)
 {
   unsigned int regnum = LOONGARCH_ARG_REGNUM - far + LOONGARCH_FIRST_FP_REGNUM;
-  regcache->cooked_write (regnum, val);
+  regcache->deprecated_cooked_write (regnum, val);
 }
 
 /* Pass a value on the stack.  */
