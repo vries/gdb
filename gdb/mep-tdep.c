@@ -2131,7 +2131,7 @@ mep_store_return_value (struct gdbarch *arch,
       else
 	offset = 0;
 
-      regcache->cooked_write_part (MEP_R0_REGNUM, offset, type->length (),
+      regcache->deprecated_cooked_write_part (MEP_R0_REGNUM, offset, type->length (),
 				   valbuf);
     }
 

@@ -1266,7 +1266,7 @@ loongarch_xfer_reg (struct regcache *regcache,
   if (readbuf)
     regcache->deprecated_cooked_read_part (regnum, 0, len, readbuf + offset);
   if (writebuf)
-    regcache->cooked_write_part (regnum, 0, len, writebuf + offset);
+    regcache->deprecated_cooked_write_part (regnum, 0, len, writebuf + offset);
 }
 
 /* Implement the return_value gdbarch method.  */

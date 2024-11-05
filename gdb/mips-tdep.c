@@ -545,7 +545,7 @@ mips_xfer_register (struct gdbarch *gdbarch, struct regcache *regcache,
   if (in != NULL)
     regcache->deprecated_cooked_read_part (reg_num, reg_offset, length, in + buf_offset);
   if (out != NULL)
-    regcache->cooked_write_part (reg_num, reg_offset, length, out + buf_offset);
+    regcache->deprecated_cooked_write_part (reg_num, reg_offset, length, out + buf_offset);
   if (mips_debug && in != NULL)
     {
       int i;
