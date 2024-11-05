@@ -2849,7 +2849,7 @@ i386_extract_return_value (struct gdbarch *gdbarch, struct type *type,
   if (((type->code () == TYPE_CODE_FLT) && len == 2)
       || ((type->code () == TYPE_CODE_COMPLEX) && len == 4))
     {
-	regcache->raw_read (I387_XMM0_REGNUM (tdep), valbuf);
+	regcache->deprecated_raw_read (I387_XMM0_REGNUM (tdep), valbuf);
 	return;
     }
   else if (type->code () == TYPE_CODE_FLT)
@@ -2865,7 +2865,7 @@ i386_extract_return_value (struct gdbarch *gdbarch, struct type *type,
 	 its contents to the desired type.  This is probably not
 	 exactly how it would happen on the target itself, but it is
 	 the best we can do.  */
-      regcache->raw_read (I386_ST0_REGNUM, buf);
+      regcache->deprecated_raw_read (I386_ST0_REGNUM, buf);
       target_float_convert (buf, i387_ext_type (gdbarch), valbuf, type);
     }
   else
@@ -2875,14 +2875,14 @@ i386_extract_return_value (struct gdbarch *gdbarch, struct type *type,
 
       if (len <= low_size)
 	{
-	  regcache->raw_read (LOW_RETURN_REGNUM, buf);
+	  regcache->deprecated_raw_read (LOW_RETURN_REGNUM, buf);
 	  memcpy (valbuf, buf, len);
 	}
       else if (len <= (low_size + high_size))
 	{
-	  regcache->raw_read (LOW_RETURN_REGNUM, buf);
+	  regcache->deprecated_raw_read (LOW_RETURN_REGNUM, buf);
 	  memcpy (valbuf, buf, low_size);
-	  regcache->raw_read (HIGH_RETURN_REGNUM, buf);
+	  regcache->deprecated_raw_read (HIGH_RETURN_REGNUM, buf);
 	  memcpy (valbuf + low_size, buf, len - low_size);
 	}
       else

@@ -336,7 +336,18 @@ public:
   register_status raw_read (int regnum, gdb::array_view<gdb_byte> dst);
 
   /* Deprecated overload of the above.  */
+  [[deprecated]]
   register_status raw_read (int regnum, gdb_byte *dst);
+
+  /* Wrapper for deprecated raw_read that silences warnings for deprecated
+     declarations.  */
+  register_status deprecated_raw_read (int regnum, gdb_byte *dst)
+  {
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_DEPRECATED_DECLARATIONS
+    return raw_read (regnum, dst);
+DIAGNOSTIC_POP
+  }
 
   template<typename T, typename = RequireLongest<T>>
   register_status raw_read (int regnum, T *val);

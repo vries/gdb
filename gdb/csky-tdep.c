@@ -2605,7 +2605,7 @@ csky_pseudo_register_read (struct gdbarch *gdbarch,
 	  offset = (regnum % 2) * 4;
 	}
 
-      status = regcache->raw_read (gdb_regnum, reg_buf);
+      status = regcache->deprecated_raw_read (gdb_regnum, reg_buf);
       if (status == REG_VALID)
 	memcpy (buf, reg_buf + offset, 4);
       return status;
@@ -2655,7 +2655,7 @@ csky_pseudo_register_write (struct gdbarch *gdbarch, struct regcache *regcache,
 	  offset = (regnum % 2) * 4;
 	}
 
-      regcache->raw_read (gdb_regnum, reg_buf);
+      regcache->deprecated_raw_read (gdb_regnum, reg_buf);
       memcpy (reg_buf + offset, buf, 4);
       regcache->raw_write (gdb_regnum, reg_buf);
       return;

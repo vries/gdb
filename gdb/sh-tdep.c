@@ -1285,7 +1285,7 @@ sh_extract_return_value_nofpu (struct type *type, struct regcache *regcache,
     {
       int i, regnum = R0_REGNUM;
       for (i = 0; i < len; i += 4)
-	regcache->raw_read (regnum++, valbuf + i);
+	regcache->deprecated_raw_read (regnum++, valbuf + i);
     }
   else
     error (_("bad size for return value"));
@@ -1302,10 +1302,10 @@ sh_extract_return_value_fpu (struct type *type, struct regcache *regcache,
       int i, regnum = gdbarch_fp0_regnum (gdbarch);
       for (i = 0; i < len; i += 4)
 	if (gdbarch_byte_order (gdbarch) == BFD_ENDIAN_LITTLE)
-	  regcache->raw_read (regnum++,
+	  regcache->deprecated_raw_read (regnum++,
 			     valbuf + len - 4 - i);
 	else
-	  regcache->raw_read (regnum++, valbuf + i);
+	  regcache->deprecated_raw_read (regnum++, valbuf + i);
     }
   else
     sh_extract_return_value_nofpu (type, regcache, valbuf);
@@ -1623,7 +1623,7 @@ pseudo_register_read_portions (struct gdbarch *gdbarch,
       gdb_byte *b;
 
       b = buffer + register_size (gdbarch, base_regnum) * portion;
-      status = regcache->raw_read (base_regnum + portion, b);
+      status = regcache->deprecated_raw_read (base_regnum + portion, b);
       if (status != REG_VALID)
 	return status;
     }
@@ -1639,7 +1639,7 @@ sh_pseudo_register_read (struct gdbarch *gdbarch, readable_regcache *regcache,
   enum register_status status;
 
   if (reg_nr == PSEUDO_BANK_REGNUM)
-    return regcache->raw_read (BANK_REGNUM, buffer);
+    return regcache->deprecated_raw_read (BANK_REGNUM, buffer);
   else if (reg_nr >= DR0_REGNUM && reg_nr <= DR_LAST_REGNUM)
     {
       /* Enough space for two float registers.  */

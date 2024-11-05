@@ -803,8 +803,8 @@ amd64_return_value (struct gdbarch *gdbarch, struct value *function,
     {
       if (readbuf)
 	{
-	  regcache->raw_read (AMD64_ST0_REGNUM, readbuf);
-	  regcache->raw_read (AMD64_ST1_REGNUM, readbuf + 16);
+	  regcache->deprecated_raw_read (AMD64_ST0_REGNUM, readbuf);
+	  regcache->deprecated_raw_read (AMD64_ST1_REGNUM, readbuf + 16);
 	}
 
       if (writebuf)

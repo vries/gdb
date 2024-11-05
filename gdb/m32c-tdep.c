@@ -312,7 +312,7 @@ static m32c_write_reg_t m32c_r3r2r1r0_write;
 static enum register_status
 m32c_raw_read (struct m32c_reg *reg, readable_regcache *cache, gdb_byte *buf)
 {
-  return cache->raw_read (reg->num, buf);
+  return cache->deprecated_raw_read (reg->num, buf);
 }
 
 
@@ -356,7 +356,7 @@ static enum register_status
 m32c_banked_read (struct m32c_reg *reg, readable_regcache *cache, gdb_byte *buf)
 {
   struct m32c_reg *bank_reg = m32c_banked_register (reg, cache);
-  return cache->raw_read (bank_reg->num, buf);
+  return cache->deprecated_raw_read (bank_reg->num, buf);
 }
 
 
