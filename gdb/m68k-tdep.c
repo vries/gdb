@@ -349,17 +349,17 @@ m68k_store_return_value (struct type *type, struct regcache *regcache,
     {
       struct gdbarch *gdbarch = regcache->arch ();
       m68k_gdbarch_tdep *tdep = gdbarch_tdep<m68k_gdbarch_tdep> (gdbarch);
-      regcache->raw_write (tdep->pointer_result_regnum, valbuf);
+      regcache->deprecated_raw_write (tdep->pointer_result_regnum, valbuf);
       /* gdb historically also set D0 in the SVR4 case.  */
       if (tdep->pointer_result_regnum != M68K_D0_REGNUM)
-	regcache->raw_write (M68K_D0_REGNUM, valbuf);
+	regcache->deprecated_raw_write (M68K_D0_REGNUM, valbuf);
     }
   else if (len <= 4)
     regcache->raw_write_part (M68K_D0_REGNUM, 4 - len, len, valbuf);
   else if (len <= 8)
     {
       regcache->raw_write_part (M68K_D0_REGNUM, 8 - len, len - 4, valbuf);
-      regcache->raw_write (M68K_D1_REGNUM, valbuf + (len - 4));
+      regcache->deprecated_raw_write (M68K_D1_REGNUM, valbuf + (len - 4));
     }
   else
     internal_error (_("Cannot store return value of %d bytes long."), len);
@@ -377,7 +377,7 @@ m68k_svr4_store_return_value (struct type *type, struct regcache *regcache,
       struct type *fpreg_type = register_type (gdbarch, M68K_FP0_REGNUM);
       gdb_byte buf[M68K_MAX_REGISTER_SIZE];
       target_float_convert (valbuf, type, buf, fpreg_type);
-      regcache->raw_write (M68K_FP0_REGNUM, buf);
+      regcache->deprecated_raw_write (M68K_FP0_REGNUM, buf);
     }
   else
     m68k_store_return_value (type, regcache, valbuf);

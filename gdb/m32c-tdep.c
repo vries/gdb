@@ -321,7 +321,7 @@ static enum register_status
 m32c_raw_write (struct m32c_reg *reg, struct regcache *cache,
 		const gdb_byte *buf)
 {
-  cache->raw_write (reg->num, buf);
+  cache->deprecated_raw_write (reg->num, buf);
 
   return REG_VALID;
 }
@@ -369,7 +369,7 @@ m32c_banked_write (struct m32c_reg *reg, struct regcache *cache,
 		   const gdb_byte *buf)
 {
   struct m32c_reg *bank_reg = m32c_banked_register (reg, cache);
-  cache->raw_write (bank_reg->num, buf);
+  cache->deprecated_raw_write (bank_reg->num, buf);
 
   return REG_VALID;
 }

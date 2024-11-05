@@ -2921,7 +2921,7 @@ i386_store_return_value (struct gdbarch *gdbarch, struct type *type,
 	 not exactly how it would happen on the target itself, but
 	 it is the best we can do.  */
       target_float_convert (valbuf, type, buf, i387_ext_type (gdbarch));
-      regcache->raw_write (I386_ST0_REGNUM, buf);
+      regcache->deprecated_raw_write (I386_ST0_REGNUM, buf);
 
       /* Set the top of the floating-point register stack to 7.  The
 	 actual value doesn't really matter, but 7 is what a normal
@@ -2945,7 +2945,7 @@ i386_store_return_value (struct gdbarch *gdbarch, struct type *type,
 	regcache->raw_write_part (LOW_RETURN_REGNUM, 0, len, valbuf);
       else if (len <= (low_size + high_size))
 	{
-	  regcache->raw_write (LOW_RETURN_REGNUM, valbuf);
+	  regcache->deprecated_raw_write (LOW_RETURN_REGNUM, valbuf);
 	  regcache->raw_write_part (HIGH_RETURN_REGNUM, 0, len - low_size,
 				    valbuf + low_size);
 	}

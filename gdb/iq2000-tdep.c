@@ -491,7 +491,7 @@ iq2000_store_return_value (struct type *type, struct regcache *regcache,
 
       memset (buf, 0, 4);
       memcpy (buf + 4 - size, valbuf, size);
-      regcache->raw_write (regno++, buf);
+      regcache->deprecated_raw_write (regno++, buf);
       len -= size;
       valbuf = ((char *) valbuf) + size;
     }
@@ -721,7 +721,7 @@ iq2000_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 	  if (argreg <= E_LAST_ARGREG)
 	    {
 	      /* Passed in a register.  */
-	      regcache->raw_write (argreg++, buf);
+	      regcache->deprecated_raw_write (argreg++, buf);
 	    }
 	  else
 	    {
@@ -740,8 +740,8 @@ iq2000_push_dummy_call (struct gdbarch *gdbarch, struct value *function,
 		 (must start with an even-numbered reg).  */
 	      if (((argreg - E_1ST_ARGREG) % 2) != 0)
 		argreg++;
-	      regcache->raw_write (argreg++, val);
-	      regcache->raw_write (argreg++, val + 4);
+	      regcache->deprecated_raw_write (argreg++, val);
+	      regcache->deprecated_raw_write (argreg++, val + 4);
 	    }
 	  else
 	    {
