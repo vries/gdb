@@ -1626,7 +1626,7 @@ xtensa_store_return_value (struct type *type,
   for (; len > 0; len -= 4, areg++, valbuf += 4)
     {
       if (len < 4)
-	regcache->raw_write_part (areg, offset, len, valbuf);
+	regcache->deprecated_raw_write_part (areg, offset, len, valbuf);
       else
 	regcache->deprecated_raw_write (areg, valbuf);
     }

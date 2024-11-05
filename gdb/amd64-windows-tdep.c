@@ -419,7 +419,7 @@ amd64_windows_return_value (struct gdbarch *gdbarch, struct value *function,
 				   (*read_value)->contents_raw ().data ());
 	}
       if (writebuf)
-	regcache->raw_write_part (regnum, 0, len, writebuf);
+	regcache->deprecated_raw_write_part (regnum, 0, len, writebuf);
       return RETURN_VALUE_REGISTER_CONVENTION;
     }
 }

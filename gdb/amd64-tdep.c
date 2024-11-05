@@ -881,7 +881,7 @@ amd64_return_value (struct gdbarch *gdbarch, struct value *function,
 	regcache->deprecated_raw_read_part (regnum, offset, std::min (len, 8),
 				 readbuf + i * 8);
       if (writebuf)
-	regcache->raw_write_part (regnum, offset, std::min (len, 8),
+	regcache->deprecated_raw_write_part (regnum, offset, std::min (len, 8),
 				  writebuf + i * 8);
     }
 
@@ -993,7 +993,7 @@ if (return_method == return_method_struct)
 	      gdb_assert (regnum != -1);
 	      memset (buf, 0, sizeof buf);
 	      memcpy (buf, valbuf + j * 8, std::min (len, 8));
-	      regcache->raw_write_part (regnum, offset, 8, buf);
+	      regcache->deprecated_raw_write_part (regnum, offset, 8, buf);
 	    }
 	}
     }

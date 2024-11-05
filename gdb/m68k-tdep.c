@@ -355,10 +355,10 @@ m68k_store_return_value (struct type *type, struct regcache *regcache,
 	regcache->deprecated_raw_write (M68K_D0_REGNUM, valbuf);
     }
   else if (len <= 4)
-    regcache->raw_write_part (M68K_D0_REGNUM, 4 - len, len, valbuf);
+    regcache->deprecated_raw_write_part (M68K_D0_REGNUM, 4 - len, len, valbuf);
   else if (len <= 8)
     {
-      regcache->raw_write_part (M68K_D0_REGNUM, 8 - len, len - 4, valbuf);
+      regcache->deprecated_raw_write_part (M68K_D0_REGNUM, 8 - len, len - 4, valbuf);
       regcache->deprecated_raw_write (M68K_D1_REGNUM, valbuf + (len - 4));
     }
   else

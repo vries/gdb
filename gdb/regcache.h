@@ -493,8 +493,20 @@ DIAGNOSTIC_POP
 		       gdb::array_view<const gdb_byte> src);
 
   /* Deprecated overload of the above.  */
+  [[deprecated]]
   void raw_write_part (int regnum, int offset, int len, const gdb_byte *src)
   { raw_write_part (regnum, offset, gdb::make_array_view (src, len)); }
+
+  /* Wrapper for deprecated raw_write_part that silences warnings for
+     deprecated declarations.  */
+  void deprecated_raw_write_part (int regnum, int offset, int len,
+				  const gdb_byte *src)
+  {
+DIAGNOSTIC_PUSH
+DIAGNOSTIC_IGNORE_DEPRECATED_DECLARATIONS
+    raw_write_part (regnum, offset, len, src);
+DIAGNOSTIC_POP
+  }
 
   /* Partial transfer of a cooked register.  Perform read, modify, write style
      operations.  */
