@@ -61,7 +61,7 @@ aarch32_gp_regcache_collect (const struct regcache *regcache, uint32_t *regs,
   for (regno = ARM_A1_REGNUM; regno <= ARM_PC_REGNUM; regno++)
     {
       if (REG_VALID == regcache->get_register_status (regno))
-	regcache->raw_collect (regno, &regs[regno]);
+	regcache->deprecated_raw_collect (regno, &regs[regno]);
     }
 
   if (arm_apcs_32
@@ -69,7 +69,7 @@ aarch32_gp_regcache_collect (const struct regcache *regcache, uint32_t *regs,
     {
       uint32_t cpsr = regs[ARM_CPSR_GREGNUM];
 
-      regcache->raw_collect (ARM_PS_REGNUM, &regs[ARM_CPSR_GREGNUM]);
+      regcache->deprecated_raw_collect (ARM_PS_REGNUM, &regs[ARM_CPSR_GREGNUM]);
       /* Keep reserved bits bit 20 to bit 23.  */
       regs[ARM_CPSR_GREGNUM] = ((regs[ARM_CPSR_GREGNUM] & 0xff0fffff)
 				| (cpsr & 0x00f00000));
@@ -101,7 +101,7 @@ aarch32_vfp_regcache_collect (const struct regcache *regcache, gdb_byte *regs,
   int regno;
 
   for (regno = 0; regno < vfp_register_count; regno++)
-    regcache->raw_collect (regno + ARM_D0_REGNUM, regs + regno * 8);
+    regcache->deprecated_raw_collect (regno + ARM_D0_REGNUM, regs + regno * 8);
 
-  regcache->raw_collect (ARM_FPSCR_REGNUM, regs + 32 * 8);
+  regcache->deprecated_raw_collect (ARM_FPSCR_REGNUM, regs + 32 * 8);
 }

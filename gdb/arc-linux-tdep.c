@@ -607,7 +607,7 @@ collect_register (const struct regcache *regcache, struct gdbarch *gdbarch,
     offset = arc_linux_core_reg_offsets[ARC_ERET_REGNUM];
   else
     offset = arc_linux_core_reg_offsets[regnum];
-  regcache->raw_collect (regnum, buf + offset);
+  regcache->deprecated_raw_collect (regnum, buf + offset);
 }
 
 void
@@ -639,11 +639,11 @@ arc_linux_collect_v2_regset (const struct regset *regset,
   bfd_byte *buf = (bfd_byte *) v2_regs;
 
   if (regnum == -1 || regnum == ARC_R30_REGNUM)
-    regcache->raw_collect (ARC_R30_REGNUM, buf);
+    regcache->deprecated_raw_collect (ARC_R30_REGNUM, buf);
   if (regnum == -1 || regnum == ARC_R58_REGNUM)
-    regcache->raw_collect (ARC_R58_REGNUM, buf + REGOFF (1));
+    regcache->deprecated_raw_collect (ARC_R58_REGNUM, buf + REGOFF (1));
   if (regnum == -1 || regnum == ARC_R59_REGNUM)
-    regcache->raw_collect (ARC_R59_REGNUM, buf + REGOFF (2));
+    regcache->deprecated_raw_collect (ARC_R59_REGNUM, buf + REGOFF (2));
 }
 
 /* Linux regset definitions.  */

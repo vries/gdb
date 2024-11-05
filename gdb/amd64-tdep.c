@@ -3468,9 +3468,9 @@ amd64_collect_fxsave (const struct regcache *regcache, int regnum,
   if (gdbarch_bfd_arch_info (gdbarch)->bits_per_word == 64)
     {
       if (regnum == -1 || regnum == I387_FISEG_REGNUM (tdep))
-	regcache->raw_collect (I387_FISEG_REGNUM (tdep), regs + 12);
+	regcache->deprecated_raw_collect (I387_FISEG_REGNUM (tdep), regs + 12);
       if (regnum == -1 || regnum == I387_FOSEG_REGNUM (tdep))
-	regcache->raw_collect (I387_FOSEG_REGNUM (tdep), regs + 20);
+	regcache->deprecated_raw_collect (I387_FOSEG_REGNUM (tdep), regs + 20);
     }
 }
 
@@ -3489,10 +3489,10 @@ amd64_collect_xsave (const struct regcache *regcache, int regnum,
   if (gdbarch_bfd_arch_info (gdbarch)->bits_per_word == 64)
     {
       if (regnum == -1 || regnum == I387_FISEG_REGNUM (tdep))
-	regcache->raw_collect (I387_FISEG_REGNUM (tdep),
+	regcache->deprecated_raw_collect (I387_FISEG_REGNUM (tdep),
 			      regs + 12);
       if (regnum == -1 || regnum == I387_FOSEG_REGNUM (tdep))
-	regcache->raw_collect (I387_FOSEG_REGNUM (tdep),
+	regcache->deprecated_raw_collect (I387_FOSEG_REGNUM (tdep),
 			      regs + 20);
     }
 }

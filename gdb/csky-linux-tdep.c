@@ -100,7 +100,7 @@ csky_collect_gregset (const struct regset *regset,
     {
       if ((regnum == csky_gregset_offset[regno] || regnum == -1)
 	  && csky_gregset_offset[regno] != -1)
-	regcache->raw_collect (regno,
+	regcache->deprecated_raw_collect (regno,
 			       gregs + 4 + csky_gregset_offset[regno]);
     }
 }
@@ -217,7 +217,7 @@ csky_collect_fregset (const struct regset *regset,
 	       && csky_fregset_offset[regno] != -1)
 	    {
 	      offset += register_size (gdbarch, csky_fregset_offset[regno]);
-	      regcache->raw_collect (regno, fregs + offset);
+	      regcache->deprecated_raw_collect (regno, fregs + offset);
 	    }
 	}
     }
@@ -247,7 +247,7 @@ csky_collect_fregset (const struct regset *regset,
 	  if (*gdbarch_register_name (gdbarch, (CSKY_VR0_REGNUM + i)) != '\0')
 	    {
 	      offset = 16 * i;
-	      regcache ->raw_collect (CSKY_VR0_REGNUM + i, fregs + offset);
+	      regcache ->deprecated_raw_collect (CSKY_VR0_REGNUM + i, fregs + offset);
 	    }
 	}
       /* Supply fr16~fr31.  */
@@ -256,7 +256,7 @@ csky_collect_fregset (const struct regset *regset,
 	  if (*gdbarch_register_name (gdbarch, (CSKY_FR16_REGNUM + i)) != '\0')
 	    {
 	      offset = (16 * 16) + (8 * i);
-	      regcache ->raw_collect (CSKY_FR16_REGNUM + i, fregs + offset);
+	      regcache ->deprecated_raw_collect (CSKY_FR16_REGNUM + i, fregs + offset);
 	    }
 	}
       /* Supply fcr, fesr, fid.  */
@@ -265,7 +265,7 @@ csky_collect_fregset (const struct regset *regset,
 	  if (*gdbarch_register_name (gdbarch, fcr_regno[i]) != '\0')
 	    {
 	      offset = (16 * 16) + (16 * 8) + (4 * i);
-	      regcache ->raw_collect (fcr_regno[i], fregs + offset);
+	      regcache ->deprecated_raw_collect (fcr_regno[i], fregs + offset);
 	    }
 	}
     }

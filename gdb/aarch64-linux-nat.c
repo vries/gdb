@@ -192,7 +192,7 @@ store_gregs_to_thread (const struct regcache *regcache)
 
       for (regno = AARCH64_X0_REGNUM; regno <= AARCH64_CPSR_REGNUM; regno++)
 	if (REG_VALID == regcache->get_register_status (regno))
-	  regcache->raw_collect (regno, &regs[regno - AARCH64_X0_REGNUM]);
+	  regcache->deprecated_raw_collect (regno, &regs[regno - AARCH64_X0_REGNUM]);
     }
 
   ret = ptrace (PTRACE_SETREGSET, tid, NT_PRSTATUS, &iovec);
@@ -287,13 +287,13 @@ store_fpregs_to_thread (const struct regcache *regcache)
 
       for (regno = AARCH64_V0_REGNUM; regno <= AARCH64_V31_REGNUM; regno++)
 	if (REG_VALID == regcache->get_register_status (regno))
-	  regcache->raw_collect
+	  regcache->deprecated_raw_collect
 	    (regno, (char *) &regs.vregs[regno - AARCH64_V0_REGNUM]);
 
       if (REG_VALID == regcache->get_register_status (AARCH64_FPSR_REGNUM))
-	regcache->raw_collect (AARCH64_FPSR_REGNUM, (char *) &regs.fpsr);
+	regcache->deprecated_raw_collect (AARCH64_FPSR_REGNUM, (char *) &regs.fpsr);
       if (REG_VALID == regcache->get_register_status (AARCH64_FPCR_REGNUM))
-	regcache->raw_collect (AARCH64_FPCR_REGNUM, (char *) &regs.fpcr);
+	regcache->deprecated_raw_collect (AARCH64_FPCR_REGNUM, (char *) &regs.fpcr);
     }
 
   if (gdbarch_bfd_arch_info (gdbarch)->bits_per_word == 32)
@@ -471,7 +471,7 @@ store_mteregs_to_thread (struct regcache *regcache)
   if (REG_VALID != regcache->get_register_status (regno))
     return;
 
-  regcache->raw_collect (regno, (char *) &tag_ctl);
+  regcache->deprecated_raw_collect (regno, (char *) &tag_ctl);
 
   struct iovec iovec;
 
@@ -530,7 +530,7 @@ store_tlsregs_to_thread (struct regcache *regcache)
       if (REG_VALID != regcache->get_register_status (regno + i))
 	continue;
 
-      regcache->raw_collect (regno + i, (char *) &tpidrs[i]);
+      regcache->deprecated_raw_collect (regno + i, (char *) &tpidrs[i]);
     }
 
   struct iovec iovec;
