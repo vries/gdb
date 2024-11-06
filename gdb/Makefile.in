@@ -920,6 +920,54 @@ NAT_GENERATED_FILES = @NAT_GENERATED_FILES@
 NM_H = @NM_H@
 HAVE_NATIVE_GCORE_HOST = @HAVE_NATIVE_GCORE_HOST@
 
+# Enable extra nat files for --enable-targets=all and --enable-unit-tests, and
+# DEVELOPMENT == true (as defined by bfd/development.sh).
+ifeq (@DEVELOPMENT@,true)
+ifneq ($(filter $(CONFIG_OBS),selftest-arch.o),)
+ifeq (@ENABLE_TARGETS@,all)
+# Todo (amd64-linux-nat.o and aarch64-linux-nat.o is low priority):
+# - i386-linux-nat.o
+# - m32r-linux-nat.o
+# - m68k-linux-nat.o
+# - mips-linux-nat.o
+# - ppc-linux-nat.o
+# - s390-linux-nat.o
+# - xtensa-linux-nat.o
+EXTRA_ARCH_NATDEPFILES = \
+	sparc-nat.o \
+	sparc64-nat.o
+ifneq ($(filter $(NATDEPFILES),linux-nat.o),)
+# Files that require native linux.
+EXTRA_LINUX_NATDEPFILES = \
+	linux-nat-trad.o \
+	sparc-linux-nat.o \
+	ia64-linux-nat.o \
+	hppa-linux-nat.o \
+	aarch32-linux-nat.o \
+	arc-linux-nat.o \
+	arm-linux-nat.o \
+	or1k-linux-nat.o
+ifneq ($(filter $(CONFIG_OBS),alpha-tdep.o),)
+# Files that require native linux with --enable-64-bit-bfd.
+EXTRA_LINUX64_NATDEPFILES = \
+	sparc64-linux-nat.o \
+	alpha-linux-nat.o \
+	loongarch-linux-nat.o \
+	riscv-linux-nat.o \
+	nat/riscv-linux-tdesc.o \
+	tilegx-linux-nat.o
+endif
+endif
+EXTRA_NATDEPFILES = \
+	$(filter-out $(NATDEPFILES), \
+			$(EXTRA_ARCH_NATDEPFILES) \
+			$(EXTRA_LINUX_NATDEPFILES) \
+			$(EXTRA_LINUX64_NATDEPFILES))
+$(EXTRA_NATDEPFILES): INTERNAL_CFLAGS += -DEXTRA_NAT
+endif
+endif
+endif
+
 # Native-target dependent makefile fragment comes in here.
 @nat_makefile_frag@
 
@@ -1658,7 +1706,8 @@ HFILES_WITH_SRCDIR = \
 # variables analogous to SER_HARDWIRE which get defaulted in this
 # Makefile.in
 
-DEPFILES = $(TARGET_OBS) $(SER_HARDWIRE) $(NATDEPFILES) $(SIM_OBS)
+DEPFILES = $(TARGET_OBS) $(SER_HARDWIRE) $(NATDEPFILES) $(EXTRA_NATDEPFILES) \
+	$(SIM_OBS)
 
 ALLDEPFILES = \
 	arch/aarch32.c \

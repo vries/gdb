@@ -47,6 +47,21 @@ static hppa_linux_nat_target the_hppa_linux_nat_target;
 /* Prototypes for supply_gregset etc.  */
 #include "gregset.h"
 
+#ifdef EXTRA_NAT
+static const bool extra_nat = true;
+#define NAT(f) static ATTRIBUTE_USED hppa_linux_nat_ ## f
+#define greg_t unsigned long
+#define elf_greg_t unsigned long
+#define elf_gregset elf_greg_t *
+#define elf_fpreg_t double
+#define elf_fpregset_t elf_fpreg_t *
+#define gdb_gregset_t elf_gregset_t
+#define gdb_fpregset_t elf_fpregset_t
+#else
+static const bool extra_nat = false;
+#define NAT(f) f
+#endif
+
 /* These must match the order of the register names.
 
    Some sort of lookup table is needed because the offsets associated
@@ -54,6 +69,7 @@ static hppa_linux_nat_target the_hppa_linux_nat_target;
 
 static const int u_offsets[] =
   {
+#ifndef EXTRA_NAT
     /* general registers */
     -1,
     PT_GR1,
@@ -156,6 +172,7 @@ static const int u_offsets[] =
     PT_FR29, PT_FR29 + 4,
     PT_FR30, PT_FR30 + 4,
     PT_FR31, PT_FR31 + 4,
+#endif
   };
 
 static CORE_ADDR
@@ -312,7 +329,7 @@ hppa_linux_nat_target::store_registers (struct regcache *regcache, int regno)
    in *gregsetp.  */
 
 void
-supply_gregset (struct regcache *regcache, const gdb_gregset_t *gregsetp)
+NAT (supply_gregset) (struct regcache *regcache, const gdb_gregset_t *gregsetp)
 {
   int i;
   const greg_t *regp = (const elf_greg_t *) gregsetp;
@@ -329,8 +346,8 @@ supply_gregset (struct regcache *regcache, const gdb_gregset_t *gregsetp)
    If regno is -1, do this for all registers.  */
 
 void
-fill_gregset (const struct regcache *regcache,
-	      gdb_gregset_t *gregsetp, int regno)
+NAT (fill_gregset) (const struct regcache *regcache,
+		    gdb_gregset_t *gregsetp, int regno)
 {
   int i;
 
@@ -348,7 +365,8 @@ fill_gregset (const struct regcache *regcache,
    idea of the current floating point register values.  */
 
 void
-supply_fpregset (struct regcache *regcache, const gdb_fpregset_t *fpregsetp)
+NAT (supply_fpregset) (struct regcache *regcache,
+		       const gdb_fpregset_t *fpregsetp)
 {
   int regi;
   const char *from;
@@ -367,8 +385,8 @@ supply_fpregset (struct regcache *regcache, const gdb_fpregset_t *fpregsetp)
    them all.  */
 
 void
-fill_fpregset (const struct regcache *regcache,
-	       gdb_fpregset_t *fpregsetp, int regno)
+NAT (fill_fpregset) (const struct regcache *regcache,
+		     gdb_fpregset_t *fpregsetp, int regno)
 {
   int i;
 
@@ -387,6 +405,9 @@ void _initialize_hppa_linux_nat ();
 void
 _initialize_hppa_linux_nat ()
 {
+  if (extra_nat)
+    return;
+
   /* Register the target.  */
   linux_target = &the_hppa_linux_nat_target;
   add_inf_child_target (&the_hppa_linux_nat_target);

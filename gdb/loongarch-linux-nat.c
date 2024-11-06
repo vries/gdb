@@ -32,6 +32,12 @@
 
 #include <asm/ptrace.h>
 
+#ifdef EXTRA_NAT
+static const bool extra_nat = true;
+#else
+static const bool extra_nat = false;
+#endif
+
 /* LoongArch Linux native additions to the default Linux support.  */
 
 class loongarch_linux_nat_target final : public linux_nat_trad_target
@@ -764,6 +770,9 @@ void _initialize_loongarch_linux_nat ();
 void
 _initialize_loongarch_linux_nat ()
 {
+  if (extra_nat)
+    return;
+
   linux_target = &the_loongarch_linux_nat_target;
   add_inf_child_target (&the_loongarch_linux_nat_target);
 

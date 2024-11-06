@@ -762,6 +762,8 @@ AMD_DBGAPI_LIBS
 AMD_DBGAPI_CFLAGS
 ENABLE_BFD_64_BIT_FALSE
 ENABLE_BFD_64_BIT_TRUE
+DEVELOPMENT
+ENABLE_TARGETS
 subdirs
 GDB_DATADIR
 DEBUGDIR
@@ -11499,7 +11501,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11502 "configure"
+#line 11504 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -11605,7 +11607,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 11608 "configure"
+#line 11610 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -24838,6 +24840,10 @@ _ACEOF
 	;;
 esac
 fi
+
+ENABLE_TARGETS=$enable_targets
+
+DEVELOPMENT=$development
 
 
 

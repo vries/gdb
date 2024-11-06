@@ -28,6 +28,16 @@
 
 #include <sys/ptrace.h>
 
+#ifdef EXTRA_NAT
+static const bool extra_nat = true;
+#define NAT(f) static ATTRIBUTE_USED riscv_linux_nat_ ## f
+#undef ELF_NFPREG
+#define ELF_NFPREG 0
+#else
+static const bool extra_nat = false;
+#define NAT(f) f
+#endif
+
 /* Work around glibc header breakage causing ELF_NFPREG not to be usable.  */
 #ifndef NFPREG
 # define NFPREG 33
@@ -81,7 +91,7 @@ supply_gregset_regnum (struct regcache *regcache, const prgregset_t *gregs,
 /* Copy all general purpose registers from regset GREGS into REGCACHE.  */
 
 void
-supply_gregset (struct regcache *regcache, const prgregset_t *gregs)
+NAT (supply_gregset) (struct regcache *regcache, const prgregset_t *gregs)
 {
   supply_gregset_regnum (regcache, gregs, -1);
 }
@@ -127,7 +137,7 @@ supply_fpregset_regnum (struct regcache *regcache, const prfpregset_t *fpregs,
 /* Copy all floating point registers from regset FPREGS into REGCACHE.  */
 
 void
-supply_fpregset (struct regcache *regcache, const prfpregset_t *fpregs)
+NAT (supply_fpregset) (struct regcache *regcache, const prfpregset_t *fpregs)
 {
   supply_fpregset_regnum (regcache, fpregs, -1);
 }
@@ -136,7 +146,8 @@ supply_fpregset (struct regcache *regcache, const prfpregset_t *fpregs)
    from REGCACHE into regset GREGS.  */
 
 void
-fill_gregset (const struct regcache *regcache, prgregset_t *gregs, int regnum)
+NAT (fill_gregset) (const struct regcache *regcache, prgregset_t *gregs,
+		    int regnum)
 {
   elf_greg_t *regp = *gregs;
 
@@ -161,8 +172,8 @@ fill_gregset (const struct regcache *regcache, prgregset_t *gregs, int regnum)
    from REGCACHE into regset FPREGS.  */
 
 void
-fill_fpregset (const struct regcache *regcache, prfpregset_t *fpregs,
-	       int regnum)
+NAT (fill_fpregset) (const struct regcache *regcache, prfpregset_t *fpregs,
+		     int regnum)
 {
   int flen = register_size (regcache->arch (), RISCV_FIRST_FP_REGNUM);
   union
@@ -333,6 +344,9 @@ void _initialize_riscv_linux_nat ();
 void
 _initialize_riscv_linux_nat ()
 {
+  if (extra_nat)
+    return;
+
   /* Register the target.  */
   linux_target = &the_riscv_linux_nat_target;
   add_inf_child_target (&the_riscv_linux_nat_target);

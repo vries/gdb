@@ -58,6 +58,20 @@ typedef struct fp_status fpregset_t;
 #endif
 #endif
 
+#ifdef EXTRA_NAT
+static const bool extra_nat = true;
+#undef PTRACE_GETREGS
+#define PTRACE_GETREGS ((PTRACE_TYPE_ARG1)0)
+#undef PTRACE_SETREGS
+#define PTRACE_SETREGS ((PTRACE_TYPE_ARG1)0)
+#undef PTRACE_GETFPREGS
+#define PTRACE_GETFPREGS ((PTRACE_TYPE_ARG1)0)
+#undef PTRACE_SETFPREGS
+#define PTRACE_SETFPREGS ((PTRACE_TYPE_ARG1)0)
+#else
+static const bool extra_nat = false;
+#endif
+
 /* Second, we need to remap the BSD ptrace(2) requests to their SunOS
    equivalents.  GNU/Linux already follows SunOS here.  */
 
@@ -313,6 +327,9 @@ void _initialize_sparc_nat ();
 void
 _initialize_sparc_nat ()
 {
+  if (extra_nat)
+    return;
+
   /* Default to using SunOS 4 register sets.  */
   if (sparc_gregmap == NULL)
     sparc_gregmap = &sparc32_sunos4_gregmap;

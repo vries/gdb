@@ -190,6 +190,8 @@ AS_HELP_STRING([--enable-targets=TARGETS], [alternative target configurations]),
 			   Additional targets configured into GDB. )
 	;;
 esac])
+AC_SUBST(ENABLE_TARGETS, $enable_targets)
+AC_SUBST(DEVELOPMENT, $development)
 
 
 BFD_64_BIT

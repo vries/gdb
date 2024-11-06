@@ -45,6 +45,16 @@
 /* Defines ps_err_e, struct ps_prochandle.  */
 #include "gdb_proc_service.h"
 
+#ifdef EXTRA_NAT
+static const bool extra_nat = true;
+#define NAT(f) static ATTRIBUTE_USED arc_linux_nat_ ## f
+#undef PTRACE_GET_THREAD_AREA
+#define PTRACE_GET_THREAD_AREA ((PTRACE_TYPE_ARG1)0)
+#else
+static const bool extra_nat = false;
+#define NAT(f) f
+#endif
+
 /* Print an "arc-linux-nat" debug statement.  */
 
 #define arc_linux_nat_debug_printf(fmt, ...) \
@@ -201,8 +211,8 @@ arc_linux_nat_target::store_registers (struct regcache *regcache, int regnum)
    This function is exported to proc-service.c  */
 
 void
-fill_gregset (const struct regcache *regcache,
-	      gdb_gregset_t *gregs, int regnum)
+NAT (fill_gregset) (const struct regcache *regcache,
+		    gdb_gregset_t *gregs, int regnum)
 {
   arc_linux_collect_gregset (NULL, regcache, regnum, gregs, 0);
 }
@@ -211,7 +221,7 @@ fill_gregset (const struct regcache *regcache,
    This function is exported to proc-service.c.  */
 
 void
-supply_gregset (struct regcache *regcache, const gdb_gregset_t *gregs)
+NAT (supply_gregset) (struct regcache *regcache, const gdb_gregset_t *gregs)
 {
   arc_linux_supply_gregset (NULL, regcache, -1, gregs, 0);
 }
@@ -220,8 +230,8 @@ supply_gregset (struct regcache *regcache, const gdb_gregset_t *gregs)
    to proc-service.c.  */
 
 void
-fill_fpregset (const struct regcache *regcache,
-	       gdb_fpregset_t *fpregsetp, int regnum)
+NAT (fill_fpregset) (const struct regcache *regcache,
+		     gdb_fpregset_t *fpregsetp, int regnum)
 {
   arc_linux_nat_debug_printf ("called");
 }
@@ -230,7 +240,8 @@ fill_fpregset (const struct regcache *regcache,
    to proc-service.c.  */
 
 void
-supply_fpregset (struct regcache *regcache, const gdb_fpregset_t *fpregsetp)
+NAT (supply_fpregset) (struct regcache *regcache,
+		       const gdb_fpregset_t *fpregsetp)
 {
   arc_linux_nat_debug_printf ("called");
 }
@@ -292,8 +303,8 @@ arc_linux_nat_target::low_prepare_to_resume (struct lwp_info *lwp)
    This is required to debug multithreaded applications with NPTL.  */
 
 ps_err_e
-ps_get_thread_area (struct ps_prochandle *ph, lwpid_t lwpid, int idx,
-		    void **base)
+NAT (ps_get_thread_area) (struct ps_prochandle *ph, lwpid_t lwpid, int idx,
+			  void **base)
 {
   arc_linux_nat_debug_printf ("called");
 
@@ -313,6 +324,9 @@ void _initialize_arc_linux_nat ();
 void
 _initialize_arc_linux_nat ()
 {
+  if (extra_nat)
+    return;
+
   /* Register the target.  */
   linux_target = &the_arc_linux_nat_target;
   add_inf_child_target (&the_arc_linux_nat_target);

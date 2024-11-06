@@ -27,6 +27,14 @@
 #include "target.h"
 #include "linux-nat.h"
 
+#ifdef EXTRA_NAT
+static const bool extra_nat = true;
+#define NAT(f) static ATTRIBUTE_USED sparc_linux_nat_ ## f
+#else
+static const bool extra_nat = false;
+#define NAT(f) f
+#endif
+
 class sparc_linux_nat_target final : public linux_nat_target
 {
 public:
@@ -41,26 +49,27 @@ public:
 static sparc_linux_nat_target the_sparc_linux_nat_target;
 
 void
-supply_gregset (struct regcache *regcache, const prgregset_t *gregs)
+NAT (supply_gregset) (struct regcache *regcache, const prgregset_t *gregs)
 {
   sparc32_supply_gregset (sparc_gregmap, regcache, -1, gregs);
 }
 
 void
-supply_fpregset (struct regcache *regcache, const prfpregset_t *fpregs)
+NAT (supply_fpregset) (struct regcache *regcache, const prfpregset_t *fpregs)
 {
   sparc32_supply_fpregset (sparc_fpregmap, regcache, -1, fpregs);
 }
 
 void
-fill_gregset (const struct regcache *regcache, prgregset_t *gregs, int regnum)
+NAT (fill_gregset) (const struct regcache *regcache, prgregset_t *gregs,
+		    int regnum)
 {
   sparc32_collect_gregset (sparc_gregmap, regcache, regnum, gregs);
 }
 
 void
-fill_fpregset (const struct regcache *regcache,
-	       prfpregset_t *fpregs, int regnum)
+NAT (fill_fpregset) (const struct regcache *regcache,
+		     prfpregset_t *fpregs, int regnum)
 {
   sparc32_collect_fpregset (sparc_fpregmap, regcache, regnum, fpregs);
 }
@@ -69,6 +78,9 @@ void _initialize_sparc_linux_nat ();
 void
 _initialize_sparc_linux_nat ()
 {
+  if (extra_nat)
+    return;
+
   sparc_fpregmap = &sparc32_bsd_fpregmap;
 
   /* Register the target.  */

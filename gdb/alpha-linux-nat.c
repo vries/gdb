@@ -24,10 +24,26 @@
 #include "gdbarch.h"
 
 #include "nat/gdb_ptrace.h"
+#ifndef EXTRA_NAT
 #include <alpha/ptrace.h>
+#endif
 
 #include <sys/procfs.h>
 #include "gregset.h"
+
+#ifdef EXTRA_NAT
+static const bool extra_nat = true;
+#define NAT(f) static ATTRIBUTE_USED alpha_linux_nat_ ## f
+#undef PC
+#define PC 0
+#undef GPR_BASE
+#define GPR_BASE 0
+#undef FPR_BASE
+#define FPR_BASE 0
+#else
+static const bool extra_nat = false;
+#define NAT(f) f
+#endif
 
 /* The address of UNIQUE for ptrace.  */
 #define ALPHA_UNIQUE_PTRACE_ADDR 65
@@ -46,7 +62,7 @@ static alpha_linux_nat_target the_alpha_linux_nat_target;
    functions.  */
 
 void
-supply_gregset (struct regcache *regcache, const gdb_gregset_t *gregsetp)
+NAT (supply_gregset) (struct regcache *regcache, const gdb_gregset_t *gregsetp)
 {
   const long *regp = (const long *)gregsetp;
 
@@ -55,8 +71,8 @@ supply_gregset (struct regcache *regcache, const gdb_gregset_t *gregsetp)
 }
 
 void
-fill_gregset (const struct regcache *regcache,
-	      gdb_gregset_t *gregsetp, int regno)
+NAT (fill_gregset) (const struct regcache *regcache,
+		    gdb_gregset_t *gregsetp, int regno)
 {
   long *regp = (long *)gregsetp;
 
@@ -68,7 +84,8 @@ fill_gregset (const struct regcache *regcache,
    Again, see the comments in m68k-tdep.c.  */
 
 void
-supply_fpregset (struct regcache *regcache, const gdb_fpregset_t *fpregsetp)
+NAT (supply_fpregset) (struct regcache *regcache,
+		       const gdb_fpregset_t *fpregsetp)
 {
   const long *regp = (const long *)fpregsetp;
 
@@ -77,8 +94,8 @@ supply_fpregset (struct regcache *regcache, const gdb_fpregset_t *fpregsetp)
 }
 
 void
-fill_fpregset (const struct regcache *regcache,
-	       gdb_fpregset_t *fpregsetp, int regno)
+NAT (fill_fpregset) (const struct regcache *regcache,
+		     gdb_fpregset_t *fpregsetp, int regno)
 {
   long *regp = (long *)fpregsetp;
 
@@ -104,6 +121,9 @@ void _initialize_alpha_linux_nat ();
 void
 _initialize_alpha_linux_nat ()
 {
+  if (extra_nat)
+    return;
+
   linux_target = &the_alpha_linux_nat_target;
   add_inf_child_target (&the_alpha_linux_nat_target);
 }

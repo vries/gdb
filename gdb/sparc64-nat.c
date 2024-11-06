@@ -22,6 +22,12 @@
 #include "sparc64-tdep.h"
 #include "sparc-nat.h"
 
+#ifdef EXTRA_NAT
+static const bool extra_nat = true;
+#else
+static const bool extra_nat = false;
+#endif
+
 /* Determine whether `gregset_t' contains register REGNUM.  */
 
 static int
@@ -72,6 +78,9 @@ void _initialize_sparc64_nat ();
 void
 _initialize_sparc64_nat ()
 {
+  if (extra_nat)
+    return;
+
   sparc_supply_gregset = sparc64_supply_gregset;
   sparc_collect_gregset = sparc64_collect_gregset;
   sparc_supply_fpregset = sparc64_supply_fpregset;

@@ -27,6 +27,14 @@
 
 #include <sys/ptrace.h>
 
+#ifdef EXTRA_NAT
+static const bool extra_nat = true;
+#define NAT(f) static ATTRIBUTE_USED or1k_linux_nat_ ## f
+#else
+static const bool extra_nat = false;
+#define NAT(f) f
+#endif
+
 /* OpenRISC Linux native additions to the default linux support.  */
 
 class or1k_linux_nat_target final : public linux_nat_target
@@ -76,7 +84,7 @@ supply_gregset_regnum (struct regcache *regcache, const prgregset_t *gregs,
 /* Copy all general purpose registers from regset GREGS into REGCACHE.  */
 
 void
-supply_gregset (struct regcache *regcache, const prgregset_t *gregs)
+NAT (supply_gregset) (struct regcache *regcache, const prgregset_t *gregs)
 {
   supply_gregset_regnum (regcache, gregs, -1);
 }
@@ -85,7 +93,8 @@ supply_gregset (struct regcache *regcache, const prgregset_t *gregs)
    from REGCACHE into regset GREGS.  */
 
 void
-fill_gregset (const struct regcache *regcache, prgregset_t *gregs, int regnum)
+NAT (fill_gregset) (const struct regcache *regcache, prgregset_t *gregs,
+		    int regnum)
 {
   elf_greg_t *regp = *gregs;
 
@@ -111,13 +120,13 @@ fill_gregset (const struct regcache *regcache, prgregset_t *gregs, int regnum)
    nothing.  */
 
 void
-supply_fpregset (struct regcache *regcache, const gdb_fpregset_t *fpregs)
+NAT (supply_fpregset) (struct regcache *regcache, const gdb_fpregset_t *fpregs)
 {
 }
 
 void
-fill_fpregset (const struct regcache *regcache,
-	       gdb_fpregset_t *fpregs, int regno)
+NAT (fill_fpregset) (const struct regcache *regcache,
+		     gdb_fpregset_t *fpregs, int regno)
 {
 }
 
@@ -203,6 +212,9 @@ void _initialize_or1k_linux_nat ();
 void
 _initialize_or1k_linux_nat ()
 {
+  if (extra_nat)
+    return;
+
   /* Register the target.  */
   linux_target = &the_or1k_linux_nat_target;
   add_inf_child_target (&the_or1k_linux_nat_target);

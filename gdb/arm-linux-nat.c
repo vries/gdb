@@ -46,6 +46,22 @@
 /* Defines ps_err_e, struct ps_prochandle.  */
 #include "gdb_proc_service.h"
 
+#ifdef EXTRA_NAT
+static const bool extra_nat = true;
+#define NAT(f) static ATTRIBUTE_USED arm_linux_nat_ ## f
+#undef PT_GETFPREGS
+#define PT_GETFPREGS ((PTRACE_TYPE_ARG1)0)
+#undef PTRACE_SETFPREGS
+#define PTRACE_SETFPREGS ((PTRACE_TYPE_ARG1)0)
+#undef PTRACE_GETREGS
+#define PTRACE_GETREGS ((PTRACE_TYPE_ARG1)0)
+#undef PTRACE_SETREGS
+#define PTRACE_SETREGS ((PTRACE_TYPE_ARG1)0)
+#else
+static const bool extra_nat = false;
+#define NAT(f) f
+#endif
+
 #ifndef PTRACE_GET_THREAD_AREA
 #define PTRACE_GET_THREAD_AREA 22
 #endif
@@ -483,21 +499,21 @@ arm_linux_nat_target::store_registers (struct regcache *regcache, int regno)
    thread debugging.  */
 
 void
-fill_gregset (const struct regcache *regcache,	
-	      gdb_gregset_t *gregsetp, int regno)
+NAT (fill_gregset) (const struct regcache *regcache,
+		    gdb_gregset_t *gregsetp, int regno)
 {
   arm_linux_collect_gregset (NULL, regcache, regno, gregsetp, 0);
 }
 
 void
-supply_gregset (struct regcache *regcache, const gdb_gregset_t *gregsetp)
+NAT (supply_gregset) (struct regcache *regcache, const gdb_gregset_t *gregsetp)
 {
   arm_linux_supply_gregset (NULL, regcache, -1, gregsetp, 0);
 }
 
 void
-fill_fpregset (const struct regcache *regcache,
-	       gdb_fpregset_t *fpregsetp, int regno)
+NAT (fill_fpregset) (const struct regcache *regcache,
+		     gdb_fpregset_t *fpregsetp, int regno)
 {
   arm_linux_collect_nwfpe (NULL, regcache, regno, fpregsetp, 0);
 }
@@ -506,7 +522,8 @@ fill_fpregset (const struct regcache *regcache,
    in *fpregsetp.  */
 
 void
-supply_fpregset (struct regcache *regcache, const gdb_fpregset_t *fpregsetp)
+NAT (supply_fpregset) (struct regcache *regcache,
+		       const gdb_fpregset_t *fpregsetp)
 {
   arm_linux_supply_nwfpe (NULL, regcache, -1, fpregsetp, 0);
 }
@@ -514,8 +531,8 @@ supply_fpregset (struct regcache *regcache, const gdb_fpregset_t *fpregsetp)
 /* Fetch the thread-local storage pointer for libthread_db.  */
 
 ps_err_e
-ps_get_thread_area (struct ps_prochandle *ph,
-		    lwpid_t lwpid, int idx, void **base)
+NAT (ps_get_thread_area) (struct ps_prochandle *ph,
+			  lwpid_t lwpid, int idx, void **base)
 {
   if (ptrace (PTRACE_GET_THREAD_AREA, lwpid, NULL, base) != 0)
     return PS_ERR;
@@ -1397,6 +1414,9 @@ void _initialize_arm_linux_nat ();
 void
 _initialize_arm_linux_nat ()
 {
+  if (extra_nat)
+    return;
+
   /* Register the target.  */
   linux_target = &the_arm_linux_nat_target;
   add_inf_child_target (&the_arm_linux_nat_target);

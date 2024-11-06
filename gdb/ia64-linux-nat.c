@@ -35,13 +35,41 @@
 #include <sys/syscall.h>
 #include <sys/user.h>
 
+#ifndef EXTRA_NAT
 #include <asm/ptrace_offsets.h>
+#endif
 #include <sys/procfs.h>
 
 /* Prototypes for supply_gregset etc.  */
 #include "gregset.h"
 
 #include "inf-ptrace.h"
+
+#ifdef EXTRA_NAT
+static const bool extra_nat = true;
+#define NAT(f) static ATTRIBUTE_USED ia64_linux_nat_ ## f
+#define greg_t unsigned long
+#define gregset_t greg_t *
+#define fpreg_t long double
+#define fpregset_t fpreg_t *
+#undef PT_DBR
+#define PT_DBR 0
+#undef __NR_getunwind
+#define __NR_getunwind 0
+#define IA64_PSR_DB (CORE_ADDR)0
+#define IA64_PSR_DD (CORE_ADDR)0
+#define IA64_DBR_MASK_W 0L
+#define IA64_DBR_MASK_R 0L
+#define IA64_DBR_MASK_RW 0L
+#else
+static const bool extra_nat = false;
+#define NAT(f) f
+#define IA64_PSR_DB (1UL << 24)
+#define IA64_PSR_DD (1UL << 39)
+#define IA64_DBR_MASK_W (1L << 62)
+#define IA64_DBR_MASK_R (1L << 63)
+#define IA64_DBR_MASK_RW (3L << 62)
+#endif
 
 class ia64_linux_nat_target final : public linux_nat_target
 {
@@ -93,6 +121,7 @@ static ia64_linux_nat_target the_ia64_linux_nat_target;
 
 static int u_offsets[] =
   {
+#ifndef EXTRA_NAT
     /* general registers */
     -1,		/* gr0 not available; i.e, it's always zero.  */
     PT_R1,
@@ -342,6 +371,7 @@ static int u_offsets[] =
     -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1,
     -1, -1, -1, -1, -1, -1, -1, -1,
+#endif
   };
 
 static CORE_ADDR
@@ -407,7 +437,7 @@ ia64_cannot_store_register (struct gdbarch *gdbarch, int regno)
 }
 
 void
-supply_gregset (struct regcache *regcache, const gregset_t *gregsetp)
+NAT (supply_gregset) (struct regcache *regcache, const gregset_t *gregsetp)
 {
   int regi;
   const greg_t *regp = (const greg_t *) gregsetp;
@@ -443,7 +473,8 @@ supply_gregset (struct regcache *regcache, const gregset_t *gregsetp)
 }
 
 void
-fill_gregset (const struct regcache *regcache, gregset_t *gregsetp, int regno)
+NAT (fill_gregset) (const struct regcache *regcache,
+		    gregset_t *gregsetp, int regno)
 {
   int regi;
   greg_t *regp = (greg_t *) gregsetp;
@@ -486,7 +517,7 @@ fill_gregset (const struct regcache *regcache, gregset_t *gregsetp, int regno)
    idea of the current floating point register values.  */
 
 void
-supply_fpregset (struct regcache *regcache, const fpregset_t *fpregsetp)
+NAT (supply_fpregset) (struct regcache *regcache, const fpregset_t *fpregsetp)
 {
   int regi;
   const char *from;
@@ -516,8 +547,8 @@ supply_fpregset (struct regcache *regcache, const fpregset_t *fpregsetp)
    them all.  */
 
 void
-fill_fpregset (const struct regcache *regcache,
-	       fpregset_t *fpregsetp, int regno)
+NAT (fill_fpregset) (const struct regcache *regcache,
+		     fpregset_t *fpregsetp, int regno)
 {
   int regi;
 
@@ -527,9 +558,6 @@ fill_fpregset (const struct regcache *regcache,
 	regcache->raw_collect (regi, &((*fpregsetp)[regi - IA64_FR0_REGNUM]));
     }
 }
-
-#define IA64_PSR_DB (1UL << 24)
-#define IA64_PSR_DD (1UL << 39)
 
 void
 ia64_linux_nat_target::enable_watchpoints_in_psr (ptid_t ptid)
@@ -598,7 +626,7 @@ ia64_linux_nat_target::insert_watchpoint (CORE_ADDR addr, int len,
   for (idx = 0; idx < max_watchpoints; idx++)
     {
       dbr_mask = debug_registers[idx * 2 + 1];
-      if ((dbr_mask & (0x3UL << 62)) == 0)
+      if ((dbr_mask & IA64_DBR_MASK_RW) == 0)
 	{
 	  /* Exit loop if both r and w bits clear.  */
 	  break;
@@ -614,13 +642,16 @@ ia64_linux_nat_target::insert_watchpoint (CORE_ADDR addr, int len,
   switch (type)
     {
     case hw_write:
-      dbr_mask |= (1L << 62);			/* Set w bit */
+      /* Set w bit.  */
+      dbr_mask |= IA64_DBR_MASK_W;
       break;
     case hw_read:
-      dbr_mask |= (1L << 63);			/* Set r bit */
+      /* Set r bit.  */
+      dbr_mask |= IA64_DBR_MASK_R;
       break;
     case hw_access:
-      dbr_mask |= (3L << 62);			/* Set both r and w bits */
+      /* Set both r and w bits.  */
+      dbr_mask |= IA64_DBR_MASK_RW;
       break;
     default:
       return -1;
@@ -654,7 +685,7 @@ ia64_linux_nat_target::remove_watchpoint (CORE_ADDR addr, int len,
     {
       dbr_addr = debug_registers[2 * idx];
       dbr_mask = debug_registers[2 * idx + 1];
-      if ((dbr_mask & (0x3UL << 62)) && addr == (CORE_ADDR) dbr_addr)
+      if ((dbr_mask & IA64_DBR_MASK_RW) && addr == (CORE_ADDR) dbr_addr)
 	{
 	  debug_registers[2 * idx] = 0;
 	  debug_registers[2 * idx + 1] = 0;
@@ -925,6 +956,9 @@ void _initialize_ia64_linux_nat ();
 void
 _initialize_ia64_linux_nat ()
 {
+  if (extra_nat)
+    return;
+
   /* Register the target.  */
   linux_target = &the_ia64_linux_nat_target;
   add_inf_child_target (&the_ia64_linux_nat_target);

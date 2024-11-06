@@ -25,6 +25,20 @@
 
 #include <sys/uio.h>
 
+#ifdef EXTRA_NAT
+#undef ELF_NFPREG
+#define ELF_NFPREG 0
+struct __riscv_f_ext_state
+{
+  unsigned __f[1];
+};
+union __riscv_fp_state
+{
+  struct __riscv_f_ext_state __f;
+};
+#define elf_fpregset_t union __riscv_fp_state
+#endif
+
 /* Work around glibc header breakage causing ELF_NFPREG not to be usable.  */
 #ifndef NFPREG
 # define NFPREG 33

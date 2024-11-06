@@ -33,6 +33,18 @@
 /* Prototypes for supply_gregset etc.  */
 #include "gregset.h"
 
+#ifdef EXTRA_NAT
+static const bool extra_nat = true;
+#define NAT(f) static ATTRIBUTE_USED tilegx_linux_nat_ ## f
+#undef PTRACE_GETREGS
+#define PTRACE_GETREGS ((PTRACE_TYPE_ARG1)0)
+#undef PTRACE_SETREGS
+#define PTRACE_SETREGS ((PTRACE_TYPE_ARG1)0)
+#else
+static const bool extra_nat = false;
+#define NAT(f) f
+#endif
+
 class tilegx_linux_nat_target final : public linux_nat_target
 {
 public:
@@ -79,8 +91,8 @@ static const int regmap[] =
    in *GREGSETP.  */
 
 void
-supply_gregset (struct regcache* regcache,
-		const elf_gregset_t *gregsetp)
+NAT (supply_gregset) (struct regcache* regcache,
+		      const elf_gregset_t *gregsetp)
 {
   elf_greg_t *regp = (elf_greg_t *) gregsetp;
   int i;
@@ -94,8 +106,8 @@ supply_gregset (struct regcache* regcache,
    register array.  */
 
 void
-fill_gregset (const struct regcache* regcache,
-	      elf_gregset_t *gregsetp, int regno)
+NAT (fill_gregset) (const struct regcache* regcache,
+		    elf_gregset_t *gregsetp, int regno)
 {
   elf_greg_t *regp = (elf_greg_t *) gregsetp;
   int i;
@@ -111,8 +123,8 @@ fill_gregset (const struct regcache* regcache,
    *FPREGSETP.  */
 
 void
-supply_fpregset (struct regcache *regcache,
-		 const elf_fpregset_t *fpregsetp)
+NAT (supply_fpregset) (struct regcache *regcache,
+		       const elf_fpregset_t *fpregsetp)
 {
   /* NOTE: There are no floating-point registers for TILE-Gx.  */
 }
@@ -122,8 +134,8 @@ supply_fpregset (struct regcache *regcache,
    do this for all registers.  */
 
 void
-fill_fpregset (const struct regcache *regcache,
-	       elf_fpregset_t *fpregsetp, int regno)
+NAT (fill_fpregset) (const struct regcache *regcache,
+		     elf_fpregset_t *fpregsetp, int regno)
 {
   /* NOTE: There are no floating-point registers for TILE-Gx.  */
 }
@@ -167,6 +179,9 @@ void _initialize_tile_linux_nat ();
 void
 _initialize_tile_linux_nat ()
 {
+  if (extra_nat)
+    return;
+
   linux_target = &the_tilegx_linux_nat_target;
   add_inf_child_target (&the_tilegx_linux_nat_target);
 }
