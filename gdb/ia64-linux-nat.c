@@ -414,32 +414,32 @@ supply_gregset (struct regcache *regcache, const gregset_t *gregsetp)
 
   for (regi = IA64_GR0_REGNUM; regi <= IA64_GR31_REGNUM; regi++)
     {
-      regcache->raw_supply (regi, regp + (regi - IA64_GR0_REGNUM));
+      regcache->deprecated_raw_supply (regi, regp + (regi - IA64_GR0_REGNUM));
     }
 
   /* FIXME: NAT collection bits are at index 32; gotta deal with these
      somehow...  */
 
-  regcache->raw_supply (IA64_PR_REGNUM, regp + 33);
+  regcache->deprecated_raw_supply (IA64_PR_REGNUM, regp + 33);
 
   for (regi = IA64_BR0_REGNUM; regi <= IA64_BR7_REGNUM; regi++)
     {
-      regcache->raw_supply (regi, regp + 34 + (regi - IA64_BR0_REGNUM));
+      regcache->deprecated_raw_supply (regi, regp + 34 + (regi - IA64_BR0_REGNUM));
     }
 
-  regcache->raw_supply (IA64_IP_REGNUM, regp + 42);
-  regcache->raw_supply (IA64_CFM_REGNUM, regp + 43);
-  regcache->raw_supply (IA64_PSR_REGNUM, regp + 44);
-  regcache->raw_supply (IA64_RSC_REGNUM, regp + 45);
-  regcache->raw_supply (IA64_BSP_REGNUM, regp + 46);
-  regcache->raw_supply (IA64_BSPSTORE_REGNUM, regp + 47);
-  regcache->raw_supply (IA64_RNAT_REGNUM, regp + 48);
-  regcache->raw_supply (IA64_CCV_REGNUM, regp + 49);
-  regcache->raw_supply (IA64_UNAT_REGNUM, regp + 50);
-  regcache->raw_supply (IA64_FPSR_REGNUM, regp + 51);
-  regcache->raw_supply (IA64_PFS_REGNUM, regp + 52);
-  regcache->raw_supply (IA64_LC_REGNUM, regp + 53);
-  regcache->raw_supply (IA64_EC_REGNUM, regp + 54);
+  regcache->deprecated_raw_supply (IA64_IP_REGNUM, regp + 42);
+  regcache->deprecated_raw_supply (IA64_CFM_REGNUM, regp + 43);
+  regcache->deprecated_raw_supply (IA64_PSR_REGNUM, regp + 44);
+  regcache->deprecated_raw_supply (IA64_RSC_REGNUM, regp + 45);
+  regcache->deprecated_raw_supply (IA64_BSP_REGNUM, regp + 46);
+  regcache->deprecated_raw_supply (IA64_BSPSTORE_REGNUM, regp + 47);
+  regcache->deprecated_raw_supply (IA64_RNAT_REGNUM, regp + 48);
+  regcache->deprecated_raw_supply (IA64_CCV_REGNUM, regp + 49);
+  regcache->deprecated_raw_supply (IA64_UNAT_REGNUM, regp + 50);
+  regcache->deprecated_raw_supply (IA64_FPSR_REGNUM, regp + 51);
+  regcache->deprecated_raw_supply (IA64_PFS_REGNUM, regp + 52);
+  regcache->deprecated_raw_supply (IA64_LC_REGNUM, regp + 53);
+  regcache->deprecated_raw_supply (IA64_EC_REGNUM, regp + 54);
 }
 
 void
@@ -450,7 +450,7 @@ fill_gregset (const struct regcache *regcache, gregset_t *gregsetp, int regno)
 
 #define COPY_REG(_idx_,_regi_) \
   if ((regno == -1) || regno == _regi_) \
-    regcache->raw_collect (_regi_, regp + _idx_)
+    regcache->deprecated_raw_collect (_regi_, regp + _idx_)
 
   for (regi = IA64_GR0_REGNUM; regi <= IA64_GR31_REGNUM; regi++)
     {
@@ -500,12 +500,12 @@ supply_fpregset (struct regcache *regcache, const fpregset_t *fpregsetp)
   /* fr0 is always read as zero.  */
   regcache->raw_supply_zeroed (IA64_FR0_REGNUM);
   /* fr1 is always read as one (1.0).  */
-  regcache->raw_supply (IA64_FR1_REGNUM, f_one);
+  regcache->deprecated_raw_supply (IA64_FR1_REGNUM, f_one);
 
   for (regi = IA64_FR2_REGNUM; regi <= IA64_FR127_REGNUM; regi++)
     {
       from = (const char *) &((*fpregsetp)[regi - IA64_FR0_REGNUM]);
-      regcache->raw_supply (regi, from);
+      regcache->deprecated_raw_supply (regi, from);
     }
 }
 
@@ -523,7 +523,7 @@ fill_fpregset (const struct regcache *regcache,
   for (regi = IA64_FR0_REGNUM; regi <= IA64_FR127_REGNUM; regi++)
     {
       if ((regno == -1) || (regno == regi))
-	regcache->raw_collect (regi, &((*fpregsetp)[regi - IA64_FR0_REGNUM]));
+	regcache->deprecated_raw_collect (regi, &((*fpregsetp)[regi - IA64_FR0_REGNUM]));
     }
 }
 
@@ -757,13 +757,13 @@ ia64_linux_fetch_register (struct regcache *regcache, int regnum)
 	{ 0, 0, 0, 0, 0, 0, 0, 0x80, 0xff, 0xff, 0, 0, 0, 0, 0, 0 };
 
       gdb_assert (sizeof (f_one) == register_size (gdbarch, regnum));
-      regcache->raw_supply (regnum, f_one);
+      regcache->deprecated_raw_supply (regnum, f_one);
       return;
     }
 
   if (ia64_cannot_fetch_register (gdbarch, regnum))
     {
-      regcache->raw_supply (regnum, NULL);
+      regcache->deprecated_raw_supply (regnum, NULL);
       return;
     }
 
@@ -788,7 +788,7 @@ ia64_linux_fetch_register (struct regcache *regcache, int regnum)
 
       addr += sizeof (PTRACE_TYPE_RET);
     }
-  regcache->raw_supply (regnum, buf);
+  regcache->deprecated_raw_supply (regnum, buf);
 }
 
 /* Fetch register REGNUM from the inferior.  If REGNUM is -1, do this
@@ -831,7 +831,7 @@ ia64_linux_store_register (const struct regcache *regcache, int regnum)
   buf = (PTRACE_TYPE_RET *) alloca (size);
 
   /* Write the register contents into the inferior a chunk at a time.  */
-  regcache->raw_collect (regnum, buf);
+  regcache->deprecated_raw_collect (regnum, buf);
   for (i = 0; i < size / sizeof (PTRACE_TYPE_RET); i++)
     {
       errno = 0;

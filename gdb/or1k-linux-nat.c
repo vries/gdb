@@ -57,10 +57,10 @@ supply_gregset_regnum (struct regcache *regcache, const prgregset_t *gregs,
     {
       /* We fill the general purpose registers.  */
       for (i = OR1K_ZERO_REGNUM + 1; i < OR1K_MAX_GPR_REGS; i++)
-	regcache->raw_supply (i, regp + i);
+	regcache->deprecated_raw_supply (i, regp + i);
 
       /* Supply OR1K_NPC_REGNUM from index 32.  */
-      regcache->raw_supply (OR1K_NPC_REGNUM, regp + 32);
+      regcache->deprecated_raw_supply (OR1K_NPC_REGNUM, regp + 32);
 
       /* Fill the inaccessible zero register with zero.  */
       regcache->raw_supply_zeroed (0);
@@ -68,9 +68,9 @@ supply_gregset_regnum (struct regcache *regcache, const prgregset_t *gregs,
   else if (regnum == OR1K_ZERO_REGNUM)
     regcache->raw_supply_zeroed (0);
   else if (regnum == OR1K_NPC_REGNUM)
-    regcache->raw_supply (OR1K_NPC_REGNUM, regp + 32);
+    regcache->deprecated_raw_supply (OR1K_NPC_REGNUM, regp + 32);
   else if (regnum > OR1K_ZERO_REGNUM && regnum < OR1K_MAX_GPR_REGS)
-    regcache->raw_supply (regnum, regp + regnum);
+    regcache->deprecated_raw_supply (regnum, regp + regnum);
 }
 
 /* Copy all general purpose registers from regset GREGS into REGCACHE.  */
@@ -93,17 +93,17 @@ fill_gregset (const struct regcache *regcache, prgregset_t *gregs, int regnum)
     {
       /* We fill the general purpose registers.  */
       for (int i = OR1K_ZERO_REGNUM + 1; i < OR1K_MAX_GPR_REGS; i++)
-	regcache->raw_collect (i, regp + i);
+	regcache->deprecated_raw_collect (i, regp + i);
 
-      regcache->raw_collect (OR1K_NPC_REGNUM, regp + 32);
+      regcache->deprecated_raw_collect (OR1K_NPC_REGNUM, regp + 32);
     }
   else if (regnum == OR1K_ZERO_REGNUM)
     /* Nothing to do here.  */
     ;
   else if (regnum > OR1K_ZERO_REGNUM && regnum < OR1K_MAX_GPR_REGS)
-    regcache->raw_collect (regnum, regp + regnum);
+    regcache->deprecated_raw_collect (regnum, regp + regnum);
   else if (regnum == OR1K_NPC_REGNUM)
-    regcache->raw_collect (OR1K_NPC_REGNUM, regp + 32);
+    regcache->deprecated_raw_collect (OR1K_NPC_REGNUM, regp + 32);
 }
 
 /* Transfering floating-point registers between GDB, inferiors and cores.

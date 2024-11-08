@@ -229,7 +229,7 @@ fetch_register (struct regcache *regcache, int regno)
 
   if (gdbarch_cannot_fetch_register (gdbarch, regno))
     {
-      regcache->raw_supply (regno, NULL);
+      regcache->deprecated_raw_supply (regno, NULL);
       return;
     }
 
@@ -242,7 +242,7 @@ fetch_register (struct regcache *regcache, int regno)
 	   gdbarch_register_name (gdbarch, regno),
 	   regno, safe_strerror (errno));
 
-  regcache->raw_supply (regno, &val);
+  regcache->deprecated_raw_supply (regno, &val);
 }
 
 /* Store one register.  */
@@ -260,7 +260,7 @@ store_register (const struct regcache *regcache, int regno)
   tid = get_ptrace_pid (regcache->ptid ());
 
   errno = 0;
-  regcache->raw_collect (regno, &val);
+  regcache->deprecated_raw_collect (regno, &val);
   ptrace (PTRACE_POKEUSER, tid, hppa_linux_register_addr (regno, 0), val);
   if (errno != 0)
     error (_("Couldn't write register %s (#%d): %s."),
@@ -320,7 +320,7 @@ supply_gregset (struct regcache *regcache, const gdb_gregset_t *gregsetp)
   for (i = 0; i < sizeof (greg_map) / sizeof (greg_map[0]); i++, regp++)
     {
       int regno = greg_map[i];
-      regcache->raw_supply (regno, regp);
+      regcache->deprecated_raw_supply (regno, regp);
     }
 }
 
@@ -339,7 +339,7 @@ fill_gregset (const struct regcache *regcache,
       int mregno = greg_map[i];
 
       if (regno == -1 || regno == mregno)
-	regcache->raw_collect (mregno, &(*gregsetp)[i]);
+	regcache->deprecated_raw_collect (mregno, &(*gregsetp)[i]);
     }
 }
 
@@ -356,8 +356,8 @@ supply_fpregset (struct regcache *regcache, const gdb_fpregset_t *fpregsetp)
   for (regi = 0; regi <= 31; regi++)
     {
       from = (const char *) &((*fpregsetp)[regi]);
-      regcache->raw_supply (2*regi + HPPA_FP0_REGNUM, from);
-      regcache->raw_supply (2*regi + HPPA_FP0_REGNUM + 1, from + 4);
+      regcache->deprecated_raw_supply (2*regi + HPPA_FP0_REGNUM, from);
+      regcache->deprecated_raw_supply (2*regi + HPPA_FP0_REGNUM + 1, from + 4);
     }
 }
 
@@ -379,7 +379,7 @@ fill_fpregset (const struct regcache *regcache,
       char *to = (char *) &((*fpregsetp)[(i - HPPA_FP0_REGNUM) / 2]);
       if ((i - HPPA_FP0_REGNUM) & 1)
 	to += 4;
-      regcache->raw_collect (i, to);
+      regcache->deprecated_raw_collect (i, to);
    }
 }
 

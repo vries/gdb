@@ -138,7 +138,7 @@ fetch_fpregs (struct regcache *regcache)
     perror_with_name (_("Unable to fetch the floating point registers"));
 
   /* Fetch fpsr.  */
-  regcache->raw_supply (ARM_FPS_REGNUM, fp + NWFPE_FPSR_OFFSET);
+  regcache->deprecated_raw_supply (ARM_FPS_REGNUM, fp + NWFPE_FPSR_OFFSET);
 
   /* Fetch the floating point registers.  */
   for (regno = ARM_F0_REGNUM; regno <= ARM_F7_REGNUM; regno++)
@@ -176,7 +176,7 @@ store_fpregs (const struct regcache *regcache)
 
   /* Store fpsr.  */
   if (REG_VALID == regcache->get_register_status (ARM_FPS_REGNUM))
-    regcache->raw_collect (ARM_FPS_REGNUM, fp + NWFPE_FPSR_OFFSET);
+    regcache->deprecated_raw_collect (ARM_FPS_REGNUM, fp + NWFPE_FPSR_OFFSET);
 
   /* Store the floating point registers.  */
   for (regno = ARM_F0_REGNUM; regno <= ARM_F7_REGNUM; regno++)
@@ -289,14 +289,14 @@ fetch_wmmx_regs (struct regcache *regcache)
     perror_with_name (_("Unable to fetch WMMX registers"));
 
   for (regno = 0; regno < 16; regno++)
-    regcache->raw_supply (regno + ARM_WR0_REGNUM, &regbuf[regno * 8]);
+    regcache->deprecated_raw_supply (regno + ARM_WR0_REGNUM, &regbuf[regno * 8]);
 
   for (regno = 0; regno < 2; regno++)
-    regcache->raw_supply (regno + ARM_WCSSF_REGNUM,
+    regcache->deprecated_raw_supply (regno + ARM_WCSSF_REGNUM,
 			  &regbuf[16 * 8 + regno * 4]);
 
   for (regno = 0; regno < 4; regno++)
-    regcache->raw_supply (regno + ARM_WCGR0_REGNUM,
+    regcache->deprecated_raw_supply (regno + ARM_WCGR0_REGNUM,
 			  &regbuf[16 * 8 + 2 * 4 + regno * 4]);
 }
 
@@ -315,16 +315,16 @@ store_wmmx_regs (const struct regcache *regcache)
 
   for (regno = 0; regno < 16; regno++)
     if (REG_VALID == regcache->get_register_status (regno + ARM_WR0_REGNUM))
-      regcache->raw_collect (regno + ARM_WR0_REGNUM, &regbuf[regno * 8]);
+      regcache->deprecated_raw_collect (regno + ARM_WR0_REGNUM, &regbuf[regno * 8]);
 
   for (regno = 0; regno < 2; regno++)
     if (REG_VALID == regcache->get_register_status (regno + ARM_WCSSF_REGNUM))
-      regcache->raw_collect (regno + ARM_WCSSF_REGNUM,
+      regcache->deprecated_raw_collect (regno + ARM_WCSSF_REGNUM,
 			     &regbuf[16 * 8 + regno * 4]);
 
   for (regno = 0; regno < 4; regno++)
     if (REG_VALID == regcache->get_register_status (regno + ARM_WCGR0_REGNUM))
-      regcache->raw_collect (regno + ARM_WCGR0_REGNUM,
+      regcache->deprecated_raw_collect (regno + ARM_WCGR0_REGNUM,
 			     &regbuf[16 * 8 + 2 * 4 + regno * 4]);
 
   ret = ptrace (PTRACE_SETWMMXREGS, tid, 0, regbuf);
