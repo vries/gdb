@@ -190,8 +190,10 @@ output_local_dictionary ()
 
 output_dictionaries ()
 {
-    output_local_dictionary
-    cat "$dictionary"
+    (
+	output_local_dictionary
+	cat "$dictionary"
+    ) | grep -E -v "[A-Z]"
 }
 
 parse_dictionary ()
@@ -219,7 +221,14 @@ find_files_matching_words ()
     else
 	rm -f "$cache_dir/$cache_file2".*
 
-	pat=$(grep_join "${words[@]}")
+	declare -a re_words
+	mapfile -t re_words \
+		< <(for f in "${words[@]}"; do
+			echo "$f"
+		    done \
+			| sed "s/^\(.\)/[\u\1\1]/")
+
+	pat=$(grep_join "${re_words[@]}")
 
 	local before after
 	before=$(grep_join \
@@ -257,6 +266,8 @@ find_files_matching_word ()
 		"\." \
 		"$")
 
+    pat="(${pat@u}|$pat)"
+
     pat="$before$pat$after"
 
     grep -E \
@@ -285,11 +296,13 @@ replace_word_in_file ()
 		"\." \
 		"$")
 
-    local repl
-    repl="s%$before$word$after%\1$replacement\2%g"
+    local repl1
+    local repl2
+    repl1="s%$before$word$after%\1$replacement\2%g"
+    repl2="s%$before${word@u}$after%\1${replacement@u}\2%g"
 
     sed -i \
-	"$repl" \
+	"$repl1;$repl2" \
 	"$file"
 }
 
