@@ -29,6 +29,9 @@ dictionary=$cache_dir/$cache_file
 local_dictionary=$scriptdir/common-misspellings.txt
 cache_file2=spell-check.pat1
 
+# shellcheck source=gdb/contrib/spellcheck-inc.sh
+source "$scriptdir/spellcheck-inc.sh"
+
 # Separators: space, slash, tab, colon, comma.
 declare -a grep_separators
 grep_separators=(
@@ -355,7 +358,23 @@ replace_word_in_files ()
     fi
 
     if echo "$replacement"| grep -q ","; then
-	echo "TODO: $id"
+	local found
+	found=false
+
+	local f
+	for f in "${files_matching_word[@]}"; do
+	    if ignore_word_in_file "$word" "$f"; then
+		continue
+	    fi
+
+	    found=true
+	    break
+	done
+
+	if $found; then
+	    echo "TODO: $id"
+	fi
+
 	return
     fi
 
@@ -364,6 +383,10 @@ replace_word_in_files ()
     local changed f before after
     changed=false
     for f in "${files_matching_word[@]}"; do
+	if ignore_word_in_file "$word" "$f"; then
+	    continue
+	fi
+
 	if [ "${md5sums[$f]}" = "" ]; then
 	    md5sums[$f]=$(md5sum "$f")
 	fi
@@ -387,8 +410,16 @@ replace_word_in_files ()
 	echo "$id"
     fi
 
-    find_files_matching_word "$word" "${files_matching_word[@]}" \
-	| awk "{ printf \"TODO: $id: replacement failed: %s\n\", \$0}"
+    mapfile -t files_matching_word \
+	    < <(find_files_matching_word "$word" "${files_matching_word[@]}")
+
+    for f in "${files_matching_word[@]}"; do
+	if ignore_word_in_file "$word" "$f"; then
+	    continue
+	fi
+
+	echo "TODO: $id: replacement failed: $f"
+    done
 }
 
 main ()
