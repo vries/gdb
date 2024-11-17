@@ -1,0 +1,52 @@
+# Copyright 2024 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Test clang in combination with llvm-dwp.
+
+standard_testfile main.c
+
+require isnative
+require {!is_remote host}
+require {!is_remote target}
+
+set opts {}
+lappend opts debug
+lappend opts additional_flags=-gsplit-dwarf
+
+# Force clang compiler.
+if { ![test_compiler_info clang*] } {
+    set CC_FOR_TARGET "clang"
+}
+
+if { [build_executable "failed to prepare" ${testfile} \
+	  $srcfile $opts] } {
+    return -1
+}
+
+# Try to run llvm-dwp.  This may or may not be installed.
+set result [remote_exec host "llvm-dwp -e $binfile -o $binfile.dwp"]
+set llvm_dwp_status [lindex $result 0]
+
+require {expr $llvm_dwp_status == 0}
+
+# Remove dwo file to make sure dwp file is used.
+set dwo_file [standard_output_file "llvm-dwp0.dwo"]
+set result [remote_exec build "rm -f $dwo_file"]
+
+# Regression test for part of PR symtab/31497.
+clean_restart $binfile
+
+gdb_test "ptype main" \
+    [string_to_regexp "type = int ()"]
