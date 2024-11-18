@@ -59,3 +59,12 @@ repos:
     - id: isort
       types_or: [file]
       files: 'gdb/.*\.py(\.in)?$'
+  - repo: local
+    hooks:
+    - id: shellcheck
+      name: shellcheck always_pass
+      language: script
+      entry: ./gdb/contrib/pre-commit-shellcheck.sh --always-pass
+      types: [shell]
+      files: '^(gdb|gdbsupport|gdbserver)/'
+      verbose: true
