@@ -313,6 +313,10 @@ print_dictionary ()
 
 find_files_matching_words ()
 {
+    local grep_opts
+    grep_opts="$1"
+    shift
+    
     local cache_id
     cache_id=$(cat "$local_dictionary" "$dictionary" "$this_script" \
 		 | md5sum  \
@@ -354,7 +358,7 @@ find_files_matching_words ()
     fi
 
     grep -E \
-	-l \
+	$grep_opts \
 	"$pat" \
 	"$@"
 }
@@ -540,7 +544,7 @@ main ()
 	done
 
 	mapfile -t files_matching_words \
-		< <(find_files_matching_words "${tmpfiles[@]}")
+		< <(find_files_matching_words -l "${tmpfiles[@]}")
 
 	if [ ${#files_matching_words[@]} -eq 0 ]; then
 	    ret=0
@@ -557,7 +561,7 @@ main ()
     else
 	# Reduce set of files for sed to operate on.
 	mapfile -t files_matching_words \
-		< <(find_files_matching_words "${unique_files[@]}")
+		< <(find_files_matching_words -l "${unique_files[@]}")
 
 	if [ ${#files_matching_words[@]} -eq 0 ]; then
 	    return
@@ -568,6 +572,7 @@ main ()
 	fi
     fi
 
+    find_files_matching_words "-H -n" ${files_matching_words}
     local i word replacement
     i=0
     for word in "${words[@]}"; do
