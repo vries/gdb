@@ -2300,6 +2300,39 @@ gdbpy_gdb_exiting (int exit_code)
     gdbpy_print_stack ();
 }
 
+static void
+catch_python_fatal (int signum)
+{
+  signal (SIGABRT, catch_python_fatal);
+
+  throw_exception_sjlj (gdb_exception ());
+}
+
+static bool
+py_initialize ()
+{
+  bool initialized = false;
+
+  auto prev_handler = signal (SIGABRT, catch_python_fatal);
+
+  TRY_SJLJ
+    {
+      Py_Initialize ();
+      initialized = true;
+    }
+  CATCH_SJLJ (e, RETURN_MASK_ERROR)
+    {
+    }
+  END_CATCH_SJLJ;
+
+  signal (SIGABRT, prev_handler);
+
+  if (Py_IsInitialized ())
+    Py_Finalize ();
+
+  return initialized;
+}
+
 static bool
 do_start_initialization ()
 {
@@ -2353,7 +2386,8 @@ do_start_initialization ()
      remain alive for the duration of the program's execution, so
      it is not freed after this call.  */
   Py_SetProgramName (progname_copy);
-  Py_Initialize ();
+  if (!py_initialize ())
+    return false;
 #else
   PyConfig config;
 
@@ -2385,7 +2419,8 @@ init_done:
     }
 #endif
 #else
-  Py_Initialize ();
+  if (!py_initialize ())
+    return false;
 #endif
 
 #if PY_VERSION_HEX < 0x03090000
