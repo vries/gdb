@@ -59,3 +59,12 @@ repos:
     - id: isort
       types_or: [file]
       files: 'gdb/.*\.py(\.in)?$'
+  - repo: local
+    hooks:
+    - id: codespell
+      name: gdb/scripts/codespell.sh --always-pass --staged
+      language: script
+      entry: ./gdb/contrib/codespell.sh
+      args: [ "--always-pass", "--staged", "--", "-C0", "--" ]
+      files: '^(gdb|gdbsupport|gdbserver)/'
+      verbose: true
