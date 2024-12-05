@@ -854,6 +854,11 @@ s390_analyze_prologue (struct gdbarch *gdbarch,
 	       || is_rre (insn64, op_lgr, &r1, &r2))
 	data->gpr[r1] = data->gpr[r2];
 
+      /* LDGR r1, r2 --- load from register to floating-point register
+	 (64-bit version).  */
+      else if (is_rre (insn64, op_ldgr, &r1, &r2))
+	data->fpr[r1] = data->gpr[r2];
+
       /* L r1, d2(x2, b2) --- load.  */
       /* LY r1, d2(x2, b2) --- load (long-displacement version).  */
       /* LG r1, d2(x2, b2) --- load (64-bit version).  */
@@ -2484,6 +2489,26 @@ s390_prologue_frame_unwind_cache (const frame_info_ptr &this_frame,
     if (s390_register_call_saved (gdbarch, S390_F0_REGNUM + i)
 	&& data.fpr_slot[i] != 0)
       info->saved_regs[S390_F0_REGNUM + i].set_addr (cfa - data.fpr_slot[i]);
+
+  for (i = 0; i < S390_NUM_FPRS; i++)
+    {
+      int fpr = S390_F0_REGNUM + i;
+      if (s390_register_call_saved (gdbarch, fpr))
+	continue;
+
+      if (data.fpr[i].kind != pvk_register
+	  || data.fpr[i].reg == fpr)
+	continue;
+
+      if (!s390_register_call_saved (gdbarch, data.fpr[i].reg))
+	continue;
+
+      /* We've copied a call-saved register to a call-clobbered floating point
+	 register in the prologue.  Assume that makes the floating point
+	 register a register save slot, leaving the value constant throughout
+	 the function.  */
+      info->saved_regs[data.fpr[i].reg].set_realreg (fpr);
+    }
 
   /* Function return will set PC to %r14.  */
   info->saved_regs[S390_PSWA_REGNUM] = info->saved_regs[S390_RETADDR_REGNUM];
