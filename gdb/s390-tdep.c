@@ -1199,16 +1199,9 @@ s390_dwarf_reg_to_regnum (struct gdbarch *gdbarch, int reg)
   if (reg >= 0 && reg < ARRAY_SIZE (s390_dwarf_regmap))
     gdb_reg = s390_dwarf_regmap[reg];
 
-  if (tdep->v0_full_regnum == -1)
-    {
-      if (gdb_reg >= S390_V16_REGNUM && gdb_reg <= S390_V31_REGNUM)
-	gdb_reg = -1;
-    }
-  else
-    {
-      if (gdb_reg >= S390_F0_REGNUM && gdb_reg <= S390_F15_REGNUM)
-	gdb_reg = gdb_reg - S390_F0_REGNUM + tdep->v0_full_regnum;
-    }
+  if (tdep->v0_full_regnum == -1
+      && gdb_reg >= S390_V16_REGNUM && gdb_reg <= S390_V31_REGNUM)
+    gdb_reg = -1;
 
   return gdb_reg;
 }
