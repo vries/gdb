@@ -143,11 +143,22 @@ set val [expr {$val ^ 7}]
 # setVariable isn't implemented yet, so use the register name.  Note
 # that we sneak the "$" into the name, written in a slightly funny way
 # to work around apparent TON limitations.
-set response [dap_check_request_and_response "set first register" \
-		  setExpression \
-		  [format {o expression [s \$%s] value [s %d] frameId [i %d]} \
-		       $name $val $frame_id]]
-set response [lindex $response 0]
+set test "set first register"
+set response_and_events \
+    [dap_request_and_response \
+	 setExpression \
+	 [format {o expression [s \$%s] value [s %d] frameId [i %d]} \
+	      $name $val $frame_id]]
+set response [lindex $response_and_events 0]
+
+# On s390x, the first register is pswm, which can't be written.
+set unsupported_message "Couldn't write registers: Invalid argument."
+if { [dict get $response success] == "false"
+     && [dict get $response message] == $unsupported_message } {
+    unsupported $test
+    return
+}
+gdb_assert { [dict get $response success] == "true" } $test
 
 gdb_assert {[dict get $response body value] == $val} \
     "setting register yields updated value"
