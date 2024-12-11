@@ -2698,6 +2698,9 @@ return_command (const char *retval_exp, int from_tty)
   if (get_frame_type (get_current_frame ()) == INLINE_FRAME)
     error (_("Can not force return from an inlined function."));
 
+  if (get_frame_type (get_current_frame ()) == SIGTRAMP_FRAME)
+    error (_("Can not force return from a signal trampoline."));
+
   /* Compute the return value.  If the computation triggers an error,
      let it bail.  If the return type can't be handled, set
      RETURN_VALUE to NULL, and QUERY_PREFIX to an informational

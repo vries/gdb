@@ -256,12 +256,11 @@ proc advancei { cmd } {
 		send_gdb "$cmd\n"
 		exp_continue -continue_timer
 	    }
+	    -re -wrap "Can not force return from a signal trampoline." {
+		pass "$gdb_test_name (cannot return)"
+	    }
 	    -re "return .*${gdb_prompt} $" {
 		fail "$test (stepped)"
-	    }
-	    -re "Make .*frame return now.*y or n. $" {
-		send_gdb "y\n"
-		exp_continue -continue_timer
 	    }
 	    -re "$inferior_exited_re normally.*${gdb_prompt} $" {
 		kfail gdb/8744 "$test (program exited)"
