@@ -950,6 +950,117 @@ proc_with_prefix test_bkpt_auto_disable { } {
     gdb_test "continue" "False.*" "auto-disabling after enable count reached"
 }
 
+proc_with_prefix test_bkpt_stop_delete { } {
+
+    foreach_with_prefix type { gdb.Breakpoint gdb.FinishBreakpoint } {
+	# Start with a fresh gdb.
+	clean_restart $::testfile
+
+	if { ![runto_main] } {
+	    return 0
+	}
+
+	delete_breakpoints
+
+	gdb_test_multiline "Sub-class a breakpoint" \
+	    "python" "" \
+	    "class basic ($type):" "" \
+	    "    def stop(self):" "" \
+	    "        self.delete()" "" \
+	    "        return True" "" \
+	    "end" ""
+
+	set line_marker "Break at function add.";
+	set bp_location [gdb_get_line_number $line_marker]
+
+	if { $type == "gdb.Breakpoint" } {
+	    gdb_py_test_silent_cmd "python basic(\"$bp_location\")" \
+		"Set breakpoint" 0
+	} else {
+	    gdb_breakpoint $bp_location
+	    gdb_continue_to_breakpoint "continue to function add" \
+		.*[string_to_regexp $line_marker].*
+
+	    gdb_py_test_silent_cmd "python basic()" \
+		"Set breakpoint" 0
+	}
+
+	set err_msg_prefix "Python Exception <class 'gdb.error'>"
+	set err_msg "Cannot delete breakpoint"
+	gdb_test "continue" \
+	    [string_to_regexp "$err_msg_prefix: $err_msg"].* \
+	    $err_msg
+    }
+}
+
+proc_with_prefix test_bkpt_stop_post_event_delete { } {
+
+    foreach_with_prefix type { gdb.Breakpoint gdb.FinishBreakpoint } {
+	# Start with a fresh gdb.
+	clean_restart $::testfile
+
+	if { ![runto_main] } {
+	    return 0
+	}
+
+	delete_breakpoints
+
+	gdb_test_multiline "Sub-class a breakpoint" \
+	    "python" "" \
+	    "class basic ($type):" "" \
+	    "    def stop(self):" "" \
+	    "        gdb.post_event(self.delete)" "" \
+	    "        return True" "" \
+	    "end" ""
+
+	set line_marker "Break at function add.";
+	set bp_location [gdb_get_line_number $line_marker]
+
+	if { $type == "gdb.Breakpoint" } {
+	    gdb_py_test_silent_cmd "python bp = basic(\"$bp_location\")" \
+		"Set breakpoint" 0
+	} else {
+	    gdb_breakpoint $bp_location
+	    gdb_continue_to_breakpoint "continue to function add" \
+		.*[string_to_regexp $line_marker].*
+
+	    gdb_py_test_silent_cmd "python bp = basic()" \
+		"Set breakpoint" 0
+	}
+
+	set bp_num ""
+	gdb_test_multiple "python print (bp.number)" "" {
+	    -re -wrap "($::decimal)" {
+		set bp_num $expect_out(1,string)
+		pass $gdb_test_name
+	    }
+	}
+
+	if { $bp_num == "" } {
+	    continue
+	}
+
+	if { $type == "gdb.Breakpoint" } {
+	    gdb_test "continue" "Breakpoint $::decimal, .*"
+	} else {
+	    # The gdb.FinishBreakpoint is a temporary breakpoint, so it's
+	    # already auto-deleted by the time self.delete tries to delete it.
+	    # Check for the error message.
+	    set err_msg_prefix \
+		[string_to_regexp "Python Exception <class 'RuntimeError'>"]
+	    set err_msg "Breakpoint $::decimal is invalid"
+	    set dot [string_to_regexp .]
+	    set re "$err_msg_prefix: $err_msg$dot\r\n"
+	    gdb_test -prompt "$::gdb_prompt $re$" \
+		"continue"
+	}
+
+	gdb_test "info breakpoints $bp_num" \
+	    [string_to_regexp \
+		 "No breakpoint, watchpoint, tracepoint, or catchpoint matching '$bp_num'."]
+    }
+}
+
 test_bkpt_basic
 test_bkpt_deletion
 test_bkpt_cond_and_cmds
@@ -968,3 +1079,5 @@ test_bkpt_explicit_loc
 test_bkpt_qualified
 test_bkpt_probe
 test_bkpt_auto_disable
+test_bkpt_stop_delete
+test_bkpt_stop_post_event_delete

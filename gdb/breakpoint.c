@@ -5644,6 +5644,10 @@ bpstat_check_watchpoint (bpstat *bs)
     }
 }
 
+/* See breakpoint.h.  */
+
+bool prevent_breakpoint_deletion;
+
 /* For breakpoints that are currently marked as telling gdb to stop,
    check conditions (condition proper, frame, thread and ignore count)
    of breakpoint referred to by BS.  If we should not stop for this
@@ -5653,6 +5657,11 @@ static void
 bpstat_check_breakpoint_conditions (bpstat *bs, thread_info *thread)
 {
   INFRUN_SCOPED_DEBUG_ENTER_EXIT;
+
+  /* Breakpoints are not allowed to be deleted while checking breakpoint
+     conditions.  */
+  scoped_restore restore_in_gdb_breakpoint_stop
+    = make_scoped_restore (&prevent_breakpoint_deletion, true);
 
   const struct bp_location *bl;
   struct breakpoint *b;
@@ -12580,6 +12589,12 @@ void
 delete_breakpoint (struct breakpoint *bpt)
 {
   gdb_assert (bpt != NULL);
+
+  if (prevent_breakpoint_deletion)
+    {
+      error (_("Cannot delete breakpoint"));
+      return;
+    }
 
   /* Has this bp already been deleted?  This can happen because
      multiple lists can hold pointers to bp's.  bpstat lists are

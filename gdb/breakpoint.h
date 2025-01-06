@@ -2103,4 +2103,8 @@ extern void enable_disable_bp_location (bp_location *loc, bool enable);
 
 extern void notify_breakpoint_modified (breakpoint *b);
 
+/* Whether breakpoints should not be deleted.  */
+
+extern bool prevent_breakpoint_deletion;
+
 #endif /* GDB_BREAKPOINT_H */

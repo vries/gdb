@@ -1036,6 +1036,12 @@ call_function_by_hand_dummy (struct value *function,
 {
   INFCALL_SCOPED_DEBUG_ENTER_EXIT;
 
+  /* Breakpoints are not allowed to be deleted while checking breakpoint
+     conditions, but inferior calls during breakpoint conditions require
+     setting and deleting breakpoints.  */
+  scoped_restore restore_in_gdb_breakpoint_stop
+    = make_scoped_restore (&prevent_breakpoint_deletion, false);
+
   CORE_ADDR sp;
   struct type *target_values_type;
   function_call_return_method return_method = return_method_normal;
