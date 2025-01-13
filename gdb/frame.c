@@ -1193,8 +1193,39 @@ frame_register_unwind (const frame_info_ptr &next_frame, int regnum,
 
   gdb_assert (value != NULL);
 
-  *optimizedp = value->optimized_out ();
-  *unavailablep = !value->entirely_available ();
+  /* The s390x ABI specifies that DWARF register 16 maps onto either
+     8-byte register f0 or 16-byte register v0 (where f0 is part of v0), and
+     s390_dwarf_reg_to_regnum maps DWARF register 16 to v0, if available.
+
+     So, if a function saves register r11 in the prologue to register f0:
+
+       ldgr    %f0,%r11
+
+     then it's represented like this in the CFI:
+
+       DW_CFA_register: r11 in r16 (f0)
+
+     and unwinding 8-byte register r11 gets us the value of 16-byte register
+     v0.
+
+     Handle this by not considering more bytes than fit in the buffer.
+
+     Then there's i386_unwind_pc which passes an 8-byte buffer, while the
+     register may be either 8-byte (for x86_64) or 4-byte (for i386).
+
+     Handle this by not considering more bytes than are provided in the
+     value.  */
+  size_t copy_len = std::min (buffer.size (),
+			      value->type ()->length () - value->offset ());
+
+  if (value->lazy ())
+    value->fetch_lazy ();
+  *optimizedp
+    = value->bits_any_optimized_out (value->offset () * 8,
+				     copy_len * 8);
+  *unavailablep
+    = !value->bytes_available (value->offset (), copy_len);
+
   *lvalp = value->lval ();
   *addrp = value->address ();
   if (*lvalp == lval_register)
@@ -1204,13 +1235,15 @@ frame_register_unwind (const frame_info_ptr &next_frame, int regnum,
 
   if (!buffer.empty ())
     {
-      gdb_assert (buffer.size () >= value->type ()->length ());
-
       if (!*optimizedp && !*unavailablep)
-	memcpy (buffer.data (), value->contents_all ().data (),
-		value->type ()->length ());
+	{
+	  auto value_part
+	    = value->contents_all ().slice (value->offset (), copy_len);
+
+	  memcpy (buffer.data (), value_part.data (), copy_len);
+	}
       else
-	memset (buffer.data (), 0, value->type ()->length ());
+	memset (buffer.data (), 0, copy_len);
     }
 
   /* Dispose of the new value.  This prevents watchpoints from
