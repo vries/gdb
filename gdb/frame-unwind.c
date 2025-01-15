@@ -295,8 +295,9 @@ struct value *
 frame_unwind_got_register (const frame_info_ptr &frame,
 			   int regnum, int new_regnum)
 {
-  return value_of_register_lazy (get_next_frame_sentinel_okay (frame),
-				 new_regnum);
+  struct gdbarch *gdbarch = frame_unwind_arch (frame);
+  struct type *type = register_type (gdbarch, regnum);
+  return value_from_register (type, new_regnum, frame);
 }
 
 /* Return a value which indicates that FRAME saved REGNUM in memory at
