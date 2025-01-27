@@ -27,9 +27,29 @@
 #include "hashtab.h"
 #include "extension-priv.h"
 #include "symtab.h"
-#include "libguile.h"
 #include "objfiles.h"
 #include "top.h"
+
+/* For libguile v2.0.9 and SCM_DEBUG_TYPING_STRICTNESS == 1, SCM_UNPACK(x) is
+   defined as:
+
+     ((scm_t_bits) (0? (*(SCM*)0=(x)): x))
+
+   and for v2.0.10 it's defined as:
+
+     ((scm_t_bits) (0? (*(volatile SCM *)0=(x)): x))
+
+   The volatile was added to avoid a clang warning.
+
+   The latter form causes a Werror=volatile with C++20.
+   This was reported upstream (
+   https://debbugs.gnu.org/cgi/bugreport.cgi?bug=65333 ).
+
+   The former form causes a Werror=sequence-point with gcc 7-14.
+
+   Work around these problem by using SCM_DEBUG_TYPING_STRICTNESS == 0.  */
+#define SCM_DEBUG_TYPING_STRICTNESS 0
+#include "libguile.h"
 
 struct block;
 struct frame_info;
