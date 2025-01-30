@@ -51,6 +51,8 @@ else:
     # the prompt is shown.
     __suggest_rpms = {}
 
+    __package_to_debug_package = {}
+
 
     # Lookup RPMs that might provide the debug information for FILENAME,
     # which is a string containing the path to an object file GDB could
@@ -66,6 +68,7 @@ else:
         for h in mi:
             # Build the debuginfo package name.
             obj = h.format("%{name}-debuginfo-%{version}-%{release}.%{arch}")
+            debug_rpm_name = str(obj)
 
             # Check to see if the package is installed.
             mi2 = ts.dbMatch(rpm.RPMDBI_LABEL, str(obj))
@@ -75,6 +78,7 @@ else:
             # Now build the name of the package FILENAME came from.
             obj = h.format("%{name}-%{version}-%{release}.%{arch}")
             rpm_name = str(obj)
+            __package_to_debug_package[rpm_name] = debug_rpm_name
             if not rpm_name in __missing_rpms:
                 __suggest_rpms[rpm_name] = True
                 __missing_rpms[rpm_name] = True
@@ -106,10 +110,12 @@ else:
     # suggests this to the user.
     def before_prompt():
         global __suggest_rpms
+        global __package_to_debug_package
 
         if len(__suggest_rpms) > 0:
             for p in __suggest_rpms.keys():
-                print("Missing debuginfo, try: dnf debuginfo-install " + p)
+                dp = __package_to_debug_package[p]
+                print("Missing separate debuginfos, use: zypper install " + dp)
             __suggest_rpms = {}
 
 
