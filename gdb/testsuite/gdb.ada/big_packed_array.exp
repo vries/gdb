@@ -21,6 +21,8 @@ standard_ada_testfile foo_ra24_010
 
 set old_gcc [expr [test_compiler_info {gcc-[0-8]-*}]]
 
+set endian [target_endianness]
+
 foreach_with_prefix scenario {all minimal} {
     set flags [list debug additional_flags=-fgnat-encodings=$scenario]
 
@@ -54,8 +56,13 @@ foreach_with_prefix scenario {all minimal} {
        }
        -re -wrap $re_xfail2 {
 	   set last $expect_out(1,string)
+	   if { $endian == "little" } {
+	       set mask 0x0f
+	   } else {
+	       set mask 0xf0
+	   }
            if { $have_xfail && [string is integer $last] \
-		    && [expr ($last & 0xf) == 0] } {
+		    && [expr ($last & $mask) == 0] } {
                # gcc/101643
                setup_xfail *-*-*
            }
