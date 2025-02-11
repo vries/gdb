@@ -1041,7 +1041,6 @@ dw2_expand_marked_cus (dwarf2_per_objfile *per_objfile, offset_type idx,
 		       expand_symtabs_lang_matcher lang_matcher)
 {
   offset_type vec_len, vec_idx;
-  bool global_seen = false;
   mapped_gdb_index &index
     = *(gdb::checked_static_cast<mapped_gdb_index *>
 	(per_objfile->per_bfd->index_table.get ()));
@@ -1063,17 +1062,6 @@ dw2_expand_marked_cus (dwarf2_per_objfile *per_objfile, offset_type idx,
       int attrs_valid =
 	(index.version >= 7
 	 && symbol_kind != GDB_INDEX_SYMBOL_KIND_NONE);
-
-      /* Work around gold/15646.  */
-      if (attrs_valid
-	  && !is_static
-	  && symbol_kind == GDB_INDEX_SYMBOL_KIND_TYPE)
-	{
-	  if (global_seen)
-	    continue;
-
-	  global_seen = true;
-	}
 
       /* Only check the symbol's kind if it has one.  */
       if (attrs_valid)

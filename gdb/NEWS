@@ -61,6 +61,11 @@
   translation mode of its stdout/stderr to binary mode.  This disables
   Line Feed translation.  MS-Windows only.
 
+* GDB now adds all type symbols to the .gdb_index section.  The index
+  version number has not increased as a consequence of this change.
+  This fixes an issue where GDB could fail to find a type when relying
+  on the index.  Any existing indexes should be regenerated.
+
 * New commands
 
 maintenance check psymtabs
