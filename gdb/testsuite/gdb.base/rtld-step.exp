@@ -59,7 +59,7 @@ set binfile_rtld [standard_output_file ${rtld_basename}]
 #
 # When testing against earlier versions of Fedora, RHEL 9, and
 # also Ubuntu 22.04, that short flag list didn't work.	For these
-# linux releases, it was found that -nostdlib -lc were also required.
+# linux releases, it was found that -nostdlib were also required.
 # Due to the use of -nostdlib, a _start() function had to be added
 # to the RTLD code.
 #
@@ -77,21 +77,16 @@ set binfile_rtld [standard_output_file ${rtld_basename}]
 # If this test becomes broken at some point in the future, you might
 # try removing -static from the flags below as it is not needed for
 # Linux.
-#
-# Also, because the RTLD is static, you'll need static versions of
-# libc/glibc installed on your system.  (A message such as "cannot
-# find -lc" is a clue that you're missing a static version of libc.)
 
 set rtld_flags [list debug additional_flags=[list -static-pie -fPIE \
-						  -nostdlib -static -lc]]
+						  -nostdlib -static]]
 
-if { ![gdb_can_simple_compile static-pie-static-libc \
+if { ![gdb_can_simple_compile static-pie \
 	   {
-	       #include <unistd.h>
-	       void _start (void) { _exit (0); }
+	       void _start (void) { }
 	   } \
 	   executable $rtld_flags] } {
-    set reason "-static-pie not supported or static libc missing"
+    set reason "-static-pie not supported"
     untested "failed to compile ($reason)"
     return -1
 }
@@ -159,4 +154,5 @@ gdb_test "step" {baz \(.*?\);} "step into foo 2"
 gdb_test "next" "\}" "next over baz in foo"
 gdb_test "step" "bar \\(\\).*}" "step out of foo back into bar"
 
-gdb_continue_to_end
+gdb_breakpoint _exit
+gdb_continue_to_breakpoint _exit

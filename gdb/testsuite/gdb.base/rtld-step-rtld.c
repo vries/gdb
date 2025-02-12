@@ -15,8 +15,6 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
-#include <unistd.h>
-
 /* The declarations below are needed if you try to make this test case
    work on FreeBSD.  They're disabled because there are other problems
    with this test on FreeBSD.  See the .exp file for more info.  If
@@ -55,6 +53,13 @@ main ()
   foo (0);
   bar ();
   return 0;
+}
+
+static void
+_exit (int status)
+{
+  while (1)
+    ;
 }
 
 void
