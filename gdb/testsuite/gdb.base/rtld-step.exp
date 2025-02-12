@@ -140,7 +140,20 @@ gdb_assert { $rtld_lower <= $pc && $pc < $rtld_upper } "pc is in rtld"
 gdb_test "next" {bar \(\);} "next over foo 0"
 gdb_test "step" {bar \(\) at.*foo \(1\);.*} "step into bar"
 gdb_test "step" {baz \(.*?\);} "step into foo 1"
-gdb_test "finish" {Run till exit.*bar \(\).*baz.*} "finish out of foo 1"
+
+set re_baz_99 [string_to_regexp "baz (99);"]
+set re_foo_1 [string_to_regexp "foo (1);"]
+
+gdb_test_multiple "finish" "finish out of foo 1" {
+    -re -wrap $re_baz_99 {
+	pass $gdb_test_name
+    }
+    -re -wrap $re_foo_1 {
+	send_gdb "step\n"
+	exp_continue
+    }
+}
+
 gdb_test "next" {foo \(2\);} "next over baz in bar"
 gdb_test "step" {baz \(.*?\);} "step into foo 2"
 gdb_test "next" "\}" "next over baz in foo"
