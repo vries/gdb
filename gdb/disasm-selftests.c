@@ -329,6 +329,106 @@ memory_error_test (struct gdbarch *gdbarch)
   SELF_CHECK (saw_memory_error);
 }
 
+/* Disassemble INSN (a GDBARCH insn), and return the result.  */
+
+static std::string
+disassemble_one_insn_to_string (struct gdbarch *gdbarch,
+				gdb::array_view<const gdb_byte> insn)
+{
+  string_file buffer;
+
+  class gdb_disassembler_test : public gdb_disassembler
+  {
+  public:
+
+    explicit gdb_disassembler_test (struct gdbarch *gdbarch,
+				    gdb::array_view<const gdb_byte> insn,
+				    string_file &buffer)
+      : gdb_disassembler (gdbarch,
+			  &buffer,
+			  gdb_disassembler_test::read_memory),
+	m_insn (insn)
+    {
+    }
+
+    int
+    print_insn (CORE_ADDR memaddr)
+    {
+      try
+	{
+	  return gdb_disassembler::print_insn (memaddr);
+	}
+      catch (const gdb_exception_error &)
+	{
+	  return -1;
+	}
+    }
+
+  private:
+    gdb::array_view<const gdb_byte> m_insn;
+
+    static int read_memory (bfd_vma memaddr, gdb_byte *myaddr,
+			    unsigned int len,
+			    struct disassemble_info *info) noexcept
+    {
+      gdb_disassembler_test *self
+	= static_cast<gdb_disassembler_test *>(info->application_data);
+
+      if (len > self->m_insn.size ())
+	return -1;
+
+      for (size_t i = 0; i < len; i++)
+	myaddr[i] = self->m_insn[i];
+
+      return 0;
+    }
+  };
+
+  gdb_disassembler_test di (gdbarch, insn, buffer);
+  if (di.print_insn (0) != insn.size ())
+    return "";
+
+  if (run_verbose ())
+    debug_printf ("%s\n", buffer.c_str ());
+
+  return buffer.string ();
+}
+
+/* Check that disassembly of INSN (a GDBARCH insn) matches EXPECTED.  */
+
+static void
+disassemble_insn (gdbarch *gdbarch, gdb::byte_vector &insn,
+		  const std::string &expected)
+{
+  std::string buffer
+    = disassemble_one_insn_to_string (gdbarch, insn);
+
+  SELF_CHECK (buffer == expected);
+}
+
+/* Return gdbarch representing s390x.  */
+
+static gdbarch *
+gdbarch_s390x ()
+{
+  struct gdbarch_info info;
+  info.bfd_arch_info = bfd_lookup_arch (bfd_arch_s390, bfd_mach_s390_64);
+  return gdbarch_find_by_info (info);
+}
+
+/* Check disassembly of s390x instructions.  */
+
+static void
+disassemble_s390x ()
+{
+  gdbarch *gdbarch = gdbarch_s390x ();
+  if (gdbarch == nullptr)
+    return;
+
+  gdb::byte_vector insn = { 0xb9, 0x68, 0x00, 0x03 };
+  disassemble_insn (gdbarch, insn, "clzg\t%r0,%r3");
+}
+
 } /* namespace selftests */
 
 void _initialize_disasm_selftests ();
@@ -341,4 +441,6 @@ _initialize_disasm_selftests ()
 					 selftests::memory_error_test);
   selftests::register_test_foreach_arch ("buffered_insn_length",
 					 selftests::buffered_insn_length_test);
+  selftests::register_test ("disassemble-s390x",
+			    selftests::disassemble_s390x);
 }
