@@ -186,10 +186,12 @@ enum gdb_syscall {
 
 #define GDB_SYSCALL(NAME, NUMBER)		\
   gdb_sys_ ## NAME = NUMBER,
+#define GDB_UNSUPPORTED_SYSCALL(NAME)
 
 #include "gdb/gdb-syscalls.def"
 
 #undef GDB_SYSCALL
+#undef GDB_UNSUPPORTED_SYSCALL
 };
 
 /* Record a linux syscall.  */

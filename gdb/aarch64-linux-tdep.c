@@ -1787,282 +1787,31 @@ enum aarch64_syscall {
 static enum gdb_syscall
 aarch64_canonicalize_syscall (enum aarch64_syscall syscall_number)
 {
-#define SYSCALL_MAP(SYSCALL) case aarch64_sys_##SYSCALL: \
-  return gdb_sys_##SYSCALL
+#define GDB_SYSCALL(NAME, NUMBER)		\
+  const enum gdb_syscall local_gdb_syscall_ ## NAME ATTRIBUTE_UNUSED = gdb_sys_ ## NAME;
+#define GDB_UNSUPPORTED_SYSCALL(NAME)	\
+  const enum gdb_syscall local_gdb_syscall_ ## NAME ATTRIBUTE_UNUSED = gdb_sys_no_syscall;
 
-#define UNSUPPORTED_SYSCALL_MAP(SYSCALL) case aarch64_sys_##SYSCALL: \
-  return gdb_sys_no_syscall
+#include "gdb/gdb-syscalls.def"
+
+#undef GDB_SYSCALL
+#undef GDB_UNSUPPORTED_SYSCALL
+
+  const enum gdb_syscall local_gdb_syscall_mmap = gdb_sys_old_mmap;
 
   switch (syscall_number)
     {
-      SYSCALL_MAP (io_setup);
-      SYSCALL_MAP (io_destroy);
-      SYSCALL_MAP (io_submit);
-      SYSCALL_MAP (io_cancel);
-      SYSCALL_MAP (io_getevents);
+#define SYSCALL(NAME, NUMBER)			\
+      case aarch64_sys_ ## NAME:		\
+	return local_gdb_syscall_ ## NAME;
+#define SYSCALL_DUP(NAME, NUMBER)
 
-      SYSCALL_MAP (setxattr);
-      SYSCALL_MAP (lsetxattr);
-      SYSCALL_MAP (fsetxattr);
-      SYSCALL_MAP (getxattr);
-      SYSCALL_MAP (lgetxattr);
-      SYSCALL_MAP (fgetxattr);
-      SYSCALL_MAP (listxattr);
-      SYSCALL_MAP (llistxattr);
-      SYSCALL_MAP (flistxattr);
-      SYSCALL_MAP (removexattr);
-      SYSCALL_MAP (lremovexattr);
-      SYSCALL_MAP (fremovexattr);
-      SYSCALL_MAP (getcwd);
-      SYSCALL_MAP (lookup_dcookie);
-      SYSCALL_MAP (eventfd2);
-      SYSCALL_MAP (epoll_create1);
-      SYSCALL_MAP (epoll_ctl);
-      SYSCALL_MAP (epoll_pwait);
-      SYSCALL_MAP (dup);
-      SYSCALL_MAP (dup3);
-      SYSCALL_MAP (fcntl);
-      SYSCALL_MAP (inotify_init1);
-      SYSCALL_MAP (inotify_add_watch);
-      SYSCALL_MAP (inotify_rm_watch);
-      SYSCALL_MAP (ioctl);
-      SYSCALL_MAP (ioprio_set);
-      SYSCALL_MAP (ioprio_get);
-      SYSCALL_MAP (flock);
-      SYSCALL_MAP (mknodat);
-      SYSCALL_MAP (mkdirat);
-      SYSCALL_MAP (unlinkat);
-      SYSCALL_MAP (symlinkat);
-      SYSCALL_MAP (linkat);
-      SYSCALL_MAP (renameat);
-      UNSUPPORTED_SYSCALL_MAP (umount2);
-      SYSCALL_MAP (mount);
-      SYSCALL_MAP (pivot_root);
-      SYSCALL_MAP (nfsservctl);
-      SYSCALL_MAP (statfs);
-      SYSCALL_MAP (truncate);
-      SYSCALL_MAP (ftruncate);
-      SYSCALL_MAP (fallocate);
-      SYSCALL_MAP (faccessat);
-      SYSCALL_MAP (fchdir);
-      SYSCALL_MAP (chroot);
-      SYSCALL_MAP (fchmod);
-      SYSCALL_MAP (fchmodat);
-      SYSCALL_MAP (fchownat);
-      SYSCALL_MAP (fchown);
-      SYSCALL_MAP (openat);
-      SYSCALL_MAP (close);
-      SYSCALL_MAP (vhangup);
-      SYSCALL_MAP (pipe2);
-      SYSCALL_MAP (quotactl);
-      SYSCALL_MAP (getdents64);
-      SYSCALL_MAP (lseek);
-      SYSCALL_MAP (read);
-      SYSCALL_MAP (write);
-      SYSCALL_MAP (readv);
-      SYSCALL_MAP (writev);
-      SYSCALL_MAP (pread64);
-      SYSCALL_MAP (pwrite64);
-      UNSUPPORTED_SYSCALL_MAP (preadv);
-      UNSUPPORTED_SYSCALL_MAP (pwritev);
-      SYSCALL_MAP (sendfile);
-      SYSCALL_MAP (pselect6);
-      SYSCALL_MAP (ppoll);
-      UNSUPPORTED_SYSCALL_MAP (signalfd4);
-      SYSCALL_MAP (vmsplice);
-      SYSCALL_MAP (splice);
-      SYSCALL_MAP (tee);
-      SYSCALL_MAP (readlinkat);
-      SYSCALL_MAP (newfstatat);
+#include "gdb/aarch64-syscalls.def"
 
-      SYSCALL_MAP (fstat);
-      SYSCALL_MAP (sync);
-      SYSCALL_MAP (fsync);
-      SYSCALL_MAP (fdatasync);
-      SYSCALL_MAP (sync_file_range);
-      UNSUPPORTED_SYSCALL_MAP (timerfd_create);
-      UNSUPPORTED_SYSCALL_MAP (timerfd_settime);
-      UNSUPPORTED_SYSCALL_MAP (timerfd_gettime);
-      UNSUPPORTED_SYSCALL_MAP (utimensat);
-      SYSCALL_MAP (acct);
-      SYSCALL_MAP (capget);
-      SYSCALL_MAP (capset);
-      SYSCALL_MAP (personality);
-      SYSCALL_MAP (exit);
-      SYSCALL_MAP (exit_group);
-      SYSCALL_MAP (waitid);
-      SYSCALL_MAP (set_tid_address);
-      SYSCALL_MAP (unshare);
-      SYSCALL_MAP (futex);
-      SYSCALL_MAP (set_robust_list);
-      SYSCALL_MAP (get_robust_list);
-      SYSCALL_MAP (nanosleep);
+#undef SYSCALL
 
-      SYSCALL_MAP (getitimer);
-      SYSCALL_MAP (setitimer);
-      SYSCALL_MAP (kexec_load);
-      SYSCALL_MAP (init_module);
-      SYSCALL_MAP (delete_module);
-      SYSCALL_MAP (timer_create);
-      SYSCALL_MAP (timer_settime);
-      SYSCALL_MAP (timer_gettime);
-      SYSCALL_MAP (timer_getoverrun);
-      SYSCALL_MAP (timer_delete);
-      SYSCALL_MAP (clock_settime);
-      SYSCALL_MAP (clock_gettime);
-      SYSCALL_MAP (clock_getres);
-      SYSCALL_MAP (clock_nanosleep);
-      SYSCALL_MAP (syslog);
-      SYSCALL_MAP (ptrace);
-      SYSCALL_MAP (sched_setparam);
-      SYSCALL_MAP (sched_setscheduler);
-      SYSCALL_MAP (sched_getscheduler);
-      SYSCALL_MAP (sched_getparam);
-      SYSCALL_MAP (sched_setaffinity);
-      SYSCALL_MAP (sched_getaffinity);
-      SYSCALL_MAP (sched_yield);
-      SYSCALL_MAP (sched_get_priority_max);
-      SYSCALL_MAP (sched_get_priority_min);
-      SYSCALL_MAP (sched_rr_get_interval);
-      SYSCALL_MAP (kill);
-      SYSCALL_MAP (tkill);
-      SYSCALL_MAP (tgkill);
-      SYSCALL_MAP (sigaltstack);
-      SYSCALL_MAP (rt_sigsuspend);
-      SYSCALL_MAP (rt_sigaction);
-      SYSCALL_MAP (rt_sigprocmask);
-      SYSCALL_MAP (rt_sigpending);
-      SYSCALL_MAP (rt_sigtimedwait);
-      SYSCALL_MAP (rt_sigqueueinfo);
-      SYSCALL_MAP (rt_sigreturn);
-      SYSCALL_MAP (setpriority);
-      SYSCALL_MAP (getpriority);
-      SYSCALL_MAP (reboot);
-      SYSCALL_MAP (setregid);
-      SYSCALL_MAP (setgid);
-      SYSCALL_MAP (setreuid);
-      SYSCALL_MAP (setuid);
-      SYSCALL_MAP (setresuid);
-      SYSCALL_MAP (getresuid);
-      SYSCALL_MAP (setresgid);
-      SYSCALL_MAP (getresgid);
-      SYSCALL_MAP (setfsuid);
-      SYSCALL_MAP (setfsgid);
-      SYSCALL_MAP (times);
-      SYSCALL_MAP (setpgid);
-      SYSCALL_MAP (getpgid);
-      SYSCALL_MAP (getsid);
-      SYSCALL_MAP (setsid);
-      SYSCALL_MAP (getgroups);
-      SYSCALL_MAP (setgroups);
-      SYSCALL_MAP (uname);
-      SYSCALL_MAP (sethostname);
-      SYSCALL_MAP (setdomainname);
-      SYSCALL_MAP (getrlimit);
-      SYSCALL_MAP (setrlimit);
-      SYSCALL_MAP (getrusage);
-      SYSCALL_MAP (umask);
-      SYSCALL_MAP (prctl);
-      SYSCALL_MAP (getcpu);
-      SYSCALL_MAP (gettimeofday);
-      SYSCALL_MAP (settimeofday);
-      SYSCALL_MAP (adjtimex);
-      SYSCALL_MAP (getpid);
-      SYSCALL_MAP (getppid);
-      SYSCALL_MAP (getuid);
-      SYSCALL_MAP (geteuid);
-      SYSCALL_MAP (getgid);
-      SYSCALL_MAP (getegid);
-      SYSCALL_MAP (gettid);
-      SYSCALL_MAP (sysinfo);
-      SYSCALL_MAP (mq_open);
-      SYSCALL_MAP (mq_unlink);
-      SYSCALL_MAP (mq_timedsend);
-      SYSCALL_MAP (mq_timedreceive);
-      SYSCALL_MAP (mq_notify);
-      SYSCALL_MAP (mq_getsetattr);
-      SYSCALL_MAP (msgget);
-      SYSCALL_MAP (msgctl);
-      SYSCALL_MAP (msgrcv);
-      SYSCALL_MAP (msgsnd);
-      SYSCALL_MAP (semget);
-      SYSCALL_MAP (semctl);
-      SYSCALL_MAP (semtimedop);
-      SYSCALL_MAP (semop);
-      SYSCALL_MAP (shmget);
-      SYSCALL_MAP (shmctl);
-      SYSCALL_MAP (shmat);
-      SYSCALL_MAP (shmdt);
-      SYSCALL_MAP (socket);
-      SYSCALL_MAP (socketpair);
-      SYSCALL_MAP (bind);
-      SYSCALL_MAP (listen);
-      SYSCALL_MAP (accept);
-      SYSCALL_MAP (connect);
-      SYSCALL_MAP (getsockname);
-      SYSCALL_MAP (getpeername);
-      SYSCALL_MAP (sendto);
-      SYSCALL_MAP (recvfrom);
-      SYSCALL_MAP (setsockopt);
-      SYSCALL_MAP (getsockopt);
-      SYSCALL_MAP (shutdown);
-      SYSCALL_MAP (sendmsg);
-      SYSCALL_MAP (recvmsg);
-      SYSCALL_MAP (readahead);
-      SYSCALL_MAP (brk);
-      SYSCALL_MAP (munmap);
-      SYSCALL_MAP (mremap);
-      SYSCALL_MAP (add_key);
-      SYSCALL_MAP (request_key);
-      SYSCALL_MAP (keyctl);
-      SYSCALL_MAP (clone);
-      SYSCALL_MAP (execve);
-
-    case aarch64_sys_mmap:
-      return gdb_sys_old_mmap;
-
-      SYSCALL_MAP (fadvise64);
-      SYSCALL_MAP (swapon);
-      SYSCALL_MAP (swapoff);
-      SYSCALL_MAP (mprotect);
-      SYSCALL_MAP (msync);
-      SYSCALL_MAP (mlock);
-      SYSCALL_MAP (munlock);
-      SYSCALL_MAP (mlockall);
-      SYSCALL_MAP (munlockall);
-      SYSCALL_MAP (mincore);
-      SYSCALL_MAP (madvise);
-      SYSCALL_MAP (remap_file_pages);
-      SYSCALL_MAP (mbind);
-      SYSCALL_MAP (get_mempolicy);
-      SYSCALL_MAP (set_mempolicy);
-      SYSCALL_MAP (migrate_pages);
-      SYSCALL_MAP (move_pages);
-      UNSUPPORTED_SYSCALL_MAP (rt_tgsigqueueinfo);
-      UNSUPPORTED_SYSCALL_MAP (perf_event_open);
-      UNSUPPORTED_SYSCALL_MAP (accept4);
-      UNSUPPORTED_SYSCALL_MAP (recvmmsg);
-
-      SYSCALL_MAP (wait4);
-
-      UNSUPPORTED_SYSCALL_MAP (prlimit64);
-      UNSUPPORTED_SYSCALL_MAP (fanotify_init);
-      UNSUPPORTED_SYSCALL_MAP (fanotify_mark);
-      UNSUPPORTED_SYSCALL_MAP (name_to_handle_at);
-      UNSUPPORTED_SYSCALL_MAP (open_by_handle_at);
-      UNSUPPORTED_SYSCALL_MAP (clock_adjtime);
-      UNSUPPORTED_SYSCALL_MAP (syncfs);
-      UNSUPPORTED_SYSCALL_MAP (setns);
-      UNSUPPORTED_SYSCALL_MAP (sendmmsg);
-      UNSUPPORTED_SYSCALL_MAP (process_vm_readv);
-      UNSUPPORTED_SYSCALL_MAP (process_vm_writev);
-      UNSUPPORTED_SYSCALL_MAP (kcmp);
-      UNSUPPORTED_SYSCALL_MAP (finit_module);
-      UNSUPPORTED_SYSCALL_MAP (sched_setattr);
-      UNSUPPORTED_SYSCALL_MAP (sched_getattr);
-      SYSCALL_MAP (getrandom);
-  default:
-    return gdb_sys_no_syscall;
+    default:
+      return gdb_sys_no_syscall;
   }
 }
 
