@@ -370,6 +370,19 @@ i386_all_but_ip_registers_record (struct regcache *regcache)
   return 0;
 }
 
+enum i386_syscall {
+
+#define SYSCALL(NAME, NUMBER)			\
+  i386_sys_ ## NAME = NUMBER,
+#define SYSCALL_DUP(NAME, NUMBER)		\
+  i386_sys_ ## NAME = NUMBER,
+
+#include "gdb/i386-syscalls.def"
+
+#undef SYSCALL
+#undef SYSCALL_DUP
+};
+
 /* i386_canonicalize_syscall maps from the native i386 Linux set
    of syscall ids into a canonical set of syscall ids used by
    process record (a mostly trivial mapping, since the canonical
@@ -378,12 +391,34 @@ i386_all_but_ip_registers_record (struct regcache *regcache)
 static enum gdb_syscall
 i386_canonicalize_syscall (int syscall)
 {
-  enum { i386_syscall_max = 499 };
+#define GDB_SYSCALL(NAME, NUMBER)		\
+  const enum gdb_syscall local_gdb_syscall_ ## NAME ATTRIBUTE_UNUSED = gdb_sys_ ## NAME;
+#define GDB_OLD_SYSCALL(NAME, NUMBER)
+#define GDB_UNSUPPORTED_SYSCALL(NAME)	\
+  const enum gdb_syscall local_gdb_syscall_ ## NAME ATTRIBUTE_UNUSED = gdb_sys_no_syscall;
 
-  if (syscall <= i386_syscall_max)
-    return (enum gdb_syscall) syscall;
-  else
-    return gdb_sys_no_syscall;
+  const enum gdb_syscall local_gdb_syscall_mmap = gdb_sys_old_mmap;
+
+#include "gdb/gdb-syscalls.def"
+
+#undef GDB_SYSCALL
+#undef GDB_OLD_SYSCALL
+#undef GDB_UNSUPPORTED_SYSCALL
+
+  switch ((enum i386_syscall)syscall)
+    {
+#define SYSCALL(NAME, NUMBER)			\
+      case i386_sys_ ## NAME:		\
+	return local_gdb_syscall_ ## NAME;
+#define SYSCALL_DUP(NAME, NUMBER)
+
+#include "gdb/i386-syscalls.def"
+
+#undef SYSCALL
+
+    default:
+      return gdb_sys_no_syscall;
+  }
 }
 
 /* Value of the sigcode in case of a boundary fault.  */
