@@ -2270,7 +2270,7 @@ aarch64_canonicalize_syscall (enum aarch64_syscall syscall_number)
       SYSCALL_MAP (execve);
 
     case aarch64_sys_mmap:
-      return gdb_sys_mmap2;
+      return gdb_sys_old_mmap;
 
       SYSCALL_MAP (fadvise64);
       SYSCALL_MAP (swapon);
