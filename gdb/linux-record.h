@@ -511,6 +511,7 @@ enum gdb_syscall {
   gdb_sys_pipe2 = 331,
   gdb_sys_inotify_init1 = 332,
   gdb_sys_getrandom = 355,
+  gdb_sys_accept4 = 364,
   gdb_sys_statx = 383,
   gdb_sys_clock_gettime64 = 403,
   gdb_sys_socket = 500,
