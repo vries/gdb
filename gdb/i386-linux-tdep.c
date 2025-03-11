@@ -813,7 +813,7 @@ i386_canonicalize_syscall (int syscall)
       UNSUPPORTED_SYSCALL_MAP (recvmmsg_time64);
       UNSUPPORTED_SYSCALL_MAP (mq_timedsend_time64);
       UNSUPPORTED_SYSCALL_MAP (mq_timedreceive_time64);
-      UNSUPPORTED_SYSCALL_MAP (semtimedop_time64);
+      SYSCALL_MAP_RENAME (semtimedop_time64, gdb_sys_semtimedop);
       UNSUPPORTED_SYSCALL_MAP (rt_sigtimedwait_time64);
       UNSUPPORTED_SYSCALL_MAP (futex_time64);
       UNSUPPORTED_SYSCALL_MAP (sched_rr_get_interval_time64);
