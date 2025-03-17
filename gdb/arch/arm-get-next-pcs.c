@@ -39,6 +39,47 @@ arm_get_next_pcs_ctor (struct arm_get_next_pcs *self,
   self->regcache = regcache;
 }
 
+/* Return true if INSN is an ldaex insn, either:
+   - thumb32 (THUMB32), or
+   - arm     (!THUMB32).  */
+
+static bool
+ldaex_p (uint32_t insn, bool thumb32)
+{
+  /* Copied from arm_opcodes in opcodes/arm-dis.c.  */
+  const uint32_t matches_arm[] = {
+    0x01900e9f, 0x0ff00fff,
+    0x01b00e9f, 0x0ff00fff,
+    0x01d00e9f, 0x0ff00fff,
+    0x01f00e9f, 0x0ff00fff
+  };
+  const size_t items_arm = sizeof (matches_arm) / sizeof (*matches_arm);
+  static_assert (items_arm % 2 == 0);
+
+  /* Copied from thumb32_opcodes in opcodes/arm-dis.c.  */
+  const uint32_t matches_thumb32[] = {
+    0xe8d00fcf, 0xfff00fff,
+    0xe8d00fdf, 0xfff00fff,
+    0xe8d00fef, 0xfff00fff,
+    0xe8d000ff, 0xfff000ff
+  };
+  const size_t items_thumb32 = sizeof (matches_thumb32) / sizeof (*matches_thumb32);
+  static_assert (items_thumb32 % 2 == 0);
+
+  const uint32_t *matches = thumb32 ? matches_thumb32 : matches_arm;
+  size_t items = thumb32 ? items_thumb32 : items_arm;
+
+  for (int i = 0; i < items; i += 2)
+    {
+      uint32_t value = matches[i];
+      uint32_t mask = matches[i + 1];
+      if ((insn & mask) == value)
+	return true;
+    }
+
+  return false;
+}
+
 /* Checks for an atomic sequence of instructions beginning with a LDREX{,B,H,D}
    instruction and ending with a STREX{,B,H,D} instruction.  If such a sequence
    is found, attempt to step through it.  The end of the sequence address is
@@ -74,8 +115,12 @@ thumb_deal_with_atomic_sequence_raw (struct arm_get_next_pcs *self)
   insn2 = self->ops->read_mem_uint (loc, 2, byte_order_for_code);
 
   loc += 2;
+
+  uint32_t insn = (uint32_t)insn2 | ((uint32_t)insn1 << 16);
+
   if (!((insn1 & 0xfff0) == 0xe850
-	|| ((insn1 & 0xfff0) == 0xe8d0 && (insn2 & 0x00c0) == 0x0040)))
+	|| ((insn1 & 0xfff0) == 0xe8d0 && (insn2 & 0x00c0) == 0x0040)
+	|| ldaex_p (insn, true)))
     return {};
 
   /* Assume that no atomic sequence is longer than "atomic_sequence_length"
