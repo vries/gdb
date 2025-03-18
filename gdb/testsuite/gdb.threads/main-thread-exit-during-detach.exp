@@ -76,10 +76,33 @@ proc run_test { spawn_inferior } {
 
 	# Attaching to a multi-threaded application in non-stop mode
 	# can result in thread stops being reported after the prompt
-	# is displayed.
+	# is displayed, so the thread may still be reported as running.
 	#
-	# Send a simple command now just to resync the command prompt.
-	gdb_test "p 1 + 2" " = 3"
+	# Iterate until the thread is no longer reported as running.
+	set stopped 0
+	set re_running [string_to_regexp "(running)"]
+	for { set i 0 } { $i < 10 } { incr i } {
+	    with_test_prefix $i {
+		gdb_test_multiple "info thread 2" "" -no-prompt-anchor {
+		    -re -wrap $re_running.* {
+		    }
+		    -re -wrap "" {
+			set stopped 1
+		    }
+		}
+	    }
+	    if { $stopped } {
+		break
+	    }
+
+	    # Back off to let gdb and inferior make progress.
+	    sleep 1
+	}
+
+	gdb_assert { $stopped } "Thread 2 stopped"
+	if { ! $stopped } {
+	    return -1
+	}
 
 	# Set thread 1 (the current thread) running again.
 	gdb_test "continue&"
