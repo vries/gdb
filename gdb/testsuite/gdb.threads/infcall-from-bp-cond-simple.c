@@ -20,6 +20,8 @@
 
 #define NUM_THREADS 3
 
+static pthread_barrier_t threads_started_barrier;
+
 int
 is_matching_tid (int *tid_ptr, int tid_value)
 {
@@ -55,6 +57,7 @@ function_with_breakpoint ()
 void *
 worker_func (void *arg)
 {
+  pthread_barrier_wait (&threads_started_barrier);
   int a = 42;	/* Breakpoint here.  */
   return NULL;
 }
@@ -72,6 +75,8 @@ main ()
   int args[NUM_THREADS];
 
   alarm (300);
+
+  pthread_barrier_init (&threads_started_barrier, NULL, NUM_THREADS);
 
   for (int i = 0; i < NUM_THREADS; i++)
     {
