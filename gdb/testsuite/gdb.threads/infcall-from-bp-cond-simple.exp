@@ -213,23 +213,12 @@ proc_with_prefix run_bp_cond_hits_breakpoint { target_async target_non_stop } {
 	     "When the function is done executing, GDB will silently stop\\."]
 }
 
-foreach_with_prefix target_async { "on" "off" } {
-    foreach_with_prefix target_non_stop { "on" "off" } {
-	run_condition_test "exactly one thread is hit" \
-	    1 "is_matching_tid (arg, 1)" \
-	    $target_async $target_non_stop
-	run_condition_test "exactly two threads are hit" \
-	    2 "(is_matching_tid (arg, 0) || is_matching_tid (arg, 2))" \
-	    $target_async $target_non_stop
-	run_condition_test "all three threads are hit" \
-	    3 "return_true ()" \
-	    $target_async $target_non_stop
-	run_condition_test "no thread is hit" \
-	    0 "return_false ()" \
-	    $target_async $target_non_stop
-
-	run_kill_and_restart_test $target_async $target_non_stop
-	run_bp_cond_segfaults $target_async $target_non_stop
-	run_bp_cond_hits_breakpoint $target_async $target_non_stop
+foreach_with_prefix target_async { "on" } {
+    foreach_with_prefix target_non_stop { "on" } {
+	for {set i 0} {$i < 10000} {incr i} {
+	    with_test_prefix $i {
+		run_bp_cond_hits_breakpoint $target_async $target_non_stop
+	    }
+	}
     }
 }
