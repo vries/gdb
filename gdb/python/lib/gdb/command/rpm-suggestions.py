@@ -503,8 +503,11 @@ class rpm_suggestion_build_id_mode(gdb.Parameter):
 
 # The 'info rpm-suggestions' command.
 class rpm_suggestion_info(gdb.Command):
-    """Relist any RPM installation suggestions that have been made
+    """Relist RPM installation suggestions.
+
+    Relist any RPM installation suggestions that have been made
     since the executable was last changed."""
+
     def __init__(self):
         super().__init__("info rpm-suggestions", gdb.COMMAND_NONE, gdb.COMPLETE_NONE)
 
