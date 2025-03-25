@@ -351,7 +351,7 @@ else:
     # Take a non-empty list of RPM names and print a command line a
     # user could run to install these RPMs.
     def print_rpm_suggestions(rpm_name_list):
-        print("Missing rpms, try: dnf --enablerepo='*debug*' install " + ' '.join(rpm_name_list))
+        print("Missing separate debuginfos, use: zypper install " + ' '.join(rpm_name_list))
 
     # Take a non-empty list of build-id strings and print a series of
     # lines that a user could run to instll the RPMs that provide
@@ -416,7 +416,10 @@ else:
 
     # Register the missing debug and missing objfile handlers with GDB.
     gdb.missing_debug.register_handler(None, RPM_MissingDebugHandler())
-    gdb.missing_objfile.register_handler(None, RPM_MissingObjfileHandler())
+
+    # Not enabled for SUSE/openSUSE.  Zypper doesn't support finding packages
+    # based on build-id, unless the package's installed.
+    #gdb.missing_objfile.register_handler(None, RPM_MissingObjfileHandler())
 
     # Implement the core of 'info rpm-suggestions'.  Reprint all rpm
     # suggestions.
