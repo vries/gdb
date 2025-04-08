@@ -54,6 +54,8 @@ extern void *foo_label_6 (void);
 void
 foo (void)
 {
+  void *goto_target = &foo_label_6;
+
   /* This label is used to find the start of 'foo' when generating the
      debug information.  */
   asm ("foo_label: .globl foo_label");
@@ -76,7 +78,7 @@ foo (void)
      destination address be a global label so that we can generate DWARF
      that has ranges that start exactly at the destination address.  */
   if (global_var > 0)
-    goto *(&foo_label_6);
+    goto *(goto_target);
 
   LABEL (4);
   ++global_var;
