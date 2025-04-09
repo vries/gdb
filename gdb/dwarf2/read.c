@@ -15361,18 +15361,33 @@ cutu_reader::read_dwo_str_index (ULONGEST str_index)
 {
   unsigned offset_size;
   ULONGEST str_offsets_base;
+
+  unsigned int bytes_read = 0;
+  bfd *abfd = m_dwo_file->sections.str_offsets.get_bfd_owner ();
+  const gdb_byte *p = m_dwo_file->sections.str_offsets.buffer;
+
+  bool valid_header = false;
   if (m_cu->header.version >= 5)
     {
       /* We have a DWARF5 CU with a reference to a .debug_str_offsets section,
 	 so assume the .debug_str_offsets section is DWARF5 as well, and
 	 parse the header.  FIXME: Parse the header only once.  */
-      unsigned int bytes_read = 0;
-      bfd *abfd = m_dwo_file->sections.str_offsets.get_bfd_owner ();
-      const gdb_byte *p = m_dwo_file->sections.str_offsets.buffer;
 
       /* Header: Initial length.  */
-      read_initial_length (abfd, p + bytes_read, &bytes_read);
+      LONGEST initial_length
+	= read_initial_length (abfd, p + bytes_read, &bytes_read);
 
+      /* GCC 8 and earlier have a bug that for dwarf5 it produces a
+	 pre-dwarf5 .debug_str_offsets section.  We'd wish we could make
+	 this work-around more precise by checking that producer is gcc and
+	 gcc version <= 8, but that doesn't work if we need this workaround
+	 to read the producer string.  */
+      valid_header
+	= initial_length + bytes_read == m_dwo_file->sections.str_offsets.size;
+    }
+
+  if (m_cu->header.version >= 5 && valid_header)
+    {
       /* Determine offset_size based on the .debug_str_offsets header.  */
       const bool dwarf5_is_dwarf64 = bytes_read != 4;
       offset_size = dwarf5_is_dwarf64 ? 8 : 4;
