@@ -279,7 +279,7 @@ struct dwo_sections
   struct dwarf2_section_info str;
   struct dwarf2_section_info str_offsets;
   /* In the case of a virtual DWO file, these two are unused.  */
-  struct dwarf2_section_info info;
+  std::vector<dwarf2_section_info> infos;
   std::vector<dwarf2_section_info> types;
 };
 
@@ -2481,11 +2481,11 @@ create_dwo_debug_type_hash_table (dwarf2_per_objfile *per_objfile,
 static void
 create_dwo_debug_types_hash_table
   (dwarf2_per_objfile *per_objfile, dwo_file *dwo_file,
-   gdb::array_view<dwarf2_section_info> type_sections)
+   gdb::array_view<dwarf2_section_info> type_sections, rcuh_kind section_kind)
 {
   for (dwarf2_section_info &section : type_sections)
     create_dwo_debug_type_hash_table (per_objfile, dwo_file, &section,
-				  rcuh_kind::TYPE);
+				      section_kind);
 }
 
 /* Add an entry for signature SIG to per_bfd->signatured_types.  */
@@ -6308,13 +6308,13 @@ lookup_dwo_file (dwarf2_per_bfd *per_bfd, const char *dwo_name,
    Note: This function processes DWO files only, not DWP files.  */
 
 static void
-create_dwo_cus_hash_table (dwarf2_cu *cu, dwo_file &dwo_file)
+create_dwo_cus_hash_table (dwarf2_cu *cu, dwo_file &dwo_file,
+			   dwarf2_section_info &section)
 {
   dwarf2_per_objfile *per_objfile = cu->per_objfile;
   struct objfile *objfile = per_objfile->objfile;
   dwarf2_per_bfd *per_bfd = per_objfile->per_bfd;
   const gdb_byte *info_ptr, *end_ptr;
-  auto &section = dwo_file.sections.info;
 
   section.read (objfile);
   info_ptr = section.buffer;
@@ -7574,7 +7574,13 @@ dwarf2_locate_dwo_sections (struct objfile *objfile, bfd *abfd,
   if (names->abbrev_dwo.matches (sectp->name))
     dw_sect = &dwo_sections->abbrev;
   else if (names->info_dwo.matches (sectp->name))
-    dw_sect = &dwo_sections->info;
+    {
+      struct dwarf2_section_info info_section;
+
+      memset (&info_section, 0, sizeof (info_section));
+      dwo_sections->infos.push_back (info_section);
+      dw_sect = &dwo_sections->infos.back ();
+    }
   else if (names->line_dwo.matches (sectp->name))
     dw_sect = &dwo_sections->line;
   else if (names->loc_dwo.matches (sectp->name))
@@ -7636,15 +7642,17 @@ open_and_init_dwo_file (dwarf2_cu *cu, const char *dwo_name,
     dwarf2_locate_dwo_sections (per_objfile->objfile, dwo_file->dbfd.get (),
 				sec, &dwo_file->sections);
 
-  create_dwo_cus_hash_table (cu, *dwo_file);
+  for (auto &sec : dwo_file->sections.infos)
+    create_dwo_cus_hash_table (cu, *dwo_file, sec);
 
   if (cu->header.version < 5)
     create_dwo_debug_types_hash_table (per_objfile, dwo_file.get (),
-				       dwo_file->sections.types);
+				       dwo_file->sections.types,
+				       rcuh_kind::TYPE);
   else
-    create_dwo_debug_type_hash_table (per_objfile, dwo_file.get (),
-				      &dwo_file->sections.info,
-				      rcuh_kind::COMPILE);
+    create_dwo_debug_types_hash_table (per_objfile, dwo_file.get (),
+				       dwo_file->sections.infos,
+				       rcuh_kind::COMPILE);
 
   dwarf_read_debug_printf ("DWO file found: %s", dwo_name);
 
