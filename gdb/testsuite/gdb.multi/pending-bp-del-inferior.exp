@@ -183,12 +183,16 @@ proc do_dprintf_test { bp_pending } {
 		 "\\s+printf \"in $bp_func\""]
 	set bp_pattern_after $bp_pattern_before
     } else {
-	set bp_pattern_before \
-	    [multi_line \
-		 "$bp_number\\s+dprintf\\s+keep\\s+y\\s+<MULTIPLE>\\s*" \
-		 "\\s+printf \"in $bp_func\"" \
-		 "$bp_number\\.1\\s+y\\s+$::hex in $bp_func at \[^\r\n\]+ inf 1" \
-		 "$bp_number\\.2\\s+y\\s+$::hex in $bp_func at \[^\r\n\]+ inf 2"]
+	set res {}
+	foreach inf_a { 1 2 } inf_b { 2 1 } {
+	    lappend res \
+		[multi_line \
+		     "$bp_number\\s+dprintf\\s+keep\\s+y\\s+<MULTIPLE>\\s*" \
+		     "\\s+printf \"in $bp_func\"" \
+		     "$bp_number\\.1\\s+y\\s+$::hex in $bp_func at \[^\r\n\]+ inf $inf_a" \
+		     "$bp_number\\.2\\s+y\\s+$::hex in $bp_func at \[^\r\n\]+ inf $inf_b"]
+	}
+	set bp_pattern_before "([join $res "|"])"
 
 	set bp_pattern_after \
 	    [multi_line \
