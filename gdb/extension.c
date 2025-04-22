@@ -34,6 +34,7 @@
 #include <array>
 #include "inferior.h"
 #include "gdbsupport/scoped_signal_handler.h"
+#include "gdbsupport/gdb-sigmask.h"
 
 static script_sourcer_func source_gdb_script;
 static objfile_script_sourcer_func source_gdb_objfile_script;
@@ -651,6 +652,38 @@ breakpoint_ext_lang_cond_says_stop (struct breakpoint *b)
    cooperative_sigint_handling_disabled.  */
 static std::recursive_mutex ext_lang_mutex;
 
+class scoped_lock_ext_lang_mutex
+{
+public:
+  scoped_lock_ext_lang_mutex ()
+  {
+#ifdef HAVE_SIGPROCMASK
+    sigset_t mask;
+    sigemptyset (&mask);
+    sigaddset (&mask, SIGINT);
+    sigaddset (&mask, SIGTERM);
+    gdb_sigmask (SIG_BLOCK, &mask, &m_old_mask);
+#endif
+    ext_lang_mutex.lock ();
+  }
+
+  ~scoped_lock_ext_lang_mutex ()
+  {
+    ext_lang_mutex.unlock ();
+#ifdef HAVE_SIGPROCMASK
+    gdb_sigmask (SIG_SETMASK, &m_old_mask, nullptr);
+#endif
+  }
+
+  DISABLE_COPY_AND_ASSIGN (scoped_lock_ext_lang_mutex);
+
+private:
+
+#ifdef HAVE_SIGPROCMASK
+  sigset_t m_old_mask;
+#endif
+};
+
 #endif /* CXX_STD_THREAD */
 
 /* This flag tracks quit requests when we haven't called out to an
@@ -709,7 +742,7 @@ static bool cooperative_sigint_handling_disabled = false;
 scoped_disable_cooperative_sigint_handling::scoped_disable_cooperative_sigint_handling ()
 {
 #if CXX_STD_THREAD
-  std::lock_guard guard (ext_lang_mutex);
+  scoped_lock_ext_lang_mutex scoped_lock;
 #endif /* CXX_STD_THREAD */
 
   /* Force the active extension language to the GDB scripting
@@ -730,7 +763,7 @@ scoped_disable_cooperative_sigint_handling::scoped_disable_cooperative_sigint_ha
 scoped_disable_cooperative_sigint_handling::~scoped_disable_cooperative_sigint_handling ()
 {
 #if CXX_STD_THREAD
-  std::lock_guard guard (ext_lang_mutex);
+  scoped_lock_ext_lang_mutex scoped_lock;
 #endif /* CXX_STD_THREAD */
 
   cooperative_sigint_handling_disabled = m_prev_cooperative_sigint_handling_disabled;
@@ -772,7 +805,7 @@ struct active_ext_lang_state *
 set_active_ext_lang (const struct extension_language_defn *now_active)
 {
 #if CXX_STD_THREAD
-  std::lock_guard guard (ext_lang_mutex);
+  scoped_lock_ext_lang_mutex scoped_lock;
 #endif /* CXX_STD_THREAD */
 
 #if GDB_SELF_TEST
@@ -828,7 +861,7 @@ void
 restore_active_ext_lang (struct active_ext_lang_state *previous)
 {
 #if CXX_STD_THREAD
-  std::lock_guard guard (ext_lang_mutex);
+  scoped_lock_ext_lang_mutex scoped_lock;
 #endif /* CXX_STD_THREAD */
 
   if (cooperative_sigint_handling_disabled)
@@ -862,7 +895,7 @@ void
 set_quit_flag ()
 {
 #if CXX_STD_THREAD
-  std::lock_guard guard (ext_lang_mutex);
+  scoped_lock_ext_lang_mutex scoped_lock;
 #endif /* CXX_STD_THREAD */
 
   if (active_ext_lang->ops != NULL
@@ -887,7 +920,7 @@ bool
 check_quit_flag ()
 {
 #if CXX_STD_THREAD
-  std::lock_guard guard (ext_lang_mutex);
+  scoped_lock_ext_lang_mutex scoped_lock;
 #endif /* CXX_STD_THREAD */
 
   bool result = false;
