@@ -638,21 +638,6 @@ breakpoint_ext_lang_cond_says_stop (struct breakpoint *b)
    This requires cooperation with the extension languages so the support
    is defined here.  */
 
-#if CXX_STD_THREAD
-
-#include <mutex>
-
-/* DAP needs a way to interrupt the main thread, so we added
-   gdb.interrupt.  However, as this can run from any thread, we need
-   locking for the current extension language.  If threading is not
-   available, DAP will not start.
-
-   This lock is held for accesses to quit_flag, active_ext_lang, and
-   cooperative_sigint_handling_disabled.  */
-static std::recursive_mutex ext_lang_mutex;
-
-#endif /* CXX_STD_THREAD */
-
 /* This flag tracks quit requests when we haven't called out to an
    extension language.  it also holds quit requests when we transition to
    an extension language that doesn't have cooperative SIGINT handling.  */
@@ -708,10 +693,6 @@ static bool cooperative_sigint_handling_disabled = false;
 
 scoped_disable_cooperative_sigint_handling::scoped_disable_cooperative_sigint_handling ()
 {
-#if CXX_STD_THREAD
-  std::lock_guard guard (ext_lang_mutex);
-#endif /* CXX_STD_THREAD */
-
   /* Force the active extension language to the GDB scripting
      language.  This ensures that a previously saved SIGINT is moved
      to the quit_flag global, as well as ensures that future SIGINTs
@@ -729,10 +710,6 @@ scoped_disable_cooperative_sigint_handling::scoped_disable_cooperative_sigint_ha
 
 scoped_disable_cooperative_sigint_handling::~scoped_disable_cooperative_sigint_handling ()
 {
-#if CXX_STD_THREAD
-  std::lock_guard guard (ext_lang_mutex);
-#endif /* CXX_STD_THREAD */
-
   cooperative_sigint_handling_disabled = m_prev_cooperative_sigint_handling_disabled;
   restore_active_ext_lang (m_prev_active_ext_lang_state);
 }
@@ -771,10 +748,6 @@ scoped_disable_cooperative_sigint_handling::~scoped_disable_cooperative_sigint_h
 struct active_ext_lang_state *
 set_active_ext_lang (const struct extension_language_defn *now_active)
 {
-#if CXX_STD_THREAD
-  std::lock_guard guard (ext_lang_mutex);
-#endif /* CXX_STD_THREAD */
-
 #if GDB_SELF_TEST
   if (selftests::hook_set_active_ext_lang)
     selftests::hook_set_active_ext_lang ();
@@ -827,10 +800,6 @@ set_active_ext_lang (const struct extension_language_defn *now_active)
 void
 restore_active_ext_lang (struct active_ext_lang_state *previous)
 {
-#if CXX_STD_THREAD
-  std::lock_guard guard (ext_lang_mutex);
-#endif /* CXX_STD_THREAD */
-
   if (cooperative_sigint_handling_disabled)
     {
       /* See set_active_ext_lang.  */
@@ -861,10 +830,6 @@ restore_active_ext_lang (struct active_ext_lang_state *previous)
 void
 set_quit_flag ()
 {
-#if CXX_STD_THREAD
-  std::lock_guard guard (ext_lang_mutex);
-#endif /* CXX_STD_THREAD */
-
   if (active_ext_lang->ops != NULL
       && active_ext_lang->ops->set_quit_flag != NULL)
     active_ext_lang->ops->set_quit_flag (active_ext_lang);
@@ -886,10 +851,6 @@ set_quit_flag ()
 bool
 check_quit_flag ()
 {
-#if CXX_STD_THREAD
-  std::lock_guard guard (ext_lang_mutex);
-#endif /* CXX_STD_THREAD */
-
   bool result = false;
 
   for (const struct extension_language_defn *extlang : extension_languages)
