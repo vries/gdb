@@ -1202,16 +1202,7 @@ gdbpy_post_event (PyObject *self, PyObject *args)
 static PyObject *
 gdbpy_interrupt (PyObject *self, PyObject *args)
 {
-  {
-    /* Make sure the interrupt isn't delivered immediately somehow.
-       This probably is not truly needed, but at the same time it
-       seems more clear to be explicit about the intent.  */
-    gdbpy_allow_threads temporarily_exit_python;
-    scoped_disable_cooperative_sigint_handling no_python_sigint;
-
-    set_quit_flag ();
-  }
-
+  kill (getpid (), SIGINT);
   Py_RETURN_NONE;
 }
 
