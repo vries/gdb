@@ -72,6 +72,7 @@ PYTHON_DIR = python
 PYTHON_INSTALL_DIR = $(DESTDIR)$(GDB_DATADIR)/$(PYTHON_DIR)
 PYTHON_FILE_LIST = \
 	gdb/__init__.py \
+	gdb/_util.py \
 	gdb/disassembler.py \
 	gdb/FrameDecorator.py \
 	gdb/FrameIterator.py \
