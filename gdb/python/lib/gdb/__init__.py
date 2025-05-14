@@ -26,16 +26,269 @@ if sys.version_info >= (3, 4):
 else:
     from imp import reload
 
-import _gdb
-
-# Note that two indicators are needed here to silence flake8.
-from _gdb import *  # noqa: F401,F403
-
 # isort: split
 
 # Historically, gdb.events was always available, so ensure it's
 # still available without an explicit import.
 import _gdbevents as events
+from _gdb import (  # noqa: F401
+    ARCH_FRAME,
+    BP_ACCESS_WATCHPOINT,
+    BP_BREAKPOINT,
+    BP_CATCHPOINT,
+    BP_HARDWARE_BREAKPOINT,
+    BP_HARDWARE_WATCHPOINT,
+    BP_NONE,
+    BP_READ_WATCHPOINT,
+    BP_WATCHPOINT,
+    COLORSPACE_AIXTERM_16COLOR,
+    COLORSPACE_ANSI_8COLOR,
+    COLORSPACE_MONOCHROME,
+    COLORSPACE_RGB_24BIT,
+    COLORSPACE_XTERM_256COLOR,
+    COMMAND_BREAKPOINTS,
+    COMMAND_DATA,
+    COMMAND_FILES,
+    COMMAND_MAINTENANCE,
+    COMMAND_NONE,
+    COMMAND_OBSCURE,
+    COMMAND_RUNNING,
+    COMMAND_STACK,
+    COMMAND_STATUS,
+    COMMAND_SUPPORT,
+    COMMAND_TRACEPOINTS,
+    COMMAND_TUI,
+    COMMAND_USER,
+    COMPLETE_COMMAND,
+    COMPLETE_EXPRESSION,
+    COMPLETE_FILENAME,
+    COMPLETE_LOCATION,
+    COMPLETE_NONE,
+    COMPLETE_SYMBOL,
+    DUMMY_FRAME,
+    FRAME_UNWIND_INNER_ID,
+    FRAME_UNWIND_MEMORY_ERROR,
+    FRAME_UNWIND_NO_REASON,
+    FRAME_UNWIND_NO_SAVED_PC,
+    FRAME_UNWIND_NULL_ID,
+    FRAME_UNWIND_OUTERMOST,
+    FRAME_UNWIND_SAME_ID,
+    FRAME_UNWIND_UNAVAILABLE,
+    HOST_CONFIG,
+    INLINE_FRAME,
+    NORMAL_FRAME,
+    PARAM_AUTO_BOOLEAN,
+    PARAM_BOOLEAN,
+    PARAM_COLOR,
+    PARAM_ENUM,
+    PARAM_FILENAME,
+    PARAM_INTEGER,
+    PARAM_OPTIONAL_FILENAME,
+    PARAM_STRING,
+    PARAM_STRING_NOESCAPE,
+    PARAM_UINTEGER,
+    PARAM_ZINTEGER,
+    PARAM_ZUINTEGER,
+    PARAM_ZUINTEGER_UNLIMITED,
+    SEARCH_COMMON_BLOCK_DOMAIN,
+    SEARCH_FUNCTION_DOMAIN,
+    SEARCH_LABEL_DOMAIN,
+    SEARCH_MODULE_DOMAIN,
+    SEARCH_STRUCT_DOMAIN,
+    SEARCH_TYPE_DOMAIN,
+    SEARCH_UNDEF_DOMAIN,
+    SEARCH_VAR_DOMAIN,
+    SENTINEL_FRAME,
+    SIGTRAMP_FRAME,
+    STDERR,
+    STDLOG,
+    STDOUT,
+    SYMBOL_COMMON_BLOCK_DOMAIN,
+    SYMBOL_FUNCTION_DOMAIN,
+    SYMBOL_LABEL_DOMAIN,
+    SYMBOL_LOC_ARG,
+    SYMBOL_LOC_BLOCK,
+    SYMBOL_LOC_COMMON_BLOCK,
+    SYMBOL_LOC_COMPUTED,
+    SYMBOL_LOC_CONST,
+    SYMBOL_LOC_CONST_BYTES,
+    SYMBOL_LOC_LABEL,
+    SYMBOL_LOC_LOCAL,
+    SYMBOL_LOC_OPTIMIZED_OUT,
+    SYMBOL_LOC_REF_ARG,
+    SYMBOL_LOC_REGISTER,
+    SYMBOL_LOC_REGPARM_ADDR,
+    SYMBOL_LOC_STATIC,
+    SYMBOL_LOC_TYPEDEF,
+    SYMBOL_LOC_UNDEF,
+    SYMBOL_LOC_UNRESOLVED,
+    SYMBOL_MODULE_DOMAIN,
+    SYMBOL_STRUCT_DOMAIN,
+    SYMBOL_TYPE_DOMAIN,
+    SYMBOL_UNDEF_DOMAIN,
+    SYMBOL_VAR_DOMAIN,
+    TAILCALL_FRAME,
+    TARGET_CONFIG,
+    TYPE_CODE_ARRAY,
+    TYPE_CODE_BITSTRING,
+    TYPE_CODE_BOOL,
+    TYPE_CODE_CHAR,
+    TYPE_CODE_COMPLEX,
+    TYPE_CODE_DECFLOAT,
+    TYPE_CODE_ENUM,
+    TYPE_CODE_ERROR,
+    TYPE_CODE_FIXED_POINT,
+    TYPE_CODE_FLAGS,
+    TYPE_CODE_FLT,
+    TYPE_CODE_FUNC,
+    TYPE_CODE_INT,
+    TYPE_CODE_INTERNAL_FUNCTION,
+    TYPE_CODE_MEMBERPTR,
+    TYPE_CODE_METHOD,
+    TYPE_CODE_METHODPTR,
+    TYPE_CODE_MODULE,
+    TYPE_CODE_NAMELIST,
+    TYPE_CODE_NAMESPACE,
+    TYPE_CODE_PTR,
+    TYPE_CODE_RANGE,
+    TYPE_CODE_REF,
+    TYPE_CODE_RVALUE_REF,
+    TYPE_CODE_SET,
+    TYPE_CODE_STRING,
+    TYPE_CODE_STRUCT,
+    TYPE_CODE_TYPEDEF,
+    TYPE_CODE_UNION,
+    TYPE_CODE_VOID,
+    TYPE_CODE_XMETHOD,
+    VERSION,
+    WP_ACCESS,
+    WP_READ,
+    WP_WRITE,
+    Architecture,
+    Block,
+    BlockIterator,
+    Breakpoint,
+    BreakpointEvent,
+    BreakpointLocation,
+    BtraceObjectList,
+    ClearObjFilesEvent,
+    Color,
+    Command,
+    ConnectionEvent,
+    ContinueEvent,
+    Event,
+    EventRegistry,
+    ExecutableChangedEvent,
+    ExitedEvent,
+    Field,
+    FinishBreakpoint,
+    Frame,
+    FreeObjFileEvent,
+    FreeProgspaceEvent,
+    Function,
+    GdbError,
+    GdbExitingEvent,
+    Inferior,
+    InferiorCallPostEvent,
+    InferiorCallPreEvent,
+    InferiorDeletedEvent,
+    InferiorThread,
+    Instruction,
+    LazyString,
+    LineTable,
+    LineTableEntry,
+    LineTableIterator,
+    Membuf,
+    MemoryChangedEvent,
+    MemoryError,
+    MICommand,
+    NewInferiorEvent,
+    NewObjFileEvent,
+    NewProgspaceEvent,
+    NewThreadEvent,
+    Objfile,
+    Parameter,
+    PendingFrame,
+    Progspace,
+    Record,
+    RecordAuxiliary,
+    RecordFunctionSegment,
+    RecordGap,
+    RecordInstruction,
+    RegisterChangedEvent,
+    RegisterDescriptor,
+    RegisterDescriptorIterator,
+    RegisterGroup,
+    RegisterGroupsIterator,
+    RemoteTargetConnection,
+    SignalEvent,
+    StopEvent,
+    Symbol,
+    Symtab,
+    Symtab_and_line,
+    TargetConnection,
+    ThreadEvent,
+    ThreadExitedEvent,
+    TuiEnabledEvent,
+    TuiWindow,
+    Type,
+    TypeIterator,
+    UnwindInfo,
+    Value,
+    ValuePrinter,
+    add_history,
+    architecture_names,
+    breakpoints,
+    connections,
+    convenience_variable,
+    current_language,
+    current_objfile,
+    current_recording,
+    decode_line,
+    default_visualizer,
+    disassembler,
+    error,
+    execute,
+    execute_mi,
+    flush,
+    format_address,
+    frame_stop_reason_string,
+    history,
+    history_count,
+    host_charset,
+    inferiors,
+    interrupt,
+    invalidate_cached_frames,
+    lookup_global_symbol,
+    lookup_objfile,
+    lookup_static_symbol,
+    lookup_static_symbols,
+    lookup_symbol,
+    lookup_type,
+    newest_frame,
+    notify_mi,
+    parameter,
+    parse_and_eval,
+    post_event,
+    print_options,
+    progspaces,
+    rbreak,
+    register_window_type,
+    selected_frame,
+    selected_inferior,
+    selected_thread,
+    set_convenience_variable,
+    start_recording,
+    stop_recording,
+    string_to_argv,
+    target_charset,
+    target_wide_charset,
+    write,
+)
+
+import gdb._util
+
+gdb._util.verify_import_all("_gdb", globals())
 
 sys.modules["gdb.events"] = events
 
@@ -60,14 +313,14 @@ class _GdbFile(object):
             self.write(line)
 
     def flush(self):
-        _gdb.flush(stream=self.stream)
+        flush(stream=self.stream)
 
     def write(self, s):
-        _gdb.write(s, stream=self.stream)
+        write(s, stream=self.stream)
 
 
-sys.stdout = _GdbFile(_gdb.STDOUT)
-sys.stderr = _GdbFile(_gdb.STDERR)
+sys.stdout = _GdbFile(STDOUT)
+sys.stderr = _GdbFile(STDERR)
 
 # Default prompt hook does nothing.
 prompt_hook = None
@@ -189,7 +442,7 @@ def GdbSetPythonDirectory(dir):
 
 def current_progspace():
     "Return the current Progspace."
-    return _gdb.selected_inferior().progspace
+    return selected_inferior().progspace
 
 
 def objfiles():
@@ -226,14 +479,14 @@ def set_parameter(name, value):
             value = "on"
         else:
             value = "off"
-    _gdb.execute("set " + name + " " + str(value), to_string=True)
+    execute("set " + name + " " + str(value), to_string=True)
 
 
 @contextmanager
 def with_parameter(name, value):
     """Temporarily set the GDB parameter NAME to VALUE.
     Note that this is a context manager."""
-    old_value = _gdb.parameter(name)
+    old_value = parameter(name)
     set_parameter(name, value)
     try:
         # Nothing that useful to return.
@@ -411,7 +664,7 @@ class ParameterPrefix:
     # __doc__ string of its own, then sub-classes will inherit that __doc__
     # string, and GDB will not understand that it needs to generate one.
 
-    class _PrefixCommand(_gdb.Command):
+    class _PrefixCommand(Command):
         """A gdb.Command used to implement both the set and show prefixes.
 
         This documentation string is not used as the prefix command
