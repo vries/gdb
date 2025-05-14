@@ -18,11 +18,29 @@
 import _gdb.disassembler
 
 # Re-export everything from the _gdb.disassembler module, which is
-# defined within GDB's C++ code.  Note that two indicators are needed
-# here to silence flake8.
-from _gdb.disassembler import *  # noqa: F401,F403
+# defined within GDB's C++ code.
+from _gdb.disassembler import (  # noqa: F401
+    STYLE_ADDRESS,
+    STYLE_ADDRESS_OFFSET,
+    STYLE_ASSEMBLER_DIRECTIVE,
+    STYLE_COMMENT_START,
+    STYLE_IMMEDIATE,
+    STYLE_MNEMONIC,
+    STYLE_REGISTER,
+    STYLE_SUB_MNEMONIC,
+    STYLE_SYMBOL,
+    STYLE_TEXT,
+    DisassembleInfo,
+    DisassemblerAddressPart,
+    DisassemblerPart,
+    DisassemblerResult,
+    DisassemblerTextPart,
+    builtin_disassemble,
+)
 
 import gdb
+
+gdb._util.verify_import_all("_gdb.disassembler", globals())
 
 # Module global dictionary of gdb.disassembler.Disassembler objects.
 # The keys of this dictionary are bfd architecture names, or the
