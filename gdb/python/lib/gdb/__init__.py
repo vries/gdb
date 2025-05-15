@@ -26,10 +26,18 @@ if sys.version_info >= (3, 4):
 else:
     from imp import reload
 
-import _gdb
-
 # Note that two indicators are needed here to silence flake8.
 from _gdb import *  # noqa: F401,F403
+from _gdb import (
+    STDERR,
+    STDOUT,
+    Command,
+    execute,
+    flush,
+    parameter,
+    selected_inferior,
+    write,
+)
 
 # isort: split
 
@@ -60,14 +68,14 @@ class _GdbFile(object):
             self.write(line)
 
     def flush(self):
-        _gdb.flush(stream=self.stream)
+        flush(stream=self.stream)
 
     def write(self, s):
-        _gdb.write(s, stream=self.stream)
+        write(s, stream=self.stream)
 
 
-sys.stdout = _GdbFile(_gdb.STDOUT)
-sys.stderr = _GdbFile(_gdb.STDERR)
+sys.stdout = _GdbFile(STDOUT)
+sys.stderr = _GdbFile(STDERR)
 
 # Default prompt hook does nothing.
 prompt_hook = None
@@ -189,7 +197,7 @@ def GdbSetPythonDirectory(dir):
 
 def current_progspace():
     "Return the current Progspace."
-    return _gdb.selected_inferior().progspace
+    return selected_inferior().progspace
 
 
 def objfiles():
@@ -226,14 +234,14 @@ def set_parameter(name, value):
             value = "on"
         else:
             value = "off"
-    _gdb.execute("set " + name + " " + str(value), to_string=True)
+    execute("set " + name + " " + str(value), to_string=True)
 
 
 @contextmanager
 def with_parameter(name, value):
     """Temporarily set the GDB parameter NAME to VALUE.
     Note that this is a context manager."""
-    old_value = _gdb.parameter(name)
+    old_value = parameter(name)
     set_parameter(name, value)
     try:
         # Nothing that useful to return.
@@ -411,7 +419,7 @@ class ParameterPrefix:
     # __doc__ string of its own, then sub-classes will inherit that __doc__
     # string, and GDB will not understand that it needs to generate one.
 
-    class _PrefixCommand(_gdb.Command):
+    class _PrefixCommand(Command):
         """A gdb.Command used to implement both the set and show prefixes.
 
         This documentation string is not used as the prefix command

@@ -15,8 +15,6 @@
 
 """Disassembler related module."""
 
-import _gdb.disassembler
-
 # Re-export everything from the _gdb.disassembler module, which is
 # defined within GDB's C++ code.  Note that two indicators are needed
 # here to silence flake8.
@@ -85,7 +83,7 @@ def register_disassembler(disassembler, architecture=None):
     # disassembler functionality, this improves performance of the
     # disassembler by avoiding unneeded calls into Python when we know
     # that no disassemblers are registered.
-    _gdb.disassembler._set_enabled(len(_disassemblers_dict) > 0)
+    disassembler._set_enabled(len(_disassemblers_dict) > 0)
     return old
 
 
