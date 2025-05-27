@@ -2062,6 +2062,7 @@ ppc64_sysv_abi_return_value (struct gdbarch *gdbarch, struct value *function,
   /* Small character arrays are returned, right justified, in r3.  */
   if (valtype->code () == TYPE_CODE_ARRAY
       && !valtype->is_vector ()
+      && !TYPE_HAS_DYNAMIC_LENGTH (valtype)
       && valtype->length () <= 8
       && valtype->target_type ()->code () == TYPE_CODE_INT
       && valtype->target_type ()->length () == 1)
@@ -2112,6 +2113,7 @@ ppc64_sysv_abi_return_value (struct gdbarch *gdbarch, struct value *function,
   /* In the ELFv2 ABI, aggregate types of up to 16 bytes are
      returned in registers r3:r4.  */
   if (tdep->elf_abi == POWERPC_ELF_V2
+      && !TYPE_HAS_DYNAMIC_LENGTH (valtype)
       && valtype->length () <= 16
       && (valtype->code () == TYPE_CODE_STRUCT
 	  || valtype->code () == TYPE_CODE_UNION
