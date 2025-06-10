@@ -27,18 +27,18 @@ namespace memory_map_tests {
 
 /* A simple valid test input for parse_memory_map.  */
 
-static const char valid_mem_map[] = R"(<?xml version="1.0"?>
-<!DOCTYPE memory-map
-	  PUBLIC "+//IDN gnu.org//DTD GDB Memory Map V1.0//EN"
-		 "http://sourceware.org/gdb/gdb-memory-map.dtd">
-<memory-map>
-  <memory type="ram" start="0" length="4096" />
-  <memory type="rom" start="65536" length="256" />
-  <memory type="flash" start="131072" length="65536">
-    <property name="blocksize">1024</property>
-  </memory>
-</memory-map>
-)";
+static const char valid_mem_map[] = "\
+<?xml version=\"1.0\"?>\n\
+<!DOCTYPE memory-map\n\
+	  PUBLIC \"+//IDN gnu.org//DTD GDB Memory Map V1.0//EN\"\n\
+		 \"http://sourceware.org/gdb/gdb-memory-map.dtd\">\n\
+<memory-map>\n\
+  <memory type=\"ram\" start=\"0\" length=\"4096\" />\n\
+  <memory type=\"rom\" start=\"65536\" length=\"256\" />\n\
+  <memory type=\"flash\" start=\"131072\" length=\"65536\">\n\
+    <property name=\"blocksize\">1024</property>\n\
+  </memory>\n\
+</memory-map>";
 
 /* Validate memory region R against some expected values (the other
    parameters).  */
