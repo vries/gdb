@@ -42743,6 +42743,13 @@ reports and error and the command is aborted.
 
 @item show watchdog
 Show the current setting of the target wait timeout.
+
+@kindex maint set console-translation-mode
+@kindex maint show console-translation-mode
+@item maint set console-translation-mode @r{[}binary|text@r{]}
+@itemx maint show console-translation-mode
+Controls the translation mode of @value{GDBN} stdout/stderr.  MingW only.
+
 @end table
 
 @node Remote Protocol
