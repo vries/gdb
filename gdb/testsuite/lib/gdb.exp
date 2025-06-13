@@ -7547,6 +7547,7 @@ proc default_gdb_init { test_file_name } {
 
     # This disables style output, which would interfere with many
     # tests.
+    setenv TERM dumb
     setenv NO_COLOR sorry
 
     # This setting helps detect bugs in the Python code and doesn't
