@@ -39,10 +39,12 @@ gdb_expect {
     }
     eof {
 	fail "$test (eof)"
+	kill_wait_spawned_process $test_spawn_id
 	return
     }
     timeout {
 	fail "$test (timeout)"
+	kill_wait_spawned_process $test_spawn_id
 	return
     }
 }
@@ -56,6 +58,7 @@ set gstack_cmd [findfile $base_dir/../../gdb/gstack]
 set command "sh -c GDB=$GDB\\ GDBARGS=-data-directory\\\\\\ $GDB_DATA_DIRECTORY\\ $gstack_cmd\\ $pid\\;echo\\ GSTACK-END"
 set res [remote_spawn host $command]
 if { ![gdb_assert { ![expr {$res < 0 || $res == ""}] } $test] } {
+    kill_wait_spawned_process $test_spawn_id
     return
 }
 
