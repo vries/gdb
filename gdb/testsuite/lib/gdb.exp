@@ -7710,6 +7710,16 @@ proc make_gdb_parallel_path { args } {
     return [eval $joiner]
 }
 
+# Return 1 if NAME is an absolute path on the build board, otherwise return 0.
+
+proc isabsolute { name } {
+    if { [isbuild *-*-mingw*] && [regexp {^[a-zA-Z]:/} $name] } {
+	return true
+    }
+
+    return [string equal [file pathtype $name] "absolute"]
+}
+
 # Turn BASENAME into a full file name in the standard output
 # directory.  It is ok if BASENAME is the empty string; in this case
 # the directory is returned.
@@ -7723,6 +7733,17 @@ proc standard_output_file {basename} {
     if { [ishost *-*-mingw*] } {
         set dir [exec sh -c "cd ${dir} && pwd -W"]
     }
+
+    if { [regexp ^[string_to_regexp $dir] $basename] } {
+	# If BASENAME is already a full filename in the standard output
+	# directory, we're done.
+	return $basename
+    }
+
+    if { [isabsolute $basename] } {
+	error "Trying to add dir prefix '$dir' to absolute path '$basename'"
+    }
+
     return [file join $dir $basename]
 }
 
@@ -8638,7 +8659,7 @@ proc get_build_id { filename } {
 	}
 	return $data
     } else {
-	set tmp [standard_output_file "${filename}-tmp"]
+	set tmp [standard_temp_file [file tail "${filename}-tmp"]]
 	set objcopy_program [gdb_find_objcopy]
 	set result [catch "exec $objcopy_program -j .note.gnu.build-id -O binary $filename $tmp" output]
 	verbose "result is $result"
@@ -8951,7 +8972,9 @@ proc build_executable { testname executable {sources ""} {options {debug}} } {
 
 # Starts fresh GDB binary and loads an optional executable into GDB.
 # Usage: clean_restart [EXECUTABLE]
-# EXECUTABLE is the basename of the binary.
+# EXECUTABLE is either:
+# - the basename of the binary relative to the standard output dir, or
+# - an absolute path (for instance an exec in the standard temp dir).
 # Return -1 if starting gdb or loading the executable failed.
 
 proc clean_restart {{executable ""}} {
@@ -8980,7 +9003,11 @@ proc clean_restart {{executable ""}} {
     gdb_reinitialize_dir $srcdir/$subdir
 
     if {$executable != ""} {
-	set binfile [standard_output_file ${executable}]
+	if { [isabsolute $executable] } {
+	    set binfile $executable
+	} else {
+	    set binfile [standard_output_file ${executable}]
+	}
 	return [gdb_load ${binfile}]
     }
 
