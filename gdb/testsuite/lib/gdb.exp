@@ -8980,7 +8980,20 @@ proc clean_restart {{executable ""}} {
     gdb_reinitialize_dir $srcdir/$subdir
 
     if {$executable != ""} {
-	set binfile [standard_output_file ${executable}]
+	# After doing standard_testfile, we have global variables:
+	# - testfile 
+	# - binfile (standard_output_file $testfile).
+	# While clean_restart documents that executable is a basename, it's
+	# common use to do "clean_restart $binfile".
+	# Support this by only adding the standard output dir prefix if
+	# necessary.
+	set dir [standard_output_file ""]
+	if { [regexp ^[string_to_regexp $dir] $executable] } {
+	    set binfile $executable
+	} else {
+	    set binfile [standard_output_file ${executable}]
+	}
+
 	return [gdb_load ${binfile}]
     }
 
