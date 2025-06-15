@@ -7723,6 +7723,13 @@ proc standard_output_file {basename} {
     if { [ishost *-*-mingw*] } {
         set dir [exec sh -c "cd ${dir} && pwd -W"]
     }
+
+    if { [regexp ^[string_to_regexp $dir] $basename] } {
+	# Don't add dir twice.  Normally this is taken care of by file join,
+	# but on mingw that doesn't work.
+	return $basename
+    }
+
     return [file join $dir $basename]
 }
 
