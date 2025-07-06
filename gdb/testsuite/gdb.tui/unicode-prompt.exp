@@ -1,0 +1,71 @@
+# Copyright 2025 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+require allow_tui_tests
+
+tuiterm_env
+
+save_vars { env(LC_ALL) } {
+    # Override "C" settings from default_gdb_init.
+    setenv LC_ALL "C.UTF-8"
+
+    Term::clean_restart 24 80
+}
+
+if {![Term::enter_tui]} {
+    unsupported "TUI not supported"
+    return
+}
+
+set unicode_char "\u276F"
+set unicode_char_unsupported "❯"
+
+set color_on [string cat {\033} "\[" "31m"]
+set color_off [string cat {\033} "\[" "0m"]
+
+set prompt "GDB$color_on$unicode_char$color_off "
+set prompt_no_color "GDB$unicode_char "
+set prompt_no_color_re [string_to_regexp $prompt_no_color]
+
+if { [ishost *-*-*bsd*] } {
+    set issue_eol "\r\n"
+} else {
+    set issue_eol "\n"
+}
+
+# Set new prompt.
+send_gdb "set prompt $prompt$issue_eol"
+# Set old prompt back.
+send_gdb "set prompt (gdb) $issue_eol"
+
+gdb_assert \
+    { [Term::wait_for "^${prompt_no_color_re}set prompt $gdb_prompt "] } \
+    "prompt with unicode char"
+
+set line [Term::get_line_with_attrs [expr $Term::_cur_row - 1]]
+verbose -log "line with attrs: '$line'"
+
+set prompt_with_attrs_re "GDB<fg:red>$unicode_char<fg:default> "
+set prompt_unsupported_re "GDB$unicode_char_unsupported "
+
+set test "colored unicode char"
+if { [regexp "^${prompt_with_attrs_re}set prompt .*$" $line] } {
+    pass $test
+} elseif { [regexp "^${prompt_unsupported_re}set prompt .*$" $line] } {
+    # I get this on freebsd: no color, and unicode char not recognized.
+    unsupported $test
+} else {
+    fail $test
+}

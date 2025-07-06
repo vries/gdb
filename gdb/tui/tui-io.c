@@ -45,6 +45,7 @@
 #include "gdbsupport/unordered_map.h"
 #include "pager.h"
 #include "gdbsupport/gdb-checked-static-cast.h"
+#include "charset.h"
 
 /* This redefines CTRL if it is not already defined, so it must come
    after terminal state related include files like <term.h> and
@@ -539,30 +540,99 @@ tui_puts_internal (WINDOW *w, const char *string, int *height)
   char c;
   int prev_col = 0;
   bool saw_nl = false;
+  size_t skip = 0;
+  wchar_iterator it ((gdb_byte *)string, strlen (string), host_charset (), 1);
 
-  while ((c = *string++) != 0)
+  while (true)
     {
-      if (c == '\1' || c == '\2')
-	{
-	  /* Ignore these, they are readline escape-marking
-	     sequences.  */
-	  continue;
-	}
+      bool handled = false;
 
-      if (c == '\033')
+      /* Get iterator in sync with string.  */
+      it.skip (skip);
+      skip = 0;
+
+      /* Detect and handle multibyte chars.  */
+      {
+	enum wchar_iterate_result res2;
+	gdb_wchar_t *dummy1;
+	const gdb_byte *dummy2;
+	size_t len;
+	int res = it.iterate (&res2, &dummy1, &dummy2, &len);
+	if (res < 0)
+	  {
+	    /* End of string.  */
+	    gdb_assert (res2 == wchar_iterate_eof);
+	    break;
+	  }
+
+	if (res == 0)
+	  {
+	    if (res2 == wchar_iterate_invalid)
+	      {
+		/* Let single-byte char code handle it.  */
+		gdb_assert (len == 1);
+	      }
+	    else if (res2 == wchar_iterate_incomplete)
+	      {
+		/* Iterator has been setup to return end-of-string on next
+		   call to iterate.  Make that an advance-by-one instead, and
+		   let single-byte char code handle it.  */
+		it.reset ((gdb_byte *)(string + 1), strlen (string + 1));
+	      }
+	    else
+	      gdb_assert_not_reached ("");
+	  }
+	else
+	  {
+	    /* res > 0.  */
+	    gdb_assert (res2 == wchar_iterate_ok);
+	    if (len > 1)
+	      {
+		/* Multi-byte char.  Handle it.  */
+		waddnstr (w, string, len);
+		string += len;
+		handled = true;
+	      }
+	    else
+	      {
+		/* Single-byte char.  Let single-byte char code handle it.  */
+		gdb_assert (len == 1);
+	      }
+	  }
+      }
+
+      if (!handled)
 	{
-	  size_t bytes_read = apply_ansi_escape (w, string - 1);
-	  if (bytes_read > 0)
+	  c = *string++;
+	  if (c == '\0')
 	    {
-	      string = string + bytes_read - 1;
+	      /* End of string.  */
+	      break;
+	    }
+
+	  if (c == '\1' || c == '\2')
+	    {
+	      /* Ignore these, they are readline escape-marking
+		 sequences.  */
 	      continue;
 	    }
+
+	  if (c == '\033')
+	    {
+	      size_t bytes_read = apply_ansi_escape (w, string - 1);
+	      if (bytes_read > 0)
+		{
+		  skip = bytes_read - 1;
+		  string += skip;
+		  continue;
+		}
+	    }
+
+	  if (c == '\n')
+	    saw_nl = true;
+
+	  do_tui_putc (w, c);
 	}
-
-      if (c == '\n')
-	saw_nl = true;
-
-      do_tui_putc (w, c);
 
       if (height != nullptr)
 	{

@@ -126,6 +126,13 @@ class wchar_iterator
   int iterate (enum wchar_iterate_result *out_result, gdb_wchar_t **out_chars,
 	       const gdb_byte **ptr, size_t *len);
 
+  /* Increase the input buffer pointer by LEN bytes.  */
+  void skip (size_t len);
+
+  /* Reset the input buffer pointer to INPUT and the number of bytes in the
+     input buffer to BYTES.  */
+  void reset (const gdb_byte *input, size_t bytes);
+
  private:
 
   /* The underlying iconv descriptor.  */
