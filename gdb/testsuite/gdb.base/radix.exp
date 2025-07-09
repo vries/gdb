@@ -88,8 +88,8 @@ test_input_radix 3 "3" "3"
 test_input_radix 8 "8" "10"
     test_one_input 8  "20"  "16"
     test_one_input 8  "-20" "-16"
-    test_one_input 8  "8"   "Invalid number \"8\"."
-    test_one_input 8  "-9"  "Invalid number \"9\"."
+    test_one_input 8  "8"   {Invalid number "8".}
+    test_one_input 8  "-9"  {Invalid number "9".}
 
 test_input_radix 10 "a" "12"
     test_one_input 10 "-12"  "-12"

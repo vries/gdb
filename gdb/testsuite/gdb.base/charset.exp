@@ -104,12 +104,12 @@ gdb_test_multiple $cmd "try malformed `set charset'" {
 
 # Try using `set host-charset' on an invalid character set.
 gdb_test "set host-charset my_grandma_bonnie" \
-         "Undefined item: \"my_grandma_bonnie\"." \
+         {Undefined item: "my_grandma_bonnie".} \
          "try `set host-charset' with invalid charset"
 
 # Try using `set target-charset' on an invalid character set.
 gdb_test "set target-charset my_grandma_bonnie" \
-         "Undefined item: \"my_grandma_bonnie\"." \
+         {Undefined item: "my_grandma_bonnie".} \
          "try `set target-charset' with invalid charset"
 
 # A Tcl array mapping the names of all the character sets we've seen
@@ -512,7 +512,7 @@ gdb_test "print '\\u'" "\\\\u escape without a following hex digit"
 gdb_test "print '\\9'" " = \[0-9\]+ '9'"
 
 # An octal escape can only be 3 digits.
-gdb_test "print \"\\1011\"" " = \"A1\""
+gdb_test "print \"\\1011\"" { = "A1"}
 
 # The final digit does not need to be escaped here.
 foreach val {0 1 2 3 4 5 6 7 8 9 a b c d e f} {
@@ -595,7 +595,7 @@ if {$ucs2_ok} {
 	}
 
     if {$go} {
-	gdb_test "print u\"abcdef\"" " = u\"abcdef\"" \
+	gdb_test {print u"abcdef"} { = u"abcdef"} \
 	    "set up for python printing of utf-16 string"
 
 	gdb_test "python print (gdb.history(0).string())" "abcdef" \

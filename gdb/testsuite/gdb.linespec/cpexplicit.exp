@@ -83,7 +83,7 @@ namespace eval $testfile {
     add linespecs "-line 25" $location(normal)
     add linespecs "-function myclass::operator," $location(operator)
     add linespecs "-function 'myclass::operator,'" $location(operator)
-    add linespecs "-function \"myclass::operator,\"" $location(operator)
+    add linespecs {-function "myclass::operator,"} $location(operator)
 
     # Fire up gdb.
     if {![runto_main]} {
@@ -98,11 +98,11 @@ namespace eval $testfile {
     }
 
     # Special (orphaned) dprintf cases.
-    gdb_test "dprintf -function myclass::operator,,\"hello\"" \
+    gdb_test {dprintf -function myclass::operator,,"hello"} \
 	"Dprintf .*$srcfile, line $lineno(operator)\\."
-    gdb_test "dprintf -function 'myclass::operator,',\"hello\"" \
+    gdb_test {dprintf -function 'myclass::operator,',"hello"} \
 	"Dprintf .*$srcfile, line $lineno(operator)\\."
-    gdb_test "dprintf -function \"myclass::operator,\",\"hello\"" \
+    gdb_test {dprintf -function "myclass::operator,","hello"} \
 	"Dprintf .*$srcfile, line $lineno(operator)\\."
 }
 

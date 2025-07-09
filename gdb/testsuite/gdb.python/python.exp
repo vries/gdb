@@ -113,7 +113,7 @@ gdb_test "python print (gdb.objfiles())" "\\\[\\\]"
 gdb_test "python import itertools; print ('IMPOR'+'TED')" "IMPORTED" "pythonX.Y/lib-dynload/*.so"
 
 gdb_test_no_output \
-    "python x = gdb.execute('printf \"%d\", 23', to_string = True)"
+    {python x = gdb.execute('printf "%d", 23', to_string = True)}
 gdb_test "python print (x)" "23"
 
 gdb_test "python gdb.execute('echo 2\\necho 3\\\\n\\n')" "23" \
@@ -222,7 +222,7 @@ set lineno [gdb_get_line_number "Break to end."]
 runto $lineno
 
 # Test gdb.decode_line.
-gdb_test "python gdb.decode_line(\"main.c:43\")" \
+gdb_test {python gdb.decode_line("main.c:43")} \
     "gdb.error.*: No source file named main.c.*" "test decode_line no source named main"
 
 with_test_prefix "test decode_line current location" {
@@ -245,16 +245,16 @@ with_test_prefix "test decode_line" {
     gdb_test "python print (symtab\[1\]\[0\].symtab)" ".*${python_c}" "current location filename"
     gdb_test "python print (symtab\[1\]\[0\].line)" "$lineno" "current location line number"
 
-    gdb_py_test_silent_cmd "python symtab = gdb.decode_line(\"python.c:26 if foo\")" "python.c:26 decode" 1
+    gdb_py_test_silent_cmd {python symtab = gdb.decode_line("python.c:26 if foo")} "python.c:26 decode" 1
     gdb_test "python print (len(symtab))" "2" "python.c:26 length 2"
     gdb_test "python print (symtab\[0\])" "if foo" "expression parse"
     gdb_test "python print (len(symtab\[1\]))" "1" "python.c:26 length 1"
     gdb_test "python print (symtab\[1\]\[0\].symtab)" ".*${python_c}" "python.c:26 filename"
     gdb_test "python print (symtab\[1\]\[0\].line)" "26" "python.c:26 line number"
 
-    gdb_test "python gdb.decode_line(\"randomfunc\")" \
-	"gdb.error.*: Function \"randomfunc\" not defined.*" "randomfunc"
-    gdb_py_test_silent_cmd "python symtab = gdb.decode_line(\"func1\")" "func1()" 1
+    gdb_test {python gdb.decode_line("randomfunc")} \
+	{gdb.error.*: Function "randomfunc" not defined.*} "randomfunc"
+    gdb_py_test_silent_cmd {python symtab = gdb.decode_line("func1")} "func1()" 1
     gdb_test "python print (len(symtab))" "2" "func1 length 2"
     gdb_test "python print (len(symtab\[1\]))" "1" "func1 length 1"
 }
@@ -285,7 +285,7 @@ gdb_py_test_silent_cmd {python symtab = gdb.decode_line ("func1,func2")} \
 gdb_test {python print (symtab[0])} ",func2" "stop at comma in linespec"
 
 with_test_prefix "test decode_line" {
-    gdb_py_test_silent_cmd "python symtab = gdb.decode_line(\"*0\")" "*0" 1
+    gdb_py_test_silent_cmd {python symtab = gdb.decode_line("*0")} "*0" 1
     gdb_test "python print (len(symtab))" "2" "*0 result length"
     gdb_test "python print (symtab\[0\])" "None" "*0 unparsed"
     gdb_test "python print (len(symtab\[1\]))" "1" "*0 locations length"
@@ -315,10 +315,10 @@ gdb_test_multiline "prompt substitution" \
   "someCounter = 0" "" \
   "def prompt(current):" "" \
   "   global someCounter" "" \
-  "   if (current == \"testfake \"):" "" \
+  {   if (current == "testfake "):} "" \
   "      return None" "" \
   "   someCounter = someCounter + 1" "" \
-  "   return \"py prompt \" + str (someCounter) + \" \"" "" \
+  {   return "py prompt " + str (someCounter) + " "} "" \
   "end" ""
 
 gdb_test_multiline "prompt substitution readline" \
@@ -326,9 +326,9 @@ gdb_test_multiline "prompt substitution readline" \
   "pCounter = 0" "" \
   "def program_prompt(current):" "" \
   "   global pCounter" "" \
-  "   if (current == \">\"):" "" \
+  {   if (current == ">"):} "" \
   "      pCounter = pCounter + 1" "" \
-  "      return \"python line \" + str (pCounter) + \": \"" "" \
+  {      return "python line " + str (pCounter) + ": "} "" \
   "   return None" "" \
   "end" ""
 
@@ -434,17 +434,17 @@ if {![runto_main]} {
 
 # print-stack settings
 gdb_test "show python print-stack" \
-    "The mode of Python stack printing on error is \"message\".*" \
+    {The mode of Python stack printing on error is "message".*} \
     "Test print-stack show setting. Default is message."
 gdb_py_test_silent_cmd "set python print-stack full" \
     "Test print-stack set setting to full" 1
 gdb_test "show python print-stack" \
-    "The mode of Python stack printing on error is \"full\".*" \
+    {The mode of Python stack printing on error is "full".*} \
     "Test print-stack show setting to full"
 gdb_py_test_silent_cmd "set python print-stack none" \
     "Test print-stack set setting to none" 1
 gdb_test "show python print-stack" \
-    "The mode of Python stack printing on error is \"none\".*" \
+    {The mode of Python stack printing on error is "none".*} \
     "test print-stack show setting to none"
 
 gdb_py_test_silent_cmd "set python print-stack message" \
@@ -454,7 +454,7 @@ gdb_test_multiline "prompt substitution readline error_prompt" \
   "python" "" \
   "pCounter = 0" "" \
   "def error_prompt(current):" "" \
-  "   raise RuntimeError(\"Python exception called\")" "" \
+  {   raise RuntimeError("Python exception called")} "" \
   "end" ""
 
 gdb_test_multiple "python gdb.prompt_hook = error_prompt" "set the hook error_prompt" {
@@ -537,7 +537,7 @@ gdb_test "print \$cvar3" "= void" \
 
 # Test PR 23669, the following would invoke the "commands" command instead of
 # "show commands".
-gdb_test "python gdb.execute(\"show commands\")" "$decimal  print \\\$cvar3.*"
+gdb_test {python gdb.execute("show commands")} "$decimal  print \\\$cvar3.*"
 
 # Check if starti command is supported.
 if { [use_gdb_stub] == 0 } {

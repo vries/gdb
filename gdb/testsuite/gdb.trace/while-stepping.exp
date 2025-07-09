@@ -59,7 +59,7 @@ gdb_test "info tracepoints" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
 \[0-9\]+\[\t \]+tracepoint     keep y.* in gdb_c_test at .*$srcfile:\[0-9\]+.
 \[\t \]+while-stepping 12.*" \
-	"5.12: info trace shows \"while-stepping\""
+	{5.12: info trace shows "while-stepping"}
 
 # 5.13 step out of context while collecting local variable
 #      [deferred to dynamic test section]

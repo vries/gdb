@@ -596,7 +596,7 @@ if {[runto_main]} {
   set prev_timeout $timeout
   set timeout 60
 
-  gdb_test "ptype \"abc\""	"type = char \\\[4\\\]"
+  gdb_test {ptype "abc"}	"type = char \\\[4\\\]"
   gdb_test "ptype {'a','b','c'}"	"type = char \\\[3\\\]"
   gdb_test "ptype {0,1,2}"		"type = int \\\[3\\\]"
   gdb_test "ptype {(long)0,(long)1,(long)2}"	  "type = long \\\[3\\\]"

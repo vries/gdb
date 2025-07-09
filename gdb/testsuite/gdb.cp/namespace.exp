@@ -195,34 +195,34 @@ if {![runto "C::D::marker2"]} {
 }
 
 gdb_test "print c" "\\$\[0-9\].* = 1"
-gdb_test "print cc" "No symbol \"cc\" in current context."
+gdb_test "print cc" {No symbol "cc" in current context.}
 gdb_test "print 'C::cc'" "\\$\[0-9\].* = 2"
 gdb_test "print C::cc" "\\$\[0-9\].* = 2"
 gdb_test "print cd" "\\$\[0-9\].* = 3"
-gdb_test "print C::D::cd" "No type \"D\" within class or namespace \"C::C\"."
+gdb_test "print C::D::cd" {No type "D" within class or namespace "C::C".}
 gdb_test "print 'E::cde'" "\\$\[0-9\].* = 5"
 gdb_test "print E::cde" "\\$\[0-9\].* = 5"
 gdb_test "print shadow" "\\$\[0-9\].* = 13"
-gdb_test "print E::ce" "No symbol \"ce\" in namespace \"C::D::E\"."
+gdb_test "print E::ce" {No symbol "ce" in namespace "C::D::E".}
 gdb_test "ptype C" "type = namespace C::C"
 gdb_test "ptype E" "type = namespace C::D::E"
 
 gdb_test "ptype CClass" "type = (class C::CClass \{\r\n  public:|struct C::CClass \{)\r\n    int x;\r\n\}"
 gdb_test "ptype CClass::NestedClass" "type = (class C::CClass::NestedClass \{\r\n  public:|struct C::CClass::NestedClass \{)\r\n    int y;\r\n\}"
-gdb_test "ptype NestedClass" "No symbol \"NestedClass\" in current context."
+gdb_test "ptype NestedClass" {No symbol "NestedClass" in current context.}
 gdb_test "ptype ::C::CClass" "type = class C::CClass \{\r\n  public:\r\n    int x;\r\n\}"
 gdb_test "ptype ::C::CClass::NestedClass" "type = class C::CClass::NestedClass \{\r\n  public:\r\n    int y;\r\n\}"
-gdb_test "ptype ::C::NestedClass" "No symbol \"NestedClass\" in namespace \"C\"."
-gdb_test "ptype C::CClass" "No symbol \"CClass\" in namespace \"C::C\"."
-gdb_test "ptype C::CClass::NestedClass" "No type \"CClass\" within class or namespace \"C::C\"."
-gdb_test "ptype C::NestedClass" "No symbol \"NestedClass\" in namespace \"C::C\"."
+gdb_test "ptype ::C::NestedClass" {No symbol "NestedClass" in namespace "C".}
+gdb_test "ptype C::CClass" {No symbol "CClass" in namespace "C::C".}
+gdb_test "ptype C::CClass::NestedClass" {No type "CClass" within class or namespace "C::C".}
+gdb_test "ptype C::NestedClass" {No symbol "NestedClass" in namespace "C::C".}
 
 # Tests involving multiple files
 
 gdb_test "print cOtherFile" "\\$\[0-9\].* = 316"
 gdb_test "ptype OtherFileClass" "type = (class C::OtherFileClass \{\r\n  public:|struct C::OtherFileClass \{)\r\n    int z;\r\n.*\}"
 gdb_test "ptype ::C::OtherFileClass" "type = class C::OtherFileClass \{\r\n  public:\r\n    int z;\r\n.*\}"
-gdb_test "ptype C::OtherFileClass" "No symbol \"OtherFileClass\" in namespace \"C::C\"."
+gdb_test "ptype C::OtherFileClass" {No symbol "OtherFileClass" in namespace "C::C".}
 
 # Test class typedefs printing.
 set expect "type = class C::OtherFileClass \{\r\n.*\r\n *typedef short cOtherFileClassType;\r\n *typedef long cOtherFileClassType2;\r\n\}"
@@ -241,8 +241,8 @@ gdb_test "print X" "\\$\[0-9\].* = 9"
 gdb_test "print 'G::Xg'" "\\$\[0-9\].* = 10"
 gdb_test "print G::Xg" "\\$\[0-9\].* = 10"
 gdb_test "print G::XgX" "\\$\[0-9\].* = 11"
-gdb_test "print cXOtherFile" "No symbol \"cXOtherFile\" in current context."
-gdb_test "print XOtherFile" "No symbol \"XOtherFile\" in current context."
+gdb_test "print cXOtherFile" {No symbol "cXOtherFile" in current context.}
+gdb_test "print XOtherFile" {No symbol "XOtherFile" in current context.}
 
 # Enum tests.
 gdb_test "print AAA::ALPHA" "\\$\[0-9\].* = AAA::ALPHA"

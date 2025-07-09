@@ -34,7 +34,7 @@ proc generate_cmd_file {gdbfile binfile} {
     puts $ofd "shell sleep 1; touch ${binfile}"
     puts $ofd "run"
     puts $ofd "file"
-    puts $ofd "p \"source-command-completed\""
+    puts $ofd {p "source-command-completed"}
     close $ofd
 }
 

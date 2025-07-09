@@ -113,11 +113,11 @@ foreach_with_prefix inf $inferiors {
 
     # Check the settings can be read from Guile.
     if { $run_guile_tests } {
-	gdb_test "guile (print (parameter-value \"args\"))" \
+	gdb_test {guile (print (parameter-value "args"))} \
 	    "inf${inf}-args"
-	gdb_test "guile (print (parameter-value \"cwd\"))" \
+	gdb_test {guile (print (parameter-value "cwd"))} \
 	    "/inf${inf}-cwd"
-	gdb_test "guile (print (parameter-value \"inferior-tty\"))" \
+	gdb_test {guile (print (parameter-value "inferior-tty"))} \
 	    "/inf${inf}-tty"
     }
 }

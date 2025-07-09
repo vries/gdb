@@ -33,12 +33,12 @@ if {![runto "foo.adb:$bp_location"]} {
 }
 
 gdb_test "print Arg" \
-    " = \"abcdefghijklmnopqrstuvwxyz\"" \
+    { = "abcdefghijklmnopqrstuvwxyz"} \
     "print with default settings"
 
 gdb_test_no_output "set print characters 26"
 gdb_test "print Arg" \
-    " = \"abcdefghijklmnopqrstuvwxyz\"" \
+    { = "abcdefghijklmnopqrstuvwxyz"} \
     "print with character limit of 26"
 
 gdb_test "print -characters 11 -- Arg" \
@@ -52,7 +52,7 @@ gdb_test "print Arg" \
 
 gdb_test_no_output "set print characters unlimited"
 gdb_test "print Arg" \
-    " = \"abcdefghijklmnopqrstuvwxyz\"" \
+    { = "abcdefghijklmnopqrstuvwxyz"} \
     "print with unlimited character limit"
 
 # The 'set print elements' command used to control printing of characters
@@ -60,7 +60,7 @@ gdb_test "print Arg" \
 # sure that 'set print elements' doesn't effect string printing any more.
 gdb_test_no_output "set print elements 12"
 gdb_test "print Arg" \
-    " = \"abcdefghijklmnopqrstuvwxyz\"" \
+    { = "abcdefghijklmnopqrstuvwxyz"} \
     "print with unlimited character limit, but lower element limit"
 
 # Except when 'set print characters elements' has been used.

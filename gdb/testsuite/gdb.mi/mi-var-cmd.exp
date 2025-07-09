@@ -272,7 +272,7 @@ mi_gdb_test "-var-evaluate-expression linteger" \
 	"\\^done,value=\"3333\"" \
 	"eval linteger"
 
-mi_gdb_test "-var-assign lpinteger \"&linteger + 3\"" \
+mi_gdb_test {-var-assign lpinteger "&linteger + 3"} \
 	"\\^done,value=\"$hex\"" \
 	"assign to lpinteger, 1st"
 

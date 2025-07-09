@@ -55,7 +55,7 @@ proc test_python_helper {} {
     gdb_test [multi_line_input \
 		  "python" \
 		  "for objfile in gdb.objfiles():" \
-		  "  if os.path.basename(objfile.filename) == \"xgdb\":" \
+		  {  if os.path.basename(objfile.filename) == "xgdb":} \
 		  "    objfile.pretty_printers.append(type_lookup_function)" \
 		  "end"] ".*" \
 	"register the type pretty printer"

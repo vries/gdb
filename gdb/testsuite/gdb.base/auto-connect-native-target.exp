@@ -109,7 +109,7 @@ gdb_test "start" "Don't know how to run.*" "start no longer works"
 
 # Explicitly connect to the native target.
 gdb_test "target native" \
-    "Done.  Use the \"run\" command to start a process.*" \
+    {Done.  Use the "run" command to start a process.*} \
     "explicitly connect to the native target"
 
 proc test_native_target_remains_pushed {} {

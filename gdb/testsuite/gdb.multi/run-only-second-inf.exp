@@ -30,7 +30,7 @@ if {[build_executable "failed to prepare" $testfile $srcfile {debug}]} {
 # was not being switched before making ptid-dependent memory access.
 # So, start GDB with this setting.
 save_vars { GDBFLAGS } {
-    append GDBFLAGS " -ex \"maint set target-non-stop on\""
+    append GDBFLAGS { -ex "maint set target-non-stop on"}
     clean_restart ${binfile}
 }
 

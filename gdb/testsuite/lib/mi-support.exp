@@ -1332,8 +1332,8 @@ proc mi_expect_interrupt { test } {
 	set prompt_re "$mi_gdb_prompt"
     }
 
-    set r_nonstop "reason=\"signal-received\",signal-name=\"0\",signal-meaning=\"Signal 0\""
-    set r_allstop "reason=\"signal-received\",signal-name=\"SIGINT\",signal-meaning=\"Interrupt\""
+    set r_nonstop {reason="signal-received",signal-name="0",signal-meaning="Signal 0"}
+    set r_allstop {reason="signal-received",signal-name="SIGINT",signal-meaning="Interrupt"}
     set r "(${r_nonstop}|${r_allstop})"
     set any "\[^\n\]*"
 
@@ -1635,11 +1635,11 @@ proc mi_list_varobj_children_range {varname from to numchildren children testnam
     }
 
     if {"$to" == ""} {
-	append expected ",has_more=\"0\""
+	append expected {,has_more="0"}
     } elseif {$to >= 0 && $numchildren > $to} {
-	append expected ",has_more=\"1\""
+	append expected {,has_more="1"}
     } else {
-	append expected ",has_more=\"0\""
+	append expected {,has_more="0"}
     }
 
     verbose -log "Expecting: $expected"
@@ -2023,7 +2023,7 @@ proc check_mi_and_console_threads_1 { name } {
   set console_thread_list {}
   foreach line [split $console_output \n] {
     if {[string index $line 0] == "~"} {
-      # This is a line from the console; trim off "~", " ", "*", and "\""
+      # This is a line from the console; trim off "~", " ", "*", and {"}
       set line [string trim $line ~\ \"\*]
       if {[scan $line "%d" id] == 1} {
 	lappend console_thread_list $id

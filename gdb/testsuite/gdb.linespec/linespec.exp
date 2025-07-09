@@ -91,7 +91,7 @@ if { [is_remote host] } {
 
 			send_gdb "\n"
 			gdb_test "" \
-			    "Function \"z\" not defined in \"thefile.cc\"." \
+			    {Function "z" not defined in "thefile.cc".} \
 			    "set break at non-unique function name in two source files"
 		    }
 		}
@@ -162,7 +162,7 @@ gdb_test "complete condition " "condition $decimal\r\ncondition $decimal\r\ncond
 
 # This is PR breakpoints/12856.
 gdb_test "break lspec.cc:nosuchfunction" \
-    "Function \"nosuchfunction\" not defined in \"lspec.cc\"." \
+    {Function "nosuchfunction" not defined in "lspec.cc".} \
     "set breakpoint on non-existent function"
 
 gdb_test "break NameSpace::overload" \

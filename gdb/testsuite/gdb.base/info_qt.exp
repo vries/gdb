@@ -45,7 +45,7 @@ with_test_prefix "info functions nameregexp" {
 	"info functions ^info_fun" } {
 	    gdb_test $cmd \
 		[multi_line \
-		     "All functions matching regular expression \".*info_fun.*\":" \
+		     {All functions matching regular expression ".*info_fun.*":} \
 		     "" \
 		     "File .*info_qt.c:" \
 		     "${number}:	void info_fun1\\\(void\\\);" \
@@ -112,7 +112,7 @@ with_test_prefix "info variables nameregexp" {
 	"info variables ^info_qt" } {
 	    gdb_test $cmd \
 		[multi_line \
-		     "All variables matching regular expression \".*info_qt.*\":" \
+		     {All variables matching regular expression ".*info_qt.*":} \
 		     "" \
 		     "File .*info_qt.c:" \
 		     "${number}:	entier info_qt_ent;" \

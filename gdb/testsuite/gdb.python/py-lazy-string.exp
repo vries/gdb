@@ -33,7 +33,7 @@ if ![runto_main ] {
 gdb_breakpoint [gdb_get_line_number "break here"]
 gdb_continue_to_breakpoint "break here"
 
-gdb_py_test_silent_cmd "python null = gdb.parse_and_eval(\"null\")" "get null value" 1
+gdb_py_test_silent_cmd {python null = gdb.parse_and_eval("null")} "get null value" 1
 
 gdb_py_test_silent_cmd "python nullstr = null.lazy_string(length=0)" "create a null lazy string" 1
 gdb_test "python print (nullstr.length)" "0" "null lazy string length"

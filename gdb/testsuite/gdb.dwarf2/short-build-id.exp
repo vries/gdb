@@ -111,7 +111,7 @@ proc run_test { buildid } {
     # For sanity, read something that was encoded in the debug
     # information, this should fail.
     gdb_test "print the_int" \
-	"(?:No symbol table is loaded|No symbol \"the_int\" in current context).*"
+	{(?:No symbol table is loaded|No symbol "the_int" in current context).*}
 }
 
 foreach_with_prefix buildid { a4 "" } {

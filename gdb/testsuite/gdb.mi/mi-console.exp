@@ -23,7 +23,7 @@ set MIFLAGS "-i=mi"
 #
 proc semihosted_string { string } {
     set semihosted_list {}
-    set leading_markers "@\""
+    set leading_markers {@"}
     set trailing_markers "\"\r\n"
 
     if {$string != "" } {

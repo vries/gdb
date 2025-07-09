@@ -64,7 +64,7 @@ proc show_setting {show_cmd expected_re {expected_re_escaped 0} {reset_value 0}}
 	if {$expected_re_escaped} {
 	    set escaped_expected_re $expected_re
 	} else {
-	    regsub -all "\"" $expected_re "\\\\\\\"" escaped_expected_re
+	    regsub -all {"} $expected_re "\\\\\\\"" escaped_expected_re
 	}
 	set test "print \$_gdb_maint_setting_str"
 	set setting_str_value "xxxYYYxxx"
@@ -479,21 +479,21 @@ proc_with_prefix test-enum {} {
 
     # A bogus value.
     gdb_test "$set_cmd bogus" \
-	"Undefined item: \"bogus\"."
+	{Undefined item: "bogus".}
 
     # Seemingly-valid but not quite valid value.
     gdb_test "$set_cmd xxx1" \
-	"Undefined item: \"xxx1\"."
+	{Undefined item: "xxx1".}
 
     # Valid value followed by garbage.
     gdb_test "$set_cmd xxx 1" \
-	"Junk after item \"xxx\": 1"
+	{Junk after item "xxx": 1}
     # Valid value followed by garbage, with extra spaces.
     gdb_test "$set_cmd xxx      1" \
-	"Junk after item \"xxx\": 1"
+	{Junk after item "xxx": 1}
     # Abbreviated value followed by garbage.
     gdb_test "$set_cmd xx 1" \
-	"Junk after item \"xx\": 1"
+	{Junk after item "xx": 1}
 
     # Various valid values.  Test both full value names and
     # abbreviations.

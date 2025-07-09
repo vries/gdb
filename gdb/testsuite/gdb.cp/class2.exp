@@ -105,7 +105,7 @@ gdb_test "print * (B *) abp" \
 
 gdb_test "print delta" \
     "= {.*d1 = 400}" \
-    "print delta with \"print object\" off"
+    {print delta with "print object" off}
 
 # Printing the value of an object containing no data fields:
 
@@ -124,7 +124,7 @@ gdb_test "p acp->c2" "\\(A \\*\\) ${hex}f"
 
 gdb_test "print delta" \
     "= {.*d1 = 400}" \
-    "print delta with \"print object\" on"
+    {print delta with "print object" on}
 
 # Regression test for PR c++/15401.
 # Check that the type printed is a reference.

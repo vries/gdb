@@ -61,7 +61,7 @@ gdb_test_multiple $test_target $test_target {
 if [gdb_protocol_is_remote] {
     gdb_test \
 	"set remote conditional-breakpoints-packet off" \
-	"Support for the 'ConditionalBreakpoints' packet on the current remote target is set to \"off\"."
+	{Support for the 'ConditionalBreakpoints' packet on the current remote target is set to "off".}
 
     gdb_test $test_target "$warning" \
 	"set breakpoint condition-evaluation target, with support disabled"
@@ -69,7 +69,7 @@ if [gdb_protocol_is_remote] {
     # Confirm we can re-enable it.
     gdb_test \
 	"set remote conditional-breakpoints-packet on" \
-	"Support for the 'ConditionalBreakpoints' packet on the current remote target is set to \"on\"."
+	{Support for the 'ConditionalBreakpoints' packet on the current remote target is set to "on".}
 
     gdb_test_no_output $test_target "restore $test_target"
 }

@@ -32,9 +32,9 @@ if {[build_executable "failed to prepare" $exefile $srcfile {debug c++}]} {
 mi_clean_restart $binfile
 
 # Turn off the pending breakpoint queries.
-mi_gdb_test "-interpreter-exec console \"set breakpoint pending off\"" \
+mi_gdb_test {-interpreter-exec console "set breakpoint pending off"} \
   {=cmd-param-changed,param=\"breakpoint pending\",.*\^done} \
-  "-interpreter-exec console \"set breakpoint pending off\""
+  {-interpreter-exec console "set breakpoint pending off"}
 
 mi_runto_main
 
@@ -50,5 +50,5 @@ mi_execute_to "exec-continue" "breakpoint-hit" "myfunction" ".*" ".*" "24" \
 # Set a breakpoint in a C++ source file whose name contains a
 # Windows-style logical drive.
 mi_gdb_test \
-    "-break-insert -f \"c:/uu.cpp:13\"" \
+    {-break-insert -f "c:/uu.cpp:13"} \
     ".*No source file named c:/uu.cpp.*"

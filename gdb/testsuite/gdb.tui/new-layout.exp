@@ -39,11 +39,11 @@ gdb_test "tui new-layout" \
 gdb_test "tui new-layout example" \
     "New layout does not contain any windows"
 gdb_test "tui new-layout example zzq" \
-    "Unknown window \"zzq\""
+    {Unknown window "zzq"}
 gdb_test "tui new-layout example src 1 src 1" \
-    "Window \"src\" seen twice in layout"
+    {Window "src" seen twice in layout}
 gdb_test "tui new-layout example src 1" \
-    "New layout does not contain the \"cmd\" window"
+    {New layout does not contain the "cmd" window}
 
 # Avoid unbalanced curly braces problems with tcl 8.5.
 if { [tcl_version_at_least 8 6] } {

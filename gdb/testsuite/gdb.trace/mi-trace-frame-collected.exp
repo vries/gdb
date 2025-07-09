@@ -60,7 +60,7 @@ mi_gdb_test "-break-insert -a gdb_c_test" \
 # Define an action.
 # Collect a global variable to be sure no registers are collected
 # except PC.
-mi_gdb_test "-break-commands 4 \"collect gdb_char_test\" \"end\" " \
+mi_gdb_test {-break-commands 4 "collect gdb_char_test" "end" } \
     {\^done} "set action on tracepoint 4"
 
 mi_gdb_test "-trace-start" {.*\^done} "trace start"

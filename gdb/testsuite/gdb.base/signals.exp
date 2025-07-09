@@ -143,7 +143,7 @@ The program being debugged stopped while in a function called from GDB.*" \
 	     "SIG46" "SIG47" "SIG48" "SIG49" "SIG50" "SIG51" "SIG52" \
 	     "SIG53" "SIG54" "SIG55" "SIG56" "SIG57" "SIG58" "SIG59" \
 	     "SIG60" "SIG61" "SIG62" "SIG63" \
-	     "Use the \"handle\" command to change these tables"]
+	     {Use the "handle" command to change these tables}]
 
     # Verify that "info signal" correctly handles an argument, be it a
     # symbolic signal name, or an integer ID.
@@ -162,11 +162,11 @@ The program being debugged stopped while in a function called from GDB.*" \
 	"handle without arguments"
 
     gdb_test "handle SIGFOO" \
-	"Unrecognized or ambiguous flag word: \"SIGFOO\".*" \
+	{Unrecognized or ambiguous flag word: "SIGFOO".*} \
 	"handle with bogus SIG"
 
     gdb_test "handle SIGHUP frump" \
-	"Unrecognized or ambiguous flag word: \"frump\".*" \
+	{Unrecognized or ambiguous flag word: "frump".*} \
 	"handle SIG with bogus action"
 
     # Verify that "handle" can take multiple actions per SIG, and that
@@ -213,7 +213,7 @@ The program being debugged stopped while in a function called from GDB.*" \
     # bug, actually.  Why is the range 1-15?
 
     gdb_test "handle 58" \
-	"Only signals 1-15 are valid as numeric signals.*Use \"info signals\" for a list of symbolic signals.*" \
+	{Only signals 1-15 are valid as numeric signals.*Use "info signals" for a list of symbolic signals.*} \
 	"invalid signal number rejected"
 
     # Verify that we can accept a signal ID range (number-number).

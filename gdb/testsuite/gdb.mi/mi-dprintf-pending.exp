@@ -52,7 +52,7 @@ set bp [mi_make_breakpoint_pending -number "1" -type "dprintf" \
 	    -disp "keep" -enabled "y" -pending "pendfunc1" \
 	    -original-location "pendfunc1" \
 	    -script {\["printf \\\"hello\\\""\]}]
-mi_gdb_test "-dprintf-insert -f pendfunc1 \"hello\"" \
+mi_gdb_test {-dprintf-insert -f pendfunc1 "hello"} \
     ".*\\^done,$bp" "mi set dprintf"
 
 mi_create_breakpoint $bp_location1 "mi insert breakpoint bp_location1" \

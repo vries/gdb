@@ -60,7 +60,7 @@ proc do_test { non_stop cond_bp_target } {
 	    # similar to native debugging.
 	    gdb_test \
 		"set remote conditional-breakpoints-packet off" \
-		"Support for the 'ConditionalBreakpoints' packet on the current remote target is set to \"off\"."
+		{Support for the 'ConditionalBreakpoints' packet on the current remote target is set to "off".}
 
 	    set should_kfail 1
 	} else {

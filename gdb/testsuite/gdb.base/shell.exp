@@ -55,7 +55,7 @@ with_test_prefix "\$_shell convenience function" {
     gdb_test "ptype \$_shell(\"true\")" "type = int"
 
     # Test passing a non-literal string as command name.
-    gdb_test "p \$cmd = \"echo bar\"" " = \"echo bar\""
+    gdb_test "p \$cmd = \"echo bar\"" { = "echo bar"}
     gdb_test "p \$_shell(\$cmd)" "bar\r\n\\$${decimal} = 0"
 
     # Test executing a non-existing command.  The result is

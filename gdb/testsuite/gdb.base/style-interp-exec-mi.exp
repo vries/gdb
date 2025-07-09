@@ -36,7 +36,7 @@ with_ansi_styling_terminal {
     gdb_test_no_output "set style enabled on"
     set main_expr [style main function]
     gdb_test "backtrace" ".* ${main_expr} .*" "backtrace before"
-    gdb_test "interpreter-exec mi \"-data-evaluate-expression 1\"" \
+    gdb_test {interpreter-exec mi "-data-evaluate-expression 1"} \
 	"\\^done,value=\"1\""
     gdb_test "backtrace" ".* ${main_expr} .*" "backtrace after"
 }

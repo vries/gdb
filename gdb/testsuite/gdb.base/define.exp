@@ -63,7 +63,7 @@ gdb_test_multiple "define nextwh" "define user command: nextwh" {
 # confirmed and unconfirmed cases.)
 #
 gdb_test "define nextwhere" \
-    "Command \"nextwhere\" not redefined.*" \
+    {Command "nextwhere" not redefined.*} \
     "redefine user command aborted: nextwhere" \
     "Redefine command \"nextwhere\".*y or n. $" \
     "n"
@@ -92,7 +92,7 @@ gdb_expect {
 # Verify that GDB gracefully handles an attempt to redefine the
 # help text for a builtin command.
 #
-gdb_test "document step" "Command \"step\" is built-in.*" \
+gdb_test "document step" {Command "step" is built-in.*} \
     "redocumenting builtin command disallowed"
 
 # Verify that a user can document their own commands.  (And redocument

@@ -80,7 +80,7 @@ gdb_test "guile (print (eq? symtab (sal-symtab sal1)))" \
     "= #t" "test eq? of equal symtabs"
 gdb_test "guile (print (eq? symtab (sal-symtab sal2)))" \
     "= #t" "test eq? of equal symtabs from different sals"
-gdb_test "guile (print (eq? symtab (symbol-symtab (lookup-global-symbol \"func1\"))))" \
+gdb_test {guile (print (eq? symtab (symbol-symtab (lookup-global-symbol "func1"))))} \
     "= #f" "test eq? of not-equal symtabs"
 
 # Test symbol table.
@@ -97,18 +97,18 @@ if { [is_remote host] } {
 }
 gdb_test "guile (print (symtab-valid? symtab))" \
     "#t" "test symtab-valid?"
-gdb_test "guile (print (->bool (member \"qq\" global-symbols)))" \
+gdb_test {guile (print (->bool (member "qq" global-symbols)))} \
     "#t" "test qq in global symbols"
-gdb_test "guile (print (->bool (member \"func\" global-symbols)))" \
+gdb_test {guile (print (->bool (member "func" global-symbols)))} \
     "#t" "test func in global symbols"
-gdb_test "guile (print (->bool (member \"main\" global-symbols)))" \
+gdb_test {guile (print (->bool (member "main" global-symbols)))} \
     "#t" "test main in global symbols"
-gdb_test "guile (print (->bool (member \"int\" static-symbols)))" \
+gdb_test {guile (print (->bool (member "int" static-symbols)))} \
     "#t" "test int in static symbols"
-gdb_test "guile (print (->bool (member \"char\" static-symbols)))" \
+gdb_test {guile (print (->bool (member "char" static-symbols)))} \
     "#t" "test char in static symbols"
 gdb_test_multiple \
-    "guile (print (->bool (member \"simple_struct\" static-symbols)))" \
+    {guile (print (->bool (member "simple_struct" static-symbols)))} \
     "test simple_struct in static symbols" {
 	-re -wrap "#t" {
 	    pass $gdb_test_name

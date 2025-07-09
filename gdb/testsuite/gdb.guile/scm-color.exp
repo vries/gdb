@@ -29,10 +29,10 @@ gdb_install_guile_utils
 gdb_install_guile_module
 
 gdb_test_no_output [concat "guile (define (print_color_attrs c) " \
-    "(display (color-string c)) (display \" \") " \
-    "(display (color-colorspace c)) (display \" \") " \
-    "(display (color-none? c)) (display \" \") " \
-    "(display (color-indexed? c)) (display \" \") " \
+    {(display (color-string c)) (display " ") } \
+    {(display (color-colorspace c)) (display " ") } \
+    {(display (color-none? c)) (display " ") } \
+    {(display (color-indexed? c)) (display " ") } \
     "(display (color-direct? c)) (newline))"] \
     "print_color_attrs helper"
 
@@ -40,7 +40,7 @@ gdb_test "guile (print_color_attrs (make-color))" \
     "none 0 #t #f #f" \
     "print attrs of a color without params"
 
-gdb_test_no_output "guile (define c (make-color \"green\"))" \
+gdb_test_no_output {guile (define c (make-color "green"))} \
     "create color from basic name string"
 gdb_test "guile (print_color_attrs c)" "green 1 #f #t #f" \
     "print attrs of a basic color name"
@@ -82,30 +82,30 @@ gdb_test "guile (print_color_attrs c)" "#ABCDEF 4 #f #f #t" \
 gdb_test "guile (print (color-components c))" "\\(171 205 239\\)" \
     "print components of an RGB color"
 
-gdb_test_no_output "guile (define c (make-color \"none\"))" \
+gdb_test_no_output {guile (define c (make-color "none"))} \
     "create color from string none"
 gdb_test "guile (print_color_attrs c)" "none 0 #t #f #f" \
     "print attrs of a color none"
 
-gdb_test_no_output "guile (define c (make-color \"254\"))" \
+gdb_test_no_output {guile (define c (make-color "254"))} \
     "create color from string 254"
 gdb_test "guile (print_color_attrs c)" "254 3 #f #t #f" \
     "print attrs of an color 254"
 gdb_test "guile (print (color-index c))" "254" \
     "print index of color 254"
 
-gdb_test_no_output "guile (define c_none (make-color \"none\"))" \
+gdb_test_no_output {guile (define c_none (make-color "none"))} \
     "save default color"
-gdb_test_no_output "guile (define c_red (make-color \"red\"))" \
+gdb_test_no_output {guile (define c_red (make-color "red"))} \
     "save blue color"
-gdb_test_no_output "guile (define c_green (make-color \"green\"))" \
+gdb_test_no_output {guile (define c_green (make-color "green"))} \
     "save yellow color"
 gdb_test [concat "guile " \
     "(display (color-escape-sequence c_red #t)) " \
     "(display (color-escape-sequence c_green #f)) " \
-    "(display \"red on green\") " \
+    {(display "red on green") } \
     "(display (color-escape-sequence c_none #f)) " \
-    "(display \" red on default\") " \
+    {(display " red on default") } \
     "(display (color-escape-sequence c_none #t)) " \
     "(newline)"] \
     "\033\\\[31m\033\\\[42mred on green\033\\\[49m red on default\033\\\[39m" \

@@ -40,7 +40,7 @@ gdb_test_debug_expr "print /x {char\[4\]} array" \
     "\[$\]$decimal = \\{0x0, 0x1, 0x2, 0x3\\}"
 
 # This caused gdb to output garbage and possibly segfault
-gdb_test_debug_expr "print \"hello\"" \
+gdb_test_debug_expr {print "hello"} \
     ".*OP_STRING\[^\r\n\]*.*: ordinary string.*\[\r\n\]\\$$decimal = \"hello\"" \
     "string evaluation with debug expr"
 

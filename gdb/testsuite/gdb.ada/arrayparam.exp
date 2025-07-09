@@ -37,7 +37,7 @@ foreach_gnat_encoding scenario flags {all minimal} {
     # Verify that a call to a function that takes an array as a parameter
     # works without problem.
 
-    gdb_test "print call_me(\"bonjour\")" \
+    gdb_test {print call_me("bonjour")} \
 	"= void"
 
     # Verify that the array was passed properly by checking the global
@@ -59,7 +59,7 @@ foreach_gnat_encoding scenario flags {all minimal} {
     gdb_breakpoint "pck.call_me"
     gdb_continue_to_breakpoint call_me
 
-    gdb_test "print str" " = \"Hello World\""
+    gdb_test "print str" { = "Hello World"}
     gdb_test "ptype str" "type = array \\(<>\\) of character"
     gdb_test "ptype str.all" "type = array \\(<>\\) of character"
     # This surrounds the type in <> -- I don't know why but it's not

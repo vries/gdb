@@ -182,4 +182,4 @@ gdb_continue_to_breakpoint second ".*foo.adb:$bp_location.*null; -- STOP_HERE_2"
 
 # A regression test for a crash caused by trying to find the thread
 # for a terminated task.
-gdb_test "interpreter-exec mi \"-ada-task-info\"" ".*"
+gdb_test {interpreter-exec mi "-ada-task-info"} ".*"

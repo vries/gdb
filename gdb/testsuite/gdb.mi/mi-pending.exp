@@ -63,7 +63,7 @@ mi_create_breakpoint_pending "-f pendfunc1" \
 
 # Add some commands to the pending breakpoint, use -break-info to
 # check that the commands show up, then clear the commands again.
-mi_gdb_test "-break-commands 1 \"print 1\" \"print 2\" \"print 3\""\
+mi_gdb_test {-break-commands 1 "print 1" "print 2" "print 3"}\
     "\\^done" \
     "set breakpoint commands on pending breakpoint"
 set bp [mi_make_breakpoint_pending -number 1 -disp keep \

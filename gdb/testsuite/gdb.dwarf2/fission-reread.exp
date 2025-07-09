@@ -61,7 +61,7 @@ pass "$testfile - unload"
 # save gdb-index doesn't crash.
 remote_file target delete $dwo
 save_vars { GDBFLAGS } {
-    append GDBFLAGS " -iex \"maint set dwarf synchronous on\""
+    append GDBFLAGS { -iex "maint set dwarf synchronous on"}
     clean_restart $binfile
 }
 set output_dir [standard_output_file ""]

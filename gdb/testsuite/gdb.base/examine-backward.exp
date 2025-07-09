@@ -147,39 +147,39 @@ with_test_prefix "char-width=1, print-max=20" {
     gdb_test_no_output "set print elements 20"
     gdb_test_sequence "x/6s TestStrings" "take 6 strings forward" {
         "\"ABCDEFGHIJKLMNOPQRST\"\.\.\."
-        "\"UVWXYZ\""
-        "\"\""
-        "\"\""
-        "\"[^\"]+\""
+        {"UVWXYZ"}
+        {""}
+        {""}
+        {"[^"]+"}
         "\"01234567890123456789\"\.\.\."
     }
     gdb_test "x/-1xb" "0x39" "take 1 char backward"
     gdb_test_sequence "x/-6s" "take 6 strings backward" {
         "\"ABCDEFGHIJKLMNOPQRST\"\.\.\."
-        "\"UVWXYZ\""
-        "\"\""
-        "\"\""
-        "\"[^\"]+\""
+        {"UVWXYZ"}
+        {""}
+        {""}
+        {"[^"]+"}
         "\"01234567890123456789\"\.\.\."
     }
     gdb_test_sequence "x/6s TestStrings" "take 6 strings forward again" {
         "\"ABCDEFGHIJKLMNOPQRST\"\.\.\."
-        "\"UVWXYZ\""
-        "\"\""
-        "\"\""
-        "\"[^\"]+\""
+        {"UVWXYZ"}
+        {""}
+        {""}
+        {"[^"]+"}
         "\"01234567890123456789\"\.\.\."
     }
     gdb_test "x/-xb" "0x39" "take 1 char backward again"
     gdb_test "x/-s" "\"01234567890123456789\"\.\.\." \
 	"take 1 string backward, 1/6"
-    gdb_test "x/-s" "\".+\"" \
+    gdb_test "x/-s" {".+"} \
 	"take 1 string backward, 2/6"
-    gdb_test "x/-s" "\"\"" \
+    gdb_test "x/-s" {""} \
 	"take 1 string backward, 3/6"
-    gdb_test "x/-s" "\"\"" \
+    gdb_test "x/-s" {""} \
 	"take 1 string backward, 4/6"
-    gdb_test "x/-s" "\"GHIJKLMNOPQRSTUVWXYZ\"" \
+    gdb_test "x/-s" {"GHIJKLMNOPQRSTUVWXYZ"} \
 	"take 1 string backward, 5/6"
     gdb_test "x/-s" "\"ABCDEFGHIJKLMNOPQRST\"\.\.\." \
 	"take 1 string backward, 6/6"
@@ -189,39 +189,39 @@ with_test_prefix "char-width=2, print-max=20" {
     gdb_test_no_output "set print elements 20"
     gdb_test_sequence "x/6sh TestStringsH" "take 6 strings forward" {
         "u\"ABCDEFGHIJKLMNOPQRST\"\.\.\."
-        "u\"UVWXYZ\""
-        "u\"\""
-        "u\"\""
-        "u\"[^\"]+\""
+        {u"UVWXYZ"}
+        {u""}
+        {u""}
+        {u"[^"]+"}
         "u\"01234567890123456789\"\.\.\."
     }
     gdb_test "x/-1xh" "0x0039" "take 1 char backward"
     gdb_test_sequence "x/-6sh" "take 6 strings backward" {
         "u\"ABCDEFGHIJKLMNOPQRST\"\.\.\."
-        "u\"UVWXYZ\""
-        "u\"\""
-        "u\"\""
-        "u\"[^\"]+\""
+        {u"UVWXYZ"}
+        {u""}
+        {u""}
+        {u"[^"]+"}
         "u\"01234567890123456789\"\.\.\."
     }
     gdb_test_sequence "x/6sh TestStringsH" "take 6 strings forward again" {
         "u\"ABCDEFGHIJKLMNOPQRST\"\.\.\."
-        "u\"UVWXYZ\""
-        "u\"\""
-        "u\"\""
-        "u\"[^\"]+\""
+        {u"UVWXYZ"}
+        {u""}
+        {u""}
+        {u"[^"]+"}
         "u\"01234567890123456789\"\.\.\."
     }
     gdb_test "x/-xh" "0x0039" "take 1 char backward again"
     gdb_test "x/-sh" "u\"01234567890123456789\"\.\.\." \
 	"take 1 string backward, 1/6"
-    gdb_test "x/-sh" "u\".+\"" \
+    gdb_test "x/-sh" {u".+"} \
 	"take 1 string backward, 2/6"
-    gdb_test "x/-sh" "u\"\"" \
+    gdb_test "x/-sh" {u""} \
 	"take 1 string backward, 3/6"
-    gdb_test "x/-sh" "u\"\"" \
+    gdb_test "x/-sh" {u""} \
 	"take 1 string backward, 4/6"
-    gdb_test "x/-sh" "u\"GHIJKLMNOPQRSTUVWXYZ\"" \
+    gdb_test "x/-sh" {u"GHIJKLMNOPQRSTUVWXYZ"} \
 	"take 1 string backward, 5/6"
     gdb_test "x/-sh" "u\"ABCDEFGHIJKLMNOPQRST\"\.\.\." \
 	"take 1 string backward, 6/6"
@@ -231,39 +231,39 @@ with_test_prefix "char-width=4, print-max=20" {
     gdb_test_no_output "set print elements 20"
     gdb_test_sequence "x/6sw TestStringsW" "take 6 strings forward" {
         "U\"ABCDEFGHIJKLMNOPQRST\"\.\.\."
-        "U\"UVWXYZ\""
-        "U\"\""
-        "U\"\""
-        "U\"[^\"]+\""
+        {U"UVWXYZ"}
+        {U""}
+        {U""}
+        {U"[^"]+"}
         "U\"01234567890123456789\"\.\.\."
     }
     gdb_test "x/-1xw" "0x00000039" "take 1 char backward"
     gdb_test_sequence "x/-6sw" "take 6 strings backward" {
         "U\"ABCDEFGHIJKLMNOPQRST\"\.\.\."
-        "U\"UVWXYZ\""
-        "U\"\""
-        "U\"\""
-        "U\"[^\"]+\""
+        {U"UVWXYZ"}
+        {U""}
+        {U""}
+        {U"[^"]+"}
         "U\"01234567890123456789\"\.\.\."
     }
     gdb_test_sequence "x/6sw TestStringsW" "take 6 strings forward again" {
         "U\"ABCDEFGHIJKLMNOPQRST\"\.\.\."
-        "U\"UVWXYZ\""
-        "U\"\""
-        "U\"\""
-        "U\"[^\"]+\""
+        {U"UVWXYZ"}
+        {U""}
+        {U""}
+        {U"[^"]+"}
         "U\"01234567890123456789\"\.\.\."
     }
     gdb_test "x/-xw" "0x00000039" "take 1 char backward again"
     gdb_test "x/-sw" "U\"01234567890123456789\"\.\.\." \
 	"take 1 string backward, 1/6"
-    gdb_test "x/-sw" "U\".+\"" \
+    gdb_test "x/-sw" {U".+"} \
 	"take 1 string backward, 2/6"
-    gdb_test "x/-sw" "U\"\"" \
+    gdb_test "x/-sw" {U""} \
 	"take 1 string backward, 3/6"
-    gdb_test "x/-sw" "U\"\"" \
+    gdb_test "x/-sw" {U""} \
 	"take 1 string backward, 4/6"
-    gdb_test "x/-sw" "U\"GHIJKLMNOPQRSTUVWXYZ\"" \
+    gdb_test "x/-sw" {U"GHIJKLMNOPQRSTUVWXYZ"} \
 	"take 1 string backward, 5/6"
     gdb_test "x/-sw" "U\"ABCDEFGHIJKLMNOPQRST\"\.\.\." \
 	"take 1 string backward, 6/6"
@@ -272,43 +272,43 @@ with_test_prefix "char-width=4, print-max=20" {
 with_test_prefix "char-width=2, print-max=0" {
     gdb_test_no_output "set print elements 0"
     gdb_test_sequence "x/6sh TestStringsH" "take 6 strings forward" {
-        "u\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\""
-        "u\"\""
-        "u\"\""
+        {u"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}
+        {u""}
+        {u""}
         "u\"\\\\x307b\\\\x3052\\\\x307b\\\\x3052\""
-        "u\"012345678901234567890123456789\""
-        "u\"!!!!!!\""
+        {u"012345678901234567890123456789"}
+        {u"!!!!!!"}
     }
     gdb_test "x/-4xh" "0x0021\[\t \]+0x0021\[\t \]+0x0021\[\t \]+0x0000" \
         "take 4 characters backward"
     gdb_test_sequence "x/-6sh" "take 6 strings backward" {
-        "u\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\""
-        "u\"\""
-        "u\"\""
-        "u\"[^\"]+\""
-        "u\"012345678901234567890123456789\""
-        "u\"!!!!!!\""
+        {u"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}
+        {u""}
+        {u""}
+        {u"[^"]+"}
+        {u"012345678901234567890123456789"}
+        {u"!!!!!!"}
     }
     gdb_test_sequence "x/6sh TestStringsH" "take 6 strings forward again" {
-        "u\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\""
-        "u\"\""
-        "u\"\""
+        {u"ABCDEFGHIJKLMNOPQRSTUVWXYZ"}
+        {u""}
+        {u""}
         "u\"\\\\x307b\\\\x3052\\\\x307b\\\\x3052\""
-        "u\"012345678901234567890123456789\""
-        "u\"!!!!!!\""
+        {u"012345678901234567890123456789"}
+        {u"!!!!!!"}
     }
     gdb_test "x/-xh" "0x0000" "take 1 char backward"
-    gdb_test "x/-sh" "u\"!!!!!!\"" \
+    gdb_test "x/-sh" {u"!!!!!!"} \
 	"take 1 string backward, 1/6"
-    gdb_test "x/-sh" "u\"012345678901234567890123456789\"" \
+    gdb_test "x/-sh" {u"012345678901234567890123456789"} \
 	"take 1 string backward, 2/6"
-    gdb_test "x/-sh" "u\".+\"" \
+    gdb_test "x/-sh" {u".+"} \
 	"take 1 string backward, 3/6"
-    gdb_test "x/-sh" "u\"\"" \
+    gdb_test "x/-sh" {u""} \
 	"take 1 string backward, 4/6"
-    gdb_test "x/-sh" "u\"\"" \
+    gdb_test "x/-sh" {u""} \
 	"take 1 string backward, 5/6"
-    gdb_test "x/-sh" "u\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\"" \
+    gdb_test "x/-sh" {u"ABCDEFGHIJKLMNOPQRSTUVWXYZ"} \
 	"take 1 string backward, 6/6"
 }
 
@@ -321,16 +321,16 @@ with_test_prefix "char-width=1, print-max=4" {
         "\"MNOP\"\.\.\."
         "\"QRST\"\.\.\."
         "\"UVWX\"\.\.\."
-        "\"YZ\""
-        "\"\""
-        "\"\""
+        {"YZ"}
+        {""}
+        {""}
     }
     gdb_test "x/-xb" "0x00" "take 1 byte backward"
     gdb_test_sequence "x/-4s" "take 4 strings backward, 1/2" {
         "\"TUVW\"\.\.\."
-        "\"XYZ\""
-        "\"\""
-        "\"\""
+        {"XYZ"}
+        {""}
+        {""}
     }
     gdb_test_sequence "x/-4s" "take 4 strings backward, 2/2" {
         "\"CDEF\"\.\.\."

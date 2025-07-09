@@ -62,7 +62,7 @@ proc test_command_line_new_ui_pending_input {} {
     set options ""
     append options " -iex \"new-ui console $extra_tty_name\""
     append options " -ex \"b $bpline\""
-    append options " -ex \"run\""
+    append options { -ex "run"}
 
     if {[gdb_spawn_with_cmdline_opts "$options $binfile"] != 0} {
 	fail $test

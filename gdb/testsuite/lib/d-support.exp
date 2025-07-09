@@ -20,7 +20,7 @@ proc set_lang_d {} {
     if [gdb_test_no_output "set language d"] {
 	return 0
     }
-    if [gdb_test "show language" ".* source language is \"d\"." \
+    if [gdb_test "show language" {.* source language is "d".} \
 	   "set language to \"d\""] {
 	return 0
     }

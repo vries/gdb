@@ -303,7 +303,7 @@ gdb_test "list foo::overloadfnarg(int, int (*)(int))" \
    "int foo::overloadfnarg.*\\(int arg, int \\(\\*foo\\) \\(int\\)\\).*" \
    "list overloaded function with function ptr args"
 
-gdb_test "list \"foo::overloadfnarg(int, int (*)(int))\"" \
+gdb_test {list "foo::overloadfnarg(int, int (*)(int))"} \
    "int foo::overloadfnarg.*\\(int arg, int \\(\\*foo\\) \\(int\\)\\).*" \
    "list overloaded function with function ptr args - quotes around argument"
 

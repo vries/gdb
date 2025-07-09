@@ -72,25 +72,25 @@ test_exit_status 0 "-batch" ""
 test_exit_status 1 "-batch -jslkflsdjlkfjlksdjf" ""
 
 # gdb -batch with good commands should exit 0.
-test_exit_status 0 "-batch -ex \"info source\"" ""
+test_exit_status 0 {-batch -ex "info source"} ""
 test_exit_status 0 "-batch -x $good_commands" "-batch -x good-commands"
 
 # gdb -batch with bad commands should exit 1.
-test_exit_status 1 "-batch -ex \"set not-a-thing 4\"" ""
+test_exit_status 1 {-batch -ex "set not-a-thing 4"} ""
 test_exit_status 1 "-batch -x $bad_commands" "-batch -x bad-commands"
 
 # Success or failure of the last thing determines the exit code.
 test_exit_status 0 "-batch -ex \"set not-a-thing 4\" -x $good_commands" \
-    "-batch -ex \"set not-a-thing 4\" -x good-commands"
+    {-batch -ex "set not-a-thing 4" -x good-commands}
 test_exit_status 0 "-batch -x $bad_commands -ex \"info source\"" \
-    "-batch -x bad-commands -ex \"info source\""
+    {-batch -x bad-commands -ex "info source"}
 test_exit_status 1 "-batch -x $good_commands -x $bad_commands" \
     "-batch -x good-commands -x bad-commands"
 test_exit_status 1 "-batch -x $good_commands -ex \"set not-a-thing 4\"" \
-    "-batch -x good-commands -ex \"set not-a-thing 4\""
+    {-batch -x good-commands -ex "set not-a-thing 4"}
 
 set test "No such file or directory"
 set no_such_re ": $test\\."
-test_exit_status 1 "-batch \"\"" "1x: $test" ^[multi_line $no_such_re ""]$
-test_exit_status 1 "-batch \"\" \"\"" "$test and No core file specified" \
+test_exit_status 1 {-batch ""} "1x: $test" ^[multi_line $no_such_re ""]$
+test_exit_status 1 {-batch "" ""} "$test and No core file specified" \
     ^[multi_line $no_such_re "No core file specified\\." ""]$

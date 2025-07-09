@@ -45,7 +45,7 @@ proc do_test {} {
     # running, we need to use the non-stop variant of the protocol.
     save_vars { ::GDBFLAGS } {
 	if { [target_info gdb_protocol] == "extended-remote"} {
-	    append ::GDBFLAGS " -ex \"maintenance set target-non-stop on\""
+	    append ::GDBFLAGS { -ex "maintenance set target-non-stop on"}
 	}
 
 	clean_restart ${::binfile_other}

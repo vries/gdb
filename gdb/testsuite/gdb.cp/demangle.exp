@@ -190,8 +190,8 @@ proc do_tests {} {
     set_demangling_style "auto"
     gdb_test_exact "demangle -l c++ -- _ZSt4cout" "std::cout"
     gdb_test_exact "demangle -l c++ _ZSt4cout" "std::cout"
-    gdb_test_exact "demangle -l c -- _ZSt4cout" "Can't demangle \"_ZSt4cout\""
-    gdb_test_exact "demangle -l garbage xyzdje" "Unknown language \"garbage\""
+    gdb_test_exact "demangle -l c -- _ZSt4cout" {Can't demangle "_ZSt4cout"}
+    gdb_test_exact "demangle -l garbage xyzdje" {Unknown language "garbage"}
 }
 
 do_tests

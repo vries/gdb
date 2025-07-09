@@ -159,7 +159,7 @@ gdb_test "break func8b" \
 # symbol is found to print.
 #
 gdb_test "print func1" \
-    "No symbol \"func1\" in current context."
+    {No symbol "func1" in current context.}
 
 #
 # func2 is a non-static inlined function.  The result should be that

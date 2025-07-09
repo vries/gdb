@@ -64,25 +64,25 @@ gdb_test "info macro  -invalid-option FOO" \
 
 # Single macro lookups.
 gdb_test "info macro -- FOO" \
-	 ".*#define FOO \"hello\""
+	 {.*#define FOO "hello"}
 
 gdb_test "info macro  -- FOO" \
-	 ".*#define FOO \"hello\""
+	 {.*#define FOO "hello"}
 
 gdb_test "info macro --  FOO" \
-	 ".*#define FOO \"hello\""
+	 {.*#define FOO "hello"}
 
 gdb_test "info macro FOO" \
-	 ".*#define FOO \"hello\""
+	 {.*#define FOO "hello"}
 
 gdb_test "info macro  FOO" \
-	 ".*#define FOO \"hello\""
+	 {.*#define FOO "hello"}
 
 # Multiple macro lookups.
 set test "info macro -a FOO"
-set r1 ".*#define FOO \"hello\""
-set r2 ".*#define FOO \" \""
-set r3 ".*#define FOO \"world\""
+set r1 {.*#define FOO "hello"}
+set r2 {.*#define FOO " "}
+set r3 {.*#define FOO "world"}
 set r4 ".*#define FOO\\(a\\) foo = a"
 set testname "$test 1"
 gdb_test "$test" "$r1$r2$r3$r4" "$testname"
@@ -102,7 +102,7 @@ set test "info macro  -a  --  FOO"
 gdb_test "$test" "$r1$r2$r3$r4"
 
 set test "info macros"
-set r1 "#define FOO \"hello\""
+set r1 {#define FOO "hello"}
 set r2 "#define ONE"
 set testname "$test 2"
 gdb_test_lines $test $testname $r1.*$r2 \
@@ -112,7 +112,7 @@ gdb_test_lines $test $testname $r1.*$r2 \
 
 gdb_test "next" "" "next, 1"
 
-set r1 "#define FOO \" \""
+set r1 {#define FOO " "}
 set r2 "#define ONE"
 set r3 "#define TWO"
 set testname "$test 3"
@@ -123,7 +123,7 @@ gdb_test_lines $test $testname $r1.*$r2.*$r3 \
 gdb_test "next" "" "next, 2"
 
 # in alphabetical order...
-set r1 "#define FOO \"world\""
+set r1 {#define FOO "world"}
 set r2 "#define ONE"
 set r3 "#define THREE"
 set r4 "#define TWO"
@@ -137,7 +137,7 @@ gdb_test_lines $test "" $r1.*$r2.*$r3.*$r4 \
     -re-not "#define FOUR"
 gdb_test "next" "" "next, 3"
 
-set r1 "#define FOO \" \""
+set r1 {#define FOO " "}
 set r2 "#define ONE"
 set r3 "#define TWO."
 set test "info macros"
@@ -163,9 +163,9 @@ set r2 "#define FOO\\(a\\) foo = a"
 set r3 "#define FOUR"
 set testname "$test 7"
 gdb_test_lines $test $testname $r1.*$r2.*$r3 \
-    -re-not "#define FOO \" \"" \
-    -re-not "#define FOO \"hello\"" \
-    -re-not "#define FOO \"world\"" \
+    -re-not {#define FOO " "} \
+    -re-not {#define FOO "hello"} \
+    -re-not {#define FOO "world"} \
     -re-not "#define ONE" \
     -re-not "#define TWO" \
     -re-not "#define THREE"

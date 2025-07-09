@@ -119,7 +119,7 @@ namespace eval $testfile {
     foreach arg {"-foo" "-foo bar" "-function myfunction -foo" \
 		     "-function -myfunction -foo bar"} {
 	gdb_test "break $arg" \
-	    [string_to_regexp "invalid explicit location argument, \"-foo\""]
+	    [string_to_regexp {invalid explicit location argument, "-foo"}]
     }
 
     # Test explicit locations, with and without conditions.
@@ -146,7 +146,7 @@ namespace eval $testfile {
 
 	# Test with invalid condition
 	gdb_test "break $linespec if foofoofoo == 1" \
-	    ".*No symbol \"foofoofoo\" in current context.*" \
+	    {.*No symbol "foofoofoo" in current context.*} \
 	    "set breakpoint at \"$linespec\" with invalid condition"
 
 	# Test with thread

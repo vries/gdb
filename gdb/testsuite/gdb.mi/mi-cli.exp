@@ -68,62 +68,62 @@ set line_callee4_body [expr $line_callee4_head + 2]
 set line_callee4_next [expr $line_callee4_body + 1]
 set line_callee4_next_step [expr $line_callee4_next + 3]
 
-mi_gdb_test "-interpreter-exec console \"set args foobar\"" \
+mi_gdb_test {-interpreter-exec console "set args foobar"} \
   ".*=cmd-param-changed,param=\"args\",value=\"foobar\".*\\^done" \
-  "-interpreter-exec console \"set args foobar\""
+  {-interpreter-exec console "set args foobar"}
 
-mi_gdb_test "-interpreter-exec console \"show args\"" \
+mi_gdb_test {-interpreter-exec console "show args"} \
   {\~"Argument list to give program being debugged when it is started is \\\"foobar\\\"\.\\n".*\^done} \
-  "-interpreter-exec console \"show args\""
+  {-interpreter-exec console "show args"}
 
-mi_gdb_test "-interpreter-exec console \"break callee4\"" \
+mi_gdb_test {-interpreter-exec console "break callee4"} \
     {(&.*)*.*~"Breakpoint 2 at.*\\n".*=breakpoint-created,bkpt=\{number="2",type="breakpoint".*\}.*\n\^done} \
-    "-interpreter-exec console \"break callee4\""
+    {-interpreter-exec console "break callee4"}
 
-mi_gdb_test "-interpreter-exec console \"info break\"" \
+mi_gdb_test {-interpreter-exec console "info break"} \
   {\~"Num[ \t]*Type[ \t]*Disp[ \t]*Enb[ \t]*Address[ \t]*What\\n".*~"2[ \t]*breakpoint[ \t]*keep[ \t]*y[ \t]*0x[0-9A-Fa-f]+[ \t]*in callee4 at .*basics.c:[0-9]+\\n".*\^done} \
-  "-interpreter-exec console \"info break\""
+  {-interpreter-exec console "info break"}
 
-mi_gdb_test "-interpreter-exec console \"set listsize 1\"" \
+mi_gdb_test {-interpreter-exec console "set listsize 1"} \
   ".*=cmd-param-changed,param=\"listsize\",value=\"1\".*\\^done" \
-  "-interpreter-exec console \"set listsize 1\""
+  {-interpreter-exec console "set listsize 1"}
 
 # {.*\~"32[ \t(\\t)]*callee1.*\\n".*\^done }
-mi_gdb_test "-interpreter-exec console \"list\"" \
+mi_gdb_test {-interpreter-exec console "list"} \
   ".*\~\"$line_main_body\[\\\\t \]*callee1.*;\\\\n\".*\\^done" \
-  "-interpreter-exec console \"list\""
+  {-interpreter-exec console "list"}
 
 mi_execute_to "exec-continue" "breakpoint-hit" "callee4" "" ".*basics.c" $line_callee4_body \
     { "" "disp=\"keep\"" } \
     "continue to callee4"
 
-mi_gdb_test "100-interpreter-exec console \"delete 2\"" \
+mi_gdb_test {100-interpreter-exec console "delete 2"} \
     {.*=breakpoint-deleted,id=\"2\".*\^done} \
-    "-interpreter-exec console \"delete 2\""
+    {-interpreter-exec console "delete 2"}
 
 # NOTE: cagney/2003-02-03: Not yet.
-# mi_gdb_test "200-interpreter-exec console \"up\"" \
+# mi_gdb_test {200-interpreter-exec console "up"} \
 #   {.*=selected-frame-level-changed,level="1".*\^done} \
-#   "-interpreter-exec console \"up\""
-mi_gdb_test "200-interpreter-exec console \"up\"" \
+#   {-interpreter-exec console "up"}
+mi_gdb_test {200-interpreter-exec console "up"} \
   {~"#.*".*200\^done} \
-  "-interpreter-exec console \"up\""
+  {-interpreter-exec console "up"}
 
 # NOTE: cagney/2003-02-03: Not yet.
-# mi_gdb_test "300-interpreter-exec console \"down\"" \
+# mi_gdb_test {300-interpreter-exec console "down"} \
 #   {.*=selected-frame-level-changed,level="0".*\^done} \
-#   "-interpreter-exec console \"down\""
-mi_gdb_test "300-interpreter-exec console \"down\"" \
+#   {-interpreter-exec console "down"}
+mi_gdb_test {300-interpreter-exec console "down"} \
   {~"#.*".*300\^done} \
-  "-interpreter-exec console \"down\""
+  {-interpreter-exec console "down"}
 
 # NOTE: cagney/2003-02-03: Not yet.
-# mi_gdb_test "-interpreter-exec console \"frame 2\"" \
+# mi_gdb_test {-interpreter-exec console "frame 2"} \
 #   {.*=selected-frame-level-changed,level="2".*\^done} \
-#   "-interpreter-exec console \"frame 2\""
-mi_gdb_test "400-interpreter-exec console \"frame 2\"" \
+#   {-interpreter-exec console "frame 2"}
+mi_gdb_test {400-interpreter-exec console "frame 2"} \
   {~"#.*".*400\^done} \
-  "-interpreter-exec console \"frame 2\""
+  {-interpreter-exec console "frame 2"}
 
 # NOTE: cagney/2003-02-03: Not yet.
 # mi_gdb_test "-stack-select-frame 0" \
@@ -167,7 +167,7 @@ with_test_prefix "CLI finish" {
 
     mi_expect_stop "function-finished" "callee3" ".*" \
 	".*basics.c" ".*" \
-	",gdb-result-var=\".1\",return-value=\"0\"" \
+	{,gdb-result-var=".1",return-value="0"} \
 	"check MI output"
 }
 
@@ -215,7 +215,7 @@ gdb_expect {
 mi_expect_stop "end-stepping-range" "main" "" ".*basics.c" $line_main_return "" \
     "34 next: stop"
 
-mi_gdb_test "-interpreter-exec console \"list\"" \
+mi_gdb_test {-interpreter-exec console "list"} \
   "\~\"$line_main_return\[\\\\t ]*callme \\(1\\);\\\\n\".*\\^done" \
   "-interpreter-exec console \"list\" at basics.c:\$line_main_return"
 
@@ -228,19 +228,19 @@ mi_execute_to "exec-continue" "breakpoint-hit" "main" "" ".*basics.c" \
     "-exec-continue to line \$line_main_callme_2"
 
 # Restore the listsize back to the default.
-mi_gdb_test "-interpreter-exec console \"set listsize 10\"" \
+mi_gdb_test {-interpreter-exec console "set listsize 10"} \
   ".*=cmd-param-changed,param=\"listsize\",value=\"10\".*\\^done" \
-  "-interpreter-exec console \"set listsize 10\""
+  {-interpreter-exec console "set listsize 10"}
 
 # "list" should show 10 lines centered on where the program stopped.
 set first_list_line [expr $line_main_callme_2 - 5]
-mi_gdb_test "-interpreter-exec console \"list\"" \
+mi_gdb_test {-interpreter-exec console "list"} \
     ".*\~\"$first_list_line.*\\^done" \
     "-interpreter-exec console \"list\" at basics.c:\$line_main_callme_2"
 
-mi_gdb_test "-interpreter-exec console \"help set args\"" \
+mi_gdb_test {-interpreter-exec console "help set args"} \
   {\~"Set argument list to give program being debugged when it is started\.\\nFollow this command with any number of args, to be passed to the program\.".*\^done} \
-  "-interpreter-exec console \"help set args\""
+  {-interpreter-exec console "help set args"}
 
 # NOTE: cagney/2003-02-03: Not yet.
 # mi_gdb_test "-interpreter-exec console \"set \$pc=0x0\"" \
@@ -250,8 +250,8 @@ mi_gdb_test "888-interpreter-exec console \"set \$pc=0x0\"" \
   {888\^done} \
   "-interpreter-exec console \"set \$pc=0x0\""
 
-#mi_gdb_test "-interpreter-exec console \"\"" \
+#mi_gdb_test {-interpreter-exec console ""} \
   {} \
-  "-interpreter-exec console \"\""
+  {-interpreter-exec console ""}
 
 mi_gdb_exit

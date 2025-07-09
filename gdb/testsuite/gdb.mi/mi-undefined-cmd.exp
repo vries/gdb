@@ -24,7 +24,7 @@ if {[mi_clean_restart]} {
 # for the "undefined-command" error code...
 mi_gdb_test "-list-features" \
             "\\^done,features=\\\[.*\"undefined-command-error-code\".*\\\]" \
-            "-list-features should include \"undefined-command-error-code\""
+            {-list-features should include "undefined-command-error-code"}
 
 mi_gdb_test "-undefined-command" \
             "\\^error,.*,code=\"undefined-command\"" \

@@ -147,7 +147,7 @@ proc_with_prefix test_setting { } {
 	    if {$lang == "modula-2"} {
 		# The Modula-2 parser doesn't know how to build a
 		# suitable string expression.
-		gdb_test "print \"foo\"" "strings are not implemented"
+		gdb_test {print "foo"} "strings are not implemented"
 		continue
 	    }
 
@@ -155,7 +155,7 @@ proc_with_prefix test_setting { } {
 		# Rust strings are actually structs, without a running
 		# inferior into which the string data can be pushed
 		# GDB can't print anything.
-		gdb_test "print \"foo\"" \
+		gdb_test {print "foo"} \
 		    "evaluation of this expression requires the target program to be active"
 		gdb_test "print \$_gdb_maint_setting(\"test-settings string\")" \
 		    "evaluation of this expression requires the target program to be active"
@@ -211,7 +211,7 @@ proc_with_prefix test_python_value { } {
 	return
     }
 
-    gdb_test_no_output "python gdb.set_convenience_variable(\"v\", \"bar\")" \
+    gdb_test_no_output {python gdb.set_convenience_variable("v", "bar")} \
 	"set convenience var"
     check_v_string "bar"
 }

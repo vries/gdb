@@ -278,7 +278,7 @@ if {[nodebug_runto inner]} {
 	    "'array_index' has unknown return type; cast the call to its declared return type"
     }
     if [target_info exists gdb,cannot_call_functions] {
-	unsupported "p/c (int) array_index(\"abcdef\",2)"
+	unsupported {p/c (int) array_index("abcdef",2)}
     } else {
 	# We need to up this because this can be really slow on some boards.
 	# (malloc() is called as part of the test).

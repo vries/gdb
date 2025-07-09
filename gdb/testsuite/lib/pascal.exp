@@ -177,7 +177,7 @@ proc set_lang_pascal {} {
     if [gdb_test_no_output "set language pascal"] {
 	return 0
     }
-    if [gdb_test "show language" ".* source language is \"pascal\"." \
+    if [gdb_test "show language" {.* source language is "pascal".} \
 	   "set language to \"pascal\""] {
 	return 0
     }

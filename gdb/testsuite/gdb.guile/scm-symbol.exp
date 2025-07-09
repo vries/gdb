@@ -34,18 +34,18 @@ gdb_install_guile_module
 # Test looking up a global symbol before we runto_main as this is the
 # point where we don't have a current frame, and we don't want to
 # require one.
-gdb_scm_test_silent_cmd "guile (define main-func (lookup-global-symbol \"main\"))" \
+gdb_scm_test_silent_cmd {guile (define main-func (lookup-global-symbol "main"))} \
     "lookup main"
 gdb_test "guile (print (symbol-function? main-func))" \
     "= #t" "test, symbol-function? main"
-gdb_test "guile (print (lookup-global-symbol \"junk\"))" \
+gdb_test {guile (print (lookup-global-symbol "junk"))} \
     "= #f" "test, lookup-global-symbol junk"
 
 gdb_test "guile (print (symbol-value main-func))" \
     "= {int \\(int, char \[*\]\[*\]\\)} $hex \\<main\\>" "print value of main"
 
 set qq_line [gdb_get_line_number "line of qq"]
-gdb_scm_test_silent_cmd "guile (define qq-var (lookup-global-symbol \"qq\"))" \
+gdb_scm_test_silent_cmd {guile (define qq-var (lookup-global-symbol "qq"))} \
     "lookup qq"
 gdb_test "guile (print (symbol-line qq-var))" \
     "= $qq_line" "print line number of qq"
@@ -59,9 +59,9 @@ if ![gdb_guile_runto_main] {
 }
 
 # Test symbol eq? and equal?.
-gdb_test "guile (print (eq? (lookup-global-symbol \"main\") (lookup-global-symbol \"main\")))" \
+gdb_test {guile (print (eq? (lookup-global-symbol "main") (lookup-global-symbol "main")))} \
     "= #t"
-gdb_test "guile (print (equal? (lookup-global-symbol \"main\") (lookup-global-symbol \"main\")))" \
+gdb_test {guile (print (equal? (lookup-global-symbol "main") (lookup-global-symbol "main")))} \
     "= #t"
 
 gdb_breakpoint [gdb_get_line_number "Block break here."]
@@ -72,7 +72,7 @@ gdb_scm_test_silent_cmd "guile (define block (frame-block frame))" \
     "get block at block break"
 
 # Test symbol-argument?.
-gdb_scm_test_silent_cmd "guile (define arg (car (lookup-symbol \"arg\")))" \
+gdb_scm_test_silent_cmd {guile (define arg (car (lookup-symbol "arg")))} \
     "get variable arg"
 gdb_test "guile (print (symbol-variable? arg))" "= #f"
 gdb_test "guile (print (symbol-constant? arg))" "= #f"
@@ -99,7 +99,7 @@ gdb_scm_test_silent_cmd "guile (define frame (selected-frame))" \
     "get frame at end"
 
 # Test symbol-variable?.
-gdb_scm_test_silent_cmd "guile (define a (car (lookup-symbol \"a\")))" \
+gdb_scm_test_silent_cmd {guile (define a (car (lookup-symbol "a")))} \
     "get variable a"
 gdb_test "guile (print (symbol-variable? a))" "= #t"
 gdb_test "guile (print (symbol-constant? a))" "= #f"
@@ -118,7 +118,7 @@ gdb_test "guile (print (symbol-needs-frame? a))" \
     "= #t" "print whether a needs a frame"
 
 # Test symbol-constant?.
-gdb_scm_test_silent_cmd "guile (define t (car (lookup-symbol \"one\")))" \
+gdb_scm_test_silent_cmd {guile (define t (car (lookup-symbol "one")))} \
     "get constant t"
 gdb_test "guile (print (symbol-variable? t))" "= #f"
 gdb_test "guile (print (symbol-constant? t))" "= #t"
@@ -178,7 +178,7 @@ if ![gdb_guile_runto_main] {
 
 gdb_breakpoint [gdb_get_line_number "Break at end."]
 gdb_continue_to_breakpoint "Break at end again"
-gdb_scm_test_silent_cmd "guile (define a (car (lookup-symbol \"a\")))" \
+gdb_scm_test_silent_cmd {guile (define a (car (lookup-symbol "a")))} \
     "get variable a for unload"
 gdb_test "guile (print (symbol-valid? a))" \
     "= #t" "test symbol validity pre-unload"

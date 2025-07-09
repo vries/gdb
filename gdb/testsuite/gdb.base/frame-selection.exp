@@ -113,8 +113,8 @@ gdb_test "frame function main" "#2  $hex in main.*"
 
 # Check for a distinction between a known function not in the stack
 # trace, and an unknown function.
-gdb_test "frame function recursive" "No frame for function \"recursive\"."
-gdb_test "frame function foo" "Function \"foo\" not defined."
+gdb_test "frame function recursive" {No frame for function "recursive".}
+gdb_test "frame function foo" {Function "foo" not defined.}
 
 
 with_test_prefix "select-frame, no keyword" {
@@ -164,9 +164,9 @@ with_test_prefix "select-frame, keyword=function" {
 # Check for a distinction between a known function not in the stack
 # trace, and an unknown function.
 gdb_test "select-frame function recursive" \
-    "No frame for function \"recursive\"."
+    {No frame for function "recursive".}
 gdb_test "select-frame function foo" \
-    "Function \"foo\" not defined."
+    {Function "foo" not defined.}
 
 # Now continue until we hit the breakpoint again.
 with_test_prefix "second frame_2 breakpoint" {

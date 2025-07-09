@@ -32,7 +32,7 @@ if {![runto_main]} {
 
 set python_error_text "Error occurred in Python.*"
 
-gdb_py_test_silent_cmd "python sym = gdb.lookup_symbol(\"some_var\")" \
+gdb_py_test_silent_cmd {python sym = gdb.lookup_symbol("some_var")} \
     "Find a symbol in objfile" 1
 gdb_py_test_silent_cmd "python objfile = sym\[0\].symtab.objfile" \
     "Get backing object file" 1
@@ -50,7 +50,7 @@ gdb_test_no_output "python dir(objfile)"
 
 gdb_test "python print (gdb.lookup_objfile (\"${testfile}\").filename)" \
     "${testfile}" "print lookup_objfile filename"
-gdb_test "python print (gdb.lookup_objfile (\"junk\"))" \
+gdb_test {python print (gdb.lookup_objfile ("junk"))} \
     "Objfile not found\\.\r\n${python_error_text}"
 
 gdb_test "python print (gdb.lookup_objfile (\"${testfile}\").lookup_global_symbol (\"global_var\").name)" \
@@ -80,10 +80,10 @@ if [string compare $binfile_build_id ""] {
 
 # Other lookup_objfile_by_build_id tests we can do, even if compiler doesn't
 # support them.
-gdb_test "python print (gdb.lookup_objfile (\"foo\", by_build_id=True))" \
+gdb_test {python print (gdb.lookup_objfile ("foo", by_build_id=True))} \
     "Not a valid build id\\.\r\n${python_error_text}" \
     "print invalid file lookup_objfile by build-id"
-gdb_test "python print (gdb.lookup_objfile (\"1234abcdef\", by_build_id=True))" \
+gdb_test {python print (gdb.lookup_objfile ("1234abcdef", by_build_id=True))} \
     "Objfile not found\\.\r\n${python_error_text}" \
     "print invalid file lookup_objfile by build-id 2"
 

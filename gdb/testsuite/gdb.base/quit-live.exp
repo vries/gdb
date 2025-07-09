@@ -140,7 +140,7 @@ proc quit_with_live_inferior {appear_how extra_inferior quit_how} {
 	    set quit_anyway_re [make_re "detached"]
 	}
 
-	set test "quit with \"quit\""
+	set test {quit with "quit"}
 	gdb_test_multiple "quit" $test {
 	    -re $quit_anyway_re {
 		send_gdb "y\n"

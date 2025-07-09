@@ -33,10 +33,10 @@ gdb_test "print double_vla" " = \\\{0, 0.5, 1, 1.5, 2\\\}"
 gdb_test "print float_vla" " = \\\{0, 0.5, 1, 1.5, 2\\\}"
 gdb_test "print long_vla" " = \\\{0, 2, 4, 6, 8\\\}"
 gdb_test "print unsigned_long_vla" " = \\\{0, 2, 4, 6, 8\\\}"
-gdb_test "print char_vla" " = \"AAAAA\""
+gdb_test "print char_vla" { = "AAAAA"}
 gdb_test "print short_vla" " = \\\{0, 2, 4, 6, 8\\\}"
 gdb_test "print unsigned_short_vla" " = \\\{0, 2, 4, 6, 8\\\}"
-gdb_test "print unsigned_char_vla" " = \"AAAAA\""
+gdb_test "print unsigned_char_vla" { = "AAAAA"}
 gdb_test "print foo_vla" \
          "\\\{\\\{a = 0\\\}, \\\{a = 2\\\}, \\\{a = 4\\\}, \\\{a = 6\\\}, \\\{a = 8\\\}\\\}"
 gdb_test "print bar_vla" \

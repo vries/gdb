@@ -127,7 +127,7 @@ proc one_jit_test {solib_binfiles_target match_str} {
 
 	# All jit librares must have been unregistered
 	gdb_test "info function jit_function" \
-	    "All functions matching regular expression \"jit_function\":" \
+	    {All functions matching regular expression "jit_function":} \
 	    "info function jit_function after unregistration"
     }
 }

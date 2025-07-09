@@ -33,37 +33,37 @@ if {![runto "a.adb:$bp_location"]} {
 # Verify that assigning to Nnn (a basic string) works...
 
 gdb_test "print nnn" \
-         "= \"12345\"" \
+         {= "12345"} \
          "print nnn before assignment"
 
-gdb_test_no_output "set variable nnn := \"qcyom\""
+gdb_test_no_output {set variable nnn := "qcyom"}
 
 gdb_test "print nnn" \
-         "= \"qcyom\"" \
+         {= "qcyom"} \
          "print nnn after assignment"
 
 # Same with Www (a wide string)...
 
 gdb_test "print www" \
-         "= \"12345\"" \
+         {= "12345"} \
          "print www before assignment"
 
-gdb_test_no_output "set variable www := \"zenrk\""
+gdb_test_no_output {set variable www := "zenrk"}
 
 gdb_test "print www" \
-         "= \"zenrk\"" \
+         {= "zenrk"} \
          "print www after assignment"
 
 # Same with Rws (a wide wide string)...
 
 gdb_test "print rws" \
-         "= \"12345\"" \
+         {= "12345"} \
          "print rws before assignment"
 
-gdb_test_no_output "set variable rws := \"ndhci\""
+gdb_test_no_output {set variable rws := "ndhci"}
 
 gdb_test "print rws" \
-         "= \"ndhci\"" \
+         {= "ndhci"} \
          "print rws after assignment"
 
 # Also, check that GDB doesn't get tricked if we assign to Www a
@@ -71,7 +71,7 @@ gdb_test "print rws" \
 # assignment, because the array lengths are different (the debugger
 # used to get tricked because the array size was the same).
 
-gdb_test "set variable www := \"1#2#3#4#5#\"" \
+gdb_test {set variable www := "1#2#3#4#5#"} \
          "cannot assign arrays of different length"
 
 # However, reassigning an array of a different length should work when

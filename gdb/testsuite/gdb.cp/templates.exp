@@ -678,4 +678,4 @@ foreach t [list "Empty" "Foozle"] {
 # Test that "-qualified" finds no matching locations.
 gdb_test_no_output "set breakpoint pending off"
 gdb_test "break -qualified Foozle::fogey" \
-    "Function \"Foozle::fogey\" not defined."
+    {Function "Foozle::fogey" not defined.}

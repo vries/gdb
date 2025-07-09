@@ -81,17 +81,17 @@ proc run_lang_tests {exefile lang} {
 	    gdb_test "print ns2" "<error reading variable: ERROR: Cannot access memory at address 0x0>"
 	}
 
-	gdb_test "print x" " = \"this is x\""
-	gdb_test "print cstring" " = \"const string\"" \
+	gdb_test "print x" { = "this is x"}
+	gdb_test "print cstring" { = "const string"} \
 	    "print cstring with max-depth unlimited"
 	gdb_test_no_output "set print max-depth 0"
-	gdb_test "print cstring" " = \"const string\"" \
+	gdb_test "print cstring" { = "const string"} \
 	    "print cstring with max-depth 0"
 	gdb_test_no_output "set print max-depth unlimited"
 
 	gdb_test "print estring" " = \"embedded x\\\\201\\\\202\\\\203\\\\204\""
 
-	gdb_test_no_output "guile (set! *pp-ls-encoding* \"UTF-8\")"
+	gdb_test_no_output {guile (set! *pp-ls-encoding* "UTF-8")}
 	gdb_test "print estring2" "\"embedded \", <incomplete sequence \\\\302>"
 
 	gdb_test_no_output "set guile print-stack full"
@@ -150,7 +150,7 @@ gdb_test "print ss" \
     " = a=<progspace a=<1> b=<$hex>> b=<progspace a=<2> b=<$hex>>" \
     "print ss via progspace"
 
-gdb_test_no_output "guile (install-objfile-pretty-printers! (current-progspace) \"scm-pretty-print\")"
+gdb_test_no_output {guile (install-objfile-pretty-printers! (current-progspace) "scm-pretty-print")}
 gdb_test "print ss" \
     " = a=<objfile a=<1> b=<$hex>> b=<objfile a=<2> b=<$hex>>" \
     "print ss via objfile"

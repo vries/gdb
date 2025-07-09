@@ -69,30 +69,30 @@ proc test { input_docs expected_output } {
 	puts $fd $input_docs
 	puts $fd ""
 	puts $fd "  def __init__ (self):"
-	puts $fd "    super ().__init__ (\"test-cmd\", gdb.COMMAND_OBSCURE)"
+	puts $fd {    super ().__init__ ("test-cmd", gdb.COMMAND_OBSCURE)}
 	puts $fd ""
 	puts $fd "  def invoke (self, arg, from_tty):"
-	puts $fd "    print (\"In test-cmd\")"
+	puts $fd {    print ("In test-cmd")}
 	puts $fd ""
 
 	puts $fd "class test_param (gdb.Parameter):"
 	puts $fd $input_docs
 	puts $fd ""
-	puts $fd "  show_doc = \"This is the show doc line\""
-	puts $fd "  set_doc = \"This is the set doc line\""
+	puts $fd {  show_doc = "This is the show doc line"}
+	puts $fd {  set_doc = "This is the set doc line"}
 	puts $fd ""
 	puts $fd "  def __init__ (self):"
-	puts $fd "    super ().__init__ (\"test-param\", gdb.COMMAND_OBSCURE, gdb.PARAM_BOOLEAN)"
+	puts $fd {    super ().__init__ ("test-param", gdb.COMMAND_OBSCURE, gdb.PARAM_BOOLEAN)}
 	puts $fd ""
 	puts $fd "  def get_show_string (self, value):"
-	puts $fd "    return \"The state is '\" + value + \"'\""
+	puts $fd {    return "The state is '" + value + "'"}
 
 	puts $fd ""
 	puts $fd "test_param ()"
 	puts $fd "test_cmd ()"
 
 	puts $fd ""
-	puts $fd "print(\"Loaded OK.\")"
+	puts $fd {print("Loaded OK.")}
 
 	close $fd
 
@@ -150,9 +150,9 @@ proc test { input_docs expected_output } {
 # the last line.
 test \
     [multi_line_input \
-	 "  \"\"\"This is the first line." \
+	 {  """This is the first line.} \
 	 "" \
-	 "  This is the third line.\"\"\""] \
+	 {  This is the third line."""}] \
     [multi_line \
 	 "This is the first line\\." \
 	 "" \
@@ -162,10 +162,10 @@ test \
 # quotes.  The blank line in the middle is still completely empty.
 test \
     [multi_line_input \
-	 "  \"\"\"" \
+	 {  """} \
 	 "  This is the first line." \
 	 "" \
-	 "  This is the third line.\"\"\""] \
+	 {  This is the third line."""}] \
     [multi_line \
 	 "This is the first line\\." \
 	 "" \
@@ -175,10 +175,10 @@ test \
 # relative indentation to be retained.
 test\
     [multi_line_input \
-	 "  \"\"\"" \
+	 {  """} \
 	 "  This is the first line." \
 	 "    Indented second line." \
-	 "  This is the third line.\"\"\""] \
+	 {  This is the third line."""}] \
     [multi_line \
 	 "This is the first line\\." \
 	 "  Indented second line\\." \
@@ -187,10 +187,10 @@ test\
 # The indentation moves to the first line.
 test\
     [multi_line_input \
-	 "  \"\"\"" \
+	 {  """} \
 	 "    Indented first line." \
 	 "  This is the second line." \
-	 "  This is the third line.\"\"\""] \
+	 {  This is the third line."""}] \
     [multi_line \
 	 "  Indented first line\\." \
 	 "This is the second line\\." \
@@ -199,10 +199,10 @@ test\
 # The indentation moves to the last line.
 test\
     [multi_line_input \
-	 "  \"\"\"" \
+	 {  """} \
 	 "  This is the first line." \
 	 "  This is the second line." \
-	 "    Indented third line.\"\"\""] \
+	 {    Indented third line."""}] \
     [multi_line \
 	 "This is the first line\\." \
 	 "This is the second line\\." \
@@ -215,11 +215,11 @@ foreach line [list "" " " "  " "   " "    "] {
     # Blank lines at the beginning should be removed.
     test \
 	[multi_line_input \
-	     "  \"\"\"" \
+	     {  """} \
 	     $line \
 	     "  This is the first line." \
 	     "    Indented second line." \
-	     "  This is the third line.\"\"\""] \
+	     {  This is the third line."""}] \
 	[multi_line \
 	     "This is the first line\\." \
 	     "  Indented second line\\." \
@@ -228,12 +228,12 @@ foreach line [list "" " " "  " "   " "    "] {
     # As should blank lines at the end.
     test \
 	[multi_line_input \
-	     "  \"\"\"" \
+	     {  """} \
 	     "  This is the first line." \
 	     "    Indented second line." \
 	     "  This is the third line." \
 	     $line \
-	     "  \"\"\""] \
+	     {  """}] \
 	[multi_line \
 	     "This is the first line\\." \
 	     "  Indented second line\\." \
@@ -243,12 +243,12 @@ foreach line [list "" " " "  " "   " "    "] {
     # removed.
     test \
 	[multi_line_input \
-	     "  \"\"\"" \
+	     {  """} \
 	     "  This is the first line." \
 	     $line \
 	     "  This is the third line." \
 	     $line \
-	     "  \"\"\""] \
+	     {  """}] \
 	[multi_line \
 	     "This is the first line\\." \
 	     "" \
@@ -259,11 +259,11 @@ foreach line [list "" " " "  " "   " "    "] {
 # their own.
 test\
     [multi_line_input \
-	 "  \"\"\"  " \
+	 {  """  } \
 	 "  This is the first line." \
 	 "    Indented second line." \
 	 "  This is the third line." \
-	 "  \"\"\""] \
+	 {  """}] \
     [multi_line \
 	 "This is the first line\\." \
 	 "  Indented second line\\." \
@@ -274,11 +274,11 @@ test\
 # sure we don't drop this character.
 test\
     [multi_line_input \
-	 "  \"\"\"  " \
+	 {  """  } \
 	 "  This is the first line." \
 	 "    Indented second line." \
 	 "  This is the third line." \
-	 "  x\"\"\""] \
+	 {  x"""}] \
     [multi_line \
 	 "This is the first line\\." \
 	 "  Indented second line\\." \

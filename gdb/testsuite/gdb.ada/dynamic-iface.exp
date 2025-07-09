@@ -31,11 +31,11 @@ set bp_location [gdb_get_line_number "STOP" ${testdir}/concrete.adb]
 runto "concrete.adb:$bp_location"
 
 gdb_test "print obj" \
-    [string_to_regexp "(n => 3, a => \"ABC\", value => 93)"] \
+    [string_to_regexp {(n => 3, a => "ABC", value => 93)}] \
     "print local as interface"
 
 gdb_continue_to_breakpoint STOP
 
 gdb_test "print obj" \
-    [string_to_regexp "(n => 5, a => \"DEFGH\", value => 107)"] \
+    [string_to_regexp {(n => 5, a => "DEFGH", value => 107)}] \
     "print local2 as interface"

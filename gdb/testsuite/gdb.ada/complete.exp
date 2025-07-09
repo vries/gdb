@@ -106,9 +106,9 @@ gdb_test "p <Exported_Capitalized>" " = 2"
 
 # Confirm that we can't print the symbol without the '<' notation.
 gdb_test "p Exported_Capitalized" \
-    "No definition of \"exported_capitalized\" in current context."
+    {No definition of "exported_capitalized" in current context.}
 gdb_test "p exported_capitalized" \
-    "No definition of \"exported_capitalized\" in current context."
+    {No definition of "exported_capitalized" in current context.}
 
 # A global symbol, created by the binder, that starts with __gnat...
 test_gdb_complete "__gnat_ada_main_progra" \

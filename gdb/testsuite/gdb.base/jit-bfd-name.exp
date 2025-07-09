@@ -158,4 +158,4 @@ gdb_continue_to_breakpoint "break here 2"
 
 # All jit librares must have been unregistered.
 gdb_test "info function jit_function" \
-    "All functions matching regular expression \"jit_function\":"
+    {All functions matching regular expression "jit_function":}

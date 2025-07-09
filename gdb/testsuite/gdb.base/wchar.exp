@@ -28,7 +28,7 @@ gdb_test "print narrow" "= 97 L'a'"
 
 gdb_test "print single" "= 48879 L'\\\\xbeef'"
 
-gdb_test "print simple" "= L\"facile\""
+gdb_test "print simple" {= L"facile"}
 
 gdb_test "print difficile" "= L\"\\\\xdead\\\\xbeef\\\\xfeed\\\\xface\""
 

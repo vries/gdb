@@ -48,7 +48,7 @@ gdb_test "guile (print (equal? (value-type (make-value 1)) (value-type (make-val
 gdb_test "guile (print (equal? (value-type (make-value 1)) (value-type (make-value 2.5))))" \
     "= #f" "not equal? type"
 
-gdb_test "guile (print (equal? (lookup-global-symbol \"main\") (lookup-global-symbol \"main\")))" \
+gdb_test {guile (print (equal? (lookup-global-symbol "main") (lookup-global-symbol "main")))} \
     "= #t" "equal? symbol"
-gdb_test "guile (print (equal? (lookup-global-symbol \"main\") (lookup-global-symbol \"x\")))" \
+gdb_test {guile (print (equal? (lookup-global-symbol "main") (lookup-global-symbol "x")))} \
     "= #f" "not equal? symbol"

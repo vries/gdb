@@ -152,7 +152,7 @@ proc_with_prefix test_bkpt_cond_and_cmds { } {
     gdb_scm_test_silent_cmd "guile (register-breakpoint! bp1)" \
 	"register bp1"
     gdb_continue_to_breakpoint "Break at multiply, first time"
-    gdb_scm_test_silent_cmd  "guile (set-breakpoint-condition! bp1 \"i == 5\")" \
+    gdb_scm_test_silent_cmd  {guile (set-breakpoint-condition! bp1 "i == 5")} \
 	"set condition"
     gdb_test "guile (print (breakpoint-condition bp1))" \
 	"= i == 5" "test condition has been set"
@@ -245,7 +245,7 @@ proc_with_prefix test_watchpoints { } {
 	return
     }
 
-    gdb_scm_test_silent_cmd  "guile (define wp1 (make-breakpoint \"result\" #:type BP_WATCHPOINT #:wp-class WP_WRITE))" \
+    gdb_scm_test_silent_cmd  {guile (define wp1 (make-breakpoint "result" #:type BP_WATCHPOINT #:wp-class WP_WRITE))} \
 	"create watchpoint"
     gdb_test "guile (display wp1) (newline)" "#<gdb:breakpoint #-1>" \
 	"print watchpoint before registering"
@@ -258,10 +258,10 @@ proc_with_prefix test_watchpoints { } {
 	".*\[Ww\]atchpoint.*result.*Old value = 0.*New value = 25.*main.*" \
 	"test watchpoint write"
 
-    gdb_test "guile (define wp2 (make-breakpoint \"result\" #:wp-class WP_WRITE #:type 999))" \
+    gdb_test {guile (define wp2 (make-breakpoint "result" #:wp-class WP_WRITE #:type 999))} \
 	"(ERROR: )?In procedure gdbscm_make_breakpoint: Out of range: invalid breakpoint type in position 5: 999\r\n.*" \
 	"create a breakpoint with an invalid type number"
-    gdb_test "guile (define wp2 (make-breakpoint \"result\" #:wp-class WP_WRITE #:type BP_NONE))" \
+    gdb_test {guile (define wp2 (make-breakpoint "result" #:wp-class WP_WRITE #:type BP_NONE))} \
 	"(ERROR: )?In procedure gdbscm_make_breakpoint: unsupported breakpoint type in position 5: \"BP_NONE\"\r\n.*" \
 	"create a breakpoint with an unsupported type"
 }
@@ -282,7 +282,7 @@ proc_with_prefix test_bkpt_internal { } {
 
     delete_breakpoints
 
-    gdb_scm_test_silent_cmd  "guile (define wp1 (make-breakpoint \"result\" #:type BP_WATCHPOINT #:wp-class WP_WRITE #:internal #t))" \
+    gdb_scm_test_silent_cmd  {guile (define wp1 (make-breakpoint "result" #:type BP_WATCHPOINT #:wp-class WP_WRITE #:internal #t))} \
 	"create invisible watchpoint"
     gdb_scm_test_silent_cmd "guile (register-breakpoint! wp1)" \
 	"register wp1"
@@ -333,7 +333,7 @@ proc_with_prefix test_bkpt_eval_funcs { } {
 	"    (set-breakpoint-stop! bp" "" \
 	"       (lambda (bkpt)" "" \
 	"         (let ((data (object-property bkpt 'bp-data))" "" \
-	"               (inf-i (parse-and-eval \"i\")))" "" \
+	{               (inf-i (parse-and-eval "i")))} "" \
 	"           (set-bp-data-count! data (+ (bp-data-count data) 1))" "" \
 	"           (set-bp-data-inf-i! data inf-i)" "" \
 	"           (value=? inf-i 3))))" "" \
@@ -394,7 +394,7 @@ proc_with_prefix test_bkpt_eval_funcs { } {
 	"Only one stop condition allowed.*"
     gdb_scm_test_silent_cmd  "guile (define eval-bp2 (make-bp-basic \"$cond_bp\"))" \
 	"create basic breakpoint"
-    gdb_scm_test_silent_cmd  "guile (set-breakpoint-condition! eval-bp2 \"1==1\")" \
+    gdb_scm_test_silent_cmd  {guile (set-breakpoint-condition! eval-bp2 "1==1")} \
 	"set a condition"
     gdb_test_multiline "construct an eval function" \
 	"guile" "" \
@@ -427,13 +427,13 @@ proc_with_prefix test_bkpt_eval_funcs { } {
 	"  (let ((wp (create-breakpoint! location #:type BP_WATCHPOINT #:wp-class WP_WRITE)))" "" \
 	"    (set-breakpoint-stop! wp" "" \
 	"      (lambda (bkpt)" "" \
-	"        (let ((result (parse-and-eval \"result\")))" "" \
+	{        (let ((result (parse-and-eval "result")))} "" \
 	"          (value=? result 788))))" "" \
 	"    wp))" "" \
 	"end" ""
 
     delete_breakpoints
-    gdb_scm_test_silent_cmd  "guile (define wp1 (make-wp-eval \"result\"))" \
+    gdb_scm_test_silent_cmd  {guile (define wp1 (make-wp-eval "result"))} \
 	"create watchpoint"
     gdb_test "continue" ".*\[Ww\]atchpoint.*result.*Old value =.*New value = 788.*" \
 	"test watchpoint write"
@@ -520,7 +520,7 @@ proc_with_prefix test_bkpt_address {} {
 
     # Leading whitespace is intentional!
     gdb_scm_test_silent_cmd \
-	"guile (define bp1 (make-breakpoint \"  *multiply\"))" \
+	{guile (define bp1 (make-breakpoint "  *multiply"))} \
 	"create address breakpoint a '  *multiply'" 1
 
     gdb_test "guile (register-breakpoint! bp1)" \
@@ -540,7 +540,7 @@ proc_with_prefix test_bkpt_probe {} {
     }
 
     gdb_scm_test_silent_cmd \
-	"guile (define bp1 (make-breakpoint \"-probe test:result_updated\"))" \
+	{guile (define bp1 (make-breakpoint "-probe test:result_updated"))} \
 	"create probe breakpoint"
 
     gdb_test \
@@ -562,7 +562,7 @@ proc_with_prefix test_catchpoints {} {
 
     # Try to create a catchpoint, currently this isn't supported via
     # the guile api.
-    gdb_test "guile (define cp (make-breakpoint \"syscall\" #:type BP_CATCHPOINT))" \
+    gdb_test {guile (define cp (make-breakpoint "syscall" #:type BP_CATCHPOINT))} \
 	"(ERROR: )?In procedure gdbscm_make_breakpoint: unsupported breakpoint type in position 3: \"BP_CATCHPOINT\"\r\n.*" \
 	"create a catchpoint via the api"
 

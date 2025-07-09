@@ -39,7 +39,7 @@ gdb_scm_test_silent_cmd "guile (use-modules (rnrs io ports) (rnrs bytevectors))"
     "import (rnrs io ports) (rnrs bytevectors)"
 
 gdb_test "guile (print (stdio-port? 42))" "= #f"
-gdb_test "guile (print (stdio-port? (%make-void-port \"r\")))" "= #f"
+gdb_test {guile (print (stdio-port? (%make-void-port "r")))} "= #f"
 gdb_test "guile (print (stdio-port? (input-port)))" "= #t"
 gdb_test "guile (print (stdio-port? (output-port)))" "= #t"
 gdb_test "guile (print (stdio-port? (error-port)))" "= #t"
@@ -147,7 +147,7 @@ foreach_with_prefix buffered {1 0} {
 
 # Test zero-length memory ports.
 
-gdb_test_no_output "guile (define zero-mem-port (open-memory #:start 0 #:size 0 #:mode \"r+\"))" \
+gdb_test_no_output {guile (define zero-mem-port (open-memory #:start 0 #:size 0 #:mode "r+"))} \
     "create zero length memory port"
 gdb_test "guile (print (read-char zero-mem-port))" \
     "= #<eof>"

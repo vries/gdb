@@ -74,7 +74,7 @@ delete_breakpoints
 #
 # Test break at quoted function.
 #
-gdb_test "hbreak \"marker2\"" \
+gdb_test {hbreak "marker2"} \
     "Hardware assisted breakpoint.*at.* file .*$srcfile1, line.*" \
     "hardware breakpoint quoted function"
 delete_breakpoints
@@ -184,7 +184,7 @@ delete_breakpoints
 #
 # Run until the breakpoint set at a quoted function.
 #
-gdb_test "hbreak \"marker2\"" \
+gdb_test {hbreak "marker2"} \
     "Hardware assisted breakpoint.*at.* file .*$srcfile1, line.*" \
     "hardware breakpoint quoted function, 2"
 gdb_test "continue" \
@@ -355,7 +355,7 @@ gdb_test "hbreak $bp_location12 thread foo" \
 # trailing garbage.
 #
 gdb_test "hbreak $bp_location12 foo" \
-    "malformed linespec error: unexpected string, \"foo\".*" \
+    {malformed linespec error: unexpected string, "foo".*} \
     "hardware breakpoint with trailing garbage disallowed"
 
 # Verify that GDB responds gracefully to a "clear" command that has

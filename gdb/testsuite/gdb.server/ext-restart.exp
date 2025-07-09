@@ -53,7 +53,7 @@ with_test_prefix "restart" {
     # use R packet to restart the process.
     gdb_test \
 	"set remote run-packet off" \
-	"Support for the 'vRun' packet on the current remote target is set to \"off\"."
+	{Support for the 'vRun' packet on the current remote target is set to "off".}
 
     gdb_test_no_output "set remote exec-file"
 

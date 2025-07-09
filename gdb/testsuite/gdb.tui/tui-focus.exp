@@ -92,9 +92,9 @@ if {[allow_python_tests]} {
 	true
 
     # Register the window with a set of similar names.
-    gdb_test_no_output "python gdb.register_window_type(\"test1\", TestWindow)"
-    gdb_test_no_output "python gdb.register_window_type(\"test2\", TestWindow)"
-    gdb_test_no_output "python gdb.register_window_type(\"test3\", TestWindow)"
+    gdb_test_no_output {python gdb.register_window_type("test1", TestWindow)}
+    gdb_test_no_output {python gdb.register_window_type("test2", TestWindow)}
+    gdb_test_no_output {python gdb.register_window_type("test3", TestWindow)}
 
     # Create a layout containing just one of the above windows.
     gdb_test_no_output "tui new-layout example1 test2 1 status 1 cmd 1"

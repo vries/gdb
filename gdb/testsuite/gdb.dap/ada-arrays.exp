@@ -114,7 +114,7 @@ foreach var [dict get $refs body variables] {
 	"hello" {
 	    # Note that the expected value looks strange here -- there
 	    # are too many backslashes.  This is a TON issue, as the
-	    # JSON looks ok: "value": "\"hello\"".
+	    # JSON looks ok: "value": {"hello"}.
 	    gdb_assert {[dict get $var value] == "\\\"hello\\\""} \
 		"value of hello variable"
 	}

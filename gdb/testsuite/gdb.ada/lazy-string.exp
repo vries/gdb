@@ -39,5 +39,5 @@ if {![runto "main.adb:$bp_location"]} {
 gdb_test_no_output "python arg = gdb.parse_and_eval('arg.all')"
 
 gdb_test "python print(str(arg.lazy_string(encoding='utf-8')))" \
-    "\"funçao\"" \
+    {"funçao"} \
     "print lazy string using utf-8"

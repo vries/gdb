@@ -24,7 +24,7 @@ if {[gdb_compile_pthreads "${srcdir}/${subdir}/${srcfile}" "${binfile}" executab
 }
 
 save_vars { GDBFLAGS } {
-    append GDBFLAGS " -ex \"set non-stop on\""
+    append GDBFLAGS { -ex "set non-stop on"}
     clean_restart $testfile
 }
 

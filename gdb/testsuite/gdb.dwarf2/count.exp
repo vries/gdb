@@ -135,20 +135,20 @@ if ![runto_main] {
 
 gdb_test "ptype array" "type = char \\\[5\\\]"
 gdb_test "whatis array" "type = char \\\[5\\\]"
-gdb_test "print array" " = \"hello\""
+gdb_test "print array" { = "hello"}
 gdb_test "print sizeof array" " = 5"
 
 gdb_test "ptype array2" "type = char \\\[1\\\]"
 gdb_test "whatis array2" "type = char \\\[1\\\]"
-gdb_test "print array2" " = \"A\""
+gdb_test "print array2" { = "A"}
 gdb_test "print sizeof array2" " = 1"
 
 gdb_test "ptype static_array" "type = char \\\[5\\\]"
 gdb_test "whatis static_array" "type = char \\\[5\\\]"
-gdb_test "print static_array" " = \"world\""
+gdb_test "print static_array" { = "world"}
 gdb_test "print sizeof static_array" " = 5"
 
 gdb_test "ptype vla_array" "type = char \\\[6\\\]"
 gdb_test "whatis vla_array" "type = char \\\[6\\\]"
-gdb_test "print vla_array" " = \"saluto\""
+gdb_test "print vla_array" { = "saluto"}
 gdb_test "print sizeof vla_array" " = 6"

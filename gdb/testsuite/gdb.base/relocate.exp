@@ -88,7 +88,7 @@ gdb_test_multiple "add-symbol-file $binfile" $test {
 }
 # Test that passing "--" disables option processing.
 gdb_test "add-symbol-file -- $binfile 0x100 -s .bss 0x3" \
-    "Unrecognized argument \"-s\"" \
+    {Unrecognized argument "-s"} \
     "add-symbol-file with -- disables option processing"
 set test "add-symbol-file with -- disables option processing, non-existent filename"
 gdb_test_multiple "add-symbol-file -- -non-existent-file 0x100" $test {
@@ -99,10 +99,10 @@ gdb_test_multiple "add-symbol-file -- -non-existent-file 0x100" $test {
 # Test that passing the wrong number of arguments to '-s' leads to an
 # error.
 gdb_test "add-symbol-file $binfile -s" \
-    "Missing section name after \"-s\"" \
+    {Missing section name after "-s"} \
     "add-symbol-file with -s without section name"
 gdb_test "add-symbol-file $binfile -s .bss" \
-    "Missing section address after \"-s\"" \
+    {Missing section address after "-s"} \
     "add-symbol-file with -s without section address"
 # Test that '-s' accepts section names with '-'
 set test "add-symbol-file with -s using section name starting with dash"
@@ -131,7 +131,7 @@ gdb_test "symbol-file -readnow -- $binfile" \
     "Reading symbols from ${binfile}\.\.\.\r\nExpanding full symbols from ${binfile}\.\.\." \
     "symbol-file with -- and -readnow"
 gdb_test "symbol-file -- $binfile -readnow" \
-    "Unrecognized argument \"-readnow\"" \
+    {Unrecognized argument "-readnow"} \
     "symbol-file with -- and -readnow, invalid option"
 
 clean_restart

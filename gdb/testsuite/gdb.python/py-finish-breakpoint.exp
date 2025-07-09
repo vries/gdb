@@ -82,7 +82,7 @@ with_test_prefix "normal conditions" {
 
     gdb_test "finish" "main.*" "return to main()"
     gdb_test "python MyFinishBreakpoint (None, gdb.selected_frame ())" \
-	"ValueError.*: \"FinishBreakpoint\" not meaningful in the outermost frame..*" \
+	{ValueError.*: "FinishBreakpoint" not meaningful in the outermost frame..*} \
 	"check FinishBP not allowed in main"
 }
 
@@ -187,7 +187,7 @@ with_test_prefix "finish in dummy frame" {
     gdb_test "python TestBreakpoint()" "TestBreakpoint init" \
 	"set FinishBP in a breakpoint condition"
     gdb_test "continue" \
-	"\"FinishBreakpoint\" cannot be set on a dummy frame.*" \
+	{"FinishBreakpoint" cannot be set on a dummy frame.*} \
 	"don't allow FinishBreakpoint on dummy frames"
     gdb_test "print i" "8" \
 	"check stopped location"
@@ -243,13 +243,13 @@ with_test_prefix "explicit inferior function call" {
     gdb_test "python TestExplicitBreakpoint('increase_1')" "Breakpoint.*at.*" \
 	"prepare TestExplicitBreakpoint, return addr in dummy frame"
     gdb_test "print increase_1(&i)" \
-	"\"FinishBreakpoint\" cannot be set on a dummy frame.*" \
+	{"FinishBreakpoint" cannot be set on a dummy frame.*} \
 	"don't allow FinishBreakpoint on dummy frames, return address in dummy frame"
 
     # return address in normal frame
 
     delete_breakpoints
-    gdb_test "python TestExplicitBreakpoint(\"increase_1\")" "Breakpoint.*at.*" \
+    gdb_test {python TestExplicitBreakpoint("increase_1")} "Breakpoint.*at.*" \
 	"prepare TestExplicitBreakpoint, return addr in normal frame"
     gdb_test "print increase(&i)" \
 	"SimpleFinishBreakpoint init.*SimpleFinishBreakpoint stop.*The program being debugged stopped while in a function called from GDB.*" \

@@ -134,7 +134,7 @@ proc_with_prefix test_basic_stuff { } {
     gdb_test_no_output "set index-cache directory /tmp" "change the index cache directory"
     gdb_test \
 	"show index-cache directory" \
-	"The directory of the index cache is \"/tmp\"."  \
+	{The directory of the index cache is "/tmp".}  \
 	"show index cache directory"
 }
 

@@ -230,13 +230,13 @@ proc make_cli_in_mi_re { command cli_in_mi_mode mode event inf cli_thread
     set frame_re(2) "~\"#0${any}main${any}\\\\n\"\r\n~\"${main_break_line}${any}\"\r\n"
 
     if { $inf != -1 } {
-	append cli_in_mi_re "~\""
+	append cli_in_mi_re {~"}
 	append cli_in_mi_re [make_cli_re $mode $inf -1 -1]
 	append cli_in_mi_re "\\\\n\"\r\n"
     }
 
     if { $cli_thread != "-1" } {
-	append cli_in_mi_re "~\""
+	append cli_in_mi_re {~"}
 	append cli_in_mi_re [make_cli_re $mode -1 $cli_thread -1]
 	append cli_in_mi_re "\\\\n\"\r\n"
     }
@@ -466,7 +466,7 @@ proc flush_buffers { } {
     }
 
     with_spawn_id $mi_spawn_id {
-	mi_gdb_test "555-data-evaluate-expression 666" ".*done,value=\"666\"" "flush MI"
+	mi_gdb_test "555-data-evaluate-expression 666" {.*done,value="666"} "flush MI"
     }
 }
 
@@ -1326,7 +1326,7 @@ proc do_test { mode } {
 foreach_with_prefix mode { "all-stop" "non-stop" } {
     save_vars { GDBFLAGS } {
 	if { $mode == "non-stop" } {
-	    set GDBFLAGS [concat $GDBFLAGS " -ex \"set non-stop 1\""]
+	    set GDBFLAGS [concat $GDBFLAGS { -ex "set non-stop 1"}]
 	}
 
 	if { [mi_clean_restart $binfile "separate-mi-tty"] != 0 } {

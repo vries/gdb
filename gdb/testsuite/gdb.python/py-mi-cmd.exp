@@ -197,7 +197,7 @@ mi_gdb_test "python pycmd1('-')" \
     [multi_line \
 	 ".*" \
 	 "&\"ValueError.*: MI command name does not start with '-' followed by at least one letter or digit\\...\"" \
-	 "&\"Error occurred in Python.*..\"" \
+	 {&"Error occurred in Python.*.."} \
 	 "\\^error,msg=\"Error occurred in Python.*\""] \
     "invalid MI command name"
 
@@ -205,7 +205,7 @@ mi_gdb_test "python pycmd1('-bad-character-@')" \
     [multi_line \
 	 ".*" \
 	 "&\"ValueError.*: MI command name contains invalid character: @\\...\"" \
-	 "&\"Error occurred in Python.*..\"" \
+	 {&"Error occurred in Python.*.."} \
 	 "\\^error,msg=\"Error occurred in Python.*\""] \
     "invalid character in MI command name"
 
@@ -307,8 +307,8 @@ mi_gdb_test "-aa" \
 mi_gdb_test "python aa.__init__('-bb', 'message three', 'zzz')" \
     [multi_line \
 	 ".*" \
-	 "&\"ValueError.*: can't reinitialize object with a different command name..\"" \
-	 "&\"Error occurred in Python.*..\"" \
+	 {&"ValueError.*: can't reinitialize object with a different command name.."} \
+	 {&"Error occurred in Python.*.."} \
 	 "\\^error,msg=\"Error occurred in Python.*\""] \
     "attempt to reinitialise aa variable to a new command name"
 
@@ -323,8 +323,8 @@ mi_gdb_test "python aa.installed = False" \
 mi_gdb_test "python aa.__init__('-bb', 'message three', 'zzz')" \
     [multi_line \
 	 ".*" \
-	 "&\"ValueError.*: can't reinitialize object with a different command name..\"" \
-	 "&\"Error occurred in Python.*..\"" \
+	 {&"ValueError.*: can't reinitialize object with a different command name.."} \
+	 {&"Error occurred in Python.*.."} \
 	 "\\^error,msg=\"Error occurred in Python.*\""] \
     "attempt to reinitialise aa variable to a new command name while uninstalled"
 
@@ -348,7 +348,7 @@ mi_gdb_test "python no_invoke('-no-invoke')" ".*\\^done" \
 mi_gdb_test "-no-invoke" \
     [multi_line \
 	 ".*" \
-	 "&\"AttributeError.*: 'no_invoke' object has no attribute 'invoke'..\"" \
+	 {&"AttributeError.*: 'no_invoke' object has no attribute 'invoke'.."} \
 	 "\\^error,msg=\"Error occurred in Python: 'no_invoke' object has no attribute 'invoke'\""] \
     "execute -no-invoke command, which is missing the invoke method"
 
@@ -361,14 +361,14 @@ mi_gdb_test "python delattr(no_invoke, 'invoke')" ".*\\^done"
 mi_gdb_test "-hello" \
     [multi_line \
 	 ".*" \
-	 "&\"AttributeError.*: 'no_invoke' object has no attribute 'invoke'..\"" \
+	 {&"AttributeError.*: 'no_invoke' object has no attribute 'invoke'.."} \
 	 "\\^error,msg=\"Error occurred in Python: 'no_invoke' object has no attribute 'invoke'\""] \
     "execute -hello command, that had its invoke method removed"
 mi_gdb_test "python cmd.invoke = 'string'" ".*\\^done"
 mi_gdb_test "-hello" \
     [multi_line \
 	 ".*" \
-	 "&\"TypeError.*: 'str' object is not callable..\"" \
+	 {&"TypeError.*: 'str' object is not callable.."} \
 	 "\\^error,msg=\"Error occurred in Python: 'str' object is not callable\""] \
     "execute command with invoke set to a string"
 
@@ -376,8 +376,8 @@ mi_gdb_test "-hello" \
 mi_gdb_test "python cmd = pycmd2('-data-disassemble')" \
     [multi_line \
 	 ".*" \
-	 "&\"RuntimeError.*: unable to add command, name is already in use..\"" \
-	 "&\"Error occurred in Python.*..\"" \
+	 {&"RuntimeError.*: unable to add command, name is already in use.."} \
+	 {&"Error occurred in Python.*.."} \
 	 "\\^error,msg=\"Error occurred in Python.*\""] \
     "try to register a command that replaces -data-disassemble"
 
@@ -386,5 +386,5 @@ mi_gdb_test "python cmd = pycmd2('-data-disassemble')" \
 mi_gdb_test "python run_exception_tests()" \
     [multi_line \
 	 ".*" \
-	 "~\"PASS..\"" \
+	 {~"PASS.."} \
 	 "\\^done"]

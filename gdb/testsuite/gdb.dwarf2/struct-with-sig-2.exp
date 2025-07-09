@@ -120,7 +120,7 @@ Dwarf::assemble $asm_file {
 }
 
 save_vars { GDBFLAGS } {
-    append GDBFLAGS " -iex \"maint set dwarf synchronous on\""
+    append GDBFLAGS { -iex "maint set dwarf synchronous on"}
 
     if { [prepare_for_testing "failed to prepare" ${testfile} \
 	      [list $srcfile $asm_file] {nodebug}] } {

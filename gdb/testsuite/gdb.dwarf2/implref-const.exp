@@ -103,7 +103,7 @@ if ![runto_main] {
 gdb_test "print ref" " = \\(int &\\) <synthetic pointer>: \\\d+"
 
 # The variable isn't located in memory, thus we can't take its address.
-gdb_test "print &var" "Can't take address of \"var\" which isn't an lvalue."
+gdb_test "print &var" {Can't take address of "var" which isn't an lvalue.}
 gdb_test "print &ref" "Attempt to take address of value not located in memory."
 
 # gdb assumes C++ references are implemented as pointers, and print &(&ref)

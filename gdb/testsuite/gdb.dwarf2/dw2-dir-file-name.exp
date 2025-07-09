@@ -398,11 +398,11 @@ lappend opts "additional_flags=-DBDIR=\"${srcabsdir}\""
 # Incorrect directory which should never be visible from GDB.
 lappend opts "additional_flags=-DXDIR=\"${srcabsdir}/xdir\""
 # CU's DW_AT_comp_dir.
-lappend opts "additional_flags=-DCOMPDIR=\"compdir\""
+lappend opts {additional_flags=-DCOMPDIR="compdir"}
 # .debug_line's directory.
-lappend opts "additional_flags=-DLDIR=\"ldir\""
+lappend opts {additional_flags=-DLDIR="ldir"}
 # CU's DW_AT_name and .debug_line's filename relative directory, if needed.
-lappend opts "additional_flags=-DFDIR=\"fdir\""
+lappend opts {additional_flags=-DFDIR="fdir"}
 # CU's DW_AT_name and .debug_line's filename.
 lappend opts "additional_flags=-DFILE=\"${srctmpfile}\""
 

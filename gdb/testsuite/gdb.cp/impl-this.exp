@@ -30,24 +30,24 @@ set gcc_used [test_compiler_info gcc-*-*]
 
 # First test expressions when there is no context.
 with_test_prefix "before run" {
-    gdb_test "print i" "No symbol \"i\" in current context."
-    gdb_test "print D::i" "Cannot reference non-static field \"i\""
-    gdb_test "print D::B<int>::i" "Cannot reference non-static field \"i\""
-    gdb_test "print B<int>::i" "Cannot reference non-static field \"i\""
-    gdb_test "print D::C::i" "Cannot reference non-static field \"i\""
-    gdb_test "print C::i" "Cannot reference non-static field \"i\""
+    gdb_test "print i" {No symbol "i" in current context.}
+    gdb_test "print D::i" {Cannot reference non-static field "i"}
+    gdb_test "print D::B<int>::i" {Cannot reference non-static field "i"}
+    gdb_test "print B<int>::i" {Cannot reference non-static field "i"}
+    gdb_test "print D::C::i" {Cannot reference non-static field "i"}
+    gdb_test "print C::i" {Cannot reference non-static field "i"}
     gdb_test "print D::B<int>::A<int>::i" \
-	"Cannot reference non-static field \"i\""
-    gdb_test "print B<int>::A<int>::i" "Cannot reference non-static field \"i\""
-    gdb_test "print A<int>::i" "Cannot reference non-static field \"i\""
-    gdb_test "print D::C::A<int>::i" "Cannot reference non-static field \"i\""
-    gdb_test "print C::A<int>::i" "Cannot reference non-static field \"i\""
-    gdb_test "print D::x" "Cannot reference non-static field \"x\""
-    gdb_test "print x" "No symbol \"x\" in current context."
-    gdb_test "print D::C::c" "Cannot reference non-static field \"c\""
-    gdb_test "print C::c" "Cannot reference non-static field \"c\""
-    gdb_test "print c" "No symbol \"c\" in current context."
-    gdb_test "print D::A<int>::i" "Cannot reference non-static field \"i\""
+	{Cannot reference non-static field "i"}
+    gdb_test "print B<int>::A<int>::i" {Cannot reference non-static field "i"}
+    gdb_test "print A<int>::i" {Cannot reference non-static field "i"}
+    gdb_test "print D::C::A<int>::i" {Cannot reference non-static field "i"}
+    gdb_test "print C::A<int>::i" {Cannot reference non-static field "i"}
+    gdb_test "print D::x" {Cannot reference non-static field "x"}
+    gdb_test "print x" {No symbol "x" in current context.}
+    gdb_test "print D::C::c" {Cannot reference non-static field "c"}
+    gdb_test "print C::c" {Cannot reference non-static field "c"}
+    gdb_test "print c" {No symbol "c" in current context.}
+    gdb_test "print D::A<int>::i" {Cannot reference non-static field "i"}
 }
 
 # Run to D::f.

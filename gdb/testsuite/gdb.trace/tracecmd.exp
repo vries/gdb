@@ -88,7 +88,7 @@ gdb_test "info trace" "in gdb_recursion_test.*$srcfile:$testline1.
 
 # 1.5 trace non-existant function
 gdb_delete_tracepoints
-gdb_test "trace NoSuChFuNc" "Function \"NoSuChFuNc\" not defined." \
+gdb_test "trace NoSuChFuNc" {Function "NoSuChFuNc" not defined.} \
 	"1.5a: trace invalid function"
 gdb_test "info trace" "No tracepoints.*" \
 	"1.5b: reject invalid srcfile"

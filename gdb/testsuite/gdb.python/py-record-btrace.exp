@@ -32,8 +32,8 @@ if {![runto_main]} {
 with_test_prefix "no or double record" {
     gdb_test "python print(gdb.current_recording())" "None"
 
-    gdb_test_no_output "python gdb.start_recording(\"btrace\")"
-    gdb_test "python gdb.start_recording(\"btrace\")" \
+    gdb_test_no_output {python gdb.start_recording("btrace")}
+    gdb_test {python gdb.start_recording("btrace")} \
 	".*gdb\.error.*: The process is already being recorded\..*" \
 	"already recording"
 
@@ -50,7 +50,7 @@ with_test_prefix "preopened record btrace" {
 }
 
 with_test_prefix "prepare record" {
-    gdb_test_no_output "python r = gdb.start_recording(\"btrace\")"
+    gdb_test_no_output {python r = gdb.start_recording("btrace")}
     gdb_test "python print(r.method)" "btrace"
     gdb_test "python print(r.format)" "pt|bts"
     gdb_test "stepi 100" ".*"

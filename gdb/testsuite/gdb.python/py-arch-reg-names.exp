@@ -50,7 +50,7 @@ gdb_py_test_silent_cmd \
 gdb_py_test_silent_cmd \
     "python arch = frame.architecture()" "get arch" 0
 gdb_py_test_silent_cmd \
-    "python regs = list (arch.registers (\"general\"))" \
+    {python regs = list (arch.registers ("general"))} \
     "get general registers" 0
 gdb_py_test_silent_cmd \
     "python regs = map (lambda r : r.name, regs)" \
@@ -97,9 +97,9 @@ gdb_py_test_silent_cmd \
 	 "python" \
 	 "for r1, r2 in zip(iter1, iter2):" \
 	 "  if (r1.name != r2.name):"\
-	 "    raise gdb.GdbError (\"miss-matched names\")" \
+	 {    raise gdb.GdbError ("miss-matched names")} \
 	 "  if (r1 != r2):" \
-	 "    raise gdb.GdbError (\"miss-matched objects\")" \
+	 {    raise gdb.GdbError ("miss-matched objects")} \
 	 "end" ] \
     "check names and objects match" 1
 
@@ -111,9 +111,9 @@ gdb_py_test_silent_cmd \
 	 "def check_regs (arch, regs):" \
 	 "   for r in (regs):" \
 	 "     if (arch.registers ().find (r.name) != r):" \
-	 "       raise gdb.GdbError (\"object miss-match\")" \
+	 {       raise gdb.GdbError ("object miss-match")} \
 	 "end" ] \
     "build check_obj function" 0
 gdb_py_test_silent_cmd \
-    "python check_regs (arch, arch.registers (\"general\"))" \
+    {python check_regs (arch, arch.registers ("general"))} \
     "ensure find gets expected descriptors" 1

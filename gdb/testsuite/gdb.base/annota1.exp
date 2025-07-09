@@ -122,7 +122,7 @@ set warning_slow_re \
 set warning_gdb_index_re \
     [multi_line \
 	 "warning: Skipping \[^\r\n\]+ .gdb_index section in \[^\r\n\]+" \
-	 "Do \"set use-deprecated-index-sections on\" before the file is read" \
+	 {Do "set use-deprecated-index-sections on" before the file is read} \
 	 "to use the section anyway\\.\r\n"]
 set reading_re \
     "Reading \[^\r\n\]+\r\n"

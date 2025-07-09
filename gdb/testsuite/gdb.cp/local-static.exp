@@ -205,7 +205,7 @@ proc do_test {lang} {
 	    # wrapped in a DW_TAG_lexical_block, making them unaddressable from
 	    # outside the function.  XFAIL the relevant tests.
 	    set test "print '${scope}'::${var_prefix}_${var}"
-	    set xfail_pattern "No symbol \".*\" in specified context."
+	    set xfail_pattern {No symbol ".*" in specified context.}
 	    gdb_test_multiple $test $test {
 		-re "\[\r\n\]*(?:$print_re)\[\r\n\]+$gdb_prompt $" {
 		    pass $test

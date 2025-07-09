@@ -100,8 +100,8 @@ gdb_py_test_silent_cmd \
 	 "python" \
 	 "for r1, r2 in zip(iter1, iter2):" \
 	 "  if (r1.name != r2.name):"\
-	 "    raise gdb.GdbError (\"miss-matched names\")" \
+	 {    raise gdb.GdbError ("miss-matched names")} \
 	 "  if (r1 != r2):" \
-	 "    raise gdb.GdbError (\"miss-matched objects\")" \
+	 {    raise gdb.GdbError ("miss-matched objects")} \
 	 "end" ] \
     "check names and objects match" 1

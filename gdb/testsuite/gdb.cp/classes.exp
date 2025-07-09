@@ -593,7 +593,7 @@ proc test_enums {} {
 # Pointers to class members
 
 proc test_pointers_to_class_members {} {
-    gdb_test "print Bar::z" "Cannot reference non-static field \"z\""
+    gdb_test "print Bar::z" {Cannot reference non-static field "z"}
     gdb_test "print &Foo::x" "\\$\[0-9\]+ = &Foo::x"
     gdb_test "print (int)&Foo::x" "\\$\[0-9\]+ = 0"
     gdb_test "print (int)&Bar::y == 2*sizeof(int)" "\\$\[0-9\]+ = true"

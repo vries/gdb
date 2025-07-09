@@ -39,7 +39,7 @@ gdb_test "python print (len (gdb.lookup_static_symbols ('rr')))" \
 # This test does not make sense when readnow is in effect.
 if {!$readnow_p} {
     # Make sure that the global symbol's symtab was not expanded.
-    gdb_test_no_output "pipe maint info symtab | grep \"name.*py-symbol-3.c\"" \
+    gdb_test_no_output {pipe maint info symtab | grep "name.*py-symbol-3.c"} \
 	"global rr symtab was not expanded"
 }
 
@@ -49,11 +49,11 @@ clean_restart ${binfile}
 # Test looking up a global symbol before we runto_main as this is the
 # point where we don't have a current frame, and we don't want to
 # require one.
-gdb_py_test_silent_cmd "python main_func = gdb.lookup_global_symbol(\"main\")" "Lookup main" 1
+gdb_py_test_silent_cmd {python main_func = gdb.lookup_global_symbol("main")} "Lookup main" 1
 gdb_test "python print (repr (main_func))" "<gdb.Symbol print_name=main>" \
     "test main_func.__repr__"
 gdb_test "python print (main_func.is_function)" "True" "test main_func.is_function"
-gdb_test "python print (gdb.lookup_global_symbol(\"junk\"))" "None" "test lookup_global_symbol(\"junk\")"
+gdb_test {python print (gdb.lookup_global_symbol("junk"))} "None" {test lookup_global_symbol("junk")}
 
 gdb_test "python print (gdb.lookup_global_symbol('main').value())" "$hex .main." \
     "print value of main"
@@ -123,7 +123,7 @@ gdb_py_test_silent_cmd "python frame = gdb.selected_frame()" "Get Frame" 0
 gdb_py_test_silent_cmd "python block = frame.block()" "Get block" 0
 
 # Test is_argument attribute.
-gdb_py_test_silent_cmd "python arg = gdb.lookup_symbol(\"arg\")" "Get variable arg" 0
+gdb_py_test_silent_cmd {python arg = gdb.lookup_symbol("arg")} "Get variable arg" 0
 gdb_test "python print (arg\[0\].is_variable)" "False" "test arg.is_variable"
 gdb_test "python print (arg\[0\].is_constant)" "False" "test arg.is_constant"
 gdb_test "python print (arg\[0\].is_argument)" "True" "test arg.is_argument"
@@ -191,7 +191,7 @@ gdb_test "python print (a\[0\].needs_frame)" "True" \
     "print whether a needs a frame"
 
 # Test is_constant attribute
-gdb_py_test_silent_cmd "python t = gdb.lookup_symbol(\"one\")" "Get constant t" 0
+gdb_py_test_silent_cmd {python t = gdb.lookup_symbol("one")} "Get constant t" 0
 gdb_test "python print (t\[0\].is_variable)" "False" "test t.is_variable"
 gdb_test "python print (t\[0\].is_constant)" "True" "test t.is_constant"
 gdb_test "python print (t\[0\].is_argument)" "False" "test t.is_argument"

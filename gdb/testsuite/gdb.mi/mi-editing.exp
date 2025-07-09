@@ -27,10 +27,10 @@ if {[mi_clean_restart]} {
     return
 }
 
-mi_gdb_test "-interpreter-exec console \"set editing on\"" \
+mi_gdb_test {-interpreter-exec console "set editing on"} \
   {=cmd-param-changed,param=\"editing\",.*\^done} \
-  "-interpreter-exec console \"set editing on\""
+  {-interpreter-exec console "set editing on"}
 
-mi_gdb_test "-interpreter-exec console \"show editing\"" \
+mi_gdb_test {-interpreter-exec console "show editing"} \
   ".*Editing of command lines as they are typed is off.*" \
-  "-interpreter-exec console \"show editing\""
+  {-interpreter-exec console "show editing"}

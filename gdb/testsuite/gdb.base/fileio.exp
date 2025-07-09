@@ -72,7 +72,7 @@ gdb_test continue \
 
 gdb_test "continue" ".*" ""
 
-catch "system \"chmod -f -w [standard_output_file nowrt.fileio.test]\""
+catch {system "chmod -f -w [standard_output_file nowrt.fileio.test]"}
 
 # If the user is root, we will always have write permission.
 if { [root_user] } {

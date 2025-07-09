@@ -69,7 +69,7 @@ if  { [gdb_compile "${srcdir}/${subdir}/${srcfile_sleep}" "${binfile_sleep}" exe
 proc do_test {method} {
     save_vars { ::GDBFLAGS } {
 	if { $method == "non-stop" } {
-	    append ::GDBFLAGS " -ex \"set non-stop on\""
+	    append ::GDBFLAGS { -ex "set non-stop on"}
 	}
 	clean_restart
     }

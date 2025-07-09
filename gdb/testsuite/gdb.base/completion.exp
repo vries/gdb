@@ -34,8 +34,8 @@
 #   "info ajksdlfk " no completions
 #   "info" " "
 #   "info " ambiguous (all info commands)
-#   "p \"break1" unambiguous (completes to filename "break1.c")
-#   "p \"break1." unambiguous (should complete to "break1.c" but does not,
+#   {p "break1} unambiguous (completes to filename "break1.c")
+#   {p "break1.} unambiguous (should complete to "break1.c" but does not,
 #	due to readline limitations)
 #   "p 'arg" ambiguous (all symbols starting with arg)
 #   "p b-arg" ambiguous (all symbols starting with arg)
@@ -365,7 +365,7 @@ gdb_test_multiple "" "$test" {
     }
 }
 
-set test "complete 'p \"break1'"
+set test {complete 'p "break1'}
 send_gdb "p \"break1\t"
 gdb_test_multiple "" "$test" {
     -re "^p \"break1\\\x07$" {
@@ -383,7 +383,7 @@ gdb_test_multiple "" "$test" {
 }
 
 setup_xfail "*-*-*"
-set test "complete 'p \"break1.'"
+set test {complete 'p "break1.'}
 send_gdb "p \"break1.\t"
 gdb_test_multiple "" "$test" {
     -re "^p \"break1\\.\\\x07$" {

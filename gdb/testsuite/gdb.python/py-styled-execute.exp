@@ -58,9 +58,9 @@ proc test_gdb_execute_styling {} {
 
     # Two possible outputs, BASIC_RE, the unstyled output text, or
     # STYLED_RE, the same things, but with styling applied.
-    set text "\"version\" style"
+    set text {"version" style}
     set styled_text \
-	[style "\"" version][style "version" version][style "\" style" version]
+	[style {"} version][style "version" version][style {" style} version]
     set basic_re "The $text foreground color is: \[^\r\n\]+"
     set styled_re "The $styled_text foreground color is: \[^\r\n\]+"
 

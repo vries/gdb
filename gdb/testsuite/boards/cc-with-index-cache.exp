@@ -37,4 +37,4 @@ load_board_description "cc-with-tweaks"
 append GDBFLAGS " -iex \"set index-cache directory $env(INDEX_CACHE_DIR)\""
 
 # Make sure gdb uses the index-cache.
-append GDBFLAGS " -iex \"set index-cache enabled on\""
+append GDBFLAGS { -iex "set index-cache enabled on"}

@@ -48,7 +48,7 @@ mi_gdb_test "311-data-evaluate-expression &A" "311\\^done,value=\"$hex\"" "eval 
 
 mi_gdb_test "411-data-evaluate-expression A+3" "411\\^done,value=\"4\"" "eval A+3"
 
-mi_gdb_test "511-data-evaluate-expression \"A + 3\"" "511\\^done,value=\"4\"" "eval A + 3"
+mi_gdb_test {511-data-evaluate-expression "A + 3"} "511\\^done,value=\"4\"" "eval A + 3"
 
 
 mi_gdb_exit

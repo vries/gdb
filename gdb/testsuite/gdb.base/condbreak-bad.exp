@@ -27,7 +27,7 @@ set bpnum [get_integer_valueof "\$bpnum" 0 "get bpnum"]
 
 # Define a 'bad' condition.  The breakpoint should stay unconditional.
 gdb_test "cond $bpnum gibberish" \
-    "No symbol \"gibberish\" in current context." \
+    {No symbol "gibberish" in current context.} \
     "attempt a bad condition"
 
 set fill "\[^\r\n\]*"
@@ -44,7 +44,7 @@ with_test_prefix "with run" {
     gdb_test_no_output "cond $bpnum a == 10"
 
     gdb_test "cond $bpnum gibberish" \
-	"No symbol \"gibberish\" in current context." \
+	{No symbol "gibberish" in current context.} \
 	"attempt a bad condition"
 
     gdb_test "info break" \
@@ -76,7 +76,7 @@ with_test_prefix "with continue 1" {
     gdb_test_no_output "cond $bpnum a == 10"
 
     gdb_test "cond $bpnum gibberish" \
-	"No symbol \"gibberish\" in current context." \
+	{No symbol "gibberish" in current context.} \
 	"attempt a bad condition"
 
     # Resume.  We should hit the breakpoint, because the
@@ -96,7 +96,7 @@ with_test_prefix "with continue 2" {
     gdb_test_no_output "cond $bpnum a == 999"
     
     gdb_test "cond $bpnum gibberish" \
-	"No symbol \"gibberish\" in current context." \
+	{No symbol "gibberish" in current context.} \
 	"attempt a bad condition"
 
     # Resume.  We should *not* hit the breakpoint, because the

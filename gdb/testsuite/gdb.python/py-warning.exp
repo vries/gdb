@@ -22,19 +22,19 @@ require allow_python_tests
 clean_restart
 
 # Basic usage.
-gdb_test "python gdb.warning(\"some text\")" \
+gdb_test {python gdb.warning("some text")} \
     "warning: some text"
 
 # Basic usage with named argument.
-gdb_test "python gdb.warning(text=\"a warning message\")" \
+gdb_test {python gdb.warning(text="a warning message")} \
     "warning: a warning message"
 
 # Make sure GDB prints format specifiers correctly.
-gdb_test "python gdb.warning(\"%s %d %p\")" \
+gdb_test {python gdb.warning("%s %d %p")} \
     "warning: %s %d %p"
 
 # Empty string gives an error.
-gdb_test "python gdb.warning(\"\")" \
+gdb_test {python gdb.warning("")} \
     [multi_line \
 	 "Python Exception <class 'ValueError'>: Empty text string passed to gdb\\.warning" \
 	 "Error occurred in Python: Empty text string passed to gdb\\.warning"]

@@ -38,7 +38,7 @@ if ![gdb_guile_runto_main] {
 gdb_breakpoint [gdb_get_line_number "break here"]
 gdb_continue_to_breakpoint "break here"
 
-gdb_scm_test_silent_cmd "gu (define null (parse-and-eval \"null\"))" 1
+gdb_scm_test_silent_cmd {gu (define null (parse-and-eval "null"))} 1
 
 gdb_scm_test_silent_cmd "gu (define nullstr (value->lazy-string null #:length 0))" "create a null lazy string" 1
 gdb_test "gu (print (lazy-string-length nullstr))" "= 0" "null lazy string length"

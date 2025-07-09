@@ -36,11 +36,11 @@ proc scm_param_test_maybe_no_output { command pattern args } {
 # We use "." here instead of ":" so that this works on win32 too.
 if { [is_remote host] } {
     # Proc gdb_reinitialize_dir has no effect for remote host.
-    gdb_test "guile (print (parameter-value \"directories\"))" \
+    gdb_test {guile (print (parameter-value "directories"))} \
 	"\\\$cdir.\\\$cwd"
 } else {
     set escaped_directory [string_to_regexp "$srcdir/$subdir"]
-    gdb_test "guile (print (parameter-value \"directories\"))" \
+    gdb_test {guile (print (parameter-value "directories"))} \
 	"$escaped_directory.\\\$cdir.\\\$cwd"
 }
 
@@ -49,14 +49,14 @@ if { [is_remote host] } {
 gdb_test_multiline "Simple gdb boolean parameter" \
     "guile" "" \
     "(define test-param" "" \
-    "  (make-parameter \"print test-param\"" "" \
+    {  (make-parameter "print test-param"} "" \
     "   #:command-class COMMAND_DATA" "" \
     "   #:parameter-type PARAM_BOOLEAN" "" \
-    "   #:doc \"When enabled, test param does something useful. When disabled, does nothing.\"" "" \
-    "   #:set-doc \"Set the state of the boolean test-param.\"" "" \
-    "   #:show-doc \"Show the state of the boolean test-param.\"" "" \
+    {   #:doc "When enabled, test param does something useful. When disabled, does nothing."} "" \
+    {   #:set-doc "Set the state of the boolean test-param."} "" \
+    {   #:show-doc "Show the state of the boolean test-param."} "" \
     "   #:show-func (lambda (self value)" ""\
-    "      (format #f \"The state of the Test Parameter is ~a.\" value))" "" \
+    {      (format #f "The state of the Test Parameter is ~a." value))} "" \
     "   #:initial-value #t))" "" \
     "(register-parameter! test-param)" "" \
     "end"
@@ -90,16 +90,16 @@ with_test_prefix "test-param" {
 gdb_test_multiline "enum gdb parameter" \
     "guile" "" \
     "(define test-enum-param" "" \
-    "  (make-parameter \"print test-enum-param\"" "" \
+    {  (make-parameter "print test-enum-param"} "" \
     "   #:command-class COMMAND_DATA" "" \
     "   #:parameter-type PARAM_ENUM" "" \
-    "   #:enum-list '(\"one\" \"two\")" "" \
-    "   #:doc \"When set, test param does something useful. When disabled, does nothing.\"" "" \
-    "   #:show-doc \"Show the state of the enum.\"" "" \
-    "   #:set-doc \"Set the state of the enum.\"" "" \
+    {   #:enum-list '("one" "two")} "" \
+    {   #:doc "When set, test param does something useful. When disabled, does nothing."} "" \
+    {   #:show-doc "Show the state of the enum."} "" \
+    {   #:set-doc "Set the state of the enum."} "" \
     "   #:show-func (lambda (self value)" "" \
-    "      (format #f \"The state of the enum is ~a.\" value))" "" \
-    "   #:initial-value \"one\"))" "" \
+    {      (format #f "The state of the enum is ~a." value))} "" \
+    {   #:initial-value "one"))} "" \
     "(register-parameter! test-enum-param)" "" \
     "end"
 
@@ -109,7 +109,7 @@ with_test_prefix "test-enum-param" {
     gdb_test_no_output "set print test-enum-param two"
     gdb_test "show print test-enum-param" "The state of the enum is two." "show new value"
     gdb_test "guile (print (parameter-value test-enum-param))" "two" "enum parameter value, two"
-    gdb_test "set print test-enum-param three" "Undefined item: \"three\".*" "set invalid enum parameter" 
+    gdb_test "set print test-enum-param three" {Undefined item: "three".*} "set invalid enum parameter" 
 }
 
 # Test integer parameters.
@@ -189,7 +189,7 @@ foreach_with_prefix kind {
 	"  (make-parameter \"print test-$kind-param\"" "" \
 	"   #:command-class COMMAND_DATA" "" \
 	"   #:parameter-type $kind" "" \
-	"   #:doc \"Set to a number or 'unlimited' to yield an effect.\"" "" \
+	{   #:doc "Set to a number or 'unlimited' to yield an effect."} "" \
 	"   #:show-doc \"Show the state of $kind.\"" "" \
 	"   #:set-doc \"Set the state of $kind.\"" "" \
 	"   #:show-func (lambda (self value)" "" \
@@ -287,15 +287,15 @@ foreach_with_prefix kind {
 gdb_test_multiline "file gdb parameter" \
     "guile" "" \
     "(define test-file-param" "" \
-    "  (make-parameter \"test-file-param\"" "" \
+    {  (make-parameter "test-file-param"} "" \
     "   #:command-class COMMAND_FILES" "" \
     "   #:parameter-type PARAM_FILENAME" "" \
-    "   #:doc \"When set, test param does something useful. When disabled, does nothing.\"" "" \
-    "   #:show-doc \"Show the name of the file.\"" "" \
-    "   #:set-doc \"Set the name of the file.\"" "" \
+    {   #:doc "When set, test param does something useful. When disabled, does nothing."} "" \
+    {   #:show-doc "Show the name of the file."} "" \
+    {   #:set-doc "Set the name of the file."} "" \
     "   #:show-func (lambda (self value)" "" \
-    "      (format #f \"The name of the file is ~a.\" value))" "" \
-    "   #:initial-value \"foo.txt\"))" "" \
+    {      (format #f "The name of the file is ~a." value))} "" \
+    {   #:initial-value "foo.txt"))} "" \
     "(register-parameter! test-file-param)" "" \
     "end"
 
@@ -312,11 +312,11 @@ with_test_prefix "test-file-param" {
 
 gdb_test_multiline "undocumented gdb parameter" \
     "guile" "" \
-    "(register-parameter! (make-parameter \"print test-undoc-param\"" "" \
+    {(register-parameter! (make-parameter "print test-undoc-param"} "" \
     "   #:command-class COMMAND_DATA" "" \
     "   #:parameter-type PARAM_BOOLEAN" "" \
     "   #:show-func (lambda (self value)" "" \
-    "      (format #f \"The state of the Test Parameter is ~a.\" value))" "" \
+    {      (format #f "The state of the Test Parameter is ~a." value))} "" \
     "   #:initial-value #t))" "" \
     "end"
 
@@ -342,18 +342,18 @@ with_test_prefix "test-undocumented-param" {
 
 gdb_test_multiline "restricted gdb parameter" \
     "guile" "" \
-    "(register-parameter! (make-parameter \"test-restricted-param\"" "" \
+    {(register-parameter! (make-parameter "test-restricted-param"} "" \
     "   #:command-class COMMAND_DATA" "" \
     "   #:parameter-type PARAM_ZINTEGER" "" \
     "   #:set-func (lambda (self)" "" \
     "      (let ((value (parameter-value self)))" "" \
     "        (if (and (>= value 0) (<= value 10))" "" \
-    "            \"\"" "" \
+    {            ""} "" \
     "            (begin" "" \
     "              (set-parameter-value! self (object-property self 'value))" "" \
-    "              \"Error: Range of parameter is 0-10.\"))))" "" \
+    {              "Error: Range of parameter is 0-10."))))} "" \
     "   #:show-func (lambda (self value)" "" \
-    "      (format #f \"The value of the restricted parameter is ~a.\" value))" "" \
+    {      (format #f "The value of the restricted parameter is ~a." value))} "" \
     "   #:initial-value (lambda (self)" "" \
     "      (set-object-property! self 'value 2)" "" \
     "      2)))" "" \
@@ -372,13 +372,13 @@ with_test_prefix "test-restricted-param" {
 
 # Test registering a parameter that already exists.
 
-gdb_test "guile (register-parameter! (make-parameter \"height\"))" \
+gdb_test {guile (register-parameter! (make-parameter "height"))} \
     "ERROR.*is already defined.*" "error registering existing parameter"
 
 # Test printing and setting the value of an unregistered parameter.
-gdb_test "guile (print (parameter-value (make-parameter \"foo\")))" \
+gdb_test {guile (print (parameter-value (make-parameter "foo")))} \
     "= #f"
-gdb_test "guile (define myparam (make-parameter \"foo\"))"
+gdb_test {guile (define myparam (make-parameter "foo"))}
 gdb_test_no_output "guile (set-parameter-value! myparam #t)"
 gdb_test "guile (print (parameter-value myparam))" \
     "= #t"
@@ -389,7 +389,7 @@ gdb_test "guile (print (parameter-value myparam))" \
 gdb_test_multiline "previously ambiguously named boolean parameter" \
     "guile" "" \
     "(define prev-ambig" "" \
-    "  (make-parameter \"print s\"" "" \
+    {  (make-parameter "print s"} "" \
     "   #:parameter-type PARAM_BOOLEAN))" "" \
     "end"
 
@@ -420,31 +420,31 @@ with_test_prefix "previously-ambiguous" {
 
 gdb_test_multiline "create set/show foo1 prefix commands" \
     "guile" "" \
-    "(register-command! (make-command \"set foo1\"" "" \
+    {(register-command! (make-command "set foo1"} "" \
     "   #:command-class COMMAND_OBSCURE" "" \
     "   #:prefix? #t))" "" \
-    "(register-command! (make-command \"show foo1\"" "" \
+    {(register-command! (make-command "show foo1"} "" \
     "   #:command-class COMMAND_OBSCURE" "" \
     "   #:prefix? #t))" "" \
     "end"
 
 gdb_test_multiline "create set/show foo1 baz1 prefix commands" \
     "guile" "" \
-    "(register-command! (make-command \"set foo1 baz1\"" "" \
+    {(register-command! (make-command "set foo1 baz1"} "" \
     "   #:command-class COMMAND_OBSCURE" "" \
     "   #:prefix? #t))" "" \
-    "(register-command! (make-command \"show foo1 baz1\"" "" \
+    {(register-command! (make-command "show foo1 baz1"} "" \
     "   #:command-class COMMAND_OBSCURE" "" \
     "   #:prefix? #t))" "" \
     "end"
 
 gdb_test_multiline "create 'foo bar' parameter" \
     "guile" "" \
-    "(register-parameter! (make-parameter \"foo bar\"" "" \
+    {(register-parameter! (make-parameter "foo bar"} "" \
     "   #:command-class COMMAND_OBSCURE" "" \
     "   #:parameter-type PARAM_BOOLEAN" "" \
     "   #:show-func (lambda (self value)" "" \
-    "      (format #f \"The state of 'foo bar' is ~a.\" value))" "" \
+    {      (format #f "The state of 'foo bar' is ~a." value))} "" \
     "   #:initial-value #t))" "" \
     "end"
 
@@ -452,36 +452,36 @@ gdb_test "show foo1 bar" "^The state of 'foo bar' is on\\." "show parameter 'foo
 
 gdb_test_multiline "create set/show foo2 prefix commands" \
     "guile" "" \
-    "(register-command! (make-command \"set foo2\"" "" \
+    {(register-command! (make-command "set foo2"} "" \
     "   #:command-class COMMAND_OBSCURE" "" \
     "   #:prefix? #t))" "" \
-    "(register-command! (make-command \"show foo2\"" "" \
+    {(register-command! (make-command "show foo2"} "" \
     "   #:command-class COMMAND_OBSCURE" "" \
     "   #:prefix? #t))" "" \
     "end" ""
 
 gdb_test_multiline "create ambiguous 'foo baz' parameter" \
     "guile" "" \
-    "(register-parameter! (make-parameter \"foo baz\"" "" \
+    {(register-parameter! (make-parameter "foo baz"} "" \
     "   #:command-class COMMAND_OBSCURE" "" \
     "   #:parameter-type PARAM_BOOLEAN" "" \
     "   #:show-func (lambda (self value)" "" \
-    "      (format #f \"The state of 'foo baz' is ~a.\" value))" "" \
+    {      (format #f "The state of 'foo baz' is ~a." value))} "" \
     "   #:initial-value #t))" "" \
     "end" \
     [multi_line \
-	 "Out of range: could not find command prefix 'foo' in position 1: \"foo baz\"" \
+	 {Out of range: could not find command prefix 'foo' in position 1: "foo baz"} \
 	 "Error while executing Scheme code."]
 
 with_test_prefix "empty doc string" {
     gdb_test_multiline "empty doc string parameter" \
 	"guile" "" \
-	"(register-parameter! (make-parameter \"empty-doc-string\"" "" \
+	{(register-parameter! (make-parameter "empty-doc-string"} "" \
 	"   #:command-class COMMAND_NONE" "" \
 	"   #:parameter-type PARAM_ZINTEGER" "" \
-	"   #:doc \"\"" "" \
-	"   #:set-doc \"Set doc string.\"" "" \
-	"   #:show-doc \"Show doc string.\"))" "" \
+	{   #:doc ""} "" \
+	{   #:set-doc "Set doc string."} "" \
+	{   #:show-doc "Show doc string."))} "" \
 	"end"
 
     gdb_test "help set empty-doc-string" "^Set doc string\\."
@@ -495,26 +495,26 @@ with_test_prefix "set/show parameter" {
     # sub-command values.
     gdb_test_multiline "Setup set/show parameter prefix with no invoke" \
 	"guile" "" \
-	"(register-command! (make-command \"set test-prefix\"" "" \
+	{(register-command! (make-command "set test-prefix"} "" \
 	"  #:prefix? #t" "" \
 	"  #:command-class COMMAND_NONE))" ""\
-	"(register-command! (make-command \"show test-prefix\"" "" \
+	{(register-command! (make-command "show test-prefix"} "" \
 	"  #:prefix? #t" "" \
 	"  #:command-class COMMAND_NONE))" ""\
-	"(register-parameter! (make-parameter \"test-prefix param-1\"" "" \
+	{(register-parameter! (make-parameter "test-prefix param-1"} "" \
 	"  #:command-class COMMAND_NONE" "" \
 	"  #:parameter-type PARAM_BOOLEAN))" "" \
-	"(register-parameter! (make-parameter \"test-prefix param-2\"" "" \
+	{(register-parameter! (make-parameter "test-prefix param-2"} "" \
 	"  #:command-class COMMAND_NONE" "" \
 	"  #:parameter-type PARAM_UINTEGER))" "" \
-	"(register-parameter! (make-parameter \"test-prefix param-3\"" "" \
+	{(register-parameter! (make-parameter "test-prefix param-3"} "" \
 	"  #:command-class COMMAND_NONE" "" \
 	"  #:parameter-type PARAM_STRING))" "" \
 	"end" ""
 
     gdb_test "set test-prefix" \
 	[multi_line \
-	     "List of \"set test-prefix\" subcommands:" \
+	     {List of "set test-prefix" subcommands:} \
 	     "" \
 	     "set test-prefix param-1 -- Set the current value of 'test-prefix param-1'." \
 	     "set test-prefix param-2 -- Set the current value of 'test-prefix param-2'." \
@@ -535,23 +535,23 @@ with_test_prefix "set/show parameter" {
     # called instead of the default behaviour tested above.
     gdb_test_multiline "Setup set/show parameter prefix with invoke" \
 	"guile" "" \
-	"(register-command! (make-command \"set test-prefix-2\"" "" \
+	{(register-command! (make-command "set test-prefix-2"} "" \
 	"  #:prefix? #t" "" \
 	"  #:command-class COMMAND_NONE" ""\
 	"  #:invoke (lambda (self arg from-tty)" "" \
 	"    (display \"invoke -- set\\n\"))))" "" \
-	"(register-command! (make-command \"show test-prefix-2\"" "" \
+	{(register-command! (make-command "show test-prefix-2"} "" \
 	"  #:prefix? #t" "" \
 	"  #:command-class COMMAND_NONE" ""\
 	"  #:invoke (lambda (self arg from-tty)" "" \
 	"    (display \"invoke -- show\\n\"))))" "" \
-	"(register-parameter! (make-parameter \"test-prefix-2 param-1\"" "" \
+	{(register-parameter! (make-parameter "test-prefix-2 param-1"} "" \
 	"  #:command-class COMMAND_NONE" "" \
 	"  #:parameter-type PARAM_BOOLEAN))" "" \
-	"(register-parameter! (make-parameter \"test-prefix-2 param-2\"" "" \
+	{(register-parameter! (make-parameter "test-prefix-2 param-2"} "" \
 	"  #:command-class COMMAND_NONE" "" \
 	"  #:parameter-type PARAM_UINTEGER))" "" \
-	"(register-parameter! (make-parameter \"test-prefix-2 param-3\"" "" \
+	{(register-parameter! (make-parameter "test-prefix-2 param-3"} "" \
 	"  #:command-class COMMAND_NONE" "" \
 	"  #:parameter-type PARAM_STRING))" "" \
 	"end" ""
@@ -584,15 +584,15 @@ with_ansi_styling_terminal {
     gdb_test_multiline "color gdb parameter" \
 	"guile" "" \
 	"(define test-color-param" "" \
-	"  (make-parameter \"print test-color-param\"" "" \
+	{  (make-parameter "print test-color-param"} "" \
 	"   #:command-class COMMAND_DATA" "" \
 	"   #:parameter-type PARAM_COLOR" "" \
-	"   #:doc \"When set, test param does something useful. When disabled, does nothing.\"" "" \
-	"   #:show-doc \"Show the state of the test-color-param.\"" "" \
-	"   #:set-doc \"Set the state of the test-color-param.\"" "" \
+	{   #:doc "When set, test param does something useful. When disabled, does nothing."} "" \
+	{   #:show-doc "Show the state of the test-color-param."} "" \
+	{   #:set-doc "Set the state of the test-color-param."} "" \
 	"   #:show-func (lambda (self value)" "" \
-	"      (format #f \"The state of the test-color-param is ~a.\" value))" "" \
-	"   #:initial-value (make-color \"green\")))" "" \
+	{      (format #f "The state of the test-color-param is ~a." value))} "" \
+	{   #:initial-value (make-color "green")))} "" \
 	"(register-parameter! test-color-param)" "" \
 	"end"
 

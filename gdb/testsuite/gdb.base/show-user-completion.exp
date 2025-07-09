@@ -21,8 +21,8 @@ load_lib completion-support.exp
 clean_restart
 
 # Define the 'foo' and 'bar' commands so we have something to complete.
-set re [multi_line "Type commands for definition of \"foo\"." \
-		   "End with a line saying just \"end\"." \
+set re [multi_line {Type commands for definition of "foo".} \
+		   {End with a line saying just "end".} \
 		   ">$" ]
 gdb_test_multiple "define foo" "define user command: foo" {
     -re $re {
@@ -30,8 +30,8 @@ gdb_test_multiple "define foo" "define user command: foo" {
     }
 }
 
-set re [multi_line "Type commands for definition of \"bar\"." \
-		   "End with a line saying just \"end\"." \
+set re [multi_line {Type commands for definition of "bar".} \
+		   {End with a line saying just "end".} \
 		   ">$"]
 gdb_test_multiple "define bar" "define user command: bar" {
     -re  $re {
@@ -50,8 +50,8 @@ test_gdb_complete_unique "show user b" "show user bar"
 gdb_test "define-prefix mygroup"
 
 # Add a user defined command in the user defined prefix.
-set re [multi_line  "Type commands for definition of \"mygroup mycommand\"." \
-		    "End with a line saying just \"end\"." \
+set re [multi_line  {Type commands for definition of "mygroup mycommand".} \
+		    {End with a line saying just "end".} \
 		    ">$"]
 set test_name "define user command: mygroup mycommand"
 gdb_test_multiple "define mygroup mycommand" $test_name {
