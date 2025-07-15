@@ -289,7 +289,9 @@ if {![info exists gdb_prompt]} {
 
 # A regexp that matches the pagination prompt.
 set pagination_prompt \
-    "--Type <RET> for more, q to quit, c to continue without paging--"
+    [string_list_to_regexp \
+	 "--Type <RET> (more), q<RET> (quit)," \
+	 " or c<RET> (continue, no paging)--"]
 
 # The variable fullname_syntax_POSIX is a regexp which matches a POSIX 
 # absolute path ie. /foo/ 

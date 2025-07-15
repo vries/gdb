@@ -1449,9 +1449,11 @@ pager_file::prompt_for_continue ()
   if (annotation_level > 1)
     m_stream->puts (("\n\032\032pre-prompt-for-continue\n"));
 
-  strcpy (cont_prompt,
-	  "--Type <RET> for more, q to quit, "
-	  "c to continue without paging--");
+  /* Keep the pagination prompt within 70ish chars to fit in a single
+     line in, say a VT100 (80x25) terminal.  */
+  strcpy (cont_prompt, "\
+--Type <RET> (more), q<RET> (quit), or c<RET> (continue, no paging)--");
+
   if (annotation_level > 1)
     strcat (cont_prompt, "\n\032\032prompt-for-continue\n");
 
