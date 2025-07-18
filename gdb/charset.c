@@ -690,6 +690,26 @@ wchar_iterator::iterate (enum wchar_iterate_result *out_result,
   return -1;
 }
 
+/* See charset.h.  */
+
+void
+wchar_iterator::skip (size_t len)
+{
+  m_input += len;
+
+  gdb_assert (len <= m_bytes);
+  m_bytes -= len;
+}
+
+/* See charset.h.  */
+
+void
+wchar_iterator::reset (const gdb_byte *input, size_t bytes)
+{
+  m_input = input;
+  m_bytes = bytes;
+}
+
 struct charset_vector
 {
   ~charset_vector ()

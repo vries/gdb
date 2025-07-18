@@ -1,0 +1,65 @@
+# Copyright 2025 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+require allow_tui_tests
+require {have_host_locale C.UTF-8}
+
+tuiterm_env
+
+save_vars { env(LC_ALL) } {
+    # Override "C" settings from default_gdb_init.
+    setenv LC_ALL "C.UTF-8"
+
+    Term::clean_restart 24 80
+}
+
+if {![Term::enter_tui]} {
+    unsupported "TUI not supported"
+    return
+}
+
+set unicode_char "\u276F"
+#set unicode_char_unsupported "❯"
+
+set csi [string cat {\033} "\["]
+set color_on [string cat {\001} $csi "31m" {\002}]
+set color_off [string cat {\001} $csi "0m" {\002}]
+
+set prompt "GDB$color_on$unicode_char$color_off "
+set prompt_no_color "GDB$unicode_char "
+set prompt_no_color_re [string_to_regexp $prompt_no_color]
+set prompt_with_attrs_re "GDB<fg:red>$unicode_char<fg:default> "
+
+# Set new prompt.
+send_gdb "set prompt $prompt\n"
+# Set old prompt back.
+send_gdb "set prompt (gdb) \n"
+
+# Wait for old prompt.
+Term::wait_for ""
+
+Term::dump_screen
+
+set line [Term::get_line [expr $Term::_cur_row - 1]]
+verbose -log "line: '$line'"
+
+gdb_assert { [regexp "^${prompt_no_color_re}set prompt .*$" $line] } \
+    "unicode char"
+
+set line [Term::get_line_with_attrs [expr $Term::_cur_row - 1]]
+verbose -log "line with attrs: '$line'"
+
+gdb_assert { [regexp "^${prompt_with_attrs_re}set prompt .*$" $line] } \
+    "colored unicode char"
