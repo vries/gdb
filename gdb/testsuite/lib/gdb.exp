@@ -2252,6 +2252,146 @@ proc gdb_assert { condition {message ""} } {
     return $res
 }
 
+# Fill in and return the global cache for drive letter to Unix mount
+# point, for Windows.
+#
+# Calling external processes on MSYS2/Cygwin is expensive so instead
+# of calling "cygpath -a $FILENAME" for every file name, we call it
+# just once per drive letter, to get the mount point of each drive
+# letter (e.g., 'c:' => '/c' or '/cygdrive/c'), and cache the mapping.
+#
+# The same mapping is used for converting from Unix file name to
+# Windows absolute file name with drive letter too.
+
+gdb_caching_proc get_drive_mount_map {} {
+    array set drive_mount_map {}
+
+    # Get all mounted drive letters.
+    set mounted_drives [split [exec sh -c {mount | grep "^.: " | cut -c1}] \n]
+
+    foreach drive_letter $mounted_drives {
+	set drive [string toupper $drive_letter]
+	catch {
+	    set fp [open "|cygpath -u $drive:" r]
+	    set mount_point [string trim [read $fp]]
+	    close $fp
+
+	    set drive_mount_map($drive) $mount_point
+	}
+    }
+
+    return [array get drive_mount_map]
+}
+
+# Normalize backward slashes to forward slashes.
+
+proc normalize_slashes {filename} {
+    return [string map {\\ /} $filename]
+}
+
+# Sanitize a host file name, without making it absolute or resolving
+# symlinks.  On native Windows, this normalizes slashes to forward
+# slashes, and makes sure that if the path starts with a drive letter,
+# it is upper case.  On other systems, it just returns the file name
+# unmodified.
+
+proc host_file_sanitize {filename} {
+    if {[ishost *-*-mingw*]} {
+	set filename [normalize_slashes $filename]
+
+	# If the file name starts with a drive letter, uppercase it.
+	if {[regexp {^([a-zA-Z]):(/.*)?} $filename -> drive rest]} {
+	    set filename "[string toupper $drive]:$rest"
+	}
+    }
+
+    return $filename
+}
+
+# Normalize a file name for the build machine.  If running native
+# Windows GDB, this replaces 'c:/foo' with '/c/foo' (on MSYS2) or
+# '/cygdrive/c/foo' (on Cygwin).  On other systems, it just wraps
+# "file normalize".
+
+proc build_file_normalize {filename} {
+    if {[ishost *-*-mingw*]} {
+	set filename [host_file_sanitize $filename]
+
+	# Expand drive letters (e.g., C:/foo) to their mount point.
+	# We assume there are no symlinks to resolve, which is a
+	# reasonable assumption for native Windows testing.
+	if {[regexp {^([A-Z]):(/.*)} $filename -> drive rest]} {
+	    array set drive_mount_map [get_drive_mount_map]
+	    if {[info exists drive_mount_map($drive)]} {
+		return "${drive_mount_map($drive)}$rest"
+	    }
+	}
+    }
+
+    return [file normalize $filename]
+}
+
+# Normalize a file name for the host machine.  If running native
+# Windows GDB, this replaces '/c/foo' (on MSYS2) or '/cygdrive/c/foo'
+# (on Cygwin) with 'c:/foo'.
+
+proc host_file_normalize {filename} {
+    if {[ishost *-*-mingw*]} {
+	set filename [host_file_sanitize $filename]
+
+	# If the file name already starts with a drive letter (e.g.,
+	# C:/foo), we're done.  Don't let it fallthrough to "file
+	# normalize", which would misinterpret it as a relative file
+	# name.
+	if {[regexp {^[A-Z]:/} $filename]} {
+	    return $filename
+	}
+
+	foreach {drive mount} [get_drive_mount_map] {
+	    set mount_len [string length $mount]
+	    if {[string equal -length $mount_len $mount $filename]} {
+		if {[string length $filename] == $mount_len} {
+		    # "cygpath -m /c" produces "C:/", so we do the
+		    # same.
+		    return "$drive/"
+		} elseif {[string index $filename $mount_len] eq "/"} {
+		    set rest [string range $filename $mount_len end]
+		    return "$drive:$rest"
+		}
+	    }
+	}
+    }
+
+    return [file normalize $filename]
+}
+
+# Wrapper around "file join" that handles host-specific details.
+#
+# For Cygwin/MSYS2's Tcl, file names that start with a drive letter
+# are not considered absolute file names, thus 'file join "c:/" "d:/"'
+# returns "c:/d:".  This procedure thus detects absolute Windows-style
+# file names, and treats them as absolute, bypassing "file join".
+
+proc host_file_join {args} {
+    if {[isbuild *-*-mingw*]} {
+	set result ""
+	foreach filename $args {
+	    set filename [host_file_sanitize $filename]
+
+	    # If the file name starts with drive letter and colon
+	    # (e.g., "C:/"), treat it as absolute.
+	    if {[regexp {^[A-Z]:/} $filename]} {
+		set result $filename
+	    } else {
+		set result [file join $result $filename]
+	    }
+	}
+	return $result
+    } else {
+	return [file join {*}$args]
+    }
+}
+
 proc gdb_reinitialize_dir { subdir } {
     global gdb_prompt
 
@@ -2266,7 +2406,8 @@ proc gdb_reinitialize_dir { subdir } {
 	    }
 	    gdb_expect 60 {
 		-re "Source directories searched.*$gdb_prompt $" {
-		    send_gdb "dir $subdir\n"
+		    set dir [host_file_normalize $subdir]
+		    send_gdb "dir $dir\n"
 		    gdb_expect 60 {
 			-re "Source directories searched.*$gdb_prompt $" {
 			    verbose "Dir set to $subdir"
@@ -7453,13 +7594,13 @@ proc clean_standard_output_dir {} {
     }
 
     # Directory containing the standard output files.
-    set standard_output_dir [file normalize [standard_output_file ""]]
+    set standard_output_dir [build_standard_output_file ""]
 
     # Ensure that standard_output_dir is clean, or only contains
     # gdb.log / gdb.sum.
     set log_file_info [split [log_file -info]]
     set log_file [file normalize [lindex $log_file_info end]]
-    if { $log_file == [file normalize [standard_output_file gdb.log]] } {
+    if { $log_file == [file normalize [build_standard_output_file gdb.log]] } {
 	# Dir already contains active gdb.log.  Don't remove the dir, but
 	# check that it's clean otherwise.
 	set res [glob -directory $standard_output_dir -tails *]
@@ -7714,22 +7855,38 @@ proc make_gdb_parallel_path { args } {
 }
 
 # Turn BASENAME into a full file name in the standard output
-# directory.  It is ok if BASENAME is the empty string; in this case
-# the directory is returned.
+# directory, as seen from the build machine.  I.e., as seen from the
+# system driving DejaGnu.  (E.g., if DejaGnu is being driven by MSYS2
+# to test native Windows GDB, the "build" paths should be paths TCL
+# understands, i.e., Unix paths.)  It is ok if BASENAME is the empty
+# string; in this case the directory is returned.
+
+proc build_standard_output_file {basename} {
+    global objdir subdir gdb_test_file_name
+
+    set dir [make_gdb_parallel_path outputs $subdir $gdb_test_file_name]
+    file mkdir $dir
+    return [file join $dir $basename]
+}
+
+# Turn BASENAME into a full file name in the standard output
+# directory, as seen from a non-remote host.  I.e., assuming the build
+# and the host share the filesystem.  E.g., if DejaGnu is being driven
+# by MSYS2 to test native Windows GDB, the "host" paths should be
+# paths GDB understands, i.e., Windows paths.  It is OK if BASENAME is
+# the empty string; in this case the directory is returned.
 
 proc standard_output_file {basename} {
     global objdir subdir gdb_test_file_name
 
     set dir [make_gdb_parallel_path outputs $subdir $gdb_test_file_name]
     file mkdir $dir
-    # If running on MinGW, replace /c/foo with c:/foo
-    if { [ishost *-*-mingw*] } {
-        set dir [exec sh -c "cd ${dir} && pwd -W"]
-    }
-    return [file join $dir $basename]
+    set dir [host_file_normalize $dir]
+    return [host_file_join $dir $basename]
 }
 
-# Turn BASENAME into a file name on host.
+# Like standard_output_file, but handles remote hosts.  Turn BASENAME
+# into a file name on (potentially remote) host.
 
 proc host_standard_output_file { basename } {
     if { [is_remote host] } {
