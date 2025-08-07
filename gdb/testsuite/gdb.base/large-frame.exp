@@ -31,9 +31,11 @@ proc run_test { opt_level } {
     global srcfile srcfile2 binfile hex
 
     standard_testfile large-frame-1.c large-frame-2.c
+    set testfile $::testfile-$opt_level
+    set binfile [standard_output_file $testfile]
 
     if {[prepare_for_testing_full "failed to prepare" \
-	     [list ${binfile}-${opt_level} debug \
+	     [list $testfile debug \
 		  $srcfile [list debug] \
 		  $srcfile2 [list nodebug optimize=-$opt_level]]]} {
 	return

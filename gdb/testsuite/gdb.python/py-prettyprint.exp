@@ -36,7 +36,8 @@ proc run_lang_tests {exefile lang} {
     set nl "\[\r\n\]+"
 
     # Start with a fresh gdb.
-    clean_restart $exefile
+    clean_restart
+    gdb_load $exefile
 
     if {![runto_main]} {
 	return

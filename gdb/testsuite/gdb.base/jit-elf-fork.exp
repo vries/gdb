@@ -23,7 +23,8 @@ load_lib jit-elf-helpers.exp
 # The main code that loads and registers JIT objects.
 set main_basename "jit-elf-fork-main"
 set main_srcfile ${srcdir}/${subdir}/${main_basename}.c
-set main_binfile [standard_output_file ${main_basename}]
+set main_testfile $main_basename
+set main_binfile [standard_output_file $main_testfile]
 
 # The shared library that gets loaded as JIT objects.
 set jit_solib_basename jit-elf-fork-solib
@@ -54,7 +55,7 @@ if { [compile_jit_main ${main_srcfile} ${main_binfile} {}] != 0 } {
 # that the callers can continue execution until there.
 
 proc do_setup { detach-on-fork follow-fork-mode } {
-	clean_restart ${::main_binfile}
+	clean_restart $::main_testfile
 
 	gdb_test_no_output "set detach-on-fork ${detach-on-fork}"
 	gdb_test_no_output "set follow-fork-mode ${follow-fork-mode}"

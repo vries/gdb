@@ -26,6 +26,7 @@ require allow_shlib_tests isnative
 set test_verbose 0
 
 set jit_host_src $srcfile
+set jit_host_bin_basename $testfile
 set jit_host_bin $binfile
 
 # We inject the complete path to jit-reader.h into the source file
@@ -102,7 +103,7 @@ proc jit_reader_test {} {
 
     set any "\[^\r\n\]*"
 
-    clean_restart $jit_host_bin
+    clean_restart $::jit_host_bin_basename
     gdb_load_shlib $jit_reader_bin
 
     if {$test_verbose > 0} {

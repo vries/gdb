@@ -27,7 +27,8 @@ load_lib jit-elf-helpers.exp
 # The main code that loads and registers JIT objects.
 set main_basename "jit-elf-main"
 set main_srcfile ${srcdir}/${subdir}/${main_basename}.c
-set main_binfile [standard_output_file ${main_basename}]
+set main_testfile $main_basename
+set main_binfile [standard_output_file $main_testfile]
 
 # The shared library that gets loaded as JIT objects.
 set jit_solib_basename jit-elf-solib
@@ -46,7 +47,7 @@ if { [compile_jit_main ${main_srcfile} ${main_binfile} {}] != 0 } {
     return
 }
 
-clean_restart $::main_binfile
+clean_restart $main_testfile
 if { ![runto_main] } {
     return
 }
