@@ -4678,7 +4678,8 @@ gdb_caching_proc allow_lam_tests {} {
     # No error message, compilation succeeded so now run it via gdb.
 
     set allow_lam_tests 0
-    clean_restart $obj
+    clean_restart
+    gdb_load $obj
     gdb_run_cmd
     gdb_expect {
 	-re ".*$inferior_exited_re with code.*${gdb_prompt} $" {
@@ -4961,7 +4962,8 @@ gdb_caching_proc allow_aarch64_sve_tests {} {
     }
 
     # Compilation succeeded so now run it via gdb.
-    clean_restart $obj
+    clean_restart
+    gdb_load $obj
     gdb_run_cmd
     gdb_expect {
         -re ".*Illegal instruction.*${gdb_prompt} $" {
@@ -5021,7 +5023,8 @@ gdb_caching_proc aarch64_initialize_sve_information { } {
 	return [array get supported_vl]
     }
 
-    clean_restart $test_exec
+    clean_restart
+    gdb_load $test_exec
 
     if {![runto_main]} {
 	return [array get supported_vl]
@@ -5118,7 +5121,8 @@ gdb_caching_proc allow_aarch64_sme_tests {} {
     }
 
     # Compilation succeeded so now run it via gdb.
-    clean_restart $obj
+    clean_restart
+    gdb_load $obj
     gdb_run_cmd
     gdb_expect {
 	-re ".*Illegal instruction.*${gdb_prompt} $" {
@@ -5178,7 +5182,8 @@ gdb_caching_proc aarch64_initialize_sme_information { } {
 	return [array get supported_svl]
     }
 
-    clean_restart $test_exec
+    clean_restart
+    gdb_load $test_exec
 
     if {![runto_main]} {
 	return [array get supported_svl]
@@ -5272,7 +5277,8 @@ gdb_caching_proc allow_aarch64_mops_tests {} {
     }
 
     # Compilation succeeded so now run it via gdb.
-    clean_restart $obj
+    clean_restart
+    gdb_load $obj
     gdb_run_cmd
     gdb_expect {
 	-re ".*$inferior_exited_re with code 01.*${gdb_prompt} $" {
@@ -9563,7 +9569,8 @@ gdb_caching_proc target_endianness {} {
         return 0
     }
 
-    clean_restart $obj
+    clean_restart
+    gdb_load $obj
     if ![runto_main] {
         return 0
     }
@@ -9808,7 +9815,8 @@ gdb_caching_proc target_supports_scheduler_locking {} {
         return 0
     }
 
-    clean_restart $obj
+    clean_restart
+    gdb_load $obj
     if ![runto_main] {
         return 0
     }
@@ -11303,7 +11311,8 @@ gdb_caching_proc have_epilogue_line_info {} {
 	 return False
     }
 
-    clean_restart $obj
+    clean_restart
+    gdb_load $obj
 
     gdb_test_multiple "info line 6" "epilogue test" {
 	-re -wrap ".*starts at address.*and ends at.*" {
