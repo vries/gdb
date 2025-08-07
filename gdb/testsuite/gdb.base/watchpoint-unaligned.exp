@@ -161,7 +161,7 @@ foreach_with_prefix wpcount {4 7} {
 foreach_with_prefix offset { 0 1 } {
     foreach_with_prefix index { 0 1 } {
 
-	clean_restart $binfile
+	clean_restart $::testfile
 
 	if ![runto_main] {
 	    return -1

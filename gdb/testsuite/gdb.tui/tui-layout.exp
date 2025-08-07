@@ -48,9 +48,9 @@ proc test_layout_or_focus {layout_name terminal execution} {
     save_vars { env(TERM) } {
 	setenv TERM $terminal
 	if {$dumb_terminal} {
-	    clean_restart $binfile
+	    clean_restart $::testfile
 	} else {
-	    Term::clean_restart 24 80 $binfile
+	    Term::clean_restart 24 80 $::testfile
 	    if {![Term::prepare_for_tui]} {
 		unsupported "TUI not supported"
 		return

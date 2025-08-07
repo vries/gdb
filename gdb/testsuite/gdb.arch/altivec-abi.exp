@@ -47,7 +47,7 @@ proc altivec_abi_tests { extra_flags force_abi } {
 	}
     }
 
-    clean_restart $binfile
+    clean_restart $::testfile
 
     # Run to `main' where we begin our tests.
     if {![runto_main]} {

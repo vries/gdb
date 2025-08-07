@@ -53,7 +53,7 @@ proc test { src name } {
 	    return
 	}
 
-	clean_restart [host_file_normalize $binfile]
+	clean_restart $::testfile
 
 	if { ![runto_main] } {
 	    return

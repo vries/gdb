@@ -176,7 +176,7 @@ with_test_prefix "using 'symbol-file' command" {
 
 # Check the executable_changed event when the executable changes on disk.
 with_test_prefix "exec changes on disk" {
-    clean_restart $binfile1
+    clean_restart $::testfile1
 
     setup_exec_change_handler
 

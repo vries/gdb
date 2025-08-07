@@ -192,7 +192,7 @@ with_test_prefix c++ {
 
 # Run various other tests.
 
-clean_restart $binfile
+clean_restart $::testfile
 
 if {![runto_main]} {
     return

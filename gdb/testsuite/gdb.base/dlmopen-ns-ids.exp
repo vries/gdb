@@ -62,7 +62,7 @@ proc get_first_so_ns {} {
 # Run the tests relating to the command "info sharedlibrary", to
 # verify that the namespace ID is consistent.
 proc test_info_shared {} {
-    clean_restart $::binfile
+    clean_restart $::testfile
 
     if { ![runto_main] } {
 	return
@@ -108,7 +108,7 @@ proc test_info_shared {} {
 # Run all tests related to the linkage namespaces convenience
 # variables, _active_namespaces and _current_namespaces.
 proc_with_prefix test_conv_vars {} {
-    clean_restart $::binfile
+    clean_restart $::testfile
 
     gdb_test "print \$_active_linker_namespaces" "1" \
 	"1 namespace before starting inferior"
@@ -151,7 +151,7 @@ proc_with_prefix test_conv_vars {} {
     # Restarting GDB so that we can test setting a breakpoint
     # using the convenience variable, while a proper bp syntax
     # isn't implemented for namespaces
-    clean_restart $::binfile
+    clean_restart $::testfile
     if {![runto_main]} {
 	return
     }
@@ -167,7 +167,7 @@ proc_with_prefix test_conv_vars {} {
 
 # Run several tests relating to the command "info namespaces".
 proc test_info_linker_namespaces {} {
-    clean_restart $::binfile
+    clean_restart $::testfile
 
     # Check that "info linker-namespaces" while the inferior is not running
     # doesn't crash.

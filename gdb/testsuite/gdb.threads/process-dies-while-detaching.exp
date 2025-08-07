@@ -214,7 +214,7 @@ proc test_detach {multi_process cmd} {
     with_test_prefix "detach" {
 	global binfile
 
-	clean_restart ${binfile}
+	clean_restart ${::testfile}
 
 	if ![runto_main] {
 	    return -1
@@ -242,7 +242,7 @@ proc test_detach_watch {wp multi_process cmd} {
     with_test_prefix "watchpoint:$wp" {
 	global binfile decimal
 
-	clean_restart ${binfile}
+	clean_restart ${::testfile}
 
 	if ![runto_main] {
 	    return -1
@@ -290,7 +290,7 @@ proc test_detach_killed_outside {multi_process cmd} {
     with_test_prefix "killed outside" {
 	global binfile
 
-	clean_restart ${binfile}
+	clean_restart ${::testfile}
 
 	if ![runto_main] {
 	    return -1

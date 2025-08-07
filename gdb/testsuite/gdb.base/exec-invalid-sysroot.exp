@@ -69,5 +69,5 @@ proc do_exec_sysroot_test {} {
 }
 
 # Start with a fresh gdb
-clean_restart $binfile
+clean_restart $::testfile
 do_exec_sysroot_test

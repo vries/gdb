@@ -173,7 +173,7 @@ proc test_dlmopen {} {
 # Setup for calling 'test_dlmopen', this is the version of the test
 # that doesn't use 'attach'.
 proc test_dlmopen_no_attach {} {
-    clean_restart $::binfile
+    clean_restart $::testfile
 
     if { ![runto_main] } {
 	return
@@ -198,7 +198,7 @@ proc test_dlmopen_with_attach {} {
 	return
     }
 
-    clean_restart $::binfile
+    clean_restart $::testfile
 
     # Start the test program.
     set test_spawn_id [spawn_wait_for_attach $::binfile]
@@ -288,7 +288,7 @@ proc_with_prefix test_solib_unmap_events { } {
 	return
     }
 
-    clean_restart $::binfile
+    clean_restart $::testfile
 
     if { ![runto_main] } {
 	return
@@ -379,7 +379,7 @@ proc_with_prefix test_solib_unmap_events { } {
 # Check that we can 'next' over the dlclose calls without GDB giving any
 # warnings or errors.
 proc_with_prefix test_next_over_dlclose {} {
-    clean_restart $::binfile
+    clean_restart $::testfile
 
     if { ![runto_main] } {
 	return

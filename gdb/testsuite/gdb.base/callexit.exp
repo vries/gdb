@@ -27,7 +27,7 @@ require {!target_info exists gdb,cannot_call_functions}
 
 # Start with a fresh gdb.
 
-clean_restart ${binfile}
+clean_restart ${::testfile}
 
 if { ![runto_main] } {
     return 0

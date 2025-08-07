@@ -205,7 +205,7 @@ proc_with_prefix test-print {{prefix ""}} {
     }
 
     global binfile
-    clean_restart $binfile
+    clean_restart $::testfile
 
     if ![runto_main] {
 	return
@@ -317,7 +317,7 @@ proc_with_prefix test-backtrace {} {
 	"backtrace no-filters"
 
     global binfile
-    clean_restart $binfile
+    clean_restart $::testfile
 
     if ![runto_main] {
 	return

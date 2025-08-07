@@ -23,7 +23,7 @@ if { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" object {debug}] 
     return
 }
 
-clean_restart ${binfile}
+clean_restart ${::testfile}
 
 gdb_test "break *pushrbp" " at 0x1: file .*"
 gdb_test "break pushrbp" " at 0x1: file .*"
