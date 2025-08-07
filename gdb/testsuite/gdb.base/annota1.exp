@@ -528,12 +528,14 @@ proc thread_test {} {
     global gdb_prompt old_gdb_prompt
     global decimal
     set srcfile watch_thread_num.c
-    set binfile [standard_output_file ${testfile}-watch_thread_num]
+    set testfile_wtn $testfile-watch-thread-num
+    set binfile_wtn [standard_output_file $testfile_wtn]
     set gdb_prompt $old_gdb_prompt
 
-    if { [gdb_compile_pthreads "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {debug nowarnings}] == "" } {
+    if { [gdb_compile_pthreads "${srcdir}/${subdir}/${srcfile}" $binfile_wtn \
+	      executable {debug nowarnings}] == "" } {
 
-	clean_restart $::testfile
+	clean_restart $testfile_wtn
 	if {![runto_main]} {
 	    return
 	}

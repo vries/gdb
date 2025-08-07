@@ -19,8 +19,9 @@
 
 standard_testfile foll-exec.c
 
-global binfile
-set binfile [standard_output_file "foll-exec"]
+set testfile "foll-exec"
+set binfile [standard_output_file $testfile]
+
 set testfile2 "execd-prog"
 set srcfile2 ${testfile2}.c
 set binfile2 [standard_output_file ${testfile2}]

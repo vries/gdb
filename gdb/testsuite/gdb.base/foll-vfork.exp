@@ -22,21 +22,20 @@ require allow_fork_tests
 
 standard_testfile .c -exit.c vforked-prog.c
 
-set binfile $testfile
-set binfile2 ${testfile}-exit
-set binfile3 vforked-prog
+set testfile2 $testfile-exit
+set testfile3 vforked-prog
 
-if {[build_executable "compile $binfile" $binfile $srcfile] == -1} {
+if {[build_executable "compile $testfile" $testfile $srcfile] == -1} {
     untested "failed to compile first test binary"
     return -1
 }
 
-if {[build_executable "compile $binfile2" $binfile2 $srcfile2] == -1} {
+if {[build_executable "compile $testfile2" $testfile2 $srcfile2] == -1} {
     untested "failed to compile second test binary"
     return -1
 }
 
-if {[build_executable "compile $binfile3" $binfile3 $srcfile3] == -1} {
+if {[build_executable "compile $testfile3" $testfile3 $srcfile3] == -1} {
     untested "failed to compile third test binary"
     return -1
 }
@@ -44,14 +43,14 @@ if {[build_executable "compile $binfile3" $binfile3 $srcfile3] == -1} {
 # If required, download the program that we exec after vfork to the
 # remote target.
 if { [is_remote target] } {
-    gdb_remote_download target [standard_output_file $binfile3]
+    gdb_remote_download target [standard_output_file $testfile3]
 }
 
 # Start with a fresh GDB, with verbosity enabled, and run to main.  On
 # error, behave as "return", so we don't try to continue testing with
 # a borked session.
-proc setup_gdb { binfile srcfile } {
-    clean_restart $::testfile
+proc setup_gdb { testfile srcfile } {
+    clean_restart $testfile
 
     if ![runto_main] {
 	return -code return
@@ -65,7 +64,7 @@ proc check_vfork_catchpoints {} {
   # Because setup_gdb uses 'return -code return' which would return to
   # our caller we need to wrap this call, spot when setup_gdb failed
   # (with return code 2), and then issue our own 'return -code return'.
-  set code [catch {setup_gdb $::binfile $::srcfile} string]
+  set code [catch {setup_gdb $::testfile $::srcfile} string]
   if { $code == 2 } {
     unsupported "vfork catchpoints"
     return -code return
@@ -90,8 +89,8 @@ proc check_vfork_catchpoints {} {
   }
 }
 
-proc_with_prefix vfork_parent_follow_through_step { binfile srcfile } {
-    setup_gdb $binfile $srcfile
+proc_with_prefix vfork_parent_follow_through_step { testfile srcfile } {
+    setup_gdb $testfile $srcfile
 
     gdb_test_no_output "set follow-fork parent"
 
@@ -102,8 +101,8 @@ proc_with_prefix vfork_parent_follow_through_step { binfile srcfile } {
     }
 }
 
-proc_with_prefix vfork_parent_follow_to_bp { binfile srcfile } {
-    setup_gdb $binfile $srcfile
+proc_with_prefix vfork_parent_follow_to_bp { testfile srcfile } {
+    setup_gdb $testfile $srcfile
 
     gdb_test_no_output "set follow-fork parent"
 
@@ -118,8 +117,8 @@ proc_with_prefix vfork_parent_follow_to_bp { binfile srcfile } {
     }
 }
 
-proc_with_prefix vfork_child_follow_to_exit { binfile srcfile } {
-    setup_gdb $binfile $srcfile
+proc_with_prefix vfork_child_follow_to_exit { testfile srcfile } {
+    setup_gdb $testfile $srcfile
 
     gdb_test_no_output "set follow-fork child"
 
@@ -133,8 +132,8 @@ proc_with_prefix vfork_child_follow_to_exit { binfile srcfile } {
     }
 }
 
-proc_with_prefix vfork_and_exec_child_follow_to_main_bp { binfile srcfile } {
-    setup_gdb $binfile $srcfile
+proc_with_prefix vfork_and_exec_child_follow_to_main_bp { testfile srcfile } {
+    setup_gdb $testfile $srcfile
 
     gdb_test_no_output "set follow-fork child"
 
@@ -147,8 +146,8 @@ proc_with_prefix vfork_and_exec_child_follow_to_main_bp { binfile srcfile } {
     }
 }
 
-proc_with_prefix vfork_and_exec_child_follow_through_step { binfile srcfile } {
-    setup_gdb $binfile $srcfile
+proc_with_prefix vfork_and_exec_child_follow_through_step { testfile srcfile } {
+    setup_gdb $testfile $srcfile
 
     gdb_test_no_output "set follow-fork child"
 
@@ -174,8 +173,8 @@ proc continue_to_vfork {} {
     }
 }
 
-proc_with_prefix tcatch_vfork_then_parent_follow { binfile srcfile } {
-    setup_gdb $binfile $srcfile
+proc_with_prefix tcatch_vfork_then_parent_follow { testfile srcfile } {
+    setup_gdb $testfile $srcfile
 
     gdb_test_no_output "set follow-fork parent"
 
@@ -195,8 +194,8 @@ proc_with_prefix tcatch_vfork_then_parent_follow { binfile srcfile } {
     }
 }
 
-proc_with_prefix tcatch_vfork_then_child_follow_exec { binfile srcfile } {
-    setup_gdb $binfile $srcfile
+proc_with_prefix tcatch_vfork_then_child_follow_exec { testfile srcfile } {
+    setup_gdb $testfile $srcfile
 
     gdb_test_no_output "set follow-fork child"
 
@@ -221,8 +220,8 @@ proc_with_prefix tcatch_vfork_then_child_follow_exec { binfile srcfile } {
     }
 }
 
-proc tcatch_vfork_then_child_follow_exit { binfile srcfile } {
-   setup_gdb $binfile $srcfile
+proc tcatch_vfork_then_child_follow_exit { testfile srcfile } {
+   setup_gdb $testfile $srcfile
 
     gdb_test_no_output "set follow-fork child"
 
@@ -245,8 +244,8 @@ proc tcatch_vfork_then_child_follow_exit { binfile srcfile } {
     }
 }
 
-proc_with_prefix vfork_relations_in_info_inferiors { variant binfile srcfile non_stop } {
-    setup_gdb $binfile $srcfile
+proc_with_prefix vfork_relations_in_info_inferiors { variant testfile srcfile non_stop } {
+    setup_gdb $testfile $srcfile
 
     gdb_test_no_output "set follow-fork child"
 
@@ -288,27 +287,27 @@ proc_with_prefix vfork_relations_in_info_inferiors { variant binfile srcfile non
     }
 }
 
-proc do_vfork_and_follow_parent_tests { binfile srcfile } {
+proc do_vfork_and_follow_parent_tests { testfile srcfile } {
    # Try following the parent process by stepping through a call to
    # vfork.  Do this without catchpoints.
-   vfork_parent_follow_through_step $binfile $srcfile
+   vfork_parent_follow_through_step $testfile $srcfile
 
    # Try following the parent process by setting a breakpoint on the
    # other side of a vfork, and running to that point.  Do this
    # without catchpoints.
-   vfork_parent_follow_to_bp $binfile $srcfile
+   vfork_parent_follow_to_bp $testfile $srcfile
 
    # Try catching a vfork, and stepping out to the parent.
    #
-   tcatch_vfork_then_parent_follow $binfile $srcfile
+   tcatch_vfork_then_parent_follow $testfile $srcfile
 }
 
-proc do_vfork_and_follow_child_tests_exec { binfile srcfile non_stop } {
+proc do_vfork_and_follow_child_tests_exec { testfile srcfile non_stop } {
    # Try following the child process by just continuing through the
    # vfork, and letting the parent's breakpoint on "main" be auto-
    # magically reset in the child.
    #
-   vfork_and_exec_child_follow_to_main_bp $binfile $srcfile
+   vfork_and_exec_child_follow_to_main_bp $testfile $srcfile
 
    # Try following the child process by stepping through a call to
    # vfork.  The child also executes an exec.  Since the child cannot
@@ -317,11 +316,11 @@ proc do_vfork_and_follow_child_tests_exec { binfile srcfile non_stop } {
    # recomputed in the exec'd child, the step through a vfork should
    # land us in the "main" for the exec'd child, too.
    #
-   vfork_and_exec_child_follow_through_step $binfile $srcfile
+   vfork_and_exec_child_follow_through_step $testfile $srcfile
 
    # Try catching a vfork, and stepping out to the child.
    #
-   tcatch_vfork_then_child_follow_exec $binfile $srcfile
+   tcatch_vfork_then_child_follow_exec $testfile $srcfile
 
    # Test the ability to follow both child and parent of a vfork.  Do
    # this without catchpoints.
@@ -339,25 +338,25 @@ proc do_vfork_and_follow_child_tests_exec { binfile srcfile non_stop } {
    # and confirm the relation is no longer displayed in "info
    # inferiors".
    #
-   vfork_relations_in_info_inferiors "exec" $binfile $srcfile $non_stop
+   vfork_relations_in_info_inferiors "exec" $testfile $srcfile $non_stop
 }
 
-proc do_vfork_and_follow_child_tests_exit { binfile srcfile non_stop } {
+proc do_vfork_and_follow_child_tests_exit { testfile srcfile non_stop } {
    # Try following the child process by just continuing through the
    # vfork, and letting the child exit.
    #
-   vfork_child_follow_to_exit $binfile $srcfile
+   vfork_child_follow_to_exit $testfile $srcfile
 
    # Try catching a vfork, and stepping out to the child.
    #
-   tcatch_vfork_then_child_follow_exit $binfile $srcfile
+   tcatch_vfork_then_child_follow_exit $testfile $srcfile
 
    # Step over a vfork in the child, do "info inferiors" and check the
    # parent/child relation is displayed.  Run the child to completion,
    # and confirm the relation is no longer displayed in "info
    # inferiors".
    #
-   vfork_relations_in_info_inferiors "exit" $binfile $srcfile $non_stop
+   vfork_relations_in_info_inferiors "exit" $testfile $srcfile $non_stop
 }
 
 with_test_prefix "check vfork support" {
@@ -367,29 +366,29 @@ with_test_prefix "check vfork support" {
 }
 
 # Follow parent and follow child vfork tests with a child that execs.
-proc_with_prefix exec_tests { binfile srcfile non_stop } {
+proc_with_prefix exec_tests { testfile srcfile non_stop } {
     # These are tests of gdb's ability to follow the parent of a Unix
     # vfork system call.  The child will subsequently call a variant
     # of the Unix exec system call.
-    do_vfork_and_follow_parent_tests $binfile $srcfile
+    do_vfork_and_follow_parent_tests $testfile $srcfile
 
     # These are tests of gdb's ability to follow the child of a Unix
     # vfork system call.  The child will subsequently call a variant
     # of a Unix exec system call.
     #
-    do_vfork_and_follow_child_tests_exec $binfile $srcfile $non_stop
+    do_vfork_and_follow_child_tests_exec $testfile $srcfile $non_stop
 }
 
 # Follow parent and follow child vfork tests with a child that exits.
-proc_with_prefix exit_tests { binfile srcfile non_stop } {
+proc_with_prefix exit_tests { testfile srcfile non_stop } {
     # These are tests of gdb's ability to follow the parent of a Unix
     # vfork system call.  The child will subsequently exit.
-    do_vfork_and_follow_parent_tests $binfile $srcfile
+    do_vfork_and_follow_parent_tests $testfile $srcfile
 
     # These are tests of gdb's ability to follow the child of a Unix
     # vfork system call.  The child will subsequently exit.
     #
-    do_vfork_and_follow_child_tests_exit $binfile $srcfile $non_stop
+    do_vfork_and_follow_child_tests_exit $testfile $srcfile $non_stop
 }
 
 # Using the remote protocol with schedule-multiple turned triggers bug
@@ -415,8 +414,8 @@ with_timeout_factor 2 {
 		    append ::GDBFLAGS " -ex \"set non-stop ${non-stop}\""
 		    append ::GDBFLAGS " -ex \"set schedule-multiple ${schedule-multiple}\""
 
-		    exec_tests $binfile $srcfile ${non-stop}
-		    exit_tests $binfile2 $srcfile2 ${non-stop}
+		    exec_tests $testfile $srcfile ${non-stop}
+		    exit_tests $testfile2 $srcfile2 ${non-stop}
 		}
 	    }
 	}

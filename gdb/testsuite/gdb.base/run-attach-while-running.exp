@@ -22,8 +22,12 @@
 
 standard_testfile
 
-set binfile_threads ${binfile}-threads
-set binfile_nothreads ${binfile}-nothreads
+set testfile_threads $testfile-threads
+set testfile_nothreads $testfile-nothreads
+set binfile_threads [standard_output_file $testfile_threads]
+set binfile_nothreads [standard_output_file $testfile_nothreads]
+
+unset testfile
 unset binfile
 
 # Valid parameter / axis values:
@@ -109,9 +113,11 @@ foreach_with_prefix threaded {0 1} {
     set options [list debug additional_flags=-DWITH_THREADS=$threaded \
 		    additional_flags=-std=gnu99]
     if { $threaded } {
+	set testfile $testfile_threads
 	set binfile $binfile_threads
 	lappend options pthreads
     } else {
+	set testfile $testfile_nothreads
 	set binfile $binfile_nothreads
     }
     if { [build_executable "failed to prepare" ${binfile} ${srcfile} $options] } {

@@ -21,6 +21,7 @@ standard_testfile .c
 # plus some additional data to overwrite the stack frame.
 set pattern  01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789
 append binfile -${pattern}
+append testfile -${pattern}
 
 if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {debug}] != "" } {
      untested "failed to compile"

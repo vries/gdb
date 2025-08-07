@@ -76,6 +76,7 @@ if {[build_shared_jit] == -1} {
 
 # Build the program that loads the JIT library.
 set srcfile_dl $testfile-dl.c
+set testfile_dl $testfile-dl
 set binfile_dl $binfile-dl
 set options [list debug shlib=${binfile_lib}]
 if {[gdb_compile ${srcdir}/${subdir}/${srcfile_dl} $binfile_dl executable \
@@ -85,6 +86,7 @@ if {[gdb_compile ${srcdir}/${subdir}/${srcfile_dl} $binfile_dl executable \
 }
 
 # Build the program that loads *two* JIT libraries.
+set testfile_dl2 $testfile-dl2
 set binfile_dl2 $binfile-dl2
 set options [list debug shlib=${binfile_lib} shlib=${binfile_lib2}]
 if {[gdb_compile ${srcdir}/${subdir}/${srcfile_dl} $binfile_dl2 executable \
