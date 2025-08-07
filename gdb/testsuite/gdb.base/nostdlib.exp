@@ -14,6 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 standard_testfile .c
+set testfile_base $testfile
+set binfile_base $binfile
 
 # If we're using a stub, breakpoints at the entry point will not trigger.
 # See also the comment in break-entry.exp.
@@ -31,7 +33,8 @@ foreach_with_prefix pie { "nopie" "pie" } {
     # OPTS and BINFILE are used by the COMPILE string (defined above)
     # when it is evaluated below.
     set opts [list debug additional_flags=-nostdlib $pie]
-    set binfile [standard_output_file $testfile-$pie]
+    set testfile $testfile_base-$pie
+    set binfile $binfile_base-$pie
 
     set board [target_info name]
     if [board_info $board exists mathlib] {

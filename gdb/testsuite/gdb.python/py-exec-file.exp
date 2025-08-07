@@ -19,8 +19,10 @@ load_lib gdb-python.exp
 
 standard_testfile
 
-set binfile1 ${binfile}-a
-set binfile2 ${binfile}-b
+set testfile1 $testfile-a
+set binfile1 [standard_output_file $testfile1]
+set testfile2 $testfile-b
+set binfile2 [standard_output_file $testfile2]
 
 if {[build_executable "failed to prepare first executable" \
 	 $binfile1 $srcfile]} {

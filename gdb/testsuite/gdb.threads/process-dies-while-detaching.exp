@@ -43,6 +43,7 @@
 # threads are reaped.  We test that as well.
 
 standard_testfile
+set testfile_base $testfile
 
 # Test that GDBserver exits.
 
@@ -334,14 +335,15 @@ proc do_test {multi_process cmd} {
 	return
     }
 
-    set binfile [standard_output_file ${testfile}-$multi_process-$cmd]
+    set testfile $::testfile_base-$multi_process-$cmd
+    set binfile [standard_output_file $testfile]
     set options {debug pthreads}
     if {$multi_process} {
 	lappend options "additional_flags=-DMULTIPROCESS"
     }
 
     if {[build_executable "failed to build" \
-	     $testfile-$multi_process-$cmd $srcfile $options] == -1} {
+	     $testfile $srcfile $options] == -1} {
 	return -1
     }
 

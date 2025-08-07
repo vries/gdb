@@ -23,6 +23,9 @@ if [target_info exists gdb,cannot_call_functions] {
     continue
 }
 
+standard_testfile infcall-nested-structs.c
+set testfile_base $testfile
+
 set int_types { tc ts ti tl tll }
 set float_types { tf td tld }
 set complex_types { tfc tdc tldc }
@@ -61,19 +64,19 @@ proc start_nested_structs_test { lang types } {
     global srcdir
     global compile_flags
 
-    standard_testfile infcall-nested-structs.c
-
     # Create the additional flags
     set flags $compile_flags
     lappend flags $lang
     lappend flags "additional_flags=-O2"
 
+    set testfile $::testfile_base
     for {set n 0} {$n<[llength ${types}]} {incr n} {
 	set m [I2A ${n}]
 	set t [lindex ${types} $n]
 	lappend flags "additional_flags=-Dt${m}=${t}"
 	append testfile "-" "$t"
     }
+    set binfile [standard_output_file $testfile]
 
     if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable "${flags}"] != "" } {
 	unresolved "failed to compile"
@@ -81,7 +84,7 @@ proc start_nested_structs_test { lang types } {
     }
 
     # Start with a fresh gdb.
-    clean_restart ${::testfile}
+    clean_restart $::testfile
 
     # Make certain that the output is consistent
     gdb_test_no_output "set print sevenbit-strings"

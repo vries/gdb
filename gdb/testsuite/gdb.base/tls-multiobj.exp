@@ -16,6 +16,7 @@
 source $srcdir/$subdir/tls-common.exp.tcl
 
 standard_testfile
+set testfile_base $testfile
 
 set lib1src "${srcdir}/${subdir}/${testfile}1.c"
 set lib2src "${srcdir}/${subdir}/${testfile}2.c"
@@ -192,10 +193,10 @@ if {[istarget *-*-linux*]
     set do_kfail_tls_access 0
 }
 
-set binprefix $binfile
 
 with_test_prefix "default" {
-    set binfile $binprefix-default
+    set testfile $testfile_base-default
+    set binfile [standard_output_file $testfile]
     if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable \
 			[list debug shlib=${lib1obj} \
 				    shlib=${lib2obj} \
@@ -216,7 +217,8 @@ with_test_prefix "default" {
 }
 
 with_test_prefix "pthreads" {
-    set binfile $binprefix-pthreads
+    set testfile $testfile_base-pthreads
+    set binfile [standard_output_file $testfile]
     if	{ [gdb_compile_pthreads "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable \
 				 [list debug shlib=${lib1obj} \
 					     shlib=${lib2obj} \
