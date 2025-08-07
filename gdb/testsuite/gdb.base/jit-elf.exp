@@ -23,7 +23,8 @@ set test_verbose 0
 # The main code that loads and registers JIT objects.
 set main_basename "jit-elf-main"
 set main_srcfile ${srcdir}/${subdir}/${main_basename}.c
-set main_binfile [standard_output_file ${main_basename}]
+set main_testfile $main_basename
+set main_binfile [standard_output_file $main_testfile]
 
 # The shared library that gets loaded as JIT objects.
 set jit_solib_basename jit-elf-solib
@@ -48,7 +49,7 @@ proc clean_reattach {} {
     gdb_test_no_output "set var wait_for_gdb = 1"
     gdb_test "detach" "Detaching from .*"
 
-    clean_restart ${main_binfile}
+    clean_restart $::main_testfile
 
     if { ![gdb_attach $testpid \
 	      -pattern "main.*at .*$::main_basename.c:.*"] } {
@@ -84,7 +85,7 @@ proc one_jit_test {jit_solibs_target match_str reattach} {
 	global test_verbose
 	global main_binfile main_srcfile
 
-	clean_restart ${main_binfile}
+	clean_restart $::main_testfile
 
 	# This is just to help debugging when things fail
 	if {$test_verbose > 0} {

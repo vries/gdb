@@ -99,7 +99,8 @@ if { ![gdb_can_simple_compile static-pie-static-libc \
 # Main program file names and flags:
 set main_basename ${::gdb_test_file_name}-main
 set srcfile_main ${srcdir}/${subdir}/${main_basename}.c
-set binfile_main [standard_output_file ${main_basename}]
+set testfile_main $main_basename
+set binfile_main [standard_output_file $testfile_main]
 set main_flags [list debug additional_flags="-Wl,--dynamic-linker=${binfile_rtld}"]
 
 # Compile pretend RTLD:
@@ -114,7 +115,7 @@ if { [gdb_compile ${srcfile_main} ${binfile_main} executable $main_flags] != "" 
     return -1
 }
 
-clean_restart ${binfile_main}
+clean_restart $testfile_main
 
 if {![runto_main]} {
     return 0

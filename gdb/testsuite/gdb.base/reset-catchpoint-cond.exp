@@ -28,6 +28,7 @@
 # should work correctly.
 
 standard_testfile .c -lib.c
+set testfile_base $testfile
 
 set libfile $binfile-lib.so
 
@@ -66,16 +67,17 @@ proc check_modified_bp_list { testname bp_num } {
 # Build an executable and run tests on 'catch MODE'.
 
 proc run_test { mode } {
-    set exec_name ${::binfile}-${mode}
+    set testfile $::testfile_base-$mode
+    set binfile [standard_output_file $testfile]
 
     set macro TEST_[string toupper $mode]
 
-    if {[build_executable "build test executable" $exec_name $::srcfile \
+    if {[build_executable "build test executable" $binfile $::srcfile \
 	     [list debug shlib=$::libfile additional_flags=-D${macro}]] == -1} {
 	return
     }
 
-    clean_restart $exec_name
+    clean_restart $testfile
     gdb_load_shlib $::libfile
 
     if {![runto_main]} {
