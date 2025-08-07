@@ -214,8 +214,10 @@ gdb_test "python print (t\[0\].symtab)" "${py_symbol_c}" "get symtab"
 # C++ tests
 # Recompile binary.
 lappend opts c++
-if {[prepare_for_testing "failed to prepare" "${binfile}-cxx" \
-	 [list $srcfile $srcfile2] $opts]} {
+set testfile $testfile-cxx
+set binfile [standard_output_file $testfile]
+if { [prepare_for_testing "failed to prepare" $testfile \
+	  [list $srcfile $srcfile2] $opts] } {
     return -1
 }
 

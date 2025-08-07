@@ -35,6 +35,7 @@
 # anything target remote specific, so let it run on all targets.
 
 standard_testfile
+set testfile_base $testfile
 
 # The allow_hw_watchpoint_tests starts GDB on a small test program to
 # check if HW watchpoints are supported.  We do not want to restart
@@ -159,9 +160,11 @@ foreach_with_prefix pie { "nopie" "pie" } {
     set opts {debug}
     lappend opts $pie
 
-    set binfile [standard_output_file $testfile-$pie]
+    set testfile $testfile_base-$pie
+    set binfile [standard_output_file $testfile]
 
-    if {[prepare_for_testing "failed to prepare" $binfile $srcfile $opts]} {
+    if { [prepare_for_testing "failed to prepare" $testfile $srcfile \
+	      $opts] } {
 	continue
     }
 

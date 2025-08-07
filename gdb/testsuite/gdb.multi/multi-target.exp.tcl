@@ -184,7 +184,7 @@ proc multi_target_prepare {} {
 	return 0
     }
 
-    if { [prepare_for_testing "failed to prepare" ${binfile} "${srcfile}" \
+    if { [prepare_for_testing "failed to prepare" $::testfile $srcfile \
 	      {debug pthreads}] } {
 	return 0
     }

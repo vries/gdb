@@ -69,14 +69,15 @@ standard_testfile -1.c -2.c -3.c
 # shared library, then use GDB to figure out the offset of the
 # variable 'library_ptr' within the library.
 set library_filename [standard_output_file "libfoo.so"]
-set binfile2 [standard_output_file "library_loader"]
+set testfile2 "library_loader"
+set binfile2 [standard_output_file $testfile2]
 
 if {[prepare_for_testing_full "build exec which loads the shared library" \
 	 [list $library_filename \
 	      { debug shlib build-id \
 		    additional_flags=-DPOINTER_VALUE=0x12345678 } \
 	      $srcfile2 {}] \
-	 [list $binfile2 [list debug shlib=$library_filename ] \
+	 [list $testfile2 [list debug shlib=$library_filename ] \
 	      $srcfile { debug }]] != 0} {
     return
 }
@@ -160,7 +161,7 @@ if { $ptr_expected_value eq "" } {
 # Load this executable within GDB and confirm that we can use the
 # offset we calculated previously to view the value of 'library_ptr'.
 set opts [list debug additional_flags=-DSHLIB_FILENAME=\"$library_filename\"]
-if {[prepare_for_testing "prepare second executable" $binfile \
+if {[prepare_for_testing "prepare second executable" $testfile \
 	 $srcfile3 $opts] != 0} {
     return
 }
