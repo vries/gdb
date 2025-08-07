@@ -22,7 +22,7 @@ set additional_flags [gdb_target_symbol_prefix_flags]
 require gdb_trace_common_supports_arch
 
 with_test_prefix "runtime trace support check" {
-    if { [prepare_for_testing "prepare for testing" ${binfile} $srcfile \
+    if { [prepare_for_testing "prepare for testing" $testfile $srcfile \
 	      [list debug pthreads $additional_flags]] } {
 	return
     }
@@ -108,8 +108,9 @@ set libipa [get_in_proc_agent]
 set remote_libipa [gdb_load_shlib $libipa]
 
 # Compile test case again with IPA.
-set binfile_ipa ${binfile}-ipa
-if { [prepare_for_testing "prepare for testing" $binfile_ipa $srcfile \
+set testfile_ipa $testfile-ipa
+set binfile_ipa [standard_output_file $testfile_ipa]
+if { [prepare_for_testing "prepare for testing" $testfile_ipa $srcfile \
 	  [list debug pthreads $additional_flags shlib=$libipa]] } {
     return
 }

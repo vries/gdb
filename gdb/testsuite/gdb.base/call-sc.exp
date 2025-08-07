@@ -25,6 +25,7 @@
 require {!target_info exists gdb,cannot_call_functions}
 
 standard_testfile .c
+set testfile_base $testfile
 
 set allow_float_test [allow_float_test]
 
@@ -43,10 +44,11 @@ proc start_scalars_test { type } {
 
     # Create the additional flags
     set flags "debug additional_flags=-DT=${type}"
-    set testfile "call-sc-${type}"
 
+    set testfile "$::testfile_base-${type}"
     set binfile [standard_output_file ${testfile}]
-    if { [prepare_for_testing "failed to prepare" $binfile $srcfile $flags] } {
+
+    if { [prepare_for_testing "failed to prepare" $testfile $srcfile $flags] } {
 	return -1
     }
 
