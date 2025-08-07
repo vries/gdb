@@ -28,7 +28,7 @@ proc test { style } {
     global gdb_prompt binfile dp_location
 
     with_test_prefix "$style" {
-	clean_restart $binfile
+	clean_restart $::testfile
 
 	if ![runto_main] {
 	    return -1

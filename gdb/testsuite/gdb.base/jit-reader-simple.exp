@@ -103,9 +103,9 @@ proc jit_test_reread {standalone change_addr} {
 
     with_test_prefix "initial run" {
 	if {$standalone} {
-	    clean_restart $binfile
+	    clean_restart $::testfile
 	} else {
-	    clean_restart $binfile_dl
+	    clean_restart $::testfile_dl
 	}
 
 	runto_main
@@ -175,7 +175,7 @@ foreach standalone {1 0} {
 # see JIT breakpoints defined for both.
 
 with_test_prefix "two JITers" {
-    clean_restart $binfile_dl2
+    clean_restart $::testfile_dl2
 
     if {![runto_main]} {
 	return -1

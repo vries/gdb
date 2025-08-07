@@ -233,7 +233,7 @@ proc bitfield_set {} {
     }
 }
 
-clean_restart ${binfile}
+clean_restart ${::testfile}
 
 gdb_test_no_output "set print sevenbit-strings"
 runto_main

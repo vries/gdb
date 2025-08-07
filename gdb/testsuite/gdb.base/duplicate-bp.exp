@@ -24,7 +24,7 @@ proc test_setup { count } {
     global srcfile
     global binfile
 
-    clean_restart ${binfile}
+    clean_restart ${::testfile}
 
     if {![runto_main]} {
 	return 0

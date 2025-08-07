@@ -51,7 +51,7 @@ if { [is_remote target] } {
 # error, behave as "return", so we don't try to continue testing with
 # a borked session.
 proc setup_gdb { binfile srcfile } {
-    clean_restart $binfile
+    clean_restart $::testfile
 
     if ![runto_main] {
 	return -code return
