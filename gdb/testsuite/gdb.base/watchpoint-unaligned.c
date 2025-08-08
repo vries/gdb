@@ -55,6 +55,26 @@ write_size8twice (void)
 #endif
 }
 
+static void
+read_size8twice (void)
+{
+  volatile uint64_t first = 1;
+  volatile uint64_t second = 2;
+
+#ifdef __aarch64__
+  volatile void *p = &data.u.size8twice[offset];
+  asm volatile ("ldp %0, %1, [%2]"
+                : "=r" (first), "=r" (second) /* output */
+                : "r" (p)  /* input */
+                : /* clobber */);
+#else
+  first = data.u.size8twice[offset];
+  second = data.u.size8twice[offset + 1];
+#endif
+
+  return; /* final_return read_size8twice */
+}
+
 int
 main (void)
 {
@@ -63,6 +83,8 @@ main (void)
   assert (sizeof (data) == 8 + 3 * 8);
 
   write_size8twice ();
+
+  read_size8twice ();
 
   while (size)
     {

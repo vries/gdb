@@ -204,3 +204,58 @@ foreach_with_prefix offset { 0 1 } {
 	}
     }
 }
+
+proc_with_prefix read_size8twice { offset index } {
+    clean_restart $::testfile
+
+    if { ![runto read_size8twice] } {
+	return -1
+    }
+
+    gdb_test_no_output "set var offset = $offset"
+    gdb_breakpoint [gdb_get_line_number "final_return read_size8twice"] \
+	"Breakpoint $::decimal at $::hex" "final_return"
+
+    set watch_index [expr $offset + $index]
+    set test "rwatch data.u.size8twice\[$watch_index\]"
+    set wpnum 0
+    gdb_test_multiple $test $test {
+	-re -wrap "Hardware read watchpoint (\[0-9\]+): .*" {
+	    set wpnum $expect_out(1,string)
+	    pass $gdb_test_name
+	}
+	-re -wrap "Watchpoint (\[0-9\]+): .*" {
+	    if {[istarget "arm*-*-*"]} {
+		untested $gdb_test_name
+	    } else {
+		fail $gdb_test_name
+	    }
+	}
+    }
+
+    if {! $wpnum} {
+	return
+    }
+
+    set test "continue"
+    set got_hit 0
+    gdb_test_multiple $test $test {
+	-re -wrap "\r\nCould not insert hardware watchpoint .*" {
+	}
+	-re -wrap "Hardware read watchpoint $wpnum:.*Value = .*" {
+	    set got_hit 1
+	    send_gdb "continue\n"
+	    exp_continue
+	}
+	-re -wrap " final_return .*" {
+	}
+    }
+
+    gdb_assert $got_hit "read8twice read"
+}
+
+foreach_with_prefix offset { 0 1 } {
+    foreach_with_prefix index { 0 1 } {
+	read_size8twice $offset $index
+    }
+}

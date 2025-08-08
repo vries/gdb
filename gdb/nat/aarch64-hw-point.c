@@ -713,7 +713,7 @@ aarch64_stopped_data_address (const struct aarch64_debug_reg_state *state,
 	   RK3399 SOC). But it also can be p (observed on M1 SOC).  Checking
 	   for this situation introduces the possibility of false positives,
 	   so we only do this for hw_write watchpoints.  */
-	const CORE_ADDR max_access_size = type == hw_write ? 16 : 8;
+	const CORE_ADDR max_access_size = 16;
 	const CORE_ADDR addr_watch_base = addr_watch_aligned -
 	  (max_access_size - AARCH64_HWP_MAX_LEN_PER_REG);
 	if (!(addr_trap >= addr_watch_base
