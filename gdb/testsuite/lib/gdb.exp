@@ -10009,6 +10009,10 @@ proc multi_line { args } {
 # match GDB output, this one is meant to be used to build strings to
 # send as GDB input.
 
+proc multi_line_output { args } {
+    return [join $args "\r\r\n"]
+}
+
 proc multi_line_input { args } {
     return [join $args "\n"]
 }
