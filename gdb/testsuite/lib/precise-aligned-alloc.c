@@ -48,7 +48,13 @@ precise_aligned_alloc (size_t alignment, size_t size, void **free_pointer)
   size_t alloc_size = size + alignment;
 
   /* Align extra, to be able to do precise align.  */
-  void *p = aligned_alloc (alignment * 2, alloc_size);
+  void *p;
+#if __MINGW32__
+  p = __mingw_aligned_malloc (alloc_size, alignment * 2);
+#else
+  p = aligned_alloc (alignment * 2, alloc_size);
+#endif
+
   assert (p != NULL);
   void *p_orig = p;
   void *p_end = p + alloc_size;
