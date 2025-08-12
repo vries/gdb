@@ -2611,6 +2611,7 @@ proc gdb_file_cmd { arg {kill_flag 1} } {
 	}
     }
 
+    set arg [host_file_normalize $arg]
     send_gdb "file $arg\n"
     set new_symbol_table 0
     set basename [file tail $arg]
