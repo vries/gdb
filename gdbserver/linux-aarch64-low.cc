@@ -548,6 +548,16 @@ aarch64_remove_non_address_bits (CORE_ADDR pointer)
   return aarch64_remove_top_bits (pointer, mask);
 }
 
+extern unsigned int aarch64_load_store_access_size (uint32_t insn);
+
+unsigned int
+aarch64_load_store_access_size (uint32_t insn)
+{
+  /* GDBserver doesn't link against libopcodes.  See aarch64-tdep.c for a
+     working version.  */
+  return 0;
+}
+
 /* Implementation of linux target ops method "low_stopped_data_address".  */
 
 CORE_ADDR

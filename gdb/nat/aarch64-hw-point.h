@@ -116,7 +116,8 @@ enum target_hw_bp_type aarch64_watchpoint_type (unsigned int ctrl);
    *ADDR_P.  */
 
 bool aarch64_stopped_data_address (const struct aarch64_debug_reg_state *state,
-				   CORE_ADDR addr_trap, CORE_ADDR *addr_p);
+				   CORE_ADDR addr_trap, CORE_ADDR *addr_p,
+				   uint32_t insn = 0);
 
 int aarch64_handle_breakpoint (enum target_hw_bp_type type, CORE_ADDR addr,
 			       int len, int is_insert, ptid_t ptid,

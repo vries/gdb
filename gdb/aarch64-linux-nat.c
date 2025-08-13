@@ -945,9 +945,14 @@ aarch64_linux_nat_target::stopped_data_address (CORE_ADDR *addr_p)
   const CORE_ADDR addr_trap
     = aarch64_remove_non_address_bits (gdbarch, (CORE_ADDR) siginfo.si_addr);
 
+  struct regcache *regs = get_thread_regcache (this, inferior_ptid);
+  CORE_ADDR trigger_pc = regcache_read_pc (regs);
+  uint32_t insn;
+  read_memory (trigger_pc, (gdb_byte *) &insn, 4);
+
   /* Check if the address matches any watched address.  */
   state = aarch64_get_debug_reg_state (inferior_ptid.pid ());
-  return aarch64_stopped_data_address (state, addr_trap, addr_p);
+  return aarch64_stopped_data_address (state, addr_trap, addr_p, insn);
 }
 
 /* Implement the "stopped_by_watchpoint" target_ops method.  */
