@@ -296,6 +296,38 @@ aarch64_frame_unmask_lr (aarch64_gdbarch_tdep *tdep,
   return addr;
 }
 
+extern unsigned int aarch64_load_store_access_size (uint32_t insn);
+
+unsigned int
+aarch64_load_store_access_size (uint32_t insn)
+{
+  if (insn == 0)
+    return 0;
+
+  aarch64_inst inst;
+  if (aarch64_decode_insn (insn, &inst, true, NULL) != 0)
+    return 0;
+
+  switch (inst.opcode->iclass)
+    {
+    case ldst_immpost:
+    case ldst_immpre:
+    case ldst_imm9:
+    case ldst_imm10:
+    case ldst_pos:
+    case ldst_regoff:
+    case ldst_unpriv:
+    case ldst_unscaled:
+    case ldstexcl:
+    case ldstnapair_offs:
+    case ldstpair_off:
+    case ldstpair_indexed:
+      return calc_ldst_datasize (inst.operands);
+    default:
+      return 0;
+    }
+}
+
 /* Implement the "get_pc_address_flags" gdbarch method.  */
 
 static std::string

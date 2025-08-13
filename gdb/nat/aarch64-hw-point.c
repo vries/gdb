@@ -18,6 +18,8 @@
 #include "gdbsupport/break-common.h"
 #include "gdbsupport/common-regcache.h"
 #include "aarch64-hw-point.h"
+#include <algorithm>
+#include "arch/aarch64-insn.h"
 
 #ifdef __linux__
 /* For kernel_supports_any_contiguous_range.  */
@@ -646,11 +648,14 @@ aarch64_region_ok_for_watchpoint (CORE_ADDR addr, int len)
   return 1;
 }
 
+extern unsigned int aarch64_load_store_access_size (uint32_t insn);
+
 /* See nat/aarch64-hw-point.h.  */
 
 bool
 aarch64_stopped_data_address (const struct aarch64_debug_reg_state *state,
-			      CORE_ADDR addr_trap, CORE_ADDR *addr_p)
+			      CORE_ADDR addr_trap, CORE_ADDR *addr_p,
+			      uint32_t insn)
 {
   bool found = false;
   for (int phase = 0; phase <= 1; ++phase)
@@ -711,7 +716,13 @@ aarch64_stopped_data_address (const struct aarch64_debug_reg_state *state,
 	   So, if we use stp to store to address p, and set a watchpoint on
 	   address p + 8, the reported ADDR_TRAP can be p + 8 (observed on
 	   RK3399 SOC). But it also can be p (observed on M1 SOC).  */
-	const CORE_ADDR max_access_size = 16;
+	const CORE_ADDR default_max_access_size = 16;
+	const unsigned int insn_access_size
+	  = aarch64_load_store_access_size (insn);
+	const CORE_ADDR max_access_size
+	  = (insn_access_size == 0
+	     ? default_max_access_size
+	     : std::max (insn_access_size, 8U));
 	const CORE_ADDR addr_watch_base = addr_watch_aligned -
 	  (max_access_size - AARCH64_HWP_MAX_LEN_PER_REG);
 	if (!(addr_trap >= addr_watch_base

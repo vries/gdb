@@ -1,0 +1,83 @@
+# Copyright (C) 2025 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+require allow_hw_watchpoint_tests
+
+standard_testfile
+
+if { [build_executable $testfile.exp $testfile $srcfile] } {
+    return
+}
+
+proc do_test { offset addr_order wp_order } {
+    clean_restart $::testfile
+
+    if { ![runto_main] } {
+	return
+    }
+
+    gdb_test "set breakpoint always-inserted on"
+
+    gdb_test "set var offset = $offset"
+
+    if { $addr_order } {
+	# Offset after.
+	set offset1 $offset
+	set offset2 [expr $offset + 1]
+    } else {
+	# Offset before.
+	set offset1 [expr $offset - 1]
+	set offset2 $offset
+    }
+
+    if { $wp_order } {
+	lassign [list $offset1 $offset2] offset2 offset1
+    }
+
+    set wpnum1 0
+    gdb_test_multiple "rwatch a\[$offset1\]" "" {
+	-re -wrap "Hardware read watchpoint ($::decimal):.*" {
+	    set wpnum1 $expect_out(1,string)
+	}
+    }
+
+    set wpnum2 0
+    gdb_test_multiple "rwatch a\[$offset2\]" "" {
+	-re -wrap "Hardware read watchpoint ($::decimal):.*" {
+	    set wpnum2 $expect_out(1,string)
+	}
+    }
+
+    set triggered 0
+    gdb_test_multiple "continue" "" {
+	-re -wrap "Hardware read watchpoint ($::decimal):.*" {
+	    set triggered $expect_out(1,string)
+	}
+    }
+
+    if { $triggered == $wpnum1 } {
+	gdb_assert { $offset == $offset1 }
+    } elseif { $triggered == $wpnum2 } {
+	gdb_assert { $offset == $offset2 }
+    }
+}
+
+foreach_with_prefix offset { 1 2 } {
+    foreach_with_prefix addr_order { 0 1 } {
+	foreach_with_prefix wp_order { 0 1 } {
+	    do_test $offset $addr_order $wp_order
+	}
+    }
+}
