@@ -1750,24 +1750,36 @@ check_za_access (const aarch64_opnd_info *opnd,
   return true;
 }
 
-/* Given a load/store operation, calculate the size of transferred data via a
-   cumulative sum of qualifier sizes preceding the address operand in the
-   OPNDS operand list argument.  */
+/* Given a load/store operation, calculate the size of transferred data.  */
+
 int
 calc_ldst_datasize (const aarch64_opnd_info *opnds)
 {
-  unsigned num_bytes = 0; /* total number of bytes transferred.  */
-  enum aarch64_operand_class opnd_class;
-  enum aarch64_opnd type;
+  int addr_opnd = -1;
 
   for (int i = 0; i < AARCH64_MAX_OPND_NUM; i++)
     {
-      type = opnds[i].type;
-      opnd_class = aarch64_operands[type].op_class;
+      enum aarch64_opnd opnd_type = opnds[i].type;
+      enum aarch64_operand_class opnd_class
+	= aarch64_operands[opnd_type].op_class;
       if (opnd_class == AARCH64_OPND_CLASS_ADDRESS)
-	break;
-      num_bytes += aarch64_get_qualifier_esize (opnds[i].qualifier);
+	{
+	  addr_opnd = i;
+	  break;
+	}
     }
+
+  if (addr_opnd == -1)
+    return 0;
+
+  enum aarch64_opnd_qualifier addr_opnd_qualifier
+    = opnds[addr_opnd].qualifier;
+  if (operand_variant_qualifier_p (addr_opnd_qualifier))
+    return addr_opnd * aarch64_get_qualifier_esize (addr_opnd_qualifier);
+
+  unsigned num_bytes = 0; /* total number of bytes transferred.  */
+  for (int i = 0; i < addr_opnd; i++)
+    num_bytes += aarch64_get_qualifier_esize (opnds[i].qualifier);
   return num_bytes;
 }
 

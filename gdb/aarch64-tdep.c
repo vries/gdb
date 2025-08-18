@@ -4914,6 +4914,49 @@ static void aarch64_process_record_test (void);
 }
 #endif
 
+#if GDB_SELF_TEST
+namespace selftests {
+
+static void
+aarch64_insn_analysis (void)
+{
+  uint32_t insn;
+  aarch64_inst inst;
+
+  /* 0x39000001 == strb w1, [x0].  */
+  insn = 0x39000001;
+  SELF_CHECK (aarch64_decode_insn (insn, &inst, true, NULL) == 0);
+  SELF_CHECK (calc_ldst_datasize (inst.operands) == 1);
+
+  /* 0xa8c17bfd == ldp x29, x30, [sp], #16.  */
+  insn = 0xa8c17bfd;
+  SELF_CHECK (aarch64_decode_insn (insn, &inst, true, NULL) == 0);
+  SELF_CHECK (calc_ldst_datasize (inst.operands) == 16);
+
+  /* 0xa9bf7bf0 == stp x16, x30, [sp, #-16]!.  */
+  insn = 0xa9bf7bf0;
+  SELF_CHECK (aarch64_decode_insn (insn, &inst, true, NULL) == 0);
+  SELF_CHECK (calc_ldst_datasize (inst.operands) == 16);
+
+  /* 0x0d4187e1 == ldap1 {v1.d}[0], [sp].  */
+  insn = 0x0d4187e1;
+  SELF_CHECK (aarch64_decode_insn (insn, &inst, true, NULL) == 0);
+  SELF_CHECK (calc_ldst_datasize (inst.operands) == 8);
+
+  /* 0xd9011860 == stilp x0, x1, [x3].  */
+  insn = 0xd9011860;
+  SELF_CHECK (aarch64_decode_insn (insn, &inst, true, NULL) == 0);
+  SELF_CHECK (calc_ldst_datasize (inst.operands) == 16);
+
+  /* 0x52800000 == mov w0, #0x0.  */
+  insn = 0x52800000;
+  SELF_CHECK (aarch64_decode_insn (insn, &inst, true, NULL) == 0);
+  SELF_CHECK (calc_ldst_datasize (inst.operands) == 0);
+}
+
+}
+#endif
+
 INIT_GDB_FILE (aarch64_tdep)
 {
   gdbarch_register (bfd_arch_aarch64, aarch64_gdbarch_init,
@@ -4933,6 +4976,8 @@ When on, AArch64 specific debugging is enabled."),
 			    selftests::aarch64_analyze_prologue_test);
   selftests::register_test ("aarch64-process-record",
 			    selftests::aarch64_process_record_test);
+  selftests::register_test ("aarch64-insn-analysis",
+			    selftests::aarch64_insn_analysis);
 #endif
 }
 
