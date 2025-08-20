@@ -1420,14 +1420,33 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
       cu_index = extract_unsigned_integer (iter, 4, BFD_ENDIAN_LITTLE);
       iter += 4;
 
-      if (lo >= hi)
+      bool valid_range_p = lo < hi;
+      bool valid_index_p = cu_index < index->units.size ();
+
+      /* Variable hi is the exclusive upper bound, get the inclusive one.  */
+      CORE_ADDR hi_m1 = (valid_range_p
+			 ? hi - 1
+			 : 0);
+
+      if (valid_range_p)
+	{
+	  CORE_ADDR relocated_lo
+	    = per_objfile->relocate (unrelocated_addr (lo));
+	  CORE_ADDR relocated_hi_m1
+	    = per_objfile->relocate (unrelocated_addr (hi_m1));
+	  struct obj_section *lo_sect = find_pc_section (relocated_lo);
+	  struct obj_section *hi_sect = find_pc_section (relocated_hi_m1);
+	  valid_range_p = lo_sect != nullptr && hi_sect != nullptr;
+	}
+
+      if (!valid_range_p)
 	{
 	  complaint (_(".gdb_index address table has invalid range (%s - %s)"),
 		     hex_string (lo), hex_string (hi));
 	  return false;
 	}
 
-      if (cu_index >= index->units.size ())
+      if (!valid_index_p)
 	{
 	  complaint (_(".gdb_index address table has invalid CU number %u"),
 		     (unsigned) cu_index);
@@ -1435,7 +1454,7 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
 	}
 
       bool full_range_p
-	= mutable_map.set_empty (lo, hi - 1, index->units[cu_index]);
+	= mutable_map.set_empty (lo, hi_m1, index->units[cu_index]);
       if (!full_range_p)
 	{
 	  complaint (_(".gdb_index address table has a range (%s - %s) that"
