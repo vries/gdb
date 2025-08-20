@@ -1441,15 +1441,17 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
 
       if (!valid_range_p)
 	{
-	  complaint (_(".gdb_index address table has invalid range (%s - %s)"),
-		     hex_string (lo), hex_string (hi));
+	  warning (_(".gdb_index address table has invalid range (%s - %s),"
+		     " ignoring .gdb_index"),
+		   hex_string (lo), hex_string (hi));
 	  return false;
 	}
 
       if (!valid_index_p)
 	{
-	  complaint (_(".gdb_index address table has invalid CU number %u"),
-		     (unsigned) cu_index);
+	  warning (_(".gdb_index address table has invalid CU number %u,"
+		     " ignoring .gdb_index"),
+		   (unsigned) cu_index);
 	  return false;
 	}
 
@@ -1457,8 +1459,8 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
 	= mutable_map.set_empty (lo, hi_m1, index->units[cu_index]);
       if (!full_range_p)
 	{
-	  complaint (_(".gdb_index address table has a range (%s - %s) that"
-		       " overlaps with an earlier range"),
+	  warning (_(".gdb_index address table has a range (%s - %s) that"
+		     " overlaps with an earlier range, ignoring .gdb_index"),
 		     hex_string (lo), hex_string (hi));
 	  return false;
 	}
