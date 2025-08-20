@@ -1422,15 +1422,17 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
       if (lo >= hi || find_pc_section (lo) == nullptr ||
 	  find_pc_section (hi -1) == nullptr)
 	{
-	  complaint (_(".gdb_index address table has invalid range (%s - %s)"),
-		     hex_string (lo), hex_string (hi));
+	  warning (_(".gdb_index address table has invalid range (%s - %s),"
+		     " ignoring .gdb_index"),
+		   hex_string (lo), hex_string (hi));
 	  return false;
 	}
 
       if (cu_index >= index->units.size ())
 	{
-	  complaint (_(".gdb_index address table has invalid CU number %u"),
-		     (unsigned) cu_index);
+	  warning (_(".gdb_index address table has invalid CU number %u,"
+		     " ignoring .gdb_index"),
+		   (unsigned) cu_index);
 	  return false;
 	}
 
