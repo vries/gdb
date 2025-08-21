@@ -1410,6 +1410,7 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
   iter = index->address_table.data ();
   end = iter + index->address_table.size ();
 
+  struct obj_section *current_section = nullptr;
   while (iter < end)
     {
       ULONGEST hi, lo, cu_index;
@@ -1430,12 +1431,31 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
 
       if (valid_range_p)
 	{
+	  struct obj_section *lo_sect = nullptr;
+	  struct obj_section *hi_sect = nullptr;
+
 	  CORE_ADDR relocated_lo
 	    = per_objfile->relocate (unrelocated_addr (lo));
 	  CORE_ADDR relocated_hi_m1
 	    = per_objfile->relocate (unrelocated_addr (hi_m1));
-	  struct obj_section *lo_sect = find_pc_section (relocated_lo);
-	  struct obj_section *hi_sect = find_pc_section (relocated_hi_m1);
+
+	  if (current_section != nullptr)
+	    {
+	      /* Avoid calling find_pc_section for each address.  */
+	      if (current_section->contains (relocated_lo))
+		lo_sect = current_section;
+	      if (current_section->contains (relocated_hi_m1))
+		hi_sect = current_section;
+	    }
+
+	  if (lo_sect == nullptr)
+	    lo_sect = find_pc_section (relocated_lo);
+	  if (hi_sect == nullptr)
+	    hi_sect = find_pc_section (relocated_hi_m1);
+
+	  /* Update current section.  */
+	  current_section = hi_sect;
+
 	  valid_range_p = lo_sect != nullptr && hi_sect != nullptr;
 	}
 
