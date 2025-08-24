@@ -1403,13 +1403,50 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
 			       mapped_gdb_index *index)
 {
   dwarf2_per_bfd *per_bfd = per_objfile->per_bfd;
-  const gdb_byte *iter, *end;
+  objfile *objfile = per_objfile->objfile;
 
   addrmap_mutable mutable_map;
 
+  /* Build an unrelocated address map of the sections in this objfile.  */
+  addrmap_mutable sect_map;
+  for (struct obj_section *s = objfile->sections_start;
+       s < objfile->sections_end; s++)
+    {
+      if (s->the_bfd_section == nullptr
+	  || s->addr_unrel () >= s->endaddr_unrel ())
+	continue;
+
+      CORE_ADDR start = CORE_ADDR (s->addr_unrel ());
+      CORE_ADDR end_inclusive = CORE_ADDR (s->endaddr_unrel ()) - 1;
+      sect_map.set_empty (start, end_inclusive, s);
+    }
+
+  auto find_section
+    = [&] (ULONGEST addr, struct obj_section *&cached_section)
+    {
+      if (cached_section != nullptr
+	  && cached_section->contains_unrel (unrelocated_addr (addr)))
+	return cached_section;
+
+      cached_section = (struct obj_section *) sect_map.find (addr);
+      return cached_section;
+    };
+
+  auto invalid_range_warning = [&] (ULONGEST lo, ULONGEST hi)
+    {
+      warning (_(".gdb_index address table has invalid range (%s - %s),"
+		 " ignoring .gdb_index"),
+	       hex_string (lo), hex_string (hi));
+      return false;
+    };
+
+  /* Cache the sections for possible re-use on the next entry.  */
+  struct obj_section *prev_lo_sect = nullptr;
+  struct obj_section *prev_hi_sect = nullptr;
+
+  const gdb_byte *iter, *end;
   iter = index->address_table.data ();
   end = iter + index->address_table.size ();
-
   while (iter < end)
     {
       ULONGEST hi, lo, cu_index;
@@ -1421,12 +1458,7 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
       iter += 4;
 
       if (lo >= hi)
-	{
-	  warning (_(".gdb_index address table has invalid range (%s - %s),"
-		     " ignoring .gdb_index"),
-		   hex_string (lo), hex_string (hi));
-	  return false;
-	}
+	return invalid_range_warning (lo, hi);
 
       if (cu_index >= index->units.size ())
 	{
@@ -1436,8 +1468,16 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
 	  return false;
 	}
 
+      /* Variable hi is the exclusive upper bound, get the inclusive one.  */
+      CORE_ADDR hi_m1 = hi - 1;
+
+      struct obj_section *lo_sect = find_section (lo, prev_lo_sect);
+      struct obj_section *hi_sect = find_section (hi_m1, prev_hi_sect);
+      if (lo_sect == nullptr || hi_sect == nullptr)
+	return invalid_range_warning (lo, hi);
+
       bool full_range_p
-	= mutable_map.set_empty (lo, hi - 1, index->units[cu_index]);
+	= mutable_map.set_empty (lo, hi_m1, index->units[cu_index]);
       if (!full_range_p)
 	{
 	  warning (_(".gdb_index address table has a range (%s - %s) that"
