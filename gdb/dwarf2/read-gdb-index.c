@@ -666,6 +666,13 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
       if (lo_sect == nullptr || hi_sect == nullptr)
 	return invalid_range_warning (lo, hi);
 
+      /* There may be valid corner-cases where the sections of lo and
+	 hi are different, so we do the best we can here: check for
+	 holes in between the sections.  */
+      if (lo_sect != hi_sect
+	  && objfile->hole_in_between_unrel (lo_sect, hi_sect))
+	return invalid_range_warning (lo, hi);
+
       bool full_range_p
 	= mutable_map.set_empty (lo, hi_incl, index->units[cu_index]);
       if (!full_range_p)

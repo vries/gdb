@@ -690,6 +690,10 @@ public:
 	     section_iterator (sections_end, sections_end)));
   }
 
+  /* Return true if there's a hole between sections A and B.  */
+
+  bool hole_in_between_unrel (struct obj_section *a, struct obj_section *b);
+
 public:
 
   /* The object file's original name as specified by the user,
