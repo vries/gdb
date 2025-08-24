@@ -624,13 +624,23 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
       return cached_section;
     };
 
-  auto invalid_range_warning = [&] (ULONGEST lo, ULONGEST hi)
-    {
-      warning (_(".gdb_index address table has invalid range (%s - %s),"
-		 " ignoring .gdb_index"),
-	       hex_string (lo), hex_string (hi));
-      return false;
-    };
+  auto invalid_range_warning
+    = [&] (ULONGEST lo, ULONGEST hi, const char *reason)
+      {
+	warning (_(".gdb_index address table has invalid range (%s - %s),"
+		   " ignoring .gdb_index: %s"),
+		 hex_string (lo), hex_string (hi), reason);
+	return false;
+      };
+
+  auto invalid_index_warning
+    = [&] (unsigned cu_index)
+      {
+	warning (_(".gdb_index address table has invalid CU number %u,"
+		   " ignoring .gdb_index"),
+		 cu_index);
+	return false;
+      };
 
   /* Cache the section for possible re-use on the next entry.  */
   struct obj_section *prev_sect = nullptr;
@@ -648,15 +658,10 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
       iter += 4;
 
       if (lo >= hi)
-	return invalid_range_warning (lo, hi);
+	return invalid_range_warning (lo, hi, _("empty range"));
 
       if (cu_index >= index->units.size ())
-	{
-	  warning (_(".gdb_index address table has invalid CU number %u,"
-		     " ignoring .gdb_index"),
-		   (unsigned) cu_index);
-	  return false;
-	}
+	return invalid_index_warning (cu_index);
 
       /* Variable hi is the exclusive upper bound, get the inclusive one.  */
       CORE_ADDR hi_incl = hi - 1;
@@ -664,24 +669,21 @@ create_addrmap_from_gdb_index (dwarf2_per_objfile *per_objfile,
       struct obj_section *lo_sect = find_section (lo, prev_sect);
       struct obj_section *hi_sect = find_section (hi_incl, prev_sect);
       if (lo_sect == nullptr || hi_sect == nullptr)
-	return invalid_range_warning (lo, hi);
+	return invalid_range_warning (lo, hi,
+				      _("starts or ends in section hole"));
 
       /* There may be valid corner-cases where the sections of lo and
 	 hi are different, so we do the best we can here: check for
 	 holes in between the sections.  */
       if (lo_sect != hi_sect
 	  && objfile->hole_in_between_unrel (lo_sect, hi_sect))
-	return invalid_range_warning (lo, hi);
+	return invalid_range_warning (lo, hi, _("contains section hole"));
 
       bool full_range_p
 	= mutable_map.set_empty (lo, hi_incl, index->units[cu_index]);
       if (!full_range_p)
-	{
-	  warning (_(".gdb_index address table has a range (%s - %s) that"
-		     " overlaps with an earlier range, ignoring .gdb_index"),
-		     hex_string (lo), hex_string (hi));
-	  return false;
-	}
+	return invalid_range_warning (lo, hi,
+				      _("overlaps with an earlier range"));
     }
 
   index->result.set_addrmap (std::move (mutable_map));
