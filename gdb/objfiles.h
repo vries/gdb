@@ -735,6 +735,11 @@ public:
 	     section_iterator (sections_end, sections_end)));
   }
 
+  /* Return TRIBOOL_TRUE if there's a hole between sections A and B.  Return
+     TRIBOOL_FALSE there's no hole.  Return TRIBOOL_UNKNOWN if unknown.  */
+
+  tribool hole_in_between_unrel (struct obj_section *a, struct obj_section *b);
+
 public:
 
   /* The object file's original name as specified by the user,

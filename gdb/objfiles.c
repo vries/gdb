@@ -1219,3 +1219,26 @@ objfile_int_type (struct objfile *of, int size_in_bytes, bool unsigned_p)
 
   gdb_assert_not_reached ("unable to find suitable integer type");
 }
+
+/* See objfiles.h.  */
+
+tribool
+objfile::hole_in_between_unrel (struct obj_section *a, struct obj_section *b)
+{
+  gdb_assert (sections_start <= a && a < b && b < sections_end);
+
+  bool found = false;
+  struct obj_section *prev, *s;
+  for (prev = nullptr, s = a; s <= b; prev = s, s++)
+    {
+      if (s->the_bfd_section == nullptr)
+	return TRIBOOL_UNKNOWN;
+
+      if (found || prev == nullptr)
+	continue;
+
+      found = prev->endaddr_unrel () < s->addr_unrel ();
+    }
+
+  return found ? TRIBOOL_TRUE : TRIBOOL_FALSE;
+}
