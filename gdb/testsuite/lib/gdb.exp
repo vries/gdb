@@ -2381,9 +2381,9 @@ proc host_file_normalize_mingw {filename unix_to_win} {
 	if {[string equal -length $mount_len $unix_filename $filename]} {
 	    if {[string length $filename] == $mount_len} {
 		return "$win_filename/"
-	    } elseif {[string index $filename $mount_len] eq "/"} {
+	    } elseif {[string index $filename [expr $mount_len - 1]] eq "/"} {
 		set rest [string range $filename $mount_len end]
-		return "$win_filename$rest"
+		return "$win_filename/$rest"
 	    }
 	}
     }
