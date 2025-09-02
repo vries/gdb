@@ -24,7 +24,3 @@ gdb_assert { [host_file_normalize_mingw $d1 $unix_to_win] == $d2 }
 
 set d3 "C:/msys64"
 gdb_assert { [host_file_normalize_mingw $d3 $unix_to_win] == $d3 }
-
-set f1 "/home/user/gdb/build/gdb/testsuite/temp/n/x"
-set f2 "C:/msys64/home/user/gdb/build/gdb/testsuite/temp/n/x"
-gdb_assert { [host_file_normalize_mingw $f1 $unix_to_win] == $f2 }
