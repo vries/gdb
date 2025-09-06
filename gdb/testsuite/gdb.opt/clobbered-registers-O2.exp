@@ -30,15 +30,58 @@ if {![runto start_sequence]} {
    return
 }
 
-gdb_test "frame 1" "#1.*in gen_movsd.*" "backtracing"
+proc do_test { var val } {
+    set re_dd [string cat [string_to_regexp {$}] $::decimal]
 
-gdb_test_multiple "print operand0" "print operand0" {
-    -re "\\\$$decimal = <optimized out>\r\n$gdb_prompt $" { pass "print operand0"}
-    -re "$hex\r\n$gdb_prompt $" { gdb_test "print *operand0" "13" "print operand0" }
+    set res 0
+    gdb_test_multiple "print /x $var" "" {
+	-re -wrap "$re_dd = <optimized out>" {
+	}
+	-re -wrap "$re_dd = $::hex" {
+	    set res 1
+	}
+	-re -wrap  "" {
+	}
+    }
+
+    if { !$res } {
+	return $res
+    }
+
+    set res 0
+    gdb_test_multiple "print *$var" "" {
+	-re -wrap "$re_dd = $val" {
+	    set res 1
+	}
+	-re -wrap  "" {
+	}
+    }
+
+    return $res
 }
 
-gdb_test_multiple "print operand1" "print operand1" {
-    -re "\\\$$decimal = <optimized out>\r\n$gdb_prompt $" { pass "print operand1"}
-    -re "$hex\r\n$gdb_prompt $" { gdb_test "print *operand1" "14" "print operand1" }
+gdb_test "finish" "0xdeadbeef"
+
+set res0 [do_test operand0 13]
+set res1 [do_test operand1 14]
+
+if {![runto start_sequence]} {
+   return
 }
 
+gdb_test "frame 1" "#1.*in gen_movsd.*" \
+    "backtracing"
+
+set test "print operand0"
+if { $res0 } {
+    gdb_assert { [do_test operand0 13] } $test
+} else {
+    unsupported $test
+}
+
+set test "print operand1"
+if { $res1 } {
+    gdb_assert { [do_test operand1 14] } $test
+} else {
+    unsupported $test
+}
