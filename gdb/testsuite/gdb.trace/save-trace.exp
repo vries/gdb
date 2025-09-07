@@ -128,7 +128,7 @@ proc gdb_verify_tracepoints { testname } {
     $result $testname
 
     gdb_test "show default-collect" \
-	"The list of expressions to collect by default is \"gdb_char_test, gdb_long_test - 100\"..*" \
+	{The list of expressions to collect by default is "gdb_char_test, gdb_long_test - 100"..*} \
 	"verify default-collect"
 }
 

@@ -204,7 +204,7 @@ proc test_change_search_directory_with_empty_dirname {} {
 
     # Arguments can be quoted.  Check a empty string has the same effect as
     # 'set directory' (i.e. reset to $cdir:$cwd)
-    gdb_test_no_output "set directories \"\""
+    gdb_test_no_output {set directories ""}
 
     with_test_prefix "directory_after_reset" {
 	gdb_test "show directories" \

@@ -93,12 +93,12 @@ proc test_gdb_complete_filename_multiple {
 	    # If ENTRY is quoted with double quotes, then any double
 	    # quotes within the entry need to be escaped.
 	    if { $end_quote_char eq "\"" } {
-		regsub -all "\"" $entry "\\\"" entry
+		regsub -all {"} $entry "\\\"" entry
 	    }
 
 	    if { $end_quote_char eq "" } {
 		regsub -all " " $entry "\\ " entry
-		regsub -all "\"" $entry "\\\"" entry
+		regsub -all {"} $entry "\\\"" entry
 		regsub -all "'" $entry "\\'" entry
 	    }
 
@@ -282,7 +282,7 @@ proc run_quoting_and_escaping_tests_1 { root cmd } {
 	}
 
 	if { $qc eq "'" } {
-	    set dq "\""
+	    set dq {"}
 	} else {
 	    set dq "\\\""
 	}
@@ -315,7 +315,7 @@ proc run_quoting_and_escaping_tests_1 { root cmd } {
 
 	test_gdb_complete_filename_multiple "$cmd ${qc}${root}/bb1/" \
 	    "a" "a" {
-		"aa\"bb"
+		{aa"bb}
 		"aa'bb"
 	    } "" "${qc}" false \
 	    "expand filenames containing quotes"

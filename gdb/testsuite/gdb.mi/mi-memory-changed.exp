@@ -46,7 +46,7 @@ mi_gdb_test "-var-assign var_c 5" \
     "-var-assign var_c 5\r\n\\^done,value=\"5\"" \
     "change C through. varobj"
 
-mi_gdb_test  "-data-write-memory-bytes &C \"00\"" \
+mi_gdb_test  {-data-write-memory-bytes &C "00"} \
     {\^done} \
     "change C through. -data-write-memory-bytes"
 

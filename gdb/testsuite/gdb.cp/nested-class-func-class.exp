@@ -43,5 +43,5 @@ gdb_continue_to_breakpoint "BP 2"
 
 with_test_prefix "BP 2" {
     gdb_test "ptype F1::F2" "There is no field named F2"
-    gdb_test "ptype F2" "No symbol \"F2\" in current context."
+    gdb_test "ptype F2" {No symbol "F2" in current context.}
 }

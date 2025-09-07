@@ -71,9 +71,9 @@ with_test_prefix "errors" {
 
     # Try ambiguous command.
     gdb_test "alias wrong = a" \
-	"Ambiguous command \"a\":.*" "ambiguous a"
+	{Ambiguous command "a":.*} "ambiguous a"
     gdb_test "alias wrong = frame a" \
-	"Ambiguous frame command \"a\":.*" "ambiguous frame a"
+	{Ambiguous frame command "a":.*} "ambiguous frame a"
 }
 
 

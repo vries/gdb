@@ -45,7 +45,7 @@ mi_gdb_test "9-data-read-memory -o -6 -- -0+bytes+6 x 1 3 2" \
 	"3x2, one byte offset by -6"
 
 
-mi_gdb_test "3-data-read-memory \"(shorts + 128)\" x 2 1 2" \
+mi_gdb_test {3-data-read-memory "(shorts + 128)" x 2 1 2} \
 	"3\\^done,addr=\"$hex\",nr-bytes=\"4\",total-bytes=\"4\",next-row=\"$hex\",prev-row=\"$hex\",next-page=\"$hex\",prev-page=\"$hex\",memory=\\\[{addr=\"$hex\",data=\\\[\"0x0100\",\"0x0102\"\\\]}\\\]" \
 	"expression in quotes"
 

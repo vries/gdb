@@ -130,7 +130,7 @@ proc one_jit_test {jit_solibs_target match_str reattach} {
 
 	# All jit librares must have been unregistered
 	gdb_test "info function jit_function" \
-	    "All functions matching regular expression \"jit_function\":"
+	    {All functions matching regular expression "jit_function":}
     }
 }
 

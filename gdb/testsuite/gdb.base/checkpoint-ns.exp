@@ -19,7 +19,7 @@
 # takes a while to run.  This way, we can test both modes in parallel.
 
 save_vars { GDBFLAGS } {
-    append GDBFLAGS " -ex \"set non-stop on\""
+    append GDBFLAGS { -ex "set non-stop on"}
 
     source $srcdir/$subdir/checkpoint.exp
 }

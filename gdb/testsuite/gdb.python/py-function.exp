@@ -26,13 +26,13 @@ gdb_test_multiline "input convenience function" \
   "python" "" \
   "class test_func (gdb.Function):" "" \
   "  def __init__ (self):" "" \
-  "    super (test_func, self).__init__ (\"test_func\")" "" \
+  {    super (test_func, self).__init__ ("test_func")} "" \
   "  def invoke (self, arg):" "" \
-  "    return \"test_func output, arg = %s\" % arg.string ()" "" \
+  {    return "test_func output, arg = %s" % arg.string ()} "" \
   "test_func ()" "" \
   "end" ""
 
-gdb_test "print \$test_func (\"ugh\")" "= \"test_func output, arg = ugh\"" "call function"
+gdb_test "print \$test_func (\"ugh\")" {= "test_func output, arg = ugh"} "call function"
 
 # Test returning a gdb.Value from the function. This segfaulted GDB at one point.
 
@@ -40,7 +40,7 @@ gdb_test_multiline "input value-returning convenience function" \
   "python" "" \
   "class Double (gdb.Function):" "" \
   "  def __init__ (self):" "" \
-  "    super (Double, self).__init__ (\"double\")" "" \
+  {    super (Double, self).__init__ ("double")} "" \
   "  def invoke (self, n):" "" \
   "    return n*2" "" \
   "Double ()" "" \
@@ -73,7 +73,7 @@ gdb_test_multiline "Test GDBError" \
   "    def __init__(self):" "" \
   "        gdb.Function.__init__(self, 'gdberror')" "" \
   "    def invoke(self):" "" \
-  "        raise gdb.GdbError(\"This is a GdbError\")" "" \
+  {        raise gdb.GdbError("This is a GdbError")} "" \
   "GDBError ()" "" \
   "end" ""
 
@@ -86,7 +86,7 @@ gdb_test_multiline "Test Normal Error" \
   "    def __init__(self):" "" \
   "        gdb.Function.__init__(self, 'normalerror')" "" \
   "    def invoke(self):" "" \
-  "        raise RuntimeError(\"This is a Normal Error\")" "" \
+  {        raise RuntimeError("This is a Normal Error")} "" \
   "NormalError ()" "" \
   "end" ""
 

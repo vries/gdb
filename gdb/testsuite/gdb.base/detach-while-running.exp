@@ -43,7 +43,7 @@ proc test {} {
 
     save_vars { ::GDBFLAGS } {
 	if {$is_remote} {
-	    append ::GDBFLAGS " -ex \"maint set target-non-stop on\""
+	    append ::GDBFLAGS { -ex "maint set target-non-stop on"}
 	}
 	clean_restart
 	gdb_load $binfile

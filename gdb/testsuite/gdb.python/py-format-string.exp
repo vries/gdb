@@ -501,10 +501,10 @@ proc_with_prefix test_address {} {
   check_var_with_bool_opt "address" "an_enum"
   check_var_with_bool_opt "address" "a_string" \
     $undefined \
-    "\"hello world\""
+    {"hello world"}
   check_var_with_bool_opt "address" "a_binary_string" \
     $undefined \
-    "\"hello\""
+    {"hello"}
   check_var_with_bool_opt "address" "a_binary_string_array"
   check_var_with_bool_opt "address" "a_big_string"
   check_var_with_bool_opt "address" "an_array"
@@ -522,10 +522,10 @@ proc_with_prefix test_address {} {
 
   with_temp_option "set print address off" "set print address on" {
     check_var_with_no_opts "a_string" \
-      "\"hello world\""
+      {"hello world"}
     check_var_with_bool_opt "address" "a_string" \
       $undefined \
-      "\"hello world\""
+      {"hello world"}
   }
 }
 
@@ -747,7 +747,7 @@ proc test_max_string_one { setting unlimited } {
     check_format_string "a_binary_string" $opts \
       "${default_pointer_regexp} \"hel\"..."
     check_format_string "a_binary_string_array" $opts \
-      "\"hel\"..."
+      {"hel"...}
     check_format_string "a_big_string" $opts \
       [get_cut_big_string 3]
     if { $setting == "elements"} {
@@ -796,7 +796,7 @@ proc test_max_string_one { setting unlimited } {
     check_format_string "a_binary_string" "" \
       "${default_pointer_regexp} \"hell\"..."
     check_format_string "a_binary_string_array" "" \
-      "\"hell\"..."
+      {"hell"...}
     if { $setting == "elements"} {
       check_format_string "an_array_with_repetition" "" \
 	"\\{1, 3 <repeats 12 times>...\\}"
@@ -1130,10 +1130,10 @@ proc_with_prefix test_invalid_args {} {
 # Check the styling argument to format_string.  This function needs to
 # be called with TERM set such that styling can be applied.
 proc test_styling {} {
-    gdb_test "python print(gdb.parse_and_eval(\"a_point_t\").format_string(styling=True, raw=True))" \
+    gdb_test {python print(gdb.parse_and_eval("a_point_t").format_string(styling=True, raw=True))} \
 	"{[style x variable] = 42, [style y variable] = 12}"
 
-    gdb_test "python print(gdb.parse_and_eval(\"a_point_t\").format_string(styling=None, raw=True))" \
+    gdb_test {python print(gdb.parse_and_eval("a_point_t").format_string(styling=None, raw=True))} \
 	[multi_line \
 	     "Python Exception <class 'TypeError'>: argument 8 must be bool, not None" \
 	     "Error occurred in Python: argument 8 must be bool, not None" ] \

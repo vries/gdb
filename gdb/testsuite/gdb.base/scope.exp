@@ -289,9 +289,9 @@ proc_with_prefix test_at_localscopes {} {
 
     gdb_test "print localval" " = 10" "print localval, outer scope"
     gdb_test "print localval1" " = 11" "print localval1, outer scope"
-    gdb_test "print localval2" "No symbol \"localval2\" in current context." \
+    gdb_test "print localval2" {No symbol "localval2" in current context.} \
 	"print localval2, outer scope"
-    gdb_test "print localval3" "No symbol \"localval3\" in current context." \
+    gdb_test "print localval3" {No symbol "localval3" in current context.} \
 	"print localval3, outer scope"
 
     gdb_test "cont" "Break.* marker3 \\(\\) at .*:$decimal.*" \
@@ -304,7 +304,7 @@ proc_with_prefix test_at_localscopes {} {
 	"print localval, first nested scope"
     gdb_test "print localval1" " = 11" "print localval1, first nested scope"
     gdb_test "print localval2" " = 12" "print localval2, first nested scope"
-    gdb_test "print localval3" "No symbol \"localval3\" in current context." \
+    gdb_test "print localval3" {No symbol "localval3" in current context.} \
 	"print localval3, first nested scope"
 
     # This test will only fail if the file was compiled by gcc, but

@@ -166,7 +166,7 @@ gdb_py_test_silent_cmd "python a = bytes('a', 'ascii')" "" 0
 gdb_py_test_silent_cmd "python astr\[1\] = a" "change str" 0
 gdb_py_test_silent_cmd "python gdb.inferiors()\[0\].write_memory (addr, astr)" \
   "write str" 1
-gdb_test "print str" " = \"hallo, testsuite\"" \
+gdb_test "print str" { = "hallo, testsuite"} \
   "ensure str was changed in the inferior"
 
 # Add a new inferior here, so we can test that operations work on the
@@ -230,7 +230,7 @@ gdb_py_test_silent_cmd "python gdb.inferiors()\[0\].write_memory (addr, astr)" \
 
 gdb_test "inferior 1" "Switching to inferior 1.*" "switch back to inferior 1"
 
-gdb_test "print str" " = \"hXllo, testsuite\"" \
+gdb_test "print str" { = "hXllo, testsuite"} \
     "ensure str was changed while other inferior selected"
 
 gdb_test_no_output "remove-inferiors $num" "remove-inferiors $num"
@@ -417,7 +417,7 @@ with_test_prefix "selected_inferior" {
 	"inferior $num's None connection number"
     gdb_test "py print (gdb.selected_inferior().connection)" "None" \
 	"inferior $num's None connection"
-    gdb_test "target native" "Done.  Use the \"run\" command to start a process." \
+    gdb_test "target native" {Done.  Use the "run" command to start a process.} \
 	"target for inferior $num"
 
     # If inf 1 has a native target, inf 3's target is shared with 1's.
@@ -477,7 +477,7 @@ gdb_test "python print(gdb.selected_inferior().arguments)" \
 gdb_test_no_output "python gdb.selected_inferior().arguments = 'a b c'" \
     "set arguments from string"
 gdb_test "show args" \
-    [string_to_regexp "Argument list to give program being debugged when it is started is \"a b c\"."] \
+    [string_to_regexp {Argument list to give program being debugged when it is started is "a b c".}] \
     "show args from string"
 
 gdb_test_no_output "python gdb.selected_inferior().arguments = \['a', 'b c'\]" \

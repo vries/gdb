@@ -263,7 +263,7 @@ foreach_with_prefix inf1_how $how_modes {
 	    && [target_info gdb_protocol] == "extended-remote"} {
 	    # No way to specify the inferior's tty in the remote
 	    # protocol.
-	    unsupported "no support for \"tty\" in the RSP"
+	    unsupported {no support for "tty" in the RSP}
 	    continue
 	}
 

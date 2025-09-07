@@ -88,7 +88,7 @@ gdb_test "break -q main" \
 #
 # test break at quoted function
 #
-gdb_test "break -q \"marker2\"" \
+gdb_test {break -q "marker2"} \
     "Breakpoint.*at.* file .*$srcfile, line.*" \
     "breakpoint quoted function"
 
@@ -370,7 +370,7 @@ gdb_test "break $bp_location12 thread foo" \
 #
 
 gdb_test "break $bp_location12 foo" \
-    "malformed linespec error: unexpected string, \"foo\".*" \
+    {malformed linespec error: unexpected string, "foo".*} \
     "breakpoint with trailing garbage disallowed"
 
 # Verify that GDB responds gracefully to a "clear" command that has
@@ -456,7 +456,7 @@ if {![runto_main]} {
 }
 
 gdb_test "finish 123" \
-    "The \"finish\" command does not take any arguments.*" \
+    {The "finish" command does not take any arguments.*} \
     "finish with arguments disallowed"
 
 # Verify that GDB responds gracefully to a request to "finish" from

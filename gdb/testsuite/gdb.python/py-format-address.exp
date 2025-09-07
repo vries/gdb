@@ -79,7 +79,7 @@ foreach_with_prefix symbol_filename { on off } {
 }
 
 if {![is_address_zero_readable]} {
-    gdb_test "python print(\"Got: \" + gdb.format_address(0))" \
+    gdb_test {python print("Got: " + gdb.format_address(0))} \
 	"Got: 0x0" \
 	"gdb.format_address for address 0"
 }

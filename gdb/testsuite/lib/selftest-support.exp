@@ -48,7 +48,7 @@ proc _selftest_gdb_is_installed {} {
 # Return true if the libtool binary is present on the host.
 
 proc _selftest_has_libtool {} {
-    lassign [remote_exec host "sh -c \"command -v libtool\""] status output
+    lassign [remote_exec host {sh -c "command -v libtool"}] status output
     return [expr {$status == 0}]
 }
 

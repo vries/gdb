@@ -51,21 +51,21 @@ GDBInfoSymbols::check_no_entry "${srcfile2}"
 
 GDBInfoSymbols::run_command "info modules 1"
 GDBInfoSymbols::check_header \
-    "All modules matching regular expression \"1\":"
+    {All modules matching regular expression "1":}
 GDBInfoSymbols::check_entry "${srcfile}" "16" "mod1"
 GDBInfoSymbols::check_no_entry "${srcfile}"
 GDBInfoSymbols::check_no_entry "${srcfile2}"
 
 GDBInfoSymbols::run_command "info modules 2"
 GDBInfoSymbols::check_header \
-    "All modules matching regular expression \"2\":"
+    {All modules matching regular expression "2":}
 GDBInfoSymbols::check_entry "${srcfile2}" "18" "mod2"
 GDBInfoSymbols::check_no_entry "${srcfile}"
 GDBInfoSymbols::check_no_entry "${srcfile2}"
 
 GDBInfoSymbols::run_command "info modules mod"
 GDBInfoSymbols::check_header \
-    "All modules matching regular expression \"mod\":"
+    {All modules matching regular expression "mod":}
 GDBInfoSymbols::check_entry "${srcfile2}" "18" "mod2"
 GDBInfoSymbols::check_entry "${srcfile}" "16" "mod1"
 GDBInfoSymbols::check_no_entry "${srcfile}"
@@ -90,7 +90,7 @@ GDBInfoModuleSymbols::check_no_entry "${srcfile2}" ".*"
 
 GDBInfoModuleSymbols::run_command "info module functions -m mod1"
 GDBInfoModuleSymbols::check_header \
-    "All functions in all modules matching regular expression \"mod1\":"
+    {All functions in all modules matching regular expression "mod1":}
 GDBInfoModuleSymbols::check_optional_entry "${srcfile}" "mod1" "35" \
     "void mod1::__copy_mod1_M1t1\\(Type m1t1, Type m1t1\\);"
 GDBInfoModuleSymbols::check_entry "${srcfile}" "mod1" "25" \
@@ -102,7 +102,7 @@ GDBInfoModuleSymbols::check_no_entry "${srcfile2}" ".*"
 
 GDBInfoModuleSymbols::run_command "info module functions -t integer"
 GDBInfoModuleSymbols::check_header \
-    "All functions with type matching regular expression \"integer\" in all modules:"
+    {All functions with type matching regular expression "integer" in all modules:}
 GDBInfoModuleSymbols::check_entry "${srcfile2}" "mod2" "22" \
     "void mod2::sub_m2_a\\(${integer4}, ${logical4}\\);"
 GDBInfoModuleSymbols::check_entry "${srcfile}" "mod1" "25" \
@@ -133,7 +133,7 @@ GDBInfoModuleSymbols::check_no_entry "${srcfile2}" ".*"
 
 GDBInfoModuleSymbols::run_command "info module variables -t real"
 GDBInfoModuleSymbols::check_header \
-    "All variables with type matching regular expression \"real\" in all modules:"
+    {All variables with type matching regular expression "real" in all modules:}
 GDBInfoModuleSymbols::check_entry "${srcfile2}" "mod2" "20" \
     "${real4} mod2::mod2_var_2;"
 GDBInfoModuleSymbols::check_entry "${srcfile}" "mod1" "21" \
@@ -143,7 +143,7 @@ GDBInfoModuleSymbols::check_no_entry "${srcfile2}" ".*"
 
 GDBInfoModuleSymbols::run_command "info module variables -m mod2"
 GDBInfoModuleSymbols::check_header \
-    "All variables in all modules matching regular expression \"mod2\":"
+    {All variables in all modules matching regular expression "mod2":}
 GDBInfoModuleSymbols::check_entry "${srcfile2}" "mod2" "19" \
     "${integer4} mod2::mod2_var_1;"
 GDBInfoModuleSymbols::check_entry "${srcfile2}" "mod2" "20" \
@@ -153,7 +153,7 @@ GDBInfoModuleSymbols::check_no_entry "${srcfile2}" ".*"
 
 GDBInfoModuleSymbols::run_command "info module variables -m mod2 -t real"
 GDBInfoModuleSymbols::check_header \
-    "All variables with type matching regular expression \"real\" in all modules matching regular expression \"mod2\":"
+    {All variables with type matching regular expression "real" in all modules matching regular expression "mod2":}
 GDBInfoModuleSymbols::check_entry "${srcfile2}" "mod2" "20" \
     "${real4} mod2::mod2_var_2;"
 GDBInfoModuleSymbols::check_no_entry "${srcfile}" ".*"
@@ -161,7 +161,7 @@ GDBInfoModuleSymbols::check_no_entry "${srcfile2}" ".*"
 
 GDBInfoModuleSymbols::run_command "info module variables _1"
 GDBInfoModuleSymbols::check_header \
-    "All variables matching regular expression \"_1\" in all modules:"
+    {All variables matching regular expression "_1" in all modules:}
 GDBInfoModuleSymbols::check_entry "${srcfile2}" "mod2" "19" \
     "${integer4} mod2::mod2_var_1;"
 GDBInfoModuleSymbols::check_entry "${srcfile}" "mod1" "21" \

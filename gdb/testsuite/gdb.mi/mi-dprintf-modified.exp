@@ -67,7 +67,7 @@ mi_execute_to "exec-continue" "breakpoint-hit" main "" ".*/$srcfile" \
 mi_delete_breakpoints
 
 # Setup a dprintf breakpoint.
-mi_gdb_test "-dprintf-insert --function main \"in main\"" \
+mi_gdb_test {-dprintf-insert --function main "in main"} \
     "\\^done,bkpt={.*}" "dprintf at main"
 
 set bpnum [mi_get_valueof "/d" "\$bpnum" "INVALID" \

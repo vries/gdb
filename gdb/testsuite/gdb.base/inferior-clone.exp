@@ -31,7 +31,7 @@ with_test_prefix "setup inferior 1" {
     gdb_test_no_output "set environment BAR bar"
     gdb_test_no_output "set inferior-tty some_tty"
     gdb_test {print $_gdb_setting_str("inferior-tty")} \
-	" = \"some_tty\""
+	{ = "some_tty"}
 }
 
 # Check that properties of inferior 1 have been copied
@@ -48,7 +48,7 @@ with_test_prefix "inferior 2" {
     gdb_test "show inferior-tty" \
 	"Terminal for future runs of program being debugged is \"some_tty\"\."
     gdb_test {print $_gdb_setting_str("inferior-tty")} \
-	" = \"some_tty\""
+	{ = "some_tty"}
 }
 
 # Change this second inferior, to check that the next clone-inferior
@@ -60,7 +60,7 @@ with_test_prefix "update inferior 2" {
     gdb_test_no_output "set environment FOO oof"
     gdb_test_no_output "set inferior-tty another_tty"
     gdb_test {print $_gdb_setting_str("inferior-tty")} \
-	" = \"another_tty\""
+	{ = "another_tty"}
 }
 
 with_test_prefix "inferior 1" {
@@ -75,7 +75,7 @@ with_test_prefix "inferior 1" {
     gdb_test "show inferior-tty" \
 	"Terminal for future runs of program being debugged is \"some_tty\"\."
     gdb_test {print $_gdb_setting_str("inferior-tty")} \
-	" = \"some_tty\""
+	{ = "some_tty"}
 }
 
 # Tweak inferior 1 a bit more.

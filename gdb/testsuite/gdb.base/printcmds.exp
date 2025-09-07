@@ -223,7 +223,7 @@ proc test_print_all_chars {} {
 	gdb_test "p ctable1\[31\]"  " = 31 '\\\\037'"
 	gdb_test "p ctable1\[32\]"  " = 32 ' '"
 	gdb_test "p ctable1\[33\]"  " = 33 '!'"
-	gdb_test "p ctable1\[34\]"  " = 34 '\"'"
+	gdb_test "p ctable1\[34\]"  { = 34 '"'}
 	gdb_test "p ctable1\[35\]"  " = 35 '#'"
 	gdb_test "p ctable1\[36\]"  " = 36 '\\\$'"
 	gdb_test "p ctable1\[37\]"  " = 37 '%'"
@@ -530,7 +530,7 @@ proc test_print_strings_one { setting } {
     # printing; this was a bug in older gdb's.
     gdb_test_no_output "set print $setting 0"
     gdb_test "p teststring" \
-	" = (.unsigned char .. )?\"teststring contents\"" "p teststring with $setting set to 0"
+	{ = (.unsigned char .. )?"teststring contents"} "p teststring with $setting set to 0"
     gdb_test_no_output "set print $setting 1"
     gdb_test "p teststring" \
 	" = (.unsigned char .. )?\"t\"\\.\\.\\." "p teststring with $setting set to 1"
@@ -539,19 +539,19 @@ proc test_print_strings_one { setting } {
 	" = (.unsigned char .. )?\"tests\"\\.\\.\\." "p teststring with $setting set to 5"
     gdb_test_no_output "set print $setting 19"
     gdb_test "p teststring" \
-	" = (.unsigned char .. )?\"teststring contents\"" "p teststring with $setting set to 19"
+	{ = (.unsigned char .. )?"teststring contents"} "p teststring with $setting set to 19"
     gdb_test_no_output "set print $setting 20"
     gdb_test "p teststring" \
-	" = (.unsigned char .. )?\"teststring contents\"" "p teststring with $setting set to 20"
+	{ = (.unsigned char .. )?"teststring contents"} "p teststring with $setting set to 20"
 
     gdb_test "p -$setting 1 -- teststring" \
 	" = (.unsigned char .. )?\"t\"\\.\\.\\."
     gdb_test "p -$setting 5 -- teststring" \
 	" = (.unsigned char .. )?\"tests\"\\.\\.\\."
     gdb_test "p -$setting 19 -- teststring" \
-	" = (.unsigned char .. )?\"teststring contents\""
+	{ = (.unsigned char .. )?"teststring contents"}
     gdb_test "p -$setting 20 -- teststring" \
-	" = (.unsigned char .. )?\"teststring contents\""
+	{ = (.unsigned char .. )?"teststring contents"}
 
     gdb_test "print teststring2" \
 	" = \\(charptr\\) \"more contents\""
@@ -639,7 +639,7 @@ proc test_print_strings {} {
     }
 
     gdb_test "p -elements 8 -- teststring" \
-	" = (.unsigned char .. )?\"teststring contents\""
+	{ = (.unsigned char .. )?"teststring contents"}
     gdb_test "p -characters 8 -- teststring" \
 	" = (.unsigned char .. )?\"teststri\"\\.\\.\\."
     gdb_test "p -elements 8 -characters elements -- teststring" \
@@ -686,13 +686,13 @@ proc test_print_typedef_arrays {} {
     gdb_test "p a1\[9\]" " = 20"
 
     gdb_test "p a2" \
-	" = \"abcd\""
+	{ = "abcd"}
     gdb_test "p a2\[0\]" " = 97 'a'"
     gdb_test "p a2\[3\]" " = 100 'd'"
 
     # Regression test of null-stop; PR 11049.
     gdb_test_no_output "set print null-stop on"
-    gdb_test "p a2" " = \"abcd\"" "print a2 with null-stop on"
+    gdb_test "p a2" { = "abcd"} "print a2 with null-stop on"
     gdb_test_no_output "set print null-stop off"
 }
 
@@ -730,15 +730,15 @@ proc test_print_char_arrays {} {
 	" = {array1 = \"abc\", array2 = \"d\", array3 = \"e\", array4 = \"fg\", array5 = \"hij\"}"
 
     gdb_test "p parrays"		" = \\(struct some_arrays \\*\\) $hex <arrays>"
-    gdb_test "p parrays->array1"	" = \"abc\""
+    gdb_test "p parrays->array1"	{ = "abc"}
     gdb_test "p &parrays->array1"	" = \\(unsigned char \\(\\*\\)\\\[4\\\]\\) $hex <arrays>"
-    gdb_test "p parrays->array2"	" = \"d\""
+    gdb_test "p parrays->array2"	{ = "d"}
     gdb_test "p &parrays->array2"	" = \\(unsigned char \\(\\*\\)\\\[1\\\]\\) $hex <arrays\\+$decimal>"
-    gdb_test "p parrays->array3"	" = \"e\""
+    gdb_test "p parrays->array3"	{ = "e"}
     gdb_test "p &parrays->array3"	" = \\(unsigned char \\(\\*\\)\\\[1\\\]\\) $hex <arrays\\+$decimal>"
-    gdb_test "p parrays->array4"	" = \"fg\""
+    gdb_test "p parrays->array4"	{ = "fg"}
     gdb_test "p &parrays->array4"	" = \\(unsigned char \\(\\*\\)\\\[2\\\]\\) $hex <arrays\\+$decimal>"
-    gdb_test "p parrays->array5"	" = \"hij\""
+    gdb_test "p parrays->array5"	{ = "hij"}
     gdb_test "p &parrays->array5"	" = \\(unsigned char \\(\\*\\)\\\[4\\\]\\) $hex <arrays\\+$decimal>"
 
     gdb_test_no_output "set print address off" "address off char arrays"
@@ -806,16 +806,16 @@ proc test_print_string_constants {} {
     # (Test may involve inferior malloc() calls).
     set timeout 60
 
-    gdb_test "p \"a string\""		" = \"a string\""
+    gdb_test {p "a string"}		{ = "a string"}
     gdb_test "p \"embedded \\000 null\"" " = \"embedded \\\\000 null\""
     gdb_test "p \"abcd\"\[2\]"	" = 99 'c'"
-    gdb_test "p sizeof (\"abcdef\")"	" = 7"
-    gdb_test "ptype \"foo\""		" = char \\\[4\\\]"
-    gdb_test "p *\"foo\""		" = 102 'f'"
-    gdb_test "ptype *\"foo\""		" = char"
-    gdb_test "p &*\"foo\""		" = \"foo\""
-    gdb_test "ptype &*\"foo\""	"type = char \\*"
-    gdb_test "p (char *)\"foo\""	" = \"foo\""
+    gdb_test {p sizeof ("abcdef")}	" = 7"
+    gdb_test {ptype "foo"}		" = char \\\[4\\\]"
+    gdb_test {p *"foo"}		" = 102 'f'"
+    gdb_test {ptype *"foo"}		" = char"
+    gdb_test {p &*"foo"}		{ = "foo"}
+    gdb_test {ptype &*"foo"}	"type = char \\*"
+    gdb_test {p (char *)"foo"}	{ = "foo"}
 }
 
 proc test_print_array_constants {} {
@@ -884,16 +884,16 @@ proc test_printf {} {
     gdb_test "printf \"%%%d%%\\n\", 5" "%5%"
 
     # Some tests for missing format specifier after '%'.
-    gdb_test "printf \"%\", 0" "Incomplete format specifier at end of format string"
-    gdb_test "printf \"%.234\", 0" "Incomplete format specifier at end of format string"
-    gdb_test "printf \"%-\", 0" "Incomplete format specifier at end of format string"
-    gdb_test "printf \"%-23\", 0" "Incomplete format specifier at end of format string"
+    gdb_test {printf "%", 0} "Incomplete format specifier at end of format string"
+    gdb_test {printf "%.234", 0} "Incomplete format specifier at end of format string"
+    gdb_test {printf "%-", 0} "Incomplete format specifier at end of format string"
+    gdb_test {printf "%-23", 0} "Incomplete format specifier at end of format string"
 
     # Test for invalid printf flags on pointer types.
-    gdb_test "printf \"%#p\", 0" "Inappropriate modifiers to format specifier 'p' in printf"
-    gdb_test "printf \"% p\", 0" "Inappropriate modifiers to format specifier 'p' in printf"
-    gdb_test "printf \"%0p\", 0" "Inappropriate modifiers to format specifier 'p' in printf"
-    gdb_test "printf \"%+p\", 0" "Inappropriate modifiers to format specifier 'p' in printf"
+    gdb_test {printf "%#p", 0} "Inappropriate modifiers to format specifier 'p' in printf"
+    gdb_test {printf "% p", 0} "Inappropriate modifiers to format specifier 'p' in printf"
+    gdb_test {printf "%0p", 0} "Inappropriate modifiers to format specifier 'p' in printf"
+    gdb_test {printf "%+p", 0} "Inappropriate modifiers to format specifier 'p' in printf"
 
 
     gdb_test "define hibob\nprintf \"hi bob \"\nshell echo zzz\nprintf \"y\\n\"\nend" \
@@ -1050,19 +1050,19 @@ proc test_repeat_bytes {} {
     set invalid(L) {\\240\\240\\240\\240}
     set invalid(R) {'\\240' <repeats 20 times>}
 
-    set fmt(SSS) "\"%s%s%s\""
-    set fmt(SSR) "\"%s%s\", %s"
-    set fmt(SRS) "\"%s\", %s, \"%s\""
-    set fmt(RSS) "%s, \"%s%s\""
-    set fmt(RSR) "%s, \"%s\", %s"
-    set fmt(SRR) "\"%s\", %s, %s"
-    set fmt(RRS) "%s, %s, \"%s\""
+    set fmt(SSS) {"%s%s%s"}
+    set fmt(SSR) {"%s%s", %s}
+    set fmt(SRS) {"%s", %s, "%s"}
+    set fmt(RSS) {%s, "%s%s"}
+    set fmt(RSR) {%s, "%s", %s}
+    set fmt(SRR) {"%s", %s, %s}
+    set fmt(RRS) {%s, %s, "%s"}
     set fmt(RRR) "%s, %s, %s"
 
-    set fmt(RS) "%s, \"%s\""
+    set fmt(RS) {%s, "%s"}
     set fmt(RR) "%s, %s"
-    set fmt(SR) "\"%s\", %s"
-    set fmt(SS) "\"%s%s\""
+    set fmt(SR) {"%s", %s}
+    set fmt(SS) {"%s%s"}
 
     # We have up to 60 elements to print.
     gdb_test_no_output "set print elements 100"
@@ -1119,13 +1119,13 @@ proc test_repeat_bytes {} {
 # This is gdb/24331
 
 proc test_repeat_bytes_limit {} {
-   gdb_test "print -elem 3 -- \"AAAAA\"" "= \"AAA\"..."
-   gdb_test "print -char 3 -elem 10 -- \"AAAAA\"" "= \"AAA\"..."
-   gdb_test "print -elem 3 -- \"ABBBB\"" "= \"ABB\"..."
-   gdb_test "print -char 3 -elem 10 -- \"ABBBB\"" "= \"ABB\"..."
+   gdb_test {print -elem 3 -- "AAAAA"} {= "AAA"...}
+   gdb_test {print -char 3 -elem 10 -- "AAAAA"} {= "AAA"...}
+   gdb_test {print -elem 3 -- "ABBBB"} {= "ABB"...}
+   gdb_test {print -char 3 -elem 10 -- "ABBBB"} {= "ABB"...}
 
-   gdb_test "print -elem 3 -repeats 2 -- \"AAABBB\"" "= 'A' <repeats 3 times>..."
-   gdb_test "print -elem 4 -repeats 2 -- \"AAABBB\"" "= 'A' <repeats 3 times>, 'B' <repeats 3 times>"
+   gdb_test {print -elem 3 -repeats 2 -- "AAABBB"} "= 'A' <repeats 3 times>..."
+   gdb_test {print -elem 4 -repeats 2 -- "AAABBB"} "= 'A' <repeats 3 times>, 'B' <repeats 3 times>"
 }
 
 # Test printf of convenience variables.
@@ -1139,7 +1139,7 @@ proc test_printf_convenience_var {prefix} {
 	gdb_test "printf \"cstr val = %s\\n\", \$cstr" "cstr val = abcde" \
 	    "printf \$cstr"
 	gdb_test_no_output "set var \$abcde = \"ABCDE\"" "set \$abcde"
-	gdb_test "eval \"print \$%s\\n\", \$cstr" "= \"ABCDE\"" \
+	gdb_test "eval \"print \$%s\\n\", \$cstr" {= "ABCDE"} \
 	    "indirect print abcde"
 	# Without a target, the below produces no output
 	# but with a target, it gives a warning.
@@ -1170,10 +1170,10 @@ gdb_test "print \$pc" "No registers\\."
 
 # Some simple operations on strings should work even without a target
 # (and therefore without calling malloc).
-gdb_test "print \"abc\"" " = \"abc\""
-gdb_test "print sizeof (\"abc\")" " = 4"
-gdb_test "ptype \"abc\"" " = char \\\[4\\\]"
-gdb_test "print \$cvar = \"abc\"" " = \"abc\""
+gdb_test {print "abc"} { = "abc"}
+gdb_test {print sizeof ("abc")} " = 4"
+gdb_test {ptype "abc"} " = char \\\[4\\\]"
+gdb_test "print \$cvar = \"abc\"" { = "abc"}
 gdb_test "print sizeof (\$cvar)" " = 4"
 
 # Similarly, printf of a string convenience var should work without a target.

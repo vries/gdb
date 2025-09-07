@@ -88,19 +88,19 @@ proc_with_prefix test_setshow_args {} {
 
     gdb_test "show args" "Argument list to give program being debugged when it is started is \"\"\." \
 	"show args empty"
-    gdb_test "p \$_gdb_setting_str(\"args\")" " = \"\""
+    gdb_test "p \$_gdb_setting_str(\"args\")" { = ""}
 
     gdb_test_no_output "set args ~"
-    gdb_test "show args" "Argument list to give program being debugged when it is started is \"~\"..*" \
+    gdb_test "show args" {Argument list to give program being debugged when it is started is "~"..*} \
 	"show args ~"
 
     #test set args
     gdb_test_no_output "set args foo bar blup baz bubble" "set args"
 
     #test show args
-    gdb_test "show args" "Argument list to give program being debugged when it is started is \"foo bar blup baz bubble\"..*" \
+    gdb_test "show args" {Argument list to give program being debugged when it is started is "foo bar blup baz bubble"..*} \
 	"show args multiple words"
-    gdb_test "p \$_gdb_setting(\"args\")" " = \"foo bar blup baz bubble\"" \
+    gdb_test "p \$_gdb_setting(\"args\")" { = "foo bar blup baz bubble"} \
 	"_gdb_setting args"
 
     # Don't test if we can't pass args or if we're using a stub.
@@ -119,7 +119,7 @@ proc_with_prefix test_setshow_check {} {
     # Note: the below might produce a warning, so match anything.
     gdb_test "set check range on" ""
 
-    gdb_test "p \$_gdb_setting(\"check range\")" " = \"on\"" \
+    gdb_test "p \$_gdb_setting(\"check range\")" { = "on"} \
 	"_gdb_setting check range on"
 
     #test show check range on
@@ -130,15 +130,15 @@ proc_with_prefix test_setshow_check {} {
 
     #test show check range off
     gdb_test "show check range" "Range checking is \"off\"\..*" "show check range, off"
-    gdb_test "p \$_gdb_setting(\"check range\")" " = \"off\"" \
+    gdb_test "p \$_gdb_setting(\"check range\")" { = "off"} \
 	"_gdb_setting check range off"
 
     #test set check range auto
     gdb_test_no_output "set check range auto" "set check range auto"
 
     #test show check range auto
-    gdb_test "show check range" "Range checking is \"auto; currently .*" "show check range (auto)"
-    gdb_test "p \$_gdb_setting(\"check range\")" " = \"auto\"" \
+    gdb_test "show check range" {Range checking is "auto; currently .*} "show check range (auto)"
+    gdb_test "p \$_gdb_setting(\"check range\")" { = "auto"} \
 	"_gdb_setting check range auto"
 
     # Test set check type on
@@ -147,14 +147,14 @@ proc_with_prefix test_setshow_check {} {
     # Test show check type on
     gdb_test "show check type" "Strict type checking is on\..*" \
 	"show check type, on"
-    gdb_test "p \$_gdb_setting_str(\"check type\")" " = \"on\"" \
+    gdb_test "p \$_gdb_setting_str(\"check type\")" { = "on"} \
 	"_gdb_setting_str check type on"
     gdb_test "p \$_gdb_setting(\"check type\")" " = 1" \
 	"_gdb_setting check type on 1"
 
     # Test set check type off with trailing space
     gdb_test_no_output "set check type off " "set check type off"
-    gdb_test "p \$_gdb_setting_str(\"check type\")" " = \"off\"" \
+    gdb_test "p \$_gdb_setting_str(\"check type\")" { = "off"} \
 	"_gdb_setting_str check type off"
     gdb_test "p \$_gdb_setting(\"check type\")" " = 0" \
 	"_gdb_setting check type off 0"
@@ -169,7 +169,7 @@ proc_with_prefix test_setshow_breakpoint_pending {} {
 
     #test set breakpoint pending on
     gdb_test_no_output "set breakpoint pending on"
-    gdb_test "p \$_gdb_setting_str(\"breakpoint pending\")" " = \"on\"" \
+    gdb_test "p \$_gdb_setting_str(\"breakpoint pending\")" { = "on"} \
 	"_gdb_setting_str breakpoint pending on"
     gdb_test "p \$_gdb_setting(\"breakpoint pending\")" " = 1" \
 	"_gdb_setting breakpoint pending 1"
@@ -180,7 +180,7 @@ proc_with_prefix test_setshow_breakpoint_pending {} {
     #test show breakpoint pending off
     gdb_test_no_output "set breakpoint pending off"
     gdb_test "show breakpoint pending" " is off\..*" "show breakpoint pending off"
-    gdb_test "p \$_gdb_setting_str(\"breakpoint pending\")" " = \"off\"" \
+    gdb_test "p \$_gdb_setting_str(\"breakpoint pending\")" { = "off"} \
 	"_gdb_setting_str breakpoint pending off"
     gdb_test "p \$_gdb_setting(\"breakpoint pending\")" " = 0" \
 	"_gdb_setting breakpoint pending 0"
@@ -190,7 +190,7 @@ proc_with_prefix test_setshow_breakpoint_pending {} {
 
     #test show breakpoint pending auto
     gdb_test "show breakpoint pending" " is auto.*" "show breakpoint pending auto"
-    gdb_test "p \$_gdb_setting_str(\"breakpoint pending\")" " = \"auto\"" \
+    gdb_test "p \$_gdb_setting_str(\"breakpoint pending\")" { = "auto"} \
 	"_gdb_setting_str breakpoint pending auto"
     gdb_test "p \$_gdb_setting(\"breakpoint pending\")" " = -1" \
 	"_gdb_setting breakpoint pending -1"
@@ -257,7 +257,7 @@ proc_with_prefix test_setshow_height {} {
 
     #test show height 100
     gdb_test "show height" "Number of lines gdb thinks are in a page is 100..*"
-    gdb_test "p \$_gdb_setting_str(\"height\")" " = \"100\"" \
+    gdb_test "p \$_gdb_setting_str(\"height\")" { = "100"} \
 	"_gdb_setting_str height 100"
     gdb_test "p \$_gdb_setting(\"height\")" " = 100" \
 	"_gdb_setting height 100"
@@ -265,7 +265,7 @@ proc_with_prefix test_setshow_height {} {
     # Back to infinite height to avoid pagers.  While at it, check that
     # literal "unlimited" works just as well as 0.
     gdb_test_no_output "set height unlimited"
-    gdb_test "p \$_gdb_setting_str(\"height\")" " = \"unlimited\"" \
+    gdb_test "p \$_gdb_setting_str(\"height\")" { = "unlimited"} \
 	"_gdb_setting_str height unlimited"
     gdb_test "p \$_gdb_setting(\"height\")" " = 0" \
 	"_gdb_setting height unlimited"
@@ -358,13 +358,13 @@ proc_with_prefix test_setshow_language {} {
     gdb_test_no_output "set language asm"
 
     #test show language asm
-    gdb_test "show language" "The current source language is \"asm\"..*" "show language, asm"
+    gdb_test "show language" {The current source language is "asm"..*} "show language, asm"
 
     #test set language rust, with a trailing space
     gdb_test_no_output "set language rust " "set language rust"
 
     #test show language rust
-    gdb_test "show language" "The current source language is \"rust\"..*" "show language, rust"
+    gdb_test "show language" {The current source language is "rust"..*} "show language, rust"
 
     #test completion for set language.
     gdb_test "complete set language min" "set language minimal" \
@@ -374,7 +374,7 @@ proc_with_prefix test_setshow_language {} {
     gdb_test_no_output "set language auto" "set language auto"
 
     #test show language
-    gdb_test "show language" "The current source language is \"auto.*\"..*" "show language, auto"
+    gdb_test "show language" {The current source language is "auto.*"..*} "show language, auto"
 }
 
 proc_with_prefix test_setshow_listsize {} {
@@ -392,19 +392,19 @@ proc_with_prefix test_setshow_print_characters {} {
 
     gdb_test "p \$_gdb_setting(\"print characters\")" " = void" \
 	"_gdb_setting print characters default"
-    gdb_test "p \$_gdb_setting_str(\"print characters\")" " = \"elements\"" \
+    gdb_test "p \$_gdb_setting_str(\"print characters\")" { = "elements"} \
 	"_gdb_setting_str print characters default"
 
     gdb_test_no_output "set print characters unlimited"
     gdb_test "p \$_gdb_setting(\"print characters\")" " = 0" \
 	"_gdb_setting print characters unlimited"
-    gdb_test "p \$_gdb_setting_str(\"print characters\")" " = \"unlimited\"" \
+    gdb_test "p \$_gdb_setting_str(\"print characters\")" { = "unlimited"} \
 	"_gdb_setting_str print characters unlimited"
 
     gdb_test_no_output "set print characters 1"
     gdb_test "p \$_gdb_setting(\"print characters\")" " = 1" \
 	"_gdb_setting print characters 1"
-    gdb_test "p \$_gdb_setting_str(\"print characters\")" " = \"1\"" \
+    gdb_test "p \$_gdb_setting_str(\"print characters\")" { = "1"} \
 	"_gdb_setting_str print characters 1"
 }
 

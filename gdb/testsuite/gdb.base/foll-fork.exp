@@ -420,12 +420,12 @@ By default, the debugger will follow the parent process..*"
     gdb_test_no_output "set follow-fork ch"
 
     gdb_test "show follow-fork" \
-	"Debugger response to a program call of fork or vfork is \"child\".*" \
+	{Debugger response to a program call of fork or vfork is "child".*} \
 	"set follow-fork, using abbreviations"
 
     # Verify that we cannot set follow-fork-mode to nonsense.
     #
-    gdb_test "set follow-fork chork" "Undefined item: \"chork\".*" \
+    gdb_test "set follow-fork chork" {Undefined item: "chork".*} \
 	"set follow-fork to nonsense is prohibited"
 
     gdb_test_no_output "set follow-fork parent" "reset parent"

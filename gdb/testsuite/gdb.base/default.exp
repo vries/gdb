@@ -31,8 +31,8 @@ set timeout 60
 gdb_test "add-symbol-file" "add-symbol-file takes a file name and an address"
 
 # test append
-gdb_test "append" "List of \"append\" subcommands:.*" 
-gdb_test "append binary" "List of \"append binary\" subcommands:.*" 
+gdb_test "append" {List of "append" subcommands:.*} 
+gdb_test "append binary" {List of "append binary" subcommands:.*} 
 gdb_test "append memory" "Missing filename\." 
 gdb_test "append value"  "Missing filename\." 
 gdb_test "append binary memory" "Missing filename\." 
@@ -72,7 +72,7 @@ if !$use_gdb_stub {
 }
 
 gdb_test "continue" "The program is not being run."
-gdb_test "c" "The program is not being run." "continue \"c\" abbreviation"
+gdb_test "c" "The program is not being run." {continue "c" abbreviation}
 
 #test call
 gdb_test "call" "The history is empty..*"
@@ -96,7 +96,7 @@ gdb_test "condition" "Argument required .breakpoint number.*"
 #test core-file
 gdb_test "core-file" "No core file now."
 #test delete "d" abbreviation
-gdb_test_no_output "d" "delete \"d\" abbreviation"
+gdb_test_no_output "d" {delete "d" abbreviation}
 #test delete
 gdb_test_no_output "delete" "delete"
 #test define
@@ -126,9 +126,9 @@ gdb_test "directory" \
     "y"
 
 #test disable "dis" abbreviation
-gdb_test_no_output "dis" "disable \"dis\" abbreviation"
+gdb_test_no_output "dis" {disable "dis" abbreviation}
 #test disable "disa" abbreviation
-gdb_test_no_output "disa" "disable \"disa\" abbreviation"
+gdb_test_no_output "disa" {disable "disa" abbreviation}
 #test disable
 gdb_test_no_output "disable" "disable"
 #test disable breakpoints
@@ -148,12 +148,12 @@ gdb_test "down" "No stack.*"
 #test down-silently
 gdb_test "down-silently" "No stack."
 # test dump
-gdb_test "dump" "List of \"dump\" subcommands:.*" 
-gdb_test "dump binary" "List of \"dump binary\" subcommands:.*" 
-gdb_test "dump ihex" "List of \"dump ihex\" subcommands:.*" 
+gdb_test "dump" {List of "dump" subcommands:.*} 
+gdb_test "dump binary" {List of "dump binary" subcommands:.*} 
+gdb_test "dump ihex" {List of "dump ihex" subcommands:.*} 
 gdb_test "dump memory" "Missing filename\." 
-gdb_test "dump srec" "List of \"dump srec\" subcommands:.*" 
-gdb_test "dump tekhex" "List of \"dump tekhex\" subcommands:.*" 
+gdb_test "dump srec" {List of "dump srec" subcommands:.*} 
+gdb_test "dump tekhex" {List of "dump tekhex" subcommands:.*} 
 gdb_test "dump value" "Missing filename\." 
 gdb_test "dump binary memory" "Missing filename\." 
 gdb_test "dump binary value"  "Missing filename\." 
@@ -198,7 +198,7 @@ gdb_expect {
 }
 
 #test frame "f" abbreviation
-gdb_test "f" "No stack." "frame \"f\" abbreviation"
+gdb_test "f" "No stack." {frame "f" abbreviation}
 #test frame
 gdb_test "frame" "No stack."
 #test fg
@@ -248,7 +248,7 @@ gdb_test_multiple "generate-core-file" "generate-core-file" {
 }
 
 #test help "h" abbreviation
-gdb_test "h" "List of classes of commands:(\[^\r\n\]*\[\r\n\])+aliases -- User-defined aliases of other commands(\[^\r\n\]*\[\r\n\])+breakpoints -- Making program stop at certain points(\[^\r\n\]*\[\r\n\])+data -- Examining data(\[^\r\n\]*\[\r\n\])+files -- Specifying and examining files(\[^\r\n\]*\[\r\n\])+obscure -- Obscure features(\[^\r\n\]*\[\r\n\])+running -- Running the program(\[^\r\n\]*\[\r\n\])+stack -- Examining the stack(\[^\r\n\]*\[\r\n\])+status -- Status inquiries(\[^\r\n\]*\[\r\n\])+support -- Support facilities(\[^\r\n\]*\[\r\n\])+user-defined -- User-defined commands(\[^\r\n\]*\[\r\n\])+Type \"help\" followed by a class name for a list of commands in that class.(\[^\r\n\]*\[\r\n\])+Type \"help\" followed by command name for full documentation.(\[^\r\n\]*\[\r\n\])+Command name abbreviations are allowed if unambiguous." "help \"h\" abbreviation"
+gdb_test "h" "List of classes of commands:(\[^\r\n\]*\[\r\n\])+aliases -- User-defined aliases of other commands(\[^\r\n\]*\[\r\n\])+breakpoints -- Making program stop at certain points(\[^\r\n\]*\[\r\n\])+data -- Examining data(\[^\r\n\]*\[\r\n\])+files -- Specifying and examining files(\[^\r\n\]*\[\r\n\])+obscure -- Obscure features(\[^\r\n\]*\[\r\n\])+running -- Running the program(\[^\r\n\]*\[\r\n\])+stack -- Examining the stack(\[^\r\n\]*\[\r\n\])+status -- Status inquiries(\[^\r\n\]*\[\r\n\])+support -- Support facilities(\[^\r\n\]*\[\r\n\])+user-defined -- User-defined commands(\[^\r\n\]*\[\r\n\])+Type \"help\" followed by a class name for a list of commands in that class.(\[^\r\n\]*\[\r\n\])+Type \"help\" followed by command name for full documentation.(\[^\r\n\]*\[\r\n\])+Command name abbreviations are allowed if unambiguous." {help "h" abbreviation}
 #test help
 gdb_test "help" "List of classes of commands:(\[^\r\n\]*\[\r\n\])+aliases -- User-defined aliases of other commands(\[^\r\n\]*\[\r\n\])+breakpoints -- Making program stop at certain points(\[^\r\n\]*\[\r\n\])+data -- Examining data(\[^\r\n\]*\[\r\n\])+files -- Specifying and examining files(\[^\r\n\]*\[\r\n\])+obscure -- Obscure features(\[^\r\n\]*\[\r\n\])+running -- Running the program(\[^\r\n\]*\[\r\n\])+stack -- Examining the stack(\[^\r\n\]*\[\r\n\])+status -- Status inquiries(\[^\r\n\]*\[\r\n\])+support -- Support facilities(\[^\r\n\]*\[\r\n\])+user-defined -- User-defined commands(\[^\r\n\]*\[\r\n\])+Type \"help\" followed by a class name for a list of commands in that class.(\[^\r\n\]*\[\r\n\])+Type \"help\" followed by command name for full documentation.(\[^\r\n\]*\[\r\n\])+Command name abbreviations are allowed if unambiguous."
 #test handle
@@ -282,7 +282,7 @@ proc test_info_command { command message } {
 }
 
 #test info "i" abbreviation
-test_info_command "i" "info \"i\" abbreviation"
+test_info_command "i" {info "i" abbreviation}
 #test info
 test_info_command "info" "info"
 
@@ -295,7 +295,7 @@ gdb_test "info all-registers" "The program has no registers now."
 #test info args
 gdb_test "info args" "No frame selected."
 #test info bogus-gdb-command
-gdb_test "info bogus-gdb-command" "Undefined info command: \"bogus-gdb-command\".  Try \"help info\".*"
+gdb_test "info bogus-gdb-command" {Undefined info command: "bogus-gdb-command".  Try "help info".*}
 #test info breakpoints
 gdb_test "info breakpoints" "No breakpoints, watchpoints, tracepoints, or catchpoints."
 #test info copying
@@ -389,7 +389,7 @@ gdb_test_multiple $test $test {
 #test info display
 gdb_test "info display" "There are no auto-display expressions now."
 #test info frame "f" abbreviation
-gdb_test "info f" "No stack.*|No selected frame.*" "info frame \"f\" abbreviation"
+gdb_test "info f" "No stack.*|No selected frame.*" {info frame "f" abbreviation}
 #test info frame
 gdb_test "info frame" "No stack.|No selected frame."
 #test info files
@@ -405,7 +405,7 @@ gdb_test "info program" "The program being debugged is not being run."
 #test info registers
 gdb_test "info registers" "The program has no registers now."
 #test info stack "s" abbreviation
-gdb_test "info s" "No stack." "info stack \"s\" abbreviation"
+gdb_test "info s" "No stack." {info stack "s" abbreviation}
 #test info stack
 gdb_test "info stack" "No stack."
 
@@ -458,7 +458,7 @@ gdb_test "info symbol" "Argument required .address.."
 #test info source
 gdb_test  "info source" "No current source file..*"
 #test info sources
-gdb_test "info sources" "No symbol table is loaded.  Use the \"file\" command.*"
+gdb_test "info sources" {No symbol table is loaded.  Use the "file" command.*}
 #test info target
 gdb_test_no_output "info target" "info target"
 #test info terminal
@@ -482,29 +482,29 @@ gdb_test "jump" "The program is not being run."
 #test kill
 gdb_test "kill" "The program is not being run."
 #test list "l" abbreviation
-gdb_test "l" "No symbol table is loaded.  Use the \"file\" command.*" "list \"l\" abbreviation"
+gdb_test "l" {No symbol table is loaded.  Use the "file" command.*} {list "l" abbreviation}
 #test list
-gdb_test "list" "No symbol table is loaded.  Use the \"file\" command.*"
+gdb_test "list" {No symbol table is loaded.  Use the "file" command.*}
 #test load
 # The ``takes a file name'' case is for vxgdb.
 # The ``Use the "file" command'' case is for newer GDB versions which try
 # to deduce the filename from the exec file.
 gdb_test "load" "You can't do that when your target is `None'.*|The load command takes a file name.*|Must specify at least a file name with the load command.*|.*Use the .file. or .exec-file. command.*"
 #test next "n" abbreviation
-gdb_test "n" "The program is not being run." "next \"n\" abbreviation"
+gdb_test "n" "The program is not being run." {next "n" abbreviation}
 #test next
 gdb_test "next" "The program is not being run."
 #test nexti "ni" abbreviation
-gdb_test "ni" "The program is not being run." "nexti \"ni\" abbreviation"
+gdb_test "ni" "The program is not being run." {nexti "ni" abbreviation}
 #test nexti
 gdb_test "nexti" "The program is not being run."
 #test output
 gdb_test "output" "Argument required .expression to compute.*"
 
 #test overlay
-gdb_test "overlay" "List of \"overlay\" subcommands:.*"
+gdb_test "overlay" {List of "overlay" subcommands:.*}
 #test a non-existant overlay subcommand
-gdb_test "overlay on"     "Undefined overlay command.* Try \"help overlay\"."
+gdb_test "overlay on"     {Undefined overlay command.* Try "help overlay".}
 gdb_test_no_output "overlay manual" "overlay manual #1"
 gdb_test_no_output "overlay auto"
 gdb_test_no_output "overlay off"
@@ -516,7 +516,7 @@ gdb_test "overlay map"    "Argument required: name of an overlay section" "overl
 gdb_test "overlay unmap"  "Argument required: name of an overlay section" "overlay unmap #2"
 
 #test print "p" abbreviation
-gdb_test "p" "The history is empty." "print \"p\" abbreviation"
+gdb_test "p" "The history is empty." {print "p" abbreviation}
 #test print
 gdb_test "print" "The history is empty."
 #test printf
@@ -585,7 +585,7 @@ gdb_test "return" "No selected frame..*"
 #test reverse-search
 gdb_test "reverse-search" "No previous regular expression.*|There is no previous regular expression.*"
 #test step "s" abbreviation
-gdb_test "s" "The program is not being run." "step \"s\" abbreviation #1"
+gdb_test "s" "The program is not being run." {step "s" abbreviation #1}
 #test step
 gdb_test "step" "The program is not being run." "step #1"
 #test search
@@ -663,9 +663,9 @@ proc test_set_print { command message } {
 }
 
 #test set print "p" abbreviation
-test_set_print "set p" "set print \"p\" abbreviation"
+test_set_print "set p" {set print "p" abbreviation}
 #test set print "pr" abbreviation
-test_set_print "set pr"  "set print \"pr\" abbreviation"
+test_set_print "set pr"  {set print "pr" abbreviation}
 #test set print
 test_set_print "set print" "set print"
 
@@ -713,7 +713,7 @@ gdb_test "shell echo Hi dad!" "Hi dad!"
 #test show annotate
 gdb_test "show annotate" "Annotation_level is 0."
 #test show args
-gdb_test "show args" "Argument list to give program being debugged when it is started is \"\"."
+gdb_test "show args" {Argument list to give program being debugged when it is started is "".}
 
 # test show check abbreviations
 foreach x {"c" "ch" "check"} {
@@ -722,7 +722,7 @@ foreach x {"c" "ch" "check"} {
 }
 
 #test show check range
-gdb_test "show check range" "Range checking is \"auto; currently off\"."
+gdb_test "show check range" {Range checking is "auto; currently off".}
 #test show check type
 gdb_test "show check type" "Strict type checking is on\."
 #test show commands
@@ -849,7 +849,7 @@ gdb_test "show history size" "The size of the command history is.*"
 #test show history
 gdb_test "show history" "history expansion:  *History expansion on command input is o(\[^\r\n\]*\[\r\n\])+history filename:  *The filename in which to record the command history is.*.gdb_history(\[^\r\n\]*\[\r\n\])+history save: *Saving of the history record on exit is o(\[^\r\n\]*\[\r\n\])+history size: * The size of the command history is.*"
 #test show language
-gdb_test "show language" "The current source language is \"auto; currently c\"."
+gdb_test "show language" {The current source language is "auto; currently c".}
 #test show listsize
 gdb_test "show listsize" "Number of source lines gdb will list by default is 10."
 
@@ -945,7 +945,7 @@ test_info_set_show "show"
 #history saving should stay disabled
 gdb_test_no_output "set history save off" "set history save off"
 #test stepi "si" abbreviation
-gdb_test  "si" "The program is not being run." "stepi \"si\" abbreviation"
+gdb_test  "si" "The program is not being run." {stepi "si" abbreviation}
 #test stepi
 gdb_test "stepi" "The program is not being run."
 #test signal
@@ -953,14 +953,14 @@ gdb_test "signal" "The program is not being run."
 #test source
 gdb_test "source" "source command requires file name of file to source..*|No such file or directory.*"
 #test step "s" abbreviation
-gdb_test "s" "The program is not being run." "step \"s\" abbreviation #2"
+gdb_test "s" "The program is not being run." {step "s" abbreviation #2}
 #test step
 gdb_test "step" "The program is not being run." "step #2"
 #test symbol-file
 gdb_test "symbol-file" ".*"
 
 #test target native
-gdb_test "target native" "Use the \"run\" command to start a process.*|Undefined target command: \"native\".  *Try \"help target\".*"
+gdb_test "target native" {Use the "run" command to start a process.*|Undefined target command: "native".  *Try "help target".*}
 
 #test target core
 send_gdb "target core\n"
@@ -1026,7 +1026,7 @@ gdb_test "thread find" "Command requires an argument."
 #test thread name
 gdb_test "thread name" "No thread selected"
 #test until "u" abbreviation
-gdb_test "u" "The program is not being run." "until \"u\" abbreviation"
+gdb_test "u" "The program is not being run." {until "u" abbreviation}
 #test until
 gdb_test "until" "The program is not being run."
 #test undisplay

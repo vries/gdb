@@ -59,4 +59,4 @@ gdb_test_multiple "target tfile ${tracefile}.tf" "$test" {
 
 gdb_test "tfind 0" "Found trace frame 0, tracepoint .*"
 
-gdb_test "interpreter-exec mi \"-trace-find frame-number 0\"" "done.*"
+gdb_test {interpreter-exec mi "-trace-find frame-number 0"} "done.*"

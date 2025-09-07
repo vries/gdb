@@ -81,7 +81,7 @@ mi_create_varobj_checked lstring estring \
     "struct lazystring" \
     "create estring varobj"
 
-mi_gdb_test "-data-evaluate-expression \"string_1 = string_2\"" ".*" \
+mi_gdb_test {-data-evaluate-expression "string_1 = string_2"} ".*" \
     "assign string_1 from string_2"
 
 mi_gdb_test "-var-update string" \

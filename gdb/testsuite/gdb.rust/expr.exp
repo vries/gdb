@@ -49,7 +49,7 @@ gdb_test "print '\\r'" " = 13 '\\\\r'"
 gdb_test "print '\\\\'" " = 92 '\\\\\\\\'"
 gdb_test "print '\\0'" " = 0 '\\\\0'"
 gdb_test "print '\\''" " = 39 '\\\\''"
-gdb_test "print '\\\"'" " = 34 '\"'"
+gdb_test "print '\\\"'" { = 34 '"'}
 gdb_test "print '\\xff'" " = 255 '\\\\xff'"
 gdb_test "print '\\xFF'" " = 255 '\\\\xff'"
 gdb_test "print '\\u\{F0eF\}'" " = 61679 '\\\\u\\{00f0ef\\}'"
@@ -119,16 +119,16 @@ gdb_test "print \[0;0\]" " = \\\[\\\]"
 gdb_test "print \[1;0\]" " = \\\[\\\]"
 gdb_test "print \[0;1\]" " = \\\[0\\\]"
 
-gdb_test "print b\"hi rust\"" " = b\"hi rust\""
+gdb_test {print b"hi rust"} { = b"hi rust"}
 # This isn't rusty syntax yet, but that's another bug -- this is just
 # testing that byte escapes work properly.
 gdb_test "print b\"\\xddhi bob\"" " = b\"\\\\335hi bob\""
 gdb_test "print b\"has\\0nul\"" " = b\"has\\\\000nul\""
 
-gdb_test "print br##\"hi\"##" " = b\"hi\""
-gdb_test "print br##\"hi" "Unexpected EOF in string"
-gdb_test "print br##\"hi\"" "Unexpected EOF in string"
-gdb_test "print br##\"hi\"#" "Unexpected EOF in string"
+gdb_test {print br##"hi"##} { = b"hi"}
+gdb_test {print br##"hi} "Unexpected EOF in string"
+gdb_test {print br##"hi"} "Unexpected EOF in string"
+gdb_test {print br##"hi"#} "Unexpected EOF in string"
 
 # Test that convenience variables and functions work with the Rust
 # parser.
@@ -154,7 +154,7 @@ gdb_test "printf \"%d %d\\n\", 23+1, 23-1" "24 22"
 gdb_test "print 5," "Syntax error near ','"
 
 # Check expression debug works for strings.
-gdb_test "with debug expression 1 -- print \"foo\"" \
+gdb_test {with debug expression 1 -- print "foo"} \
     [multi_line \
 	 "Operation: OP_AGGREGATE" \
 	 " Type: &str" \

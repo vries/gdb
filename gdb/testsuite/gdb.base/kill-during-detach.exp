@@ -75,7 +75,7 @@ set checkpoint_line [gdb_get_line_number "Checkpoint here"]
 # When CHECKPOINT_P is false we don't use the 'checkpoint' command.
 proc run_test { exit_p checkpoint_p } {
     save_vars { ::GDBFLAGS } {
-	append ::GDBFLAGS " -ex \"set non-stop on\""
+	append ::GDBFLAGS { -ex "set non-stop on"}
 	clean_restart
 	gdb_load $::binfile
     }
@@ -107,7 +107,7 @@ proc run_test { exit_p checkpoint_p } {
     gdb_test "continue &"
 
     if { $exit_p } {
-	set action_line "gdb.execute(\"set variable dont_exit_just_yet=0\")"
+	set action_line {gdb.execute("set variable dont_exit_just_yet=0")}
     } else {
 	set action_line "os.kill(inf_pid, signal.SIGKILL)"
     }
@@ -120,7 +120,7 @@ proc run_test { exit_p checkpoint_p } {
 	"def kill_and_detach():" "" \
 	"   $action_line" "" \
 	"   time.sleep(1)" "" \
-	"   gdb.execute(\"detach\")" "" \
+	{   gdb.execute("detach")} "" \
 	"end" ""
 
     if { $checkpoint_p } {

@@ -45,8 +45,8 @@ foreach_mi_ui_mode mode {
     # Restart, but enable non-stop mode, we need it for background
     # execution.
     save_vars { GDBFLAGS } {
-	append GDBFLAGS " -ex \"maint set target-non-stop on\""
-	append GDBFLAGS " -ex \"set mi-async on\""
+	append GDBFLAGS { -ex "maint set target-non-stop on"}
+	append GDBFLAGS { -ex "set mi-async on"}
 	mi_clean_restart $::testfile $start_ops
     }
 

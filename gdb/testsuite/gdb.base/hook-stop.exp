@@ -57,7 +57,7 @@ proc hook_stop_before_frame {} {
     with_test_prefix "hook-stop runs before frame print" {
 	global gdb_prompt
 
-	setup "echo \"Hello.\""
+	setup {echo "Hello."}
 
 	set test "run hook-stop"
 	gdb_test_multiple "continue" "$test" {

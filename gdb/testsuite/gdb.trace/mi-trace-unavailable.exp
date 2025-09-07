@@ -46,7 +46,7 @@ mi_gdb_test "-break-insert -a bar" \
     "insert tracepoint on bar"
 
 # Define an action.
-mi_gdb_test "-break-commands 3 \"collect array\" \"collect j\" \"end\" " \
+mi_gdb_test {-break-commands 3 "collect array" "collect j" "end" } \
     {\^done} "set action"
 
 mi_gdb_test "-break-insert -a foo" \
@@ -54,7 +54,7 @@ mi_gdb_test "-break-insert -a foo" \
     "insert tracepoint on foo"
 
 # Collect 'main' to make sure no registers are collected except PC.
-mi_gdb_test "-break-commands 4 \"collect main\" \"end\" " \
+mi_gdb_test {-break-commands 4 "collect main" "end" } \
     {\^done} "set action on tracepoint 4"
 
 mi_gdb_test "-trace-start" {.*\^done} "trace start"

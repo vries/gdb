@@ -31,7 +31,7 @@ proc test_per_inferior { } {
 	"AMDGPU precise memory access reporting is off \\(currently disabled\\)." \
 	"show initial value, inferior 1"
     if $::test_python {
-	gdb_test "python print(gdb.parameter(\"amdgpu precise-memory\"))" \
+	gdb_test {python print(gdb.parameter("amdgpu precise-memory"))} \
 	    "False" \
 	    "show initial value using Python, inferior 1"
     }
@@ -41,7 +41,7 @@ proc test_per_inferior { } {
 	"AMDGPU precise memory access reporting is on \\(currently disabled\\)." \
 	"show new value, inferior 1"
     if $::test_python {
-	gdb_test "python print(gdb.parameter(\"amdgpu precise-memory\"))" \
+	gdb_test {python print(gdb.parameter("amdgpu precise-memory"))} \
 	    "True" \
 	    "show new value using Python, inferior 1"
     }
@@ -53,7 +53,7 @@ proc test_per_inferior { } {
 	"AMDGPU precise memory access reporting is off \\(currently disabled\\)." \
 	"show initial value, inferior 2"
     if $::test_python {
-	gdb_test "python print(gdb.parameter(\"amdgpu precise-memory\"))" \
+	gdb_test {python print(gdb.parameter("amdgpu precise-memory"))} \
 	    "False" \
 	    "show initial value using Python, inferior 2"
     }

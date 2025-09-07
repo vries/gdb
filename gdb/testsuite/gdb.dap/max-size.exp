@@ -27,7 +27,7 @@ if {[build_executable ${testfile}.exp $testfile] == -1} {
 }
 
 save_vars GDBFLAGS {
-    append GDBFLAGS " -iex \"set max-value-size 16\""
+    append GDBFLAGS { -iex "set max-value-size 16"}
 
     if {[dap_initialize] == ""} {
 	return
@@ -75,7 +75,7 @@ foreach var [dict get $refs body variables] {
     gdb_assert {[dict get $var name] == "the_string"} "variable name"
     # The result looks strange here, but only because TON does not
     # handle the backslash-quote sequence properly when decoding the
-    # JSON.  The actual JSON is: "value": "\"DEI\"".
+    # JSON.  The actual JSON is: "value": {"DEI"}.
     gdb_assert {[dict get $var value] == "\\\"this is a string longer than 16 bytes\\\""} \
 	"variable value"
 }

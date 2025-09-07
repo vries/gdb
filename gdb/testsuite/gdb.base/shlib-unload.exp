@@ -126,7 +126,7 @@ proc_with_prefix test_dprintf_after_unload {} {
     gdb_continue_to_breakpoint "stop before dlclose"
 
     # Setup a dprintf within the shared library.
-    gdb_test "dprintf foo,\"In foo\""
+    gdb_test {dprintf foo,"In foo"}
     set bp_num [get_integer_valueof "\$bpnum" "*UNKNOWN*" \
 		    "get b/p number"]
 
@@ -156,7 +156,7 @@ proc_with_prefix test_dprintf_with_rerun {} {
     gdb_continue_to_breakpoint "stop before dlclose"
 
     # Setup a dprintf within the shared library.
-    gdb_test "dprintf foo,\"In foo\""
+    gdb_test {dprintf foo,"In foo"}
     set bp_num [get_integer_valueof "\$bpnum" "*UNKNOWN*" \
 		    "get b/p number"]
 
@@ -255,7 +255,7 @@ proc_with_prefix test_silent_nosharedlib {} {
 	if { $type eq "breakpoint" } {
 	    gdb_test "break foo"
 	} else {
-	    gdb_test "dprintf foo,\"In foo\""
+	    gdb_test {dprintf foo,"In foo"}
 	}
 
 	# Record the number of the b/p (or dprintf) we just inserted.

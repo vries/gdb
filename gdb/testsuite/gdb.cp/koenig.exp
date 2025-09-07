@@ -61,8 +61,8 @@ gdb_test "p foo(1 ,fo, eo)"  "= 5"
 gdb_test "p foo(go, fo, eo)" "= 6"
 
 #test that gdb fails gracefully
-gdb_test "p fake(eo)" "No symbol \"fake\" in current context."
-gdb_test "p foo (fake)" "No symbol \"fake\" in current context."
+gdb_test "p fake(eo)" {No symbol "fake" in current context.}
+gdb_test "p foo (fake)" {No symbol "fake" in current context.}
 
 #test that namespaces of base classes are searched
 gdb_test "p foo(io)" "= 7"
@@ -95,8 +95,8 @@ gdb_test "p foo(labo)" "= 17"
 gdb_test "p ma.foo('a')" "= 18"
 gdb_test "p foo(ma,'a')" "= 19"
 gdb_test "p M::N::foo(ma,'a')" "= 20"
-gdb_test "p M::FAKE::foo(ma,'a')" "No type \"FAKE\" within class or namespace \"M\"."
-gdb_test "p M::N::fake(ma,'a')" "No symbol \"fake\" in namespace \"M::N\"."
+gdb_test "p M::FAKE::foo(ma,'a')" {No type "FAKE" within class or namespace "M".}
+gdb_test "p M::N::fake(ma,'a')" {No symbol "fake" in namespace "M::N".}
 
 gdb_test "p M::bar('a')" "= 21"
 gdb_test "p M::N::bar('a')" "= 22"

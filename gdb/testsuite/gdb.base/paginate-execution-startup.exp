@@ -39,7 +39,7 @@ proc probe_can_run_cmdline  {} {
 
 	gdb_exit
 	save_vars { GDBFLAGS } {
-	    append GDBFLAGS " -ex \"start\""
+	    append GDBFLAGS { -ex "start"}
 	    append GDBFLAGS " --args \"$file_arg\""
 	    set res [gdb_spawn]
 	}
@@ -80,8 +80,8 @@ proc test_fg_execution_pagination_return {} {
 	gdb_exit
 
 	save_vars { GDBFLAGS  } {
-	    append GDBFLAGS " -ex \"set height 2\""
-	    append GDBFLAGS " -ex \"start\""
+	    append GDBFLAGS { -ex "set height 2"}
+	    append GDBFLAGS { -ex "start"}
 	    append GDBFLAGS " --args \"$file_arg\""
 	    set res [gdb_spawn]
 	}
@@ -135,8 +135,8 @@ proc test_fg_execution_pagination_cancel { how } {
 	gdb_exit
 
 	save_vars { GDBFLAGS } {
-	    append GDBFLAGS " -ex \"set height 2\""
-	    append GDBFLAGS " -ex \"start\""
+	    append GDBFLAGS { -ex "set height 2"}
+	    append GDBFLAGS { -ex "start"}
 	    append GDBFLAGS " --args \"$file_arg\""
 	    set res [gdb_spawn]
 	}

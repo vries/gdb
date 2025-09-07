@@ -37,5 +37,5 @@ gdb_test "info frame" "inlined into frame 1\r\n.*"
 
 gdb_test "up" "#1  g .*"
 
-gdb_test "guile (print (frame-read-var (selected-frame) \"l\"))" \
+gdb_test {guile (print (frame-read-var (selected-frame) "l"))} \
     "= 42"

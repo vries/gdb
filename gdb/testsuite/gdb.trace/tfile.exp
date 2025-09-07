@@ -138,9 +138,9 @@ Not looking at any trace frame.*" \
 gdb_test \
     "interpreter-exec mi \"-target-select tfile $tfile_basic\"" \
     "\\^connected.*" \
-    "interpreter-exec mi \"-target-select tfile tfile-basic.tf\""
+    {interpreter-exec mi "-target-select tfile tfile-basic.tf"}
 
-gdb_test "interpreter-exec mi \"-trace-status\"" \
+gdb_test {interpreter-exec mi "-trace-status"} \
     "\\^done,supported=\"file\",trace-file=\".*$tfile_basic\",running=\"0\",stop-reason=\"request\",frames=\"${decimal}\",frames-created=\"${decimal}\",buffer-size=\"${decimal}\",buffer-free=\"${decimal}\",disconnected=\".*\",circular=\".*\",user-name=\"\",notes=\"\",start-time=\".*\",stop-time=\".*\"" \
     "-trace-status"
 

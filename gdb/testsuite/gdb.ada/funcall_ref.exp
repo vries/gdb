@@ -84,6 +84,6 @@ foreach_gnat_encoding scenario flags {all minimal} {
 	return 0
     }
 
-    gdb_test "p get(\"Hello world!\")" \
+    gdb_test {p get("Hello world!")} \
 	"= \\(n => 12, s => \"Hello world!\"\\)"
 }

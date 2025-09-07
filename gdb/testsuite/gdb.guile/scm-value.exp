@@ -60,7 +60,7 @@ proc test_value_in_inferior {} {
 
     gdb_scm_test_silent_cmd "gu (define s (history-ref 0))" "set s"
 
-    gdb_test "gu (print (value-field s \"a\"))" \
+    gdb_test {gu (print (value-field s "a"))} \
 	"= 3" "access element inside struct using string name"
 
     # Append value in the value history.
@@ -121,7 +121,7 @@ proc test_value_in_inferior {} {
     if {$can_read_0} {
 	untested $test
     } else {
-	gdb_test "gu (print (parse-and-eval \"*(int*)0\"))" \
+	gdb_test {gu (print (parse-and-eval "*(int*)0"))} \
 	    "ERROR: Cannot access memory at address 0x0.*" $test
     }
 
@@ -130,7 +130,7 @@ proc test_value_in_inferior {} {
     if {$can_read_0} {
 	untested $test
     } else {
-	gdb_test_no_output "gu (define inval (parse-and-eval \"*(int*)0\"))"
+	gdb_test_no_output {gu (define inval (parse-and-eval "*(int*)0"))}
 	gdb_test "gu (print (value-lazy? inval))" \
 	    "#t"
 	gdb_test "gu (define inval2 (value-add inval 1))" \
@@ -140,8 +140,8 @@ proc test_value_in_inferior {} {
 	    "ERROR: Cannot access memory at address 0x0.*" \
 	    "$test, using value in value-fetch-lazy!"
     }
-    gdb_test_no_output "gu (define argc-lazy (parse-and-eval \"argc\"))"
-    gdb_test_no_output "gu (define argc-notlazy (parse-and-eval \"argc\"))"
+    gdb_test_no_output {gu (define argc-lazy (parse-and-eval "argc"))}
+    gdb_test_no_output {gu (define argc-notlazy (parse-and-eval "argc"))}
     gdb_test_no_output "gu (value-fetch-lazy! argc-notlazy)"
     gdb_test "gu (print (value-lazy? argc-lazy))" "= #t" \
 	"argc-lazy is initially lazy"
@@ -156,7 +156,7 @@ proc test_value_in_inferior {} {
 	"argc-lazy is no longer lazy"
 
     # Test string fetches, both partial and whole.
-    gdb_test "print st" "\"divide et impera\""
+    gdb_test "print st" {"divide et impera"}
     gdb_scm_test_silent_cmd "gu (define st (history-ref 0))" \
 	"inf: get st value from history"
     gdb_test "gu (print (value->string st))" \
@@ -165,7 +165,7 @@ proc test_value_in_inferior {} {
 	"= divide et impera" "Test string (length = -1) is all of the string"
     gdb_test "gu (print (value->string st #:length 6))" \
 	"= divide"
-    gdb_test "gu (print (string-append \"---\" (value->string st #:length 0) \"---\"))" \
+    gdb_test {gu (print (string-append "---" (value->string st #:length 0) "---"))} \
 	"= ------" "Test string (length = 0) is empty"
     gdb_test "gu (print (string-length (value->string st #:length 0)))" \
 	"= 0" "Test length is 0"
@@ -196,7 +196,7 @@ proc test_value_in_inferior {} {
 }
 
 proc test_strings {} {
-    gdb_test "gu (make-value \"test\")" "#<gdb:value \"test\">" "make string"
+    gdb_test {gu (make-value "test")} {#<gdb:value "test">} "make string"
 
     # Test string conversion errors.
     set save_charset [get_target_charset]
@@ -226,7 +226,7 @@ proc test_strings {} {
 	"ERROR.*decoding-error.*" "value->string #:errors 'error"
     gdb_test "gu (print (value->string (make-value (string #\\x1234)) #:encoding \"ASCII\" #:errors 'substitute))" \
 	"= \[?\]{3}" "value->string #:errors 'substitute"
-    gdb_test "gu (print (value->string (make-value \"abc\") #:errors \"foo\"))" \
+    gdb_test {gu (print (value->string (make-value "abc") #:errors "foo"))} \
 	"ERROR.*invalid error kind.*" "bad value for #:errors"
 
     gdb_test_no_output "set target-charset $save_charset" \
@@ -275,7 +275,7 @@ proc test_inferior_function_call {} {
 
 proc test_value_after_death {} {
     # Construct a type while the inferior is still running.
-    gdb_scm_test_silent_cmd "gu (define ptrtype (lookup-type \"PTR\"))" \
+    gdb_scm_test_silent_cmd {gu (define ptrtype (lookup-type "PTR"))} \
 	"create PTR type"
 
     # Kill the inferior and remove the symbols.
@@ -329,16 +329,16 @@ proc test_subscript_regression {exefile lang} {
 
 	# Just the most basic test of dynamic_cast -- it is checked in
 	# the C++ tests.
-	gdb_test "gu (print (value->bool (value-dynamic-cast (parse-and-eval \"base\") (type-pointer (lookup-type \"Derived\")))))" \
+	gdb_test {gu (print (value->bool (value-dynamic-cast (parse-and-eval "base") (type-pointer (lookup-type "Derived")))))} \
 	    "= #t"
 
 	# Likewise.
-	gdb_test "gu (print (value-dynamic-type (parse-and-eval \"base\")))" \
+	gdb_test {gu (print (value-dynamic-type (parse-and-eval "base")))} \
 	    "= Derived \[*\]"
-	gdb_test "gu (print (value-dynamic-type (parse-and-eval \"base_ref\")))" \
+	gdb_test {gu (print (value-dynamic-type (parse-and-eval "base_ref")))} \
 	    "= Derived \[&\]"
 	# A static type case.
-	gdb_test "gu (print (value-dynamic-type (parse-and-eval \"5\")))" \
+	gdb_test {gu (print (value-dynamic-type (parse-and-eval "5")))} \
 	    "= int"
     }
 
@@ -347,7 +347,7 @@ proc test_subscript_regression {exefile lang} {
 
     gdb_scm_test_silent_cmd "gu (define intv (make-value 1))" \
 	"Create int value for subscript test"
-    gdb_scm_test_silent_cmd "gu (define stringv (make-value \"foo\"))" \
+    gdb_scm_test_silent_cmd {gu (define stringv (make-value "foo"))} \
 	"Create string value for subscript test"
 
     # Try to access an int with a subscript.  This should fail.
@@ -359,7 +359,7 @@ proc test_subscript_regression {exefile lang} {
 
     # Try to access a string with a subscript.  This should pass.
     gdb_test "gu (print stringv)" \
-	"= \"foo\"" "Baseline print of a string Guile value"
+	{= "foo"} "Baseline print of a string Guile value"
     gdb_test "gu (print (value-subscript stringv 0))" \
 	"= 102 'f'" "Attempt to access a string with a subscript"
 
@@ -389,11 +389,11 @@ proc test_subscript_regression {exefile lang} {
 # A few tests of gdb:parse-and-eval.
 
 proc test_parse_and_eval {} {
-    gdb_test "gu (print (parse-and-eval \"23\"))" \
+    gdb_test {gu (print (parse-and-eval "23"))} \
 	"= 23" "parse-and-eval constant test"
-    gdb_test "gu (print (parse-and-eval \"5 + 7\"))" \
+    gdb_test {gu (print (parse-and-eval "5 + 7"))} \
 	"= 12" "parse-and-eval simple expression test"
-    gdb_test "gu (raw-print (parse-and-eval \"5 + 7\"))" \
+    gdb_test {gu (raw-print (parse-and-eval "5 + 7"))} \
 	"#<gdb:value 12>" "parse-and-eval type test"
 }
 
@@ -410,9 +410,9 @@ proc test_value_hash {} {
 	"(define two (make-value 2))" "" \
 	"(define three (make-value 3))" "" \
         "(define vdict (make-hash-table 5))" "" \
-	"(hash-set! vdict one \"one str\")" "" \
-	"(hash-set! vdict two \"two str\")" "" \
-	"(hash-set! vdict three \"three str\")" "" \
+	{(hash-set! vdict one "one str")} "" \
+	{(hash-set! vdict two "two str")} "" \
+	{(hash-set! vdict three "three str")} "" \
 	"end"
     gdb_test "gu (print (hash-ref vdict one))" \
 	"one str" "Test dictionary hash 1"

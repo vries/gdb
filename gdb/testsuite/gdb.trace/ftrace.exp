@@ -132,7 +132,7 @@ proc test_fast_tracepoints {} {
 
             if { [expr $minaddr > 64512] } {
                 warning "mmap_min_addr > 64512, fast tracepoint will fail"
-                warning "do \"sudo sysctl -w vm.mmap_min_addr=32768\" to adjust"
+                warning {do "sudo sysctl -w vm.mmap_min_addr=32768" to adjust}
             }
         }
 

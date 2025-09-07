@@ -155,8 +155,8 @@ with_test_prefix "basics" {
 
     # An early prototype of the "with" command got this wrong.
     gdb_test \
-	"w print repeats unlimited -- w print repeats 1 -- p \"1223334444\"" \
-	" = \"1\", '2' <repeats 2 times>, '3' <repeats 3 times>, '4' <repeats 4 times>"
+	{w print repeats unlimited -- w print repeats 1 -- p "1223334444"} \
+	{ = "1", '2' <repeats 2 times>, '3' <repeats 3 times>, '4' <repeats 4 times>}
 }
 
 # Check a user-defined command.
@@ -246,7 +246,7 @@ with_test_prefix "errors" {
 	"Ambiguous set print command \"m\": max-depth, max-symbolic-offset, memory-tag-violations\\."
 
     gdb_test "with variable xxx=1" \
-	"Cannot use this setting with the \"with\" command"
+	{Cannot use this setting with the "with" command}
 
     gdb_test "with print elements -- p 1" \
 	"Argument required \\(integer to set it to, or \"unlimited\"\\)\\."

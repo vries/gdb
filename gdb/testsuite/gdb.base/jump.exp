@@ -70,7 +70,7 @@ proc do_tests {} {
     # Verify that GDB responds gracefully to the "jump" command with
     # trailing junk.
     gdb_test "jump $call_line 100" \
-	"malformed linespec error: unexpected number, \"100\"" \
+	{malformed linespec error: unexpected number, "100"} \
 	"jump with trailing argument junk"
 
     # Verify that GDB responds gracefully to a request to jump out of

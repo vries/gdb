@@ -276,7 +276,7 @@ with_debuginfod_env $cache {
     setenv DEBUGINFOD_URLS $url
 
     save_vars { GDBFLAGS } {
-	append GDBFLAGS " -ex \"set debuginfod enabled on\""
+	append GDBFLAGS { -ex "set debuginfod enabled on"}
 
 	# Reload the executable and core file.  GDB should download
 	# the file libfoo_1.so using debuginfod during the mapped file

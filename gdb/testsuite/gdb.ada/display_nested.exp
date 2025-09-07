@@ -28,4 +28,4 @@ clean_restart ${testfile}
 set bp_location [gdb_get_line_number "BREAK" ${testdir}/foo.adb]
 runto "foo.adb:$bp_location"
 
-gdb_test "display s(I..I+5)" [string_to_regexp "1: s(I..I+5) = \"test s\""]
+gdb_test "display s(I..I+5)" [string_to_regexp {1: s(I..I+5) = "test s"}]

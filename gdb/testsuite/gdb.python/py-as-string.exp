@@ -31,9 +31,9 @@ if ![runto_main] {
 }
 
 proc test_as_string { } {
-    gdb_test "p \$_as_string(2)" "\"2\""
-    gdb_test "p \$_as_string(enum_valid)" "\"ENUM_VALUE_B\""
-    gdb_test "p \$_as_string(enum_invalid)" "\"20\""
+    gdb_test "p \$_as_string(2)" {"2"}
+    gdb_test "p \$_as_string(enum_valid)" {"ENUM_VALUE_B"}
+    gdb_test "p \$_as_string(enum_invalid)" {"20"}
 }
 
 test_as_string

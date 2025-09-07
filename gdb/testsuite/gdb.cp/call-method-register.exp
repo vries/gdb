@@ -113,5 +113,5 @@ if ![runto_main] {
 }
 
 gdb_test "print global_var.yyy ()" \
-    "Address requested for identifier \"global_var\" which is in register .*" \
+    {Address requested for identifier "global_var" which is in register .*} \
     "call method on register local"

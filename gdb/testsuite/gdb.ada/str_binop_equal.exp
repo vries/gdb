@@ -31,11 +31,11 @@ runto "foo_p211_061.adb:$bp_location"
 gdb_test "print my_str = my_str" \
          " = true"
 
-gdb_test "print my_str = \"ABCD\"" \
+gdb_test {print my_str = "ABCD"} \
     " = true"
 
-gdb_test "print my_str = \"EFGH\"" \
+gdb_test {print my_str = "EFGH"} \
          " = false"
 
-gdb_test "print my_str = \"AB\"" \
+gdb_test {print my_str = "AB"} \
          " = false"

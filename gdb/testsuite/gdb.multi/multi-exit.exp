@@ -35,7 +35,7 @@ if {[build_executable "failed to prepare" $testfile $srcfile]} {
 # We are testing GDB's ability to stop all threads.
 # Hence, go with the all-stop-on-top-of-non-stop mode.
 save_vars { GDBFLAGS } {
-    append GDBFLAGS " -ex \"maint set target-non-stop on\""
+    append GDBFLAGS { -ex "maint set target-non-stop on"}
     clean_restart ${::testfile}
 }
 

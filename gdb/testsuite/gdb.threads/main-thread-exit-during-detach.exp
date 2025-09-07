@@ -49,7 +49,7 @@ if {[build_executable "failed to prepare" $testfile $srcfile \
 
 proc run_test { spawn_inferior } {
     save_vars { ::GDBFLAGS } {
-	append ::GDBFLAGS " -ex \"set non-stop on\""
+	append ::GDBFLAGS { -ex "set non-stop on"}
 	clean_restart $::testfile
     }
 
@@ -109,9 +109,9 @@ proc run_test { spawn_inferior } {
 	"python" "" \
 	"import time" "" \
 	"def set_and_detach():" "" \
-	"   gdb.execute(\"set variable dont_exit_just_yet=0\")" "" \
+	{   gdb.execute("set variable dont_exit_just_yet=0")} "" \
 	"   time.sleep(1)" "" \
-	"   gdb.execute(\"detach\")" "" \
+	{   gdb.execute("detach")} "" \
 	"end" ""
 
     # The Python function performs two actions, the first causes the

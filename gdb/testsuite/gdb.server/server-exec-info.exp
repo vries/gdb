@@ -31,7 +31,7 @@ gdb_test "disconnect" ".*"
 
 gdb_test \
     "set remote pid-to-exec-file-packet off" \
-    "Support for the 'qXfer:exec-file:read' packet on future remote targets is set to \"off\"."
+    {Support for the 'qXfer:exec-file:read' packet on future remote targets is set to "off".}
 
 gdb_test "file" ".*" "file" \
 	 {Discard symbol table from `.*'\? \(y or n\) } "y"

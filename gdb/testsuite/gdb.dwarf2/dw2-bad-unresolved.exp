@@ -56,4 +56,4 @@ if { [prepare_for_testing "failed to prepare" ${testfile} \
 }
 
 gdb_test "ptype var" "type = bool"
-gdb_test "print var" "Missing .* symbol \"var\"."
+gdb_test "print var" {Missing .* symbol "var".}

@@ -46,7 +46,7 @@ mi_gdb_test "[incr i]-dprintf-insert 29" \
 
 mi_gdb_test "-break-insert main" ".*" "mi insert breakpoint main"
 
-mi_gdb_test "-dprintf-insert --function main \"hello\"" \
+mi_gdb_test {-dprintf-insert --function main "hello"} \
     "\\^done,bkpt={.*}" "explicit dprintf at main"
 
 mi_gdb_test "-dprintf-insert --source $srcfile --line $dp_location1 \"hello\"" \
@@ -87,7 +87,7 @@ proc mi_expect_dprintf {args where msg} {
     global inferior_spawn_id gdb_spawn_id
 
     if { $args == "call" || $args == "fprintf" } {
-	set foobarbazqux "\"foobarbazqux\""
+	set foobarbazqux {"foobarbazqux"}
 	set sid $inferior_spawn_id
     } else {
 	set foobarbazqux "\\\\\"foobarbazqux\\\\\""

@@ -147,9 +147,9 @@ proc_with_prefix scenario_1 { start_before } {
     gdb_test "break func if aaa == 10" \
 	[multi_line \
 	     "${warning} at location $decimal, disabling:" \
-	     "  No symbol \"aaa\" in current context." \
+	     {  No symbol "aaa" in current context.} \
 	     "${warning} at location $decimal, disabling:" \
-	     "  No symbol \"aaa\" in current context." \
+	     {  No symbol "aaa" in current context.} \
 	     "Breakpoint $decimal at $fill .3 locations."] \
 	"define bp with condition aaa == 10"
     set bpnum1 [get_integer_valueof "\$bpnum" 0 "get bpnum1"]
@@ -157,9 +157,9 @@ proc_with_prefix scenario_1 { start_before } {
     gdb_test "break func if ccc == 30" \
 	[multi_line \
 	     ".*${warning} at location $decimal, disabling:" \
-	     "  No symbol \"ccc\" in current context." \
+	     {  No symbol "ccc" in current context.} \
 	     ".*${warning} at location $decimal, disabling:" \
-	     "  No symbol \"ccc\" in current context." \
+	     {  No symbol "ccc" in current context.} \
 	     ".*Breakpoint $decimal at $fill .3 locations."] \
 	"define bp with condition ccc == 30"
     set bpnum2 [get_integer_valueof "\$bpnum" 0 "get bpnum2"]
@@ -218,18 +218,18 @@ proc setup_bps { bpnum1_name bpnum2_name } {
     gdb_test "cond $bpnum1 aaa == 10" \
 	[multi_line \
 	     "$warning at location ${bpnum1}.[lindex $locs 0], disabling:" \
-	     "  No symbol \"aaa\" in current context." \
+	     {  No symbol "aaa" in current context.} \
 	     "$warning at location ${bpnum1}.[lindex $locs 1], disabling:" \
-	     "  No symbol \"aaa\" in current context."]
+	     {  No symbol "aaa" in current context.}]
 
     # Defining a condition on 'c' disables 2 locations.
     set locs [lsort -integer "$loc_index(Base) $loc_index(A)"]
     gdb_test "cond $bpnum2 ccc == 30" \
 	[multi_line \
 	     "$warning at location ${bpnum2}.[lindex $locs 0], disabling:" \
-	     "  No symbol \"ccc\" in current context." \
+	     {  No symbol "ccc" in current context.} \
 	     "$warning at location ${bpnum2}.[lindex $locs 1], disabling:" \
-	     "  No symbol \"ccc\" in current context."]
+	     {  No symbol "ccc" in current context.}]
 }
 
 # Scenario 2: Define breakpoints unconditionally, and then define
@@ -308,9 +308,9 @@ proc_with_prefix scenario_3 { start_before } {
     gdb_test "cond $bpnum1 ccc == 30" \
 	[multi_line \
 	     "${warning} at location ${bpnum1}.[lindex $locs 0], disabling:" \
-	     "  No symbol \"ccc\" in current context." \
+	     {  No symbol "ccc" in current context.} \
 	     "${warning} at location ${bpnum1}.[lindex $locs 1], disabling:" \
-	     "  No symbol \"ccc\" in current context." \
+	     {  No symbol "ccc" in current context.} \
 	     "Breakpoint ${bpnum1}'s condition is now valid at location $loc_index(C), enabling."] \
 	"change the condition of bp 1"
     check_bp_locations $bpnum1 {N* N* y} "ccc == 30" "after changing the condition"
@@ -335,7 +335,7 @@ proc_with_prefix scenario_3 { start_before } {
     gdb_test "cond $bpnum2 ccc == 30" \
 	[multi_line \
 	     "${warning} at location ${bpnum2}.$loc_index(Base), disabling:" \
-	     "  No symbol \"ccc\" in current context."] \
+	     {  No symbol "ccc" in current context.}] \
 	"re-define a condition"
     check_bp_locations $bpnum2 {N* N* n} "ccc == 30" "loc for C should remain disabled"
 
@@ -345,7 +345,7 @@ proc_with_prefix scenario_3 { start_before } {
     check_bp_locations $bpnum2 {N* N* n} "ccc == 30" "after enable attempt"
 
     gdb_test "cond $bpnum2 garbage" \
-	"No symbol \"garbage\" in current context." \
+	{No symbol "garbage" in current context.} \
 	"reject condition if bad for all locations"
 
     gdb_test_no_output "delete $bpnum1"
@@ -386,11 +386,11 @@ proc_with_prefix scenario_4 { start_before } {
     gdb_test "cond -force $bpnum1 foo" \
 	[multi_line \
 	     "${warning} at location ${bpnum1}.1, disabling:" \
-	     "  No symbol \"foo\" in current context." \
+	     {  No symbol "foo" in current context.} \
 	     "${warning} at location ${bpnum1}.2, disabling:" \
-	     "  No symbol \"foo\" in current context." \
+	     {  No symbol "foo" in current context.} \
 	     "${warning} at location ${bpnum1}.3, disabling:" \
-	     "  No symbol \"foo\" in current context."] \
+	     {  No symbol "foo" in current context.}] \
 	"force the condition of bp 1"
     check_bp_locations $bpnum1 {N* N* N*} "foo" "after forcing the condition"
 

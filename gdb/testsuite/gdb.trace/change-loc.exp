@@ -317,7 +317,7 @@ proc tracepoint_install_in_trace_disabled { trace_type } {
 	# Force-disable the InstallInTrace RSP feature.
 	gdb_test \
 	    "set remote install-in-trace-packet off" \
-	    "Support for the 'InstallInTrace' packet on the current remote target is set to \"off\"."
+	    {Support for the 'InstallInTrace' packet on the current remote target is set to "off".}
 
 	# Set a tracepoint while a trace experiment is ongoing.
 	gdb_test "${trace_type} set_tracepoint" \

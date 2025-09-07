@@ -313,10 +313,10 @@ gdb_test "p file2_thread_local" " = \[0-9\]+"
 # Depending on the current lookup scope we get LOC_UNRESOLVED or LOC_COMPUTED
 # both printing:
 # Symbol "file2_thread_local" is a thread-local variable at offset 8 in the thread-local storage for `.../gdb.threads/tls'.
-gdb_test "info address file2_thread_local" "Symbol \"file2_thread_local\" is a thread-local variable.*"
+gdb_test "info address file2_thread_local" {Symbol "file2_thread_local" is a thread-local variable.*}
 # Here it could also crash with: Cannot access memory at address 0x0
 gdb_test "p a_thread_local" " = \[0-9\]+" "p a_thread_local second time"
-gdb_test "info address a_thread_local" "Symbol \"a_thread_local\" is a thread-local variable.*"
+gdb_test "info address a_thread_local" {Symbol "a_thread_local" is a thread-local variable.*}
 
 # Done!
 #

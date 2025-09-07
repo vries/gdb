@@ -235,7 +235,7 @@ proc run_style_tests { } {
 		 ".* total size.*: *$decimal *$cend" \
 		 " *}.*"]
 
-	set address_style_expr [limited_style ".*\".*address.*\".*style.*" address]
+	set address_style_expr [limited_style {.*".*address.*".*style.*} address]
 	set color "blue"
 	if { $currently_disabled_style == "address" } {
 	    set color "none"
@@ -304,8 +304,8 @@ proc run_style_tests { } {
 	    "GDB's data directory is \"[limited_style .*? file]\"\\..*"
 
 	# Check that deprecation styles command names.
-	gdb_test_no_output "maintenance deprecate p \"new_p\"" \
-	    "maintenance deprecate p \"new_p\" /1/"
+	gdb_test_no_output {maintenance deprecate p "new_p"} \
+	    {maintenance deprecate p "new_p" /1/}
 	gdb_test "p 5" \
 	    "Warning: '[limited_style p command]', an alias for the command '[limited_style print command]', is deprecated.*Use '[limited_style new_p command]'.*" \
 	    "p deprecated warning, with replacement"
@@ -545,11 +545,11 @@ proc test_colorsupport_monochrome { } {
 	    gdb_test_no_output "set style enabled off"
 	    gdb_test_no_output "set style filename foreground none"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: none" \
+	      {The "filename" style foreground color is: none} \
 	      "none without approximation"
 	    gdb_test_no_output "set style filename foreground blue"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: none" \
+	      {The "filename" style foreground color is: none} \
 	      "blue approximated to none"
 	}
     }
@@ -568,23 +568,23 @@ proc test_colorsupport_8color { } {
 	    gdb_test_no_output "set style enabled off"
 	    gdb_test_no_output "set style filename foreground none"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: none" \
+	      {The "filename" style foreground color is: none} \
 	      "none without approximation"
 	    gdb_test_no_output "set style filename foreground yellow"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: yellow" \
+	      {The "filename" style foreground color is: yellow} \
 	      "yellow without approximation"
 	    gdb_test_no_output "set style filename foreground 9"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: red" \
+	      {The "filename" style foreground color is: red} \
 	      "9 approximated to red"
 	    gdb_test_no_output "set style filename foreground 118"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: green" \
+	      {The "filename" style foreground color is: green} \
 	      "118 approximated to green"
 	    gdb_test_no_output "set style filename foreground #000ABC"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: blue" \
+	      {The "filename" style foreground color is: blue} \
 	      "#000ABC approximated to blue"
 	}
     }
@@ -604,27 +604,27 @@ proc test_colorsupport_256color { } {
 	    gdb_test_no_output "set style enabled off"
 	    gdb_test_no_output "set style filename foreground none"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: none" \
+	      {The "filename" style foreground color is: none} \
 	      "none without approximation"
 	    gdb_test_no_output "set style filename foreground red"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: red" \
+	      {The "filename" style foreground color is: red} \
 	      "red without approximation"
 	    gdb_test_no_output "set style filename foreground 9"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: 9" \
+	      {The "filename" style foreground color is: 9} \
 	      "9 without approximation"
 	    gdb_test_no_output "set style filename foreground 118"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: 118" \
+	      {The "filename" style foreground color is: 118} \
 	      "118 without approximation"
 	    gdb_test_no_output "set style filename foreground #CD00CD"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: 5" \
+	      {The "filename" style foreground color is: 5} \
 	      "#CD00CD approximated to 5"
 	    gdb_test_no_output "set style filename foreground #FFAF12"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: 214" \
+	      {The "filename" style foreground color is: 214} \
 	      "#FFAF12 approximated to 214"
 	}
     }
@@ -645,23 +645,23 @@ proc test_colorsupport_truecolor { } {
 	    gdb_test_no_output "set style enabled off"
 	    gdb_test_no_output "set style filename foreground none"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: none" \
+	      {The "filename" style foreground color is: none} \
 	      "none without approximation"
 	    gdb_test_no_output "set style filename foreground red"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: red" \
+	      {The "filename" style foreground color is: red} \
 	      "red without approximation"
 	    gdb_test_no_output "set style filename foreground 9"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: 9" \
+	      {The "filename" style foreground color is: 9} \
 	      "9 without approximation"
 	    gdb_test_no_output "set style filename foreground 118"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: 118" \
+	      {The "filename" style foreground color is: 118} \
 	      "118 without approximation"
 	    gdb_test_no_output "set style filename foreground #CD00CD"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: #CD00CD" \
+	      {The "filename" style foreground color is: #CD00CD} \
 	      "#CD00CD without approximation"
 	}
     }
@@ -682,23 +682,23 @@ proc test_colorsupport_truecolor_only { } {
 	    gdb_test_no_output "set style enabled off"
 	    gdb_test_no_output "set style filename foreground none"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: none" \
+	      {The "filename" style foreground color is: none} \
 	      "none without approximation"
 	    gdb_test_no_output "set style filename foreground red"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: #DE382B" \
+	      {The "filename" style foreground color is: #DE382B} \
 	      "red replaced by #DE382B"
 	    gdb_test_no_output "set style filename foreground 9"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: #FF0000" \
+	      {The "filename" style foreground color is: #FF0000} \
 	      "9 replaced by #FF0000"
 	    gdb_test_no_output "set style filename foreground 118"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: #87FF00" \
+	      {The "filename" style foreground color is: #87FF00} \
 	      "118 replaced by #87FF00"
 	    gdb_test_no_output "set style filename foreground #CD00CD"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: #CD00CD" \
+	      {The "filename" style foreground color is: #CD00CD} \
 	      "#CD00CD without approximation"
 	}
     }

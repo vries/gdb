@@ -355,7 +355,7 @@ set all_languages [get_set_option_choices "set language"]
 
 gdb_test_no_output "set language unknown"
 gdb_test "p/x 0" \
-	"expression parsing not implemented for language \"Unknown\""
+	{expression parsing not implemented for language "Unknown"}
 
 # If 1, test each arch.  If 0, test one arch for each sizeof
 # short/int/long/longlong configuration.

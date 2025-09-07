@@ -101,7 +101,7 @@ gdb_test "python print(gdb.selected_inferior().thread_from_handle(gdb.parse_and_
 
 # We should see an exception when passing too small of an object.
 
-gdb_test "python print(gdb.selected_inferior().thread_from_handle(gdb.parse_and_eval('\"S\"')))" \
+gdb_test {python print(gdb.selected_inferior().thread_from_handle(gdb.parse_and_eval('"S"')))} \
          ".*Thread handle size mismatch.*" \
 	 "Pass too small of an object to thread_from_handle"
 

@@ -80,7 +80,7 @@ if {[target_info gdb_protocol] == "remote"
     with_test_prefix "search-memory-packet off" {
 	gdb_test \
 	    "set remote search-memory-packet off" \
-	    "Support for the 'qSearch:memory' packet on the current remote target is set to \"off\"."
+	    {Support for the 'qSearch:memory' packet on the current remote target is set to "off".}
 
 	test_not_found 0
     }

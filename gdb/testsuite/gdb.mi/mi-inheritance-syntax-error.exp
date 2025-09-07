@@ -51,7 +51,7 @@ mi_gdb_test "-var-info-path-expression var1.A" \
 # Extract the result of the -var-info-path-expression command
 # to use it in -data-evaluate-expression
 set cmd_output $expect_out(2,string)
-set path [lindex [split $cmd_output "\""] 1]
+set path [lindex [split $cmd_output {"}] 1]
 verbose "var-info-path-expression returned $cmd_output" 2
 verbose "Using $path for data-evaluate-expression" 2
 

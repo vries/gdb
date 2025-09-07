@@ -32,14 +32,14 @@ if { ![readline_is_used] } {
 # complete to "filesym"; completing again, we expect the symbol name and the
 # filename (in that order).
 
-set tst "complete on \"filesy\""
+set tst {complete on "filesy"}
 send_gdb "break filesy\t"
 gdb_test_multiple "" $tst {
     -re "break filesy\\\x07m\$" {
 	pass $tst
 
 	# Now ask for the completion list
-	set tst "completion list for \"filesym\""
+	set tst {completion list for "filesym"}
 	send_gdb "\t\t"
 	gdb_test_multiple "" $tst {
 	    -re "\\\x07\r\nfilesym\[ \t\]+filesym.c\[ \t\]+\r\n$gdb_prompt " {

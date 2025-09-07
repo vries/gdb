@@ -92,7 +92,7 @@ with_test_prefix "force-disable xml descriptions" {
 	|| [target_info gdb_protocol] == "extended-remote"} {
 
 	save_vars { GDBFLAGS } {
-	    append GDBFLAGS " -ex \"set remote target-features-packet off\""
+	    append GDBFLAGS { -ex "set remote target-features-packet off"}
 	    clean_restart ${::testfile}
 	}
 

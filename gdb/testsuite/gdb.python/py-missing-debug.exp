@@ -425,7 +425,7 @@ with_test_prefix "return False handler in global list" {
 with_test_prefix "check handler replacement" {
     # First, check we can have the same name appear in both program
     # space and global lists without giving an error.
-    gdb_test_no_output "python register(\"Foo\", pspace)"
+    gdb_test_no_output {python register("Foo", pspace)}
 
     gdb_test "info missing-debug-handlers" \
 	[multi_line \
@@ -441,12 +441,12 @@ with_test_prefix "check handler replacement" {
 
     # Now check that we get an error if we try to add a handler with
     # the same name.
-    gdb_test "python gdb.missing_debug.register_handler(pspace, log_handler(\"Foo\"))" \
+    gdb_test {python gdb.missing_debug.register_handler(pspace, log_handler("Foo"))} \
 	[multi_line \
 	     "RuntimeError.*: Handler Foo already exists\\." \
 	     "Error occurred in Python.*"]
 
-    gdb_test "python gdb.missing_debug.register_handler(handler=log_handler(\"Foo\"), locus=pspace)" \
+    gdb_test {python gdb.missing_debug.register_handler(handler=log_handler("Foo"), locus=pspace)} \
 	[multi_line \
 	     "RuntimeError.*: Handler Foo already exists\\." \
 	     "Error occurred in Python.*"]
@@ -454,22 +454,22 @@ with_test_prefix "check handler replacement" {
     # And now try again, but this time with 'replace=True', we
     # shouldn't get an error in this case.
     gdb_test_no_output \
-	"python gdb.missing_debug.register_handler(pspace, log_handler(\"Foo\"), replace=True)"
+	{python gdb.missing_debug.register_handler(pspace, log_handler("Foo"), replace=True)}
 
     gdb_test_no_output \
-	"python gdb.missing_debug.register_handler(handler=log_handler(\"Foo\"), locus=None, replace=True)"
+	{python gdb.missing_debug.register_handler(handler=log_handler("Foo"), locus=None, replace=True)}
 
     # Now disable a handler and check we still need to use 'replace=True'.
     gdb_test "disable missing-debug-handler progspace Foo" \
 	"^1 missing debug handler disabled"
 
-    gdb_test "python gdb.missing_debug.register_handler(pspace, log_handler(\"Foo\"))" \
+    gdb_test {python gdb.missing_debug.register_handler(pspace, log_handler("Foo"))} \
 	[multi_line \
 	     "RuntimeError.*: Handler Foo already exists\\." \
 	     "Error occurred in Python.*"] \
 	"still get an error when handler is disabled"
 
     gdb_test_no_output \
-	"python gdb.missing_debug.register_handler(pspace, log_handler(\"Foo\"), replace=True)" \
+	{python gdb.missing_debug.register_handler(pspace, log_handler("Foo"), replace=True)} \
 	"can replace a disabled handler"
 }

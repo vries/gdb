@@ -24,7 +24,7 @@ if {[prepare_for_testing "failed to prepare" linespecs keywords.c]} {
 
 # PR gdb/12843
 gdb_test "list c:/foo/bar/baz.c:1" "No source file named c:/foo/bar/baz.c."
-gdb_test "list c:/foo/bar/baz.c" "Function \"c:/foo/bar/baz.c\" not defined."
+gdb_test "list c:/foo/bar/baz.c" {Function "c:/foo/bar/baz.c" not defined.}
 gdb_test "list fooc:/foo/bar/baz.c:1" "No source file named fooc."
 gdb_test "list fooc:/foo/bar/baz.c" "No source file named fooc."
 

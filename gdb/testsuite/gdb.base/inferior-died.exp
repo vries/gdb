@@ -24,7 +24,7 @@ if { [build_executable "failed to build" ${testfile} ${testfile}.c] } {
 }
 
 save_vars { GDBFLAGS } {
-    append GDBFLAGS " -ex \"set non-stop on\""
+    append GDBFLAGS { -ex "set non-stop on"}
     clean_restart
     gdb_load $binfile
 }

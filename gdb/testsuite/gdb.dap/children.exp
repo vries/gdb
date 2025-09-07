@@ -105,7 +105,7 @@ foreach var [dict get $refs body variables] {
 	    # The result looks strange here, but only because TON does
 	    # not handle the backslash-quote sequence properly when
 	    # decoding the JSON.  The actual JSON is: "value":
-	    # "\"DEI\"".
+	    # {"DEI"}.
 	    gdb_assert {[dict get $var value] == "\\\"DEI\\\""} \
 		"value of second"
 	    incr saw_second

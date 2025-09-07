@@ -29,7 +29,7 @@ gdb_test_no_output "define-prefix abc-prefix"
 
 # Verify an empty prefix command cannot be used as a command.
 gdb_test "abc-prefix" \
-    "\"abc-prefix\" must be followed by the name of a subcommand.*" \
+    {"abc-prefix" must be followed by the name of a subcommand.*} \
     "execute prefix command not followed by subcommand"
 
 # Define a sub-prefix command.
@@ -66,7 +66,7 @@ gdb_test_no_output "define-prefix abc-prefix def-prefix ghi-prefix-cmd"
 # Verify a sequence ending with an empty prefix command cannot be used as
 # a command.
 gdb_test "abc-prefix def-prefix ghi-prefix-cmd" \
-    "\"abc-prefix def-prefix ghi-prefix-cmd\" must be followed by the name of a subcommand.*" \
+    {"abc-prefix def-prefix ghi-prefix-cmd" must be followed by the name of a subcommand.*} \
     "execute sequence of prefix commands not followed by a subcommand"
 
 # Define jkl-cmd command.
@@ -157,8 +157,8 @@ gdb_test "abc-prefix def-prefix ghi-prefix-cmd alternate-jkl-cmd" \
 gdb_test "define-prefix print" ".* is built-in.*"
 
 gdb_test "define-prefix something-not-existing something-else" \
-    "Undefined command: \"something-not-existing\".*"
+    {Undefined command: "something-not-existing".*}
 
 gdb_test "define-prefix abc-prefix something-not-existing something-else" \
-    "Undefined abc-prefix command: \"something-not-existing\".*"
+    {Undefined abc-prefix command: "something-not-existing".*}
 

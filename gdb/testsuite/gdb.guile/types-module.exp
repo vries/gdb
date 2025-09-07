@@ -37,34 +37,34 @@ if ![gdb_guile_runto_main] {
 gdb_scm_test_silent_cmd "guile (use-modules (gdb types))" \
     "import (gdb types)"
 
-gdb_scm_test_silent_cmd "guile (define d (lookup-type \"derived\"))" \
+gdb_scm_test_silent_cmd {guile (define d (lookup-type "derived"))} \
     "get derived type"
 
-gdb_test "guile (print (type-has-field? d \"base_member\"))" \
+gdb_test {guile (print (type-has-field? d "base_member"))} \
     "= #f" "type-has-field? member in baseclass"
 
-gdb_test "guile (print (type-has-field-deep? d \"base_member\"))" \
+gdb_test {guile (print (type-has-field-deep? d "base_member"))} \
     "= #t" "type-has-field-deep? member in baseclass"
 
-gdb_test "guile (print (type-has-field-deep? (lookup-type \"int\") \"base_member\"))" \
+gdb_test {guile (print (type-has-field-deep? (lookup-type "int") "base_member"))} \
     "Wrong type argument in position 1 \\(expecting struct or union\\): #<gdb:type int>.*" \
     "type-has-field-deep? from int"
 
-gdb_scm_test_silent_cmd "guile (define enum-htab (make-enum-hashtable (lookup-type \"enum_type\")))" \
+gdb_scm_test_silent_cmd {guile (define enum-htab (make-enum-hashtable (lookup-type "enum_type")))} \
     "create enum hash table"
 
-gdb_test "guile (print (hash-ref enum-htab \"B\"))" \
+gdb_test {guile (print (hash-ref enum-htab "B"))} \
     "= 1" "verify make-enum-hashtable"
 
 gdb_test "guile (define bad-enum-htab (make-enum-hashtable #f))" \
     "Wrong type argument in position 1 \\(expecting gdb:type\\): #f.*" \
     "make-enum-hashtable from #f"
 
-gdb_test "guile (define bad-enum-htab (make-enum-hashtable (lookup-type \"int\")))" \
+gdb_test {guile (define bad-enum-htab (make-enum-hashtable (lookup-type "int")))} \
     "Wrong type argument in position 1 \\(expecting enum\\): #<gdb:type int>.*" \
     "make-enum-hashtable from int"
 
-gdb_test_no_output "guile (define foo-ref (parse-and-eval \"foo_ref\"))" \
+gdb_test_no_output {guile (define foo-ref (parse-and-eval "foo_ref"))} \
     "get foo-ref value"
 gdb_test "guile (get-basic-type (value-type foo-ref))" "#<gdb:type int>" \
     "check get-basic-type"

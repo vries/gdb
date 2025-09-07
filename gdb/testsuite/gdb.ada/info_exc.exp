@@ -38,11 +38,11 @@ gdb_test "info exceptions" \
                 ".*\[\r\n\]*const.aint_global_gdb_e: $hex\[\r\n\]*.*" ]
 
 gdb_test "info exceptions task" \
-    [multi_line "All Ada exceptions matching regular expression \"task\":" \
+    [multi_line {All Ada exceptions matching regular expression "task":} \
                 "tasking_error: $hex"]
 
 gdb_test "info exceptions global_gdb" \
-    [multi_line "All Ada exceptions matching regular expression \"global_gdb\":" \
+    [multi_line {All Ada exceptions matching regular expression "global_gdb":} \
                 "const.aint_global_gdb_e: $hex"]
 
 gdb_test "info exceptions const.aint" \

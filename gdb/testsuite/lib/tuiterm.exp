@@ -1273,7 +1273,7 @@ proc Term::clean_restart {rows cols {executable {}}} {
 	    # Make GDB not print the directory names.  Use this setting to
 	    # remove the differences in test runs due to varying directory
 	    # names.
-	    append ::GDBFLAGS " -ex \"set filename-display basename\""
+	    append ::GDBFLAGS { -ex "set filename-display basename"}
 
 	    if {$executable == ""} {
 		::clean_restart

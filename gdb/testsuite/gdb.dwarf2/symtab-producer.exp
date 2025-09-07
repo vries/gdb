@@ -82,12 +82,12 @@ save_vars { GDBFLAGS } {
     }
 }
 
-gdb_py_test_silent_cmd "python with_producer = gdb.lookup_global_symbol(\"with_producer\")" \
+gdb_py_test_silent_cmd {python with_producer = gdb.lookup_global_symbol("with_producer")} \
     "get with_producer symbol" 0
 
 gdb_test "python print(with_producer.symtab.producer)" "ACME Compiler Company"
 
-gdb_py_test_silent_cmd "python without_producer = gdb.lookup_global_symbol(\"without_producer\")" \
+gdb_py_test_silent_cmd {python without_producer = gdb.lookup_global_symbol("without_producer")} \
     "get without_producer symbol" 0
 
 gdb_test "python print(without_producer.symtab.producer)" "None"

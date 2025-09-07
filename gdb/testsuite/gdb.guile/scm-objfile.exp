@@ -30,7 +30,7 @@ if ![gdb_guile_runto_main] {
     return
 }
 
-gdb_scm_test_silent_cmd "gu (define sym (lookup-symbol \"some_var\"))" \
+gdb_scm_test_silent_cmd {gu (define sym (lookup-symbol "some_var"))} \
     "Find a symbol in objfile"
 gdb_scm_test_silent_cmd "gu (define objfile (symtab-objfile (symbol-symtab (car sym))))" \
     "Get backing object file"
@@ -40,7 +40,7 @@ gdb_test "gu (print (objfile-filename objfile))" \
 gdb_test "gu (print (objfile-valid? objfile))" \
     "#t" "Get objfile validity"
 
-gdb_test "gu (print (->bool (or-map (lambda (o) (string-contains (objfile-filename o) \"scm-objfile\")) (objfiles))))" \
+gdb_test {gu (print (->bool (or-map (lambda (o) (string-contains (objfile-filename o) "scm-objfile")) (objfiles))))} \
     "= #t" "scm-objfile in objfile list"
 
 gdb_test "gu (print (objfile-pretty-printers objfile))" \

@@ -137,4 +137,4 @@ if {![runto "circular1.found"]} {
 }
 
 # This last test shouldn't timeout.
-gdb_test "print notfound" "No symbol \"notfound\" in current context."
+gdb_test "print notfound" {No symbol "notfound" in current context.}

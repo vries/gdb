@@ -20,7 +20,7 @@ lappend options "additional_flags=-I."
 
 set local_srcfile [standard_output_file twice-tmp.c]
 set fileid [open $local_srcfile w]
-puts $fileid "#include \"twice.c\""
+puts $fileid {#include "twice.c"}
 close $fileid
 
 gdb_remote_download host ${srcdir}/${subdir}/twice.c

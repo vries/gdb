@@ -212,7 +212,7 @@ with_test_prefix "agent" {
     test_agent
 }
 
-gdb_test "set dprintf-style foobar" "Undefined item: \"foobar\"." \
+gdb_test "set dprintf-style foobar" {Undefined item: "foobar".} \
     "Set dprintf style to an unrecognized type"
 
 # Test that force-disabling the BreakpointCommands RSP feature works
@@ -221,7 +221,7 @@ gdb_test "set dprintf-style foobar" "Undefined item: \"foobar\"." \
 if [gdb_protocol_is_remote] {
     gdb_test \
 	"set remote breakpoint-commands-packet off" \
-	"Support for the 'BreakpointCommands' packet on the current remote target is set to \"off\"."
+	{Support for the 'BreakpointCommands' packet on the current remote target is set to "off".}
 
     gdb_test "set dprintf-style agent" \
 	"warning: Target cannot run dprintf commands.*" \

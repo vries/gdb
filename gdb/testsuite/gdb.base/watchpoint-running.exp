@@ -34,14 +34,14 @@ proc test {stop_mode hw} {
 
     save_vars { ::GDBFLAGS } {
 	if { $stop_mode == "non-stop" } {
-	    append ::GDBFLAGS " -ex \"set non-stop on\""
+	    append ::GDBFLAGS { -ex "set non-stop on"}
 	} elseif {[target_info gdb_protocol] == "remote"
 		  || [target_info gdb_protocol]== "extended-remote"} {
 	    # Communicating with the target while the inferior is
 	    # running depends on target running in non-stop mode.
 	    # Force it on for remote targets, until this is the
 	    # default.
-	    append ::GDBFLAGS " -ex \"maint set target-non-stop on\""
+	    append ::GDBFLAGS { -ex "maint set target-non-stop on"}
 	}
 	clean_restart
 	gdb_load $::binfile

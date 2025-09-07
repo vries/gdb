@@ -24,7 +24,7 @@ if {[mi_clean_restart]} {
 # for the -info-gdb-mi-command command.
 mi_gdb_test "-list-features" \
             "\\^done,features=\\\[.*\"info-gdb-mi-command\".*\\\]" \
-            "-list-features includes \"info-gdb-mi-command\""
+            {-list-features includes "info-gdb-mi-command"}
 
 mi_gdb_test "-info-gdb-mi-command unsupported-command" \
             "\\^done,command=\\\{exists=\"false\"\\\}" \

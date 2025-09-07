@@ -33,14 +33,14 @@ if {![runto_main]} {
 gdb_breakpoint [gdb_get_line_number "Break here."]
 gdb_continue_to_breakpoint "Break here" ".*Break here.*"
 
-gdb_test "python print (str(gdb.parse_and_eval(\"int_rref\").type))" "int &&"
-gdb_test "python print (str(gdb.parse_and_eval(\"int_rref\").referenced_value().type))" "int"
-gdb_test "python print (str(gdb.parse_and_eval(\"int_rref\").referenced_value()))" "10"
+gdb_test {python print (str(gdb.parse_and_eval("int_rref").type))} "int &&"
+gdb_test {python print (str(gdb.parse_and_eval("int_rref").referenced_value().type))} "int"
+gdb_test {python print (str(gdb.parse_and_eval("int_rref").referenced_value()))} "10"
 
-gdb_test "python print (str(gdb.parse_and_eval(\"int_ptr_rref\").dereference().type))" "int"
-gdb_test "python print (str(gdb.parse_and_eval(\"int_ptr_rref\").referenced_value().type))" "int_ptr"
-gdb_test "python print (str(gdb.parse_and_eval(\"int_ptr_rref\").referenced_value().dereference()))" "10"
-gdb_test "python print (str(gdb.parse_and_eval(\"int_ptr_rref\").referenced_value().referenced_value()))" "10"
+gdb_test {python print (str(gdb.parse_and_eval("int_ptr_rref").dereference().type))} "int"
+gdb_test {python print (str(gdb.parse_and_eval("int_ptr_rref").referenced_value().type))} "int_ptr"
+gdb_test {python print (str(gdb.parse_and_eval("int_ptr_rref").referenced_value().dereference()))} "10"
+gdb_test {python print (str(gdb.parse_and_eval("int_ptr_rref").referenced_value().referenced_value()))} "10"
 
 gdb_test_no_output "python b = gdb.parse_and_eval('b')" "init b"
 gdb_test_no_output "python b_rref = gdb.parse_and_eval('b_rref')" "init b_rref"

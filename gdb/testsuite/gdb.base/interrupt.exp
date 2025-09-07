@@ -198,7 +198,7 @@ if {![file exists $binfile]} {
 	gdb_test_multiple "" $msg {
 	    -i spawn_list -re "end of file" {
 		set saw_end_of_file 1
-		verbose -log "saw \"end of file\""
+		verbose -log {saw "end of file"}
 		if {!$saw_inferior_exit} {
 		    # When $inferior_spawn_id != $gdb_spawn_id, such
 		    # as when testing with gdbserver, we may see the

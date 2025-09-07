@@ -85,7 +85,7 @@ gdb_test "p var1" " = 1"
 
 set re \
     [multi_line \
-	 "All variables matching regular expression \"var1\":" \
+	 {All variables matching regular expression "var1":} \
 	 "" \
 	 "File file3.c:" \
 	 "1:\tstatic int var1;"]

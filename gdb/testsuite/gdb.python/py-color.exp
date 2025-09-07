@@ -25,7 +25,7 @@ with_ansi_styling_terminal {
     clean_restart
 }
 
-gdb_test_no_output "python get_color_attrs = lambda c: \"%s %s %s %s %s\" % (str(c), c.colorspace, c.is_none, c.is_indexed, c.is_direct)" \
+gdb_test_no_output {python get_color_attrs = lambda c: "%s %s %s %s %s" % (str(c), c.colorspace, c.is_none, c.is_indexed, c.is_direct)} \
     "get_color_attrs helper"
 
 gdb_test_no_output "python print_color_attrs = lambda c: print (get_color_attrs (c))" \

@@ -31,7 +31,7 @@ gdb_test_no_output "maint info symtabs" \
 
 # The bug was that this caused CU expansion even though the type does
 # not exist.
-gdb_test "whatis INT" "No symbol \"INT\" in current context."
+gdb_test "whatis INT" {No symbol "INT" in current context.}
 
 # Check that no CUs were expanded by the lookup.  This fails with
 # .gdb_index.

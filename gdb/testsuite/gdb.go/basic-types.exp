@@ -65,7 +65,7 @@ proc test_character_literal_types_accepted {} {
 proc test_string_literal_types_accepted {} {
     # Test various string values.
 
-    gdb_test "pt \"a simple string\"" "type = string"
+    gdb_test {pt "a simple string"} "type = string"
     gdb_test "pt `a simple raw string`" "type = string"
 
     # FIXME: Need more.

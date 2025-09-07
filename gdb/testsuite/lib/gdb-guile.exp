@@ -70,9 +70,9 @@ proc gdb_install_guile_utils { } {
     # and in the case of "print" add a prefix to help erroneous passes.
     #
     gdb_test_no_output -nopass \
-	"guile (define (print x) (format #t \"= ~A\" x) (newline))"
+	{guile (define (print x) (format #t "= ~A" x) (newline))}
     gdb_test_no_output -nopass \
-	"guile (define (raw-print x) (format #t \"= ~S\" x) (newline))"
+	{guile (define (raw-print x) (format #t "= ~S" x) (newline))}
 }
 
 # Install the gdb module.

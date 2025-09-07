@@ -19,7 +19,7 @@ proc set_lang_rust {} {
     if [gdb_test_no_output "set language rust"] {
 	return 0
     }
-    if [gdb_test "show language" ".* source language is \"rust\"." \
+    if [gdb_test "show language" {.* source language is "rust".} \
 	   "set language to \"rust\""] {
 	return 0
     }

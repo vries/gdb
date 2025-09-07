@@ -41,4 +41,4 @@ foreach_with_prefix cmd {1 2} {
 	}
     }
 }
-gdb_test "document ambiguous_command" "Ambiguous command: \"ambiguous_command\"."
+gdb_test "document ambiguous_command" {Ambiguous command: "ambiguous_command".}

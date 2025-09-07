@@ -37,7 +37,7 @@ proc do_test { detach-on-fork } {
     global gdb_prompt
 
     save_vars { GDBFLAGS } {
-	set GDBFLAGS [concat $GDBFLAGS " -ex \"set non-stop on\""]
+	set GDBFLAGS [concat $GDBFLAGS { -ex "set non-stop on"}]
 
 	if {[prepare_for_testing "failed to prepare" \
 		 $testfile $srcfile {debug pthreads}] == -1} {

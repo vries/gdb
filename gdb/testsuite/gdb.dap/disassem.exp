@@ -54,7 +54,7 @@ set obj [dap_check_request_and_response "disassemble using CLI" \
 	     evaluate {o expression [s {disassemble &return_value}] \
 			   context [s repl]}]
 set output [dict get [lindex $obj 0] body result]
-# The result will have literal "\" "n" sequences, turn these into
+# The result will have literal {" }n" sequences, turn these into
 # newlines.
 set with_nl [string map [list "\\n" "\n"] $output]
 # The value we want is the number of lines starting with an address.

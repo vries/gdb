@@ -32,8 +32,8 @@ if {![runto_main]} {
 with_test_prefix "no or double record" {
     gdb_test "python print(gdb.current_recording())" "None"
 
-    gdb_test_no_output "python gdb.start_recording(\"full\")"
-    gdb_test "python gdb.start_recording(\"full\")" \
+    gdb_test_no_output {python gdb.start_recording("full")}
+    gdb_test {python gdb.start_recording("full")} \
 	".*gdb\.error.*: The process is already being recorded\..*" \
 	"already recording"
 

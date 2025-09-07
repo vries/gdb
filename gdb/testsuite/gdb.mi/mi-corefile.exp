@@ -52,16 +52,16 @@ proc test_core_file {} {
     mi_gdb_test \
 	"-target-select core $::corefile" \
 	[multi_line \
-	     "=thread-group-started,id=\"i1\",.*" \
-	     "=thread-created,id=\"1\",group-id=\"i1\"" \
+	     {=thread-group-started,id="i1",.*} \
+	     {=thread-created,id="1",group-id="i1"} \
 	     ".*\\^connected,frame=.*"] \
 	"-target-select core \$corefile"
 
     mi_gdb_test \
 	"-target-detach" \
 	[multi_line \
-	     "=thread-exited,id=\"1\",group-id=\"i1\"" \
-	     "=thread-group-exited,id=\"i1\"" \
+	     {=thread-exited,id="1",group-id="i1"} \
+	     {=thread-group-exited,id="i1"} \
 	     ".*\\^done"]
 }
 

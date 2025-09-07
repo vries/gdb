@@ -219,7 +219,7 @@ with_test_prefix "DisassemblerResult errors" {
 # First, register a global disassembler, and check it is in place.
 with_test_prefix "GLOBAL tagging disassembler" {
     py_remove_all_disassemblers
-    gdb_test_no_output "python gdb.disassembler.register_disassembler(TaggingDisassembler(\"GLOBAL\"), None)"
+    gdb_test_no_output {python gdb.disassembler.register_disassembler(TaggingDisassembler("GLOBAL"), None)}
     gdb_test "disassemble test" "${base_pattern}\\s+## tag = GLOBAL\r\n.*"
 }
 

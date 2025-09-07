@@ -523,7 +523,7 @@ proc gdb_collect_globals_test_1 { } {
 
     # Const string is always available, even when not collected.
     gdb_test "print g_const_string" \
-	" = \"hello world\"" \
+	{ = "hello world"} \
 	"non collected const string is still printable"
 
     gdb_test "print g_string_p" \

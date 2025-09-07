@@ -173,7 +173,7 @@ proc run_tests { lang } {
 
 	if { $lang == "c" || $lang == "c++" } {
 	    set d_pattern "4 \\+ 5i"
-	    set e_pattern "\"abcdef\""
+	    set e_pattern {"abcdef"}
 	    set g_val_pattern "\{a = 1.5, b = 2.5\}"
 	} else {
 	    set d_pattern "\\(4,5\\)"

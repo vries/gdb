@@ -147,7 +147,7 @@ proc do_console_test {} {
 	    return -1
 	}
 	
-	gdb_test "info addr ptr" "Symbol \"ptr\" is optimized out."
+	gdb_test "info addr ptr" {Symbol "ptr" is optimized out.}
 	
 	gdb_test "print ptr" "<optimized out>"
 	

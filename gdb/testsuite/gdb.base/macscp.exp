@@ -218,7 +218,7 @@ list_and_check_macro macscp3_2 WHERE {macscp3.h macscp1.c {before macscp3_2}}
 gdb_test "info macro FROM_COMMANDLINE" \
 	 "Defined at \[^\r\n\]*:0\r\n-DFROM_COMMANDLINE=ARG"
 
-gdb_test "info macro __FILE__" "#define __FILE__ \".*macscp3.h\"" \
+gdb_test "info macro __FILE__" {#define __FILE__ ".*macscp3.h"} \
     "info macro __FILE__ before running"
 gdb_test "info macro __LINE__" "#define __LINE__ 26" \
     "info macro __LINE__ before running"
@@ -714,18 +714,18 @@ gdb_test_no_output "macro define xstr(x) str(x)" \
   "define second stringification helper"
 
 gdb_test "print str(5)" \
-  " = \"5\"" \
+  { = "5"} \
   "simple stringify"
 
 gdb_test "print str(hi bob)" \
-  " = \"hi bob\"" \
+  { = "hi bob"} \
   "stringify with one space"
 
 gdb_test "print str(  hi  bob  )" \
-  " = \"hi bob\"" \
+  { = "hi bob"} \
   "stringify with many spaces"
 
-gdb_test "print str(hi \"bob\")" \
+gdb_test {print str(hi "bob")} \
   " = \"hi \\\\\"bob\\\\\"\"" \
   "stringify with quotes"
 
@@ -734,11 +734,11 @@ gdb_test "print str(hi \\bob\\)" \
   "stringify with backslashes"
 
 gdb_test "print str(maude)" \
-  " = \"maude\"" \
+  { = "maude"} \
   "stringify without substitution"
 
 gdb_test "print xstr(maude)" \
-  " = \"5\"" \
+  { = "5"} \
   "stringify with substitution"
 
 # Regression test for pp-number bug.
@@ -748,6 +748,6 @@ gdb_test_no_output "macro define si_addr fields.fault.si_addr" \
 gdb_test "macro expand siginfo.si_addr" \
   "expands to: siginfo.fields.fault.si_addr"
 
-gdb_test "print __FILE__" " = \".*macscp1.c\""
+gdb_test "print __FILE__" { = ".*macscp1.c"}
 gdb_test "print __LINE__" \
     " = [gdb_get_line_number {stopping point for line test}]"

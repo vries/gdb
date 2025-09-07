@@ -93,7 +93,7 @@ proc_with_prefix test_tstatus {} {
     # all.  Otherwise, no RSP packet is sent out.
     gdb_test \
 	"set remote trace-status-packet on" \
-	"Support for the 'qTStatus' packet on the current remote target is set to \"on\"."
+	{Support for the 'qTStatus' packet on the current remote target is set to "on".}
 
     # Force GDB to talk with GDBserver, so that we can get the
     # "connection closed" error.

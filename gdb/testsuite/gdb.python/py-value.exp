@@ -59,7 +59,7 @@ proc test_value_creation {} {
 
   gdb_py_test_silent_cmd "python f = gdb.Value (1.25)" "create double value" 1
   gdb_py_test_silent_cmd "python a = gdb.Value ('string test')" "create 8-bit string value" 1
-  gdb_test "python print (a)" "\"string test\"" "print 8-bit string"
+  gdb_test "python print (a)" {"string test"} "print 8-bit string"
   gdb_test "python print (a.__class__)" "<(type|class) 'gdb.Value'>" "verify type of 8-bit string"
 
   # Test address attribute is None in a non-addressable value
@@ -303,12 +303,12 @@ proc test_value_in_inferior {} {
   gdb_test "python print (argc_lazy.is_lazy)" "False"
 
   # Test string fetches,  both partial and whole.
-  gdb_test "print st" "\"divide et impera\""
+  gdb_test "print st" {"divide et impera"}
   gdb_py_test_silent_cmd "python st = gdb.history (0)" "get value st from history" 1
   gdb_test "python print (st.string ())"  "divide et impera"  "Test string with no length"
   gdb_test "python print (st.string (length = -1))" "divide et impera" "test string (length = -1) is all of the string"
   gdb_test "python print (st.string (length = 6))" "divide"
-  gdb_test "python print (\"---\"+st.string (length = 0)+\"---\")" "------" "test string (length = 0) is empty"
+  gdb_test {python print ("---"+st.string (length = 0)+"---")} "------" "test string (length = 0) is empty"
   gdb_test "python print (len(st.string (length = 0)))" "0" "test length is 0"
 
   # We choose Ada here to test a language where c_style_arrays is
@@ -336,7 +336,7 @@ proc test_value_in_inferior {} {
 
   # However it shouldn't be possible to fetch past the end of a
   # non-memory value.
-  gdb_py_test_silent_cmd "python str = '\"str\"'" "set up str variable" 1
+  gdb_py_test_silent_cmd {python str = '"str"'} "set up str variable" 1
   gdb_test "python print (gdb.parse_and_eval (str).string (length = 10))" \
       "gdb.error.*: Attempt to take address of value not located in memory.\r\nError occurred in Python.*"
 
@@ -469,7 +469,7 @@ proc test_subscript_regression {exefile lang} {
 
  gdb_py_test_silent_cmd "python intv = gdb.Value(1)" \
      "Create value intv for subscript test" 1
- gdb_py_test_silent_cmd "python stringv = gdb.Value(\"foo\")" \
+ gdb_py_test_silent_cmd {python stringv = gdb.Value("foo")} \
      "Create value stringv for subscript test" 1
 
  # Try to access an int with a subscript.  This should fail.
@@ -626,7 +626,7 @@ proc test_add_to_history {} {
 
     # Try adding something that can't be converted to a gdb.Value,
     # this should give an error.
-    gdb_test "python idx = gdb.add_history(gdb.GdbError(\"an error\"))" \
+    gdb_test {python idx = gdb.add_history(gdb.GdbError("an error"))} \
 	"TypeError.*: Could not convert Python object: .*"
 }
 
@@ -639,7 +639,7 @@ proc test_value_sub_classes {} {
 	"class MyValue(gdb.Value):" "" \
 	"  def __init__(self,val,type=None):" "" \
 	"    gdb.Value.__init__(self,val,type)" "" \
-	"    print(\"In MyValue.__init__\")" "" \
+	{    print("In MyValue.__init__")} "" \
 	"end"
 
     gdb_test "python obj = MyValue (123)" "In MyValue.__init__" \
@@ -705,7 +705,7 @@ proc_with_prefix test_value_bytes { } {
   # gdb.Value.assign().  The bytes value is cached within the Value
   # object, so calling assign should clear the cache.
   with_test_prefix "assign clears bytes cache" {
-      gdb_test_no_output "python v = gdb.parse_and_eval(\"i\")"
+      gdb_test_no_output {python v = gdb.parse_and_eval("i")}
       gdb_test_no_output "python bytes_before = v.bytes"
       gdb_test_no_output "python v.assign(9)"
       gdb_test_no_output "python bytes_after = v.bytes"

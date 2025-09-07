@@ -137,7 +137,7 @@ proc expect_integer {option val operand} {
 proc expect_string {str operand} {
     # Dequote the string in the expected output.
     if { ( [string range $str 0 0] == "\""
-	   && [string range $str end end] == "\"")
+	   && [string range $str end end] == {"})
 	 || ([string range $str 0 0] == "'"
 	     && [string range $str end end] == "'")} {
 	set str [string range $str 1 end-1]
@@ -152,7 +152,7 @@ proc expect_string {str operand} {
 proc expect_filename {str operand} {
     # Dequote the string in the expected output.
     if { ( [string range $str 0 0] == "\""
-	   && [string range $str end end] == "\"")
+	   && [string range $str end end] == {"})
 	 || ([string range $str 0 0] == "'"
 	     && [string range $str end end] == "'")} {
 	set str [string range $str 1 end-1]
@@ -255,7 +255,7 @@ proc_with_prefix test-print {{prefix ""}} {
 	"Left operand of assignment is not an lvalue\\."
     test_invalid_expression \
 	"${prefix}print -object" \
-	"No symbol \"object\".*"
+	{No symbol "object".*}
 
     # Test printing with options and no expression.
     set test "${prefix}print -object --"
@@ -1028,14 +1028,14 @@ proc_with_prefix test-string {variant} {
 
     foreach_with_prefix str {
 	"STR"
-	"\"STR\""
+	{"STR"}
 	"\\\"STR"
 	"'STR'"
 	"\\'STR"
-	"\"STR AAA\""
+	{"STR AAA"}
 	"'STR BBB'"
-	"\"STR 'CCC' DDD\""
-	"'STR \"EEE\" FFF'"
+	{"STR 'CCC' DDD"}
+	{'STR "EEE" FFF'}
 	"\"STR \\\"GGG\\\" HHH\""
 	"'STR \\\'III\\\' JJJ'"
     } {
@@ -1092,14 +1092,14 @@ proc_with_prefix test-filename {variant} {
 
     foreach_with_prefix str {
 	"STR"
-	"\"STR\""
+	{"STR"}
 	"\\\"STR"
 	"'STR'"
 	"\\'STR"
-	"\"STR AAA\""
+	{"STR AAA"}
 	"'STR BBB'"
-	"\"STR 'CCC' DDD\""
-	"'STR \"EEE\" FFF'"
+	{"STR 'CCC' DDD"}
+	{'STR "EEE" FFF'}
 	"\"STR \\\"GGG\\\" HHH\""
 	"'STR \\\'III\\\' JJJ'"
     } {

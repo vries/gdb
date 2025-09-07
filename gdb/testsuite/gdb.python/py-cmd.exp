@@ -36,9 +36,9 @@ gdb_test_multiline "input simple command" \
   "python" "" \
   "class test_cmd (gdb.Command):" "" \
   "  def __init__ (self):" "" \
-  "    super (test_cmd, self).__init__ (\"test_cmd\", gdb.COMMAND_OBSCURE)" "" \
+  {    super (test_cmd, self).__init__ ("test_cmd", gdb.COMMAND_OBSCURE)} "" \
   "  def invoke (self, arg, from_tty):" "" \
-  "    print (\"test_cmd output, arg = %s\" % arg)" "" \
+  {    print ("test_cmd output, arg = %s" % arg)} "" \
   "test_cmd ()" "" \
   "end" ""
 
@@ -50,9 +50,9 @@ gdb_test_multiline "input prefix command" \
   "python" "" \
   "class prefix_cmd (gdb.Command):" "" \
   "  def __init__ (self):" "" \
-  "    super (prefix_cmd, self).__init__ (\"prefix_cmd\", gdb.COMMAND_OBSCURE, gdb.COMPLETE_NONE, True)" "" \
+  {    super (prefix_cmd, self).__init__ ("prefix_cmd", gdb.COMMAND_OBSCURE, gdb.COMPLETE_NONE, True)} "" \
   "  def invoke (self, arg, from_tty):" "" \
-  "    print (\"prefix_cmd output, arg = %s\" % arg)" "" \
+  {    print ("prefix_cmd output, arg = %s" % arg)} "" \
   "prefix_cmd ()" "" \
   "end" ""
 
@@ -62,9 +62,9 @@ gdb_test_multiline "input subcommand" \
   "python" "" \
   "class subcmd (gdb.Command):" "" \
   "  def __init__ (self):" "" \
-  "    super (subcmd, self).__init__ (\"prefix_cmd subcmd\", gdb.COMMAND_OBSCURE)" "" \
+  {    super (subcmd, self).__init__ ("prefix_cmd subcmd", gdb.COMMAND_OBSCURE)} "" \
   "  def invoke (self, arg, from_tty):" "" \
-  "    print (\"subcmd output, arg = %s\" % arg)" "" \
+  {    print ("subcmd output, arg = %s" % arg)} "" \
   "subcmd ()" "" \
   "end" ""
 
@@ -76,9 +76,9 @@ gdb_test_multiline "input prefix command, keyword arguments" \
   "python" "" \
   "class prefix_cmd2 (gdb.Command):" "" \
   "  def __init__ (self):" "" \
-  "    super (prefix_cmd2, self).__init__ (\"prefix_cmd2\", gdb.COMMAND_OBSCURE, prefix = True, completer_class = gdb.COMPLETE_FILENAME)" "" \
+  {    super (prefix_cmd2, self).__init__ ("prefix_cmd2", gdb.COMMAND_OBSCURE, prefix = True, completer_class = gdb.COMPLETE_FILENAME)} "" \
   "  def invoke (self, arg, from_tty):" "" \
-  "    print (\"prefix_cmd2 output, arg = %s\" % arg)" "" \
+  {    print ("prefix_cmd2 output, arg = %s" % arg)} "" \
   "prefix_cmd2 ()" "" \
   "end" ""
 
@@ -88,9 +88,9 @@ gdb_test_multiline "input subcommand under prefix_cmd2" \
   "python" "" \
   "class subcmd (gdb.Command):" "" \
   "  def __init__ (self):" "" \
-  "    super (subcmd, self).__init__ (\"prefix_cmd2 subcmd\", gdb.COMMAND_OBSCURE)" "" \
+  {    super (subcmd, self).__init__ ("prefix_cmd2 subcmd", gdb.COMMAND_OBSCURE)} "" \
   "  def invoke (self, arg, from_tty):" "" \
-  "    print (\"subcmd output, arg = %s\" % arg)" "" \
+  {    print ("subcmd output, arg = %s" % arg)} "" \
   "subcmd ()" "" \
   "end" ""
 
@@ -102,9 +102,9 @@ gdb_test_multiline "input new subcommand" \
   "python" "" \
   "class newsubcmd (gdb.Command):" "" \
   "  def __init__ (self):" "" \
-  "    super (newsubcmd, self).__init__ (\"info newsubcmd\", gdb.COMMAND_OBSCURE)" "" \
+  {    super (newsubcmd, self).__init__ ("info newsubcmd", gdb.COMMAND_OBSCURE)} "" \
   "  def invoke (self, arg, from_tty):" "" \
-  "    print (\"newsubcmd output, arg = %s\" % arg)" "" \
+  {    print ("newsubcmd output, arg = %s" % arg)} "" \
   "newsubcmd ()" "" \
   "end" ""
 
@@ -116,7 +116,7 @@ gdb_test_multiline "input command to throw error" \
   "python" "" \
   "class test_error_cmd (gdb.Command):" "" \
   "  def __init__ (self):" "" \
-  "    super (test_error_cmd, self).__init__ (\"test_error_cmd\", gdb.COMMAND_OBSCURE)" "" \
+  {    super (test_error_cmd, self).__init__ ("test_error_cmd", gdb.COMMAND_OBSCURE)} "" \
   "  def invoke (self, arg, from_tty):" "" \
   "    raise gdb.GdbError ('you lose!')" "" \
   "test_error_cmd ()" "" \
@@ -126,17 +126,17 @@ gdb_test "test_error_cmd ugh" "you lose!" "call error command"
 
 # Test gdb.string_to_argv.
 
-gdb_test "python print (gdb.string_to_argv (\"1 2 3\"))" \
+gdb_test {python print (gdb.string_to_argv ("1 2 3"))} \
   {\['1', '2', '3'\]} \
-  "string_to_argv (\"1 2 3\"), case 1"
+  {string_to_argv ("1 2 3"), case 1}
 
-gdb_test "python print (gdb.string_to_argv (\"'1 2' 3\"))" \
+gdb_test {python print (gdb.string_to_argv ("'1 2' 3"))} \
   {\['1 2', '3'\]} \
-  "string_to_argv (\"'1 2' 3\"), case 2"
+  {string_to_argv ("'1 2' 3"), case 2}
 
-gdb_test "python print (gdb.string_to_argv ('\"1 2\" 3'))" \
+gdb_test {python print (gdb.string_to_argv ('"1 2" 3'))} \
   {\['1 2', '3'\]} \
-  "string_to_argv ('\"1 2\" 3'), case 3"
+  {string_to_argv ('"1 2" 3'), case 3}
 
 gdb_test "python print (gdb.string_to_argv ('1\\ 2 3'))" \
   {\['1 2', '3'\]} \
@@ -146,11 +146,11 @@ gdb_test "python print (gdb.string_to_argv ('1\\ 2 3'))" \
 gdb_test_multiline "input simple user-defined command" \
   "python" "" \
   "class test_help (gdb.Command):" "" \
-  "  \"\"\"Docstring\"\"\"" "" \
+  {  """Docstring"""} "" \
   "  def __init__ (self):" "" \
-  "    super (test_help, self).__init__ (\"test_help\", gdb.COMMAND_USER)" "" \
+  {    super (test_help, self).__init__ ("test_help", gdb.COMMAND_USER)} "" \
   "  def invoke (self, arg, from_tty):" "" \
-  "    print (\"test_cmd output, arg = %s\" % arg)" "" \
+  {    print ("test_cmd output, arg = %s" % arg)} "" \
   "test_help ()" "" \
   "end" ""
 
@@ -168,9 +168,9 @@ gdb_test_multiline "expression completion command" \
   "python" "" \
   "class expr_test (gdb.Command):" "" \
   "  def __init__ (self):" "" \
-  "    super (expr_test, self).__init__ (\"expr_test\", gdb.COMMAND_USER, gdb.COMPLETE_EXPRESSION)" "" \
+  {    super (expr_test, self).__init__ ("expr_test", gdb.COMMAND_USER, gdb.COMPLETE_EXPRESSION)} "" \
   "  def invoke (self, arg, from_tty):" "" \
-  "    print (\"invoked on = %s\" % arg)" "" \
+  {    print ("invoked on = %s" % arg)} "" \
   "expr_test ()" "" \
   "end" ""
 
@@ -267,12 +267,12 @@ gdb_test_no_output "set height 10"
 gdb_test_multiline "input multi-line-output command" \
   "python" "" \
   "class test_mline (gdb.Command):" "" \
-  "  \"\"\"Docstring\"\"\"" "" \
+  {  """Docstring"""} "" \
   "  def __init__ (self):" "" \
-  "    super (test_mline, self).__init__ (\"test_multiline\", gdb.COMMAND_USER)" "" \
+  {    super (test_mline, self).__init__ ("test_multiline", gdb.COMMAND_USER)} "" \
   "  def invoke (self, arg, from_tty):" "" \
   "    for f in range(20):" "" \
-  "      print (\"test_multiline output\")" "" \
+  {      print ("test_multiline output")} "" \
   "test_mline ()" "" \
   "end" ""
 
@@ -305,12 +305,12 @@ proc_with_prefix test_command_redefining_itself {} {
 	"python" "" \
 	"class redefine_cmd (gdb.Command):" "" \
 	"  def __init__ (self, msg):" "" \
-	"    super (redefine_cmd, self).__init__ (\"redefine_cmd\", gdb.COMMAND_OBSCURE)" "" \
+	{    super (redefine_cmd, self).__init__ ("redefine_cmd", gdb.COMMAND_OBSCURE)} "" \
 	"    self._msg = msg" "" \
 	"  def invoke (self, arg, from_tty):" "" \
-	"    print (\"redefine_cmd output, msg = %s\" % self._msg)" "" \
+	{    print ("redefine_cmd output, msg = %s" % self._msg)} "" \
 	"    redefine_cmd (arg)" "" \
-	"redefine_cmd (\"XXX\")" "" \
+	{redefine_cmd ("XXX")} "" \
 	"end" ""
 
     gdb_test "redefine_cmd AAA" \
@@ -357,9 +357,9 @@ proc_with_prefix test_deleting_invoke_methods {} {
 	"python" "" \
 	"class test_prefix(gdb.Command):" "" \
 	"  def __init__ (self):" "" \
-	"    super().__init__ (\"foo\", gdb.COMMAND_USER, prefix=True)" "" \
+	{    super().__init__ ("foo", gdb.COMMAND_USER, prefix=True)} "" \
 	"  def invoke (self, arg, from_tty):" "" \
-	"    print(\"In 'foo' invoke: %s\" % arg)" "" \
+	{    print("In 'foo' invoke: %s" % arg)} "" \
 	"foo = test_prefix()" "" \
 	"end" ""
 
@@ -367,9 +367,9 @@ proc_with_prefix test_deleting_invoke_methods {} {
 	"python" "" \
 	"class test_cmd(gdb.Command):" "" \
 	"  def __init__ (self):" "" \
-	"    super().__init__ (\"foo bar\", gdb.COMMAND_USER)" "" \
+	{    super().__init__ ("foo bar", gdb.COMMAND_USER)} "" \
 	"  def invoke (self, arg, from_tty):" "" \
-	"    print(\"In 'foo bar' invoke: %s\" % arg)" "" \
+	{    print("In 'foo bar' invoke: %s" % arg)} "" \
 	"foo_bar = test_cmd()" "" \
 	"end" ""
 

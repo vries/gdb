@@ -46,10 +46,10 @@ gdb_test "print sum_vararg_int(5, 20, 30, 40, 50, 60)" "200"
 gdb_test "print vararg_func(1)" "1"
 gdb_test "print vararg_func(2, 3)" "2"
 gdb_test "print vararg_func(4, 5.5)" "2"
-gdb_test "print vararg_func(6, \"7\")" "1"
+gdb_test {print vararg_func(6, "7")} "1"
 gdb_test "print vararg_func(8, 9, 10)" "2"
 gdb_test "print vararg_func(11, 12, 13.5)" "2"
-gdb_test "print vararg_func(14, 15, \"16\")" "2"
+gdb_test {print vararg_func(14, 15, "16")} "2"
 
 # Regression test for method call via a typedef.
 gdb_test "print handle->func()" "\\\$$decimal = 1"

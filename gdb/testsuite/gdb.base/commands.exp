@@ -391,11 +391,11 @@ proc_with_prefix user_defined_command_test {} {
 	"execute user-defined empty command"
 
     gdb_test "show user" \
-	"User command \"myemptycommand.*" \
+	{User command "myemptycommand.*} \
 	"display empty command in command list"
 
     gdb_test "show user myemptycommand" \
-	"User command \"myemptycommand.*" \
+	{User command "myemptycommand.*} \
 	"display user-defined empty command"
 }
 
@@ -674,20 +674,20 @@ proc_with_prefix deprecated_command_test {} {
     gdb_test "maintenance deprecate blah" "Can't find command.*" \
           "tried to deprecate non-existing command"
 
-    gdb_test_no_output "maintenance deprecate p \"new_p\"" "maintenance deprecate p \"new_p\" /1/"
+    gdb_test_no_output {maintenance deprecate p "new_p"} {maintenance deprecate p "new_p" /1/}
     gdb_test "p 5" \
 	    "Warning: 'p', an alias for the command 'print', is deprecated.*Use 'new_p'.*" \
 	    "p deprecated warning, with replacement"
     gdb_test "p 5" ".\[0-9\]* = 5.*" "deprecated warning goes away /1/"
 
-    gdb_test_no_output "maintenance deprecate p \"new_p\"" "maintenance deprecate p \"new_p\" /2/"
-    gdb_test_no_output "maintenance deprecate print \"new_print\"" 
+    gdb_test_no_output {maintenance deprecate p "new_p"} {maintenance deprecate p "new_p" /2/}
+    gdb_test_no_output {maintenance deprecate print "new_print"} 
     gdb_test "p 5" \
 	    "Warning: command 'print' \\(p\\) is deprecated.*Use 'new_print'.*" \
 	    "both alias and command are deprecated"
     gdb_test "p 5" ".\[0-9\]* = 5.*" "deprecated warning goes away /2/"
 
-    gdb_test_no_output "maintenance deprecate set remote memory-read-packet-size \"srm\" " \
+    gdb_test_no_output {maintenance deprecate set remote memory-read-packet-size "srm" } \
 	    "deprecate long command /1/"
     gdb_test "set remote memory-read-packet-size" \
 	    "Warning: command 'set remote memory-read-packet-size' is deprecated.*Use 'srm'.*" \
@@ -700,7 +700,7 @@ proc_with_prefix deprecated_command_test {} {
 	    "long command deprecated with no alternative /2/"
 
     gdb_test "maintenance deprecate" \
-	    "\"maintenance deprecate\".*" \
+	    {"maintenance deprecate".*} \
 	    "deprecate with no arguments"
 
     # Test that an alias with a prefix still gives a warning.

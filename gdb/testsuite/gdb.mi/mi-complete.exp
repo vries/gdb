@@ -41,14 +41,14 @@ mi_gdb_test "5-complete bogus" \
             "-complete bogus"
 
 # Check completions for commands with space.
-mi_gdb_test "4-complete \"b mai\"" \
+mi_gdb_test {4-complete "b mai"} \
             "4\\^done,completion=\"b main\",matches=\\\[.*\"b main\".*\\\],max_completions_reached=\"0\"" \
-            "-complete \"b mai\""
+            {-complete "b mai"}
 
 # Check wildmatching.
-mi_gdb_test "5-complete \"b push_ba\"" \
+mi_gdb_test {5-complete "b push_ba"} \
             "5\\^done,completion=\"b push_back\\(\",matches=\\\[.*\"b A::push_back\\(void\\*\\)\".*\\\],max_completions_reached=\"0\"" \
-            "-complete \"b push_ba\", wildmatching"
+            {-complete "b push_ba", wildmatching}
 
 mi_gdb_test "-info-gdb-mi-command complete" \
             "\\^done,command=\{exists=\"true\"\}" \

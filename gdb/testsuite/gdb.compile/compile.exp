@@ -68,7 +68,7 @@ if {[skip_compile_feature_untested]} {
 gdb_test_no_output "compile -- f = 10" \
     "test abbreviations and code delimiter"
 
-gdb_test "compile f = 10;" "^Junk after filename \"=\": 10;" \
+gdb_test "compile f = 10;" {^Junk after filename "=": 10;} \
     "Test abbreviations and code collision"
 
 gdb_test_no_output "compile -r -- void _gdb_expr(){int i = 5;}" \
@@ -134,7 +134,7 @@ gdb_test_no_output "compile code static int staticvar = 5; intptr = &staticvar" 
     "do not keep jit in memory"
 gdb_test "p *intptr" "Cannot access memory at address 0x\[0-9a-f\]+" "expect no 5"
 
-gdb_test "compile code func_doesnotexist ();" "warning: Could not find symbol \"func_doesnotexist\" for .*"
+gdb_test "compile code func_doesnotexist ();" {warning: Could not find symbol "func_doesnotexist" for .*}
 
 gdb_test "compile code *(volatile int *) 0 = 0;" \
     "The program being debugged was signaled while in a function called from GDB\\.\r\nGDB remains in the frame where the signal was received\\.\r\n.*" \
@@ -360,7 +360,7 @@ gdb_test "compile file -z --" \
     "test compile file with unknown option plus --"
 gdb_test "compile file -raw -- -raw" \
     "/-raw: No such file or directory.*" \
-    "test compile file \"-raw\" file"
+    {test compile file "-raw" file}
 
 # LOC_CONST tests.
 

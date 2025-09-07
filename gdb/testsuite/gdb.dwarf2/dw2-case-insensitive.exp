@@ -34,7 +34,7 @@ if { [prepare_for_testing "failed to prepare" ${testfile} \
 gdb_test "show case-sensitive" {Case sensitivity in name search is "auto; currently on"\.}
 
 gdb_test "info functions fUnC_lang" \
-	 "All functions matching regular expression \"fUnC_lang\":" \
+	 {All functions matching regular expression "fUnC_lang":} \
 	 "regexp case-sensitive on"
 
 gdb_test "set case-sensitive off" {warning: the current case sensitivity setting does not match the language\.}

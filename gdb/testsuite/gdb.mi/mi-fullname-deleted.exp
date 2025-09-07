@@ -64,7 +64,7 @@ if {[mi_clean_restart $::testfile]} {
 
 mi_gdb_test "-interpreter-exec console \"set substitute-path ${initdir} ${initdir}subst\"" {\^done} "set substitute-path"
 
-mi_gdb_test "-file-list-exec-source-file" ".*\",fullname=\".*\".*" "fullname present"
+mi_gdb_test "-file-list-exec-source-file" {.*",fullname=".*".*} "fullname present"
 
 mi_gdb_test "-file-list-exec-source-file" ".*\",fullname=\"$srcfileabssubst_regexp\".*" "substituted fullname"
 

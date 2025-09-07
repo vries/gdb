@@ -65,7 +65,7 @@ proc start_gdb_for_test {condition_eval target_non_stop non_stop displaced} {
 	append ::GDBFLAGS " -ex \"maint set target-non-stop $target_non_stop\""
 	append ::GDBFLAGS " -ex \"set non-stop $non_stop\""
 	append ::GDBFLAGS " -ex \"set displaced $displaced\""
-	append ::GDBFLAGS " -ex \"set schedule-multiple on\""
+	append ::GDBFLAGS { -ex "set schedule-multiple on"}
 	clean_restart $::testfile
     }
 

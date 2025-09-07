@@ -56,7 +56,7 @@ proc check_info_bp_any_syscall {} {
     # Verifying that the catchpoint appears in the 'info breakpoints'
     # command, but with "<any syscall>".
     set thistest "catch syscall appears in 'info breakpoints'"
-    gdb_test "info breakpoints" ".*catchpoint.*keep y.*syscall \"<any syscall>\".*" $thistest
+    gdb_test "info breakpoints" {.*catchpoint.*keep y.*syscall "<any syscall>".*} $thistest
 }
 
 # Internal procedure used to check if, after issuing a 'catch syscall X'

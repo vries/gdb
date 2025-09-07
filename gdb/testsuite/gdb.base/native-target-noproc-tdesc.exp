@@ -21,7 +21,7 @@ clean_restart
 require have_native_target
 
 # Manually attach the native target
-gdb_test "target native" "Done.  Use the \"run\" command to start a process."
+gdb_test "target native" {Done.  Use the "run" command to start a process.}
 
 # Load a default target description
 gdb_test_no_output "unset tdesc filename"

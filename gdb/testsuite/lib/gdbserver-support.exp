@@ -522,7 +522,7 @@ proc gdbserver_exit { is_mi } {
 	# Catch the exceptions.
 	catch {
 	    if { $is_mi } {
-		set monitor_exit "-interpreter-exec console \"monitor exit\""
+		set monitor_exit {-interpreter-exec console "monitor exit"}
 	    } else {
 		set monitor_exit "monitor exit"
 	    }

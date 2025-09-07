@@ -102,7 +102,7 @@ foreach_mi_ui_mode mode {
 	# notification.
 	mi_gdb_test "-remove-inferior i2" \
 	    [multi_line \
-		 "=thread-group-removed,id=\"i2\"" \
+		 {=thread-group-removed,id="i2"} \
 		 "~\"Inferior-specific breakpoint $bpnum deleted - inferior 2 has been removed\\.\\\\n\"" \
 		 "=breakpoint-deleted,id=\"$bpnum\"" \
 		 "\\^done"]

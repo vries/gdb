@@ -66,7 +66,7 @@ proc test_fields {lang} {
 	global gdb_prompt
 
 	# fields of a typedef should still return the underlying field list
-	gdb_test "guile (print (length (type-fields (value-type (parse-and-eval \"ts\")))))" \
+	gdb_test {guile (print (length (type-fields (value-type (parse-and-eval "ts")))))} \
 	    "= 2" "$lang typedef field list"
 
 	if {$lang == "c++"} {
@@ -98,13 +98,13 @@ proc test_fields {lang} {
 	    "= a" "check structure field a name"
 	gdb_test "guile (print (field-name (cadr fields)))" \
 	    "= b" "check structure field b name"
-	gdb_test "guile (print (field-name (type-field st-type \"a\")))" \
+	gdb_test {guile (print (field-name (type-field st-type "a")))} \
 	    "= a" "check fields lookup by name"
 
 	# Test has-field?
-	gdb_test "guile (print (type-has-field? st-type \"b\"))" \
+	gdb_test {guile (print (type-has-field? st-type "b"))} \
 	    "= #t" "check existent field"
-	gdb_test "guile (print (type-has-field? st-type \"nosuch\"))" \
+	gdb_test {guile (print (type-has-field? st-type "nosuch"))} \
 	    "= #f" "check non-existent field"
 
 	# Test Guile mapping behavior of gdb:type for structs/classes.
@@ -116,7 +116,7 @@ proc test_fields {lang} {
 	    "= \\(0 32\\)" "check field iterator"
 
 	# Test rejection of mapping operations on scalar types.
-	gdb_test "guile (print (make-field-iterator (field-type (type-field st-type \"a\"))))" \
+	gdb_test {guile (print (make-field-iterator (field-type (type-field st-type "a"))))} \
 	    "ERROR: .*: Out of range: type is not a structure, union, or enum type in position 1: .*" \
 	    "check field iterator on bad type"
 
@@ -161,9 +161,9 @@ proc test_fields {lang} {
 
 proc test_equality {lang} {
     with_test_prefix "test_equality" {
-	gdb_scm_test_silent_cmd "guile (define st (parse-and-eval \"st\"))" \
+	gdb_scm_test_silent_cmd {guile (define st (parse-and-eval "st"))} \
 	    "get st"
-	gdb_scm_test_silent_cmd "guile (define ar (parse-and-eval \"ar\"))" \
+	gdb_scm_test_silent_cmd {guile (define ar (parse-and-eval "ar"))} \
 	    "get ar"
 	gdb_test "guile (print (eq? (value-type st) (value-type st)))" \
 	    "= #t" "test type eq? on equal types"
@@ -175,9 +175,9 @@ proc test_equality {lang} {
 	    "= #f" "test type equal? on not-equal types"
 
 	if {$lang == "c++"} {
-	    gdb_scm_test_silent_cmd "guile (define c (parse-and-eval \"c\"))" \
+	    gdb_scm_test_silent_cmd {guile (define c (parse-and-eval "c"))} \
 		"get c"
-	    gdb_scm_test_silent_cmd "guile (define d (parse-and-eval \"d\"))" \
+	    gdb_scm_test_silent_cmd {guile (define d (parse-and-eval "d"))} \
 		"get d"
 	    gdb_test "guile (print (eq? (value-type c) (field-type (car (type-fields (value-type d))))))" \
 		"= #t" "test c++ type eq? on equal types"
@@ -208,9 +208,9 @@ proc test_enums {} {
 	# Ditto but by mapping operations.
 	gdb_test "guile (print (type-num-fields (value-type e)))" \
 	    "= 3" "check the number of enum values"
-	gdb_test "guile (print (field-name (type-field (value-type e) \"v1\")))" \
+	gdb_test {guile (print (field-name (type-field (value-type e) "v1")))} \
 	    "= v1" "check enum field lookup by name, v1"
-	gdb_test "guile (print (field-name (type-field (value-type e) \"v3\")))" \
+	gdb_test {guile (print (field-name (type-field (value-type e) "v3")))} \
 	    "= v3" "check enum field lookup by name, v3"
 	gdb_test "guile (print (iterator-map field-enumval (make-field-iterator (value-type e))))" \
 	    "\\(0 1 2\\)" "check enum fields iteration"
@@ -260,11 +260,11 @@ proc test_range {} {
 	    gdb_scm_test_silent_cmd "print f" "print value, f"
 	    gdb_scm_test_silent_cmd "guile (define f (history-ref 0))" \
 		"get value (f) from history"
-	    gdb_test "guile (print (type-range (field-type (type-field (value-type (value-dereference f)) \"items\"))))" \
+	    gdb_test {guile (print (type-range (field-type (type-field (value-type (value-dereference f)) "items"))))} \
 		"= \\(0 (0|-1)\\)"
-	    gdb_test "guile (print (value-subscript (value-field (value-dereference f) \"items\") 0))" \
+	    gdb_test {guile (print (value-subscript (value-field (value-dereference f) "items") 0))} \
 		"= 111"
-	    gdb_test "guile (print (value-subscript (value-field (value-dereference f) \"items\") 1))" \
+	    gdb_test {guile (print (value-subscript (value-field (value-dereference f) "items") 1))} \
 		"= 222"
 	}
     }

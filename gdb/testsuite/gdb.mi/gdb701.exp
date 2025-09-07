@@ -39,7 +39,7 @@ mi_clean_restart $::testfile
 mi_runto_main
 
 # Step over "foo = 0"
-mi_next "step over \"foo = 0\""
+mi_next {step over "foo = 0"}
 
 mi_create_varobj "fooPtr" "foo" "create fooPtr"
 

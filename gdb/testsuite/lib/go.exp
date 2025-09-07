@@ -23,7 +23,7 @@ proc set_lang_go {} {
     if [gdb_test_no_output "set language go"] {
 	return 0
     }
-    if [gdb_test "show language" ".* source language is \"go\"." \
+    if [gdb_test "show language" {.* source language is "go".} \
 	   "set language to \"go\""] {
 	return 0
     }

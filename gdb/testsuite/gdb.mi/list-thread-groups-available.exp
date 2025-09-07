@@ -36,7 +36,7 @@ if [mi_gdb_start] {
 set string_re {(?:[^\\"]|\\.)*}
 
 set id_re "id=\"$decimal\""
-set type_re "type=\"process\""
+set type_re {type="process"}
 set description_re "description=\"$string_re\""
 set user_re "user=\"$string_re\""
 

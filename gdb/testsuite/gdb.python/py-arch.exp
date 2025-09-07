@@ -57,9 +57,9 @@ gdb_test "python print (len(insn_list4))" "1" "test number of instructions 4"
 
 gdb_py_test_silent_cmd "python insn = insn_list1\[0\]" "get instruction" 0
 
-gdb_test "python print (\"addr\" in insn)" "True" "test key addr"
-gdb_test "python print (\"asm\" in insn)" "True" "test key asm"
-gdb_test "python print (\"length\" in insn)" "True" "test key length"
+gdb_test {python print ("addr" in insn)} "True" "test key addr"
+gdb_test {python print ("asm" in insn)} "True" "test key asm"
+gdb_test {python print ("length" in insn)} "True" "test key length"
 
 if { ![is_address_zero_readable] } {
     # Negative test

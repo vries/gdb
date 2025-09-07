@@ -62,21 +62,21 @@ with_read1_timeout_factor 10 {
     # Test help of an abbreviated command.  "break" is picked at random.
     set help_breakpoint_text "Set breakpoint at specified location\..*"
     # Test help breakpoint "b" abbreviation.
-    gdb_test "help b" $help_breakpoint_text "help breakpoint \"b\" abbreviation"
+    gdb_test "help b" $help_breakpoint_text {help breakpoint "b" abbreviation}
     # Test help breakpoint "br" abbreviation.
-    gdb_test "help br" $help_breakpoint_text "help breakpoint \"br\" abbreviation"
+    gdb_test "help br" $help_breakpoint_text {help breakpoint "br" abbreviation}
     # Test help breakpoint "bre" abbreviation;
-    gdb_test "help bre" $help_breakpoint_text "help breakpoint \"bre\" abbreviation"
+    gdb_test "help bre" $help_breakpoint_text {help breakpoint "bre" abbreviation}
     # Test help breakpoint "brea" abbreviation.
 }
-gdb_test "help brea" $help_breakpoint_text "help breakpoint \"brea\" abbreviation"
+gdb_test "help brea" $help_breakpoint_text {help breakpoint "brea" abbreviation}
 # Test help breakpoint "break" abbreviation.
-gdb_test "help break" $help_breakpoint_text "help breakpoint \"break\" abbreviation"
+gdb_test "help break" $help_breakpoint_text {help breakpoint "break" abbreviation}
 
 # Test help of an aliased command.  "bt" is picked at random.
 set help_backtrace_text "Print backtrace of all stack frames, or innermost COUNT frames\..*"
 # Test help backtrace "bt" abbreviation.
-gdb_test "help bt" $help_backtrace_text "help backtrace \"bt\" abbreviation"
+gdb_test "help bt" $help_backtrace_text {help backtrace "bt" abbreviation}
 # Test help backtrace.
 gdb_test "help backtrace" $help_backtrace_text
 
@@ -99,7 +99,7 @@ test_prefix_command_help "delete" $expected_help_delete
 
 # Make sure help for help itself is present.
 # Test help help "h" abbreviation.
-gdb_test "help h" "Print list of commands\." "help help \"h\" abbreviation"
+gdb_test "help h" "Print list of commands\." {help help "h" abbreviation}
 # Test help help.
 gdb_test "help help" "Print list of commands\."
 
@@ -172,5 +172,5 @@ gdb_test "help mybt" " alias mybt = backtrace \[\r\n\]+An alias of command backt
     "help mybt after documenting aliases showing mybt doc"
 
 # Check pre-defined aliases cannot be documented.
-gdb_test "document where" "Alias \"where\" is built-in.*" \
+gdb_test "document where" {Alias "where" is built-in.*} \
     "documenting builtin where alias disallowed"

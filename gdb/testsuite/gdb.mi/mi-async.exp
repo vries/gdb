@@ -40,7 +40,7 @@ if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {deb
 
 # The plan is for async mode to become the default but toggle for now.
 save_vars { GDBFLAGS } {
-    set GDBFLAGS [concat $GDBFLAGS " -ex \"set mi-async on\""]
+    set GDBFLAGS [concat $GDBFLAGS { -ex "set mi-async on"}]
 
     if {[mi_clean_restart $::testfile]} {
 	return
