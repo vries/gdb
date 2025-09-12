@@ -16,7 +16,7 @@
 
 standard_testfile langs0.c langs1.c langs2.c
 
-if [is_remote host] {
+if { [is_remote host] } {
     remote_download host ${srcdir}/${subdir}/langs1.f
     remote_download host ${srcdir}/${subdir}/langs2.cxx
 }

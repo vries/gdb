@@ -43,7 +43,7 @@ verbose "Timeout is now $timeout seconds" 2
 
 # Some coverage stuff
 #
-if !$use_gdb_stub {
+if { !$use_gdb_stub } {
     gdb_test "kill" ".*The program is not being run.*"
     gdb_test "detach" ".*"
     gdb_test "run" ".*"

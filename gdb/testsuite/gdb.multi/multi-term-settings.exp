@@ -56,7 +56,7 @@ proc create_inferior {which_inf inf_how} {
 
     # Run to main and delete breakpoints.
     proc my_runto_main {} {
-	if ![runto_main] {
+	if { ![runto_main] } {
 	    return 0
 	} else {
 	    # Delete breakpoints otherwise GDB would try to step over
@@ -69,7 +69,7 @@ proc create_inferior {which_inf inf_how} {
     }
 
     if {$inf_how == "run"} {
-	if [my_runto_main] {
+	if { [my_runto_main] } {
 	    global inferior_spawn_id
 	    return $inferior_spawn_id
 	}
@@ -80,7 +80,7 @@ proc create_inferior {which_inf inf_how} {
 	set inf_tty_name $spawn_out(slave,name)
 	gdb_test_no_output "tty $inf_tty_name" "tty TTY"
 
-	if [my_runto_main] {
+	if { [my_runto_main] } {
 	    return $inf_spawn_id
 	}
     } elseif {$inf_how == "attach"} {
@@ -193,7 +193,7 @@ proc coretest {inf1_how inf2_how} {
     proc pass_or_exp_continue {} {
 	uplevel 1 {
 	    if {$count1 >= 3 && $count2 >= 3} {
-		if $expect_ttou {
+		if { $expect_ttou } {
 		    fail "$gdb_test_name (expected SIGTTOU)"
 		} else {
 		    pass $gdb_test_name
@@ -233,7 +233,7 @@ proc coretest {inf1_how inf2_how} {
 	    pass_or_exp_continue
 	}
 	-i $gdb_spawn_id -re "received signal SIGTTOU.*$gdb_prompt " {
-	    if $expect_ttou {
+	    if { $expect_ttou } {
 		pass "$gdb_test_name (expected SIGTTOU)"
 	    } else {
 		fail "$gdb_test_name (SIGTTOU)"

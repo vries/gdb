@@ -131,6 +131,6 @@ gdb_test "show language" {The current source language is "(auto; currently )?for
 # gcc-4.4.2: The main program is always $fmain in .symtab so "runto" above
 # works.  But DWARF DW_TAG_subprogram contains the name specified by
 # the "program" Fortran statement.
-if [gdb_breakpoint "module"] {
+if { [gdb_breakpoint "module"] } {
     pass "setting breakpoint at module"
 }

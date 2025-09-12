@@ -98,7 +98,7 @@ proc test_mode { mode } {
     }
     set binfile [standard_output_file ${executable}]
 
-    if ![runto_main] {
+    if { ![runto_main] } {
 	untested "could not run to main"
 	return -1
     }

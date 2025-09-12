@@ -112,7 +112,7 @@ proc run_test { field_name } {
 	return -1
     }
 
-    if ![runto_main] {
+    if { ![runto_main] } {
 	return -1
     }
 

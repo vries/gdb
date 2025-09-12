@@ -76,16 +76,16 @@ proc gdb_target_monitor { exec_file } {
     global exit_status
     global timeout
 
-    if [target_info exists gdb_protocol] {
+    if { [target_info exists gdb_protocol] } {
 	set targetname "[target_info gdb_protocol]"
     } else {
 	perror "No protocol specified for [target_info name]."
 	return -1
     }
-    if [target_info exists baud] {
+    if { [target_info exists baud] } {
 	gdb_test "set serial baud [target_info baud]" "" ""
     }
-    if [target_info exists binarydownload] {
+    if { [target_info exists binarydownload] } {
 	gdb_test "set remotebinarydownload [target_info binarydownload]" "" ""
     }
     if { [ target_info exists disable_x_packet ] } {
@@ -94,9 +94,9 @@ proc gdb_target_monitor { exec_file } {
     if { [ target_info exists disable_z_packet ] } {
 	gdb_test "set remote Z-packet disable" ""
     }
-    if [target_info exists gdb_serial] {
+    if { [target_info exists gdb_serial] } {
        set serialport "[target_info gdb_serial]"
-    } elseif [target_info exists netport] {
+    } elseif { [target_info exists netport] } {
 	set serialport "[target_info netport]"
     } else {
 	set serialport "[target_info serial]"
@@ -136,7 +136,7 @@ proc gdb_load { arg } {
     global last_gdb_file
 
     if { $arg == "" } {
-	if [info exists last_gdb_file] {
+	if { [info exists last_gdb_file] } {
 	    set arg $last_gdb_file
 	} else {
 	    send_gdb "info files\n"
@@ -157,13 +157,13 @@ proc gdb_load { arg } {
     set last_gdb_file $arg
 
     for { set j 1 } { $j <= 2 } {incr j } {
-	if [target_info exists gdb,use_standard_load] {
+	if { [target_info exists gdb,use_standard_load] } {
 	    gdb_target_exec
-	    if ![target_info exists gdb,no_push_conn] {
+	    if { ![target_info exists gdb,no_push_conn] } {
 		remote_push_conn host
 	    }
 	    set state [remote_ld target $arg]
-	    if ![target_info exists gdb,no_push_conn] {
+	    if { ![target_info exists gdb,no_push_conn] } {
 		remote_close target
 		remote_pop_conn host
 	    }
@@ -177,7 +177,7 @@ proc gdb_load { arg } {
 
 	    if [gdb_target_monitor $arg] { return -1 }
 
-	    if [is_remote host] {
+	    if { [is_remote host] } {
 		# FIXME: Multiple downloads. bleah.
 		set farg [remote_download host $arg]
 	    } else {
@@ -211,18 +211,18 @@ proc gdb_load { arg } {
 	    }
 
 	    verbose "Loading $farg"
-	    if [target_info exists gdb_load_offset] {
+	    if { [target_info exists gdb_load_offset] } {
 		set command "load $farg [target_info gdb_load_offset]\n"
 	    } else {
 		set command "load $farg\n"
 	    }
-	    if [target_info exists gdb_load_timeout] {
+	    if { [target_info exists gdb_load_timeout] } {
 		set loadtimeout [target_info gdb_load_timeout]
 	    } else {
 		set loadtimeout 1600
 	    }
 
-	    if [is_remote target] {
+	    if { [is_remote target] } {
 		set oldremotetimeout [get_remotetimeout]
 		set_remotetimeout $loadtimeout
 	    }
@@ -246,7 +246,7 @@ proc gdb_load { arg } {
 		}
 	    }
 
-	    if [is_remote target] {
+	    if { [is_remote target] } {
 		set_remotetimeout $oldremotetimeout
 	    }
 

@@ -126,7 +126,7 @@ proc build_executable_and_dwo_files { testname executable options args } {
     }
 
     # Must be run on local host due to use of objcopy.
-    if [is_remote host] {
+    if { [is_remote host] } {
 	return -1
     }
 
@@ -1834,7 +1834,7 @@ namespace eval Dwarf {
 
 	parse_options {{"is-64" "false"}}
 
-	if [is_64_target] {
+	if { [is_64_target] } {
 	    set _debug_rnglists_addr_size 8
 	} else {
 	    set _debug_rnglists_addr_size 4
@@ -2022,7 +2022,7 @@ namespace eval Dwarf {
 
 	parse_options {{"is-64" "false"}}
 
-	if [is_64_target] {
+	if { [is_64_target] } {
 	    set _debug_loclists_addr_size 8
 	} else {
 	    set _debug_loclists_addr_size 4

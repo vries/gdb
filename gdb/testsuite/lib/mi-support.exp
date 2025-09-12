@@ -65,7 +65,7 @@ proc mi_uncatched_gdb_exit {} {
 	sid_exit
     }
 
-    if ![info exists gdb_spawn_id] {
+    if { ![info exists gdb_spawn_id] } {
 	return
     }
 
@@ -99,7 +99,7 @@ proc mi_uncatched_gdb_exit {} {
 	close -i $mi_spawn_id
     }
 
-    if ![is_remote host] {
+    if { ![is_remote host] } {
 	remote_close host
     }
     unset gdb_spawn_id
@@ -256,7 +256,7 @@ proc default_mi_gdb_start { { flags {} } } {
 	sid_start
     }
 
-    if [info exists gdb_spawn_id] {
+    if { [info exists gdb_spawn_id] } {
 	return 0
     }
 
@@ -386,7 +386,7 @@ proc mi_gdb_reinitialize_dir { subdir } {
     global mi_gdb_prompt
     global MIFLAGS
 
-    if [is_remote host] {
+    if { [is_remote host] } {
 	return ""
     }
 
@@ -487,7 +487,7 @@ proc mi_gdb_file_cmd { arg } {
 
     set last_loaded_file $arg
 
-    if [is_remote host] {
+    if { [is_remote host] } {
 	set arg [remote_download host $arg]
 	if { $arg == "" } {
 	    error "download failed"
@@ -553,7 +553,7 @@ proc mi_gdb_target_load { } {
     global GDB
     global mi_gdb_prompt
 
-    if [target_info exists gdb_load_timeout] {
+    if { [target_info exists gdb_load_timeout] } {
 	set loadtimeout [target_info gdb_load_timeout]
     } else {
 	set loadtimeout 1600
@@ -700,11 +700,11 @@ proc mi_gdb_test { args } {
 	set message $command
     }
 
-    if [llength $args]==4 {
+    if { [llength $args]==4 } {
 	set ipattern [lindex $args 3]
     }
 
-    if [llength $args]==5 {
+    if { [llength $args]==5 } {
 	set question_string [lindex $args 3]
 	set response_string [lindex $args 4]
     } else {
@@ -750,11 +750,11 @@ proc mi_gdb_test { args } {
 	}
     }
 
-    if [info exists timeout] {
+    if { [info exists timeout] } {
 	set tmt $timeout
     } else {
 	global timeout
-	if [info exists timeout] {
+	if { [info exists timeout] } {
 	    set tmt $timeout
 	} else {
 	    set tmt 60
@@ -863,7 +863,7 @@ proc mi_gdb_test { args } {
 
     # If the GDB output matched, compare the inferior output.
     if { $result == 0 } {
-	if [ info exists ipattern ] {
+	if { [ info exists ipattern ] } {
 	    if { ![target_info exists gdb,noinferiorio] } {
 		global gdb_spawn_id inferior_spawn_id
 
@@ -957,8 +957,8 @@ proc mi_run_cmd_full {use_mi_command args} {
 	return -1
     }
 
-    if $use_gdb_stub {
-	if [target_info exists gdb,do_reload_on_run] {
+    if { $use_gdb_stub } {
+	if { [target_info exists gdb,do_reload_on_run] } {
 	    send_gdb "${run_prefix}continue\n"
 	    gdb_expect 60 {
 		-re "${run_match}\\^running\[\r\n\]+\\*running,thread-id=\"\[^\"\]+\"\r\n$mi_gdb_prompt" {}
@@ -968,7 +968,7 @@ proc mi_run_cmd_full {use_mi_command args} {
 	    return 0
 	}
 
-	if [target_info exists gdb,start_symbol] {
+	if { [target_info exists gdb,start_symbol] } {
 	    set start [target_info gdb,start_symbol]
 	} else {
 	    set start "start"
@@ -2102,7 +2102,7 @@ proc check_mi_and_console_threads { name } {
 proc mi_locate_shlib { file } {
     global mi_spawn_id
 
-    if ![info exists mi_spawn_id] {
+    if { ![info exists mi_spawn_id] } {
 	perror "mi_locate_shlib: GDB is not running"
     }
 
@@ -2922,7 +2922,7 @@ proc mi_get_valueof { fmt exp default {test ""} } {
 proc foreach_mi_ui_mode { var_name body } {
     upvar 1 $var_name var
 
-    if [gdb_debug_enabled] {
+    if { [gdb_debug_enabled] } {
        # gdb debug doesn't work for separate-mi-tty.
        set modes {"main"}
     } else {

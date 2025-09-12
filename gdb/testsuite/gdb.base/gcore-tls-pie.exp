@@ -46,7 +46,7 @@ clean_restart
 gdb_load $stripped_binfile
 
 # The binary is stripped of debug info, but not minsyms.
-if ![runto break_here] {
+if { ![runto break_here] } {
     return -1
 }
 

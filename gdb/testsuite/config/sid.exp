@@ -91,7 +91,7 @@ proc sid_start {} {
     # GDB would wait for a fair while for the stub to respond.
     sleep 4
 
-    if ![target_info exists gdb,no_push_conn] {
+    if { ![target_info exists gdb,no_push_conn] } {
         remote_push_conn host
     }
 }
@@ -106,7 +106,7 @@ proc gdb_start {} {
 }
 
 proc sid_exit {} {
-    if ![target_info exists gdb,no_push_conn] {
+    if { ![target_info exists gdb,no_push_conn] } {
 	remote_close host
 	remote_pop_conn host
     }

@@ -176,7 +176,7 @@ save_vars { env(TERM) } {
 	# sequence is a hard-coded VT100 up arrow.
 	gdb_test "print 42" "\\\$\[0-9\]* = 42"
 	set msg "arrow keys with secondary prompt"
-	gdb_test_multiple "if 1 > 0\n\033\[A\033\[A\nend" $msg {
+	gdb_test_multiple "if { 1 > 0\n\033\[A\033\[A\nend" $msg } {
 	    -re ".*\\\$\[0-9\]* = 42\r\n$gdb_prompt $" {
 		pass $msg
 	    }

@@ -85,7 +85,7 @@ proc gdb_install_guile_module { } {
 # The result is the same as for runto_main.
 
 proc gdb_guile_runto_main { } {
-    if ![runto_main] {
+    if { ![runto_main] } {
 	return 0
     }
 

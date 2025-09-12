@@ -19,7 +19,7 @@
 # clone as proxy for when libthread_db is not available.
 
 # This only works on targets with the Linux kernel.
-if ![istarget *-*-linux*] {
+if { ![istarget *-*-linux*] } {
     return
 }
 

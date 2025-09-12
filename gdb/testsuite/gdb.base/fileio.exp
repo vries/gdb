@@ -241,7 +241,7 @@ gdb_test continue \
 
 # This test fails on Cygwin because unlink() succeeds on Win32 systems
 # in that situation.
-if [ishost *cygwin*] {
+if { [ishost *cygwin*] } {
     setup_xfail "*-*-*"
 }
 # If the user is root, we will always have write permission.

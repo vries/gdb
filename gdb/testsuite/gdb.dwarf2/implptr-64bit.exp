@@ -129,7 +129,7 @@ proc test_1 { name dwarf_version offset_size addr_size ref_addr_size two_cu } {
 	return -1
     }
 
-    if ![runto_main] {
+    if { ![runto_main] } {
 	return -1
     }
 

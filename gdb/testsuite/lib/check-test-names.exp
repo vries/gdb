@@ -120,11 +120,11 @@ namespace eval ::CheckTestNames {
     proc check { message } {
 	set message [ _strip_status $message ]
 
-	if [ _check_paths $message ] {
+	if { [ _check_paths $message ] } {
 	    clone_output "PATH: $message"
 	}
 
-	if [ _check_duplicates $message ] {
+	if { [ _check_duplicates $message ] } {
 	    clone_output "DUPLICATE: $message"
 	}
 

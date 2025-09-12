@@ -312,7 +312,7 @@ proc test_subscript_regression {exefile lang} {
     clean_restart
     gdb_load ${exefile}
 
-    if ![gdb_guile_runto_main ] {
+    if { ![gdb_guile_runto_main ] } {
 	return
     }
 
@@ -438,7 +438,7 @@ test_value_hash
 
 # The following tests require execution.
 
-if ![gdb_guile_runto_main] {
+if { ![gdb_guile_runto_main] } {
     return
 }
 

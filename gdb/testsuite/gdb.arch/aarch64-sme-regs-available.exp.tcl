@@ -50,7 +50,7 @@ proc check_regs { mode vl svl } {
     }
 
     # Check SVCR.
-    if [gdb_test "print \$svcr" $za_state "svcr before assignments" ] {
+    if { [gdb_test "print \$svcr" $za_state "svcr before assignments" ] } {
 	fail "incorrect za state"
 	return -1
     }
@@ -130,7 +130,7 @@ proc check_regs { mode vl svl } {
     }
 
     # Exercise reading/writing from/to SME2 registers.
-    if [is_sme2_available] {
+    if { [is_sme2_available] } {
       # The target supports SME2.
       set zt_size 64
       gdb_test "print sizeof \$zt0" " = $zt_size"
@@ -163,7 +163,7 @@ proc test_sme_registers_available { id_start id_end } {
     }
     set binfile [standard_output_file ${executable}]
 
-    if ![runto_main] {
+    if { ![runto_main] } {
 	untested "could not run to main"
 	return -1
     }

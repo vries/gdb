@@ -34,7 +34,7 @@ foreach_with_prefix pie { "nopie" "pie" } {
     set binfile [standard_output_file $testfile-$pie]
 
     set board [target_info name]
-    if [board_info $board exists mathlib] {
+    if { [board_info $board exists mathlib] } {
 	set mathlib [board_info $dest mathlib]
 	set_board_info mathlib ""
 	set err [eval $compile]

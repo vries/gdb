@@ -191,7 +191,7 @@ proc test_template_breakpoints {} {
 proc test_template_calls {} {
     global gdb_prompt
 
-    if [target_info exists gdb,cannot_call_functions] {
+    if { [target_info exists gdb,cannot_call_functions] } {
 	unsupported "this target can not call functions"
 	return
     }
@@ -264,7 +264,7 @@ proc do_tests {} {
     test_template_typedef
     test_template_args
 
-    if [ runto_main] {
+    if { [ runto_main] } {
 	test_template_calls
     }
 }

@@ -21,7 +21,7 @@ standard_testfile
 set gcc_compiled [is_c_compiler_gcc]
 
 set compile_flags {debug nowarnings quiet}
-if [support_complex_tests] {
+if { [support_complex_tests] } {
     lappend compile_flags "additional_flags=-DTEST_COMPLEX"
 }
 
@@ -1032,7 +1032,7 @@ proc_with_prefix stepping_over_trampolines { } {
 }
 
 set prev_timeout $timeout
-if [istarget "mips*tx39-*"] {
+if { [istarget "mips*tx39-*"] } {
     set timeout 300
 } else {
     set timeout 60
@@ -1083,7 +1083,7 @@ if {$allow_float_test} {
 }
 
 # Test _Complex type here if supported.
-if [support_complex_tests] {
+if { [support_complex_tests] } {
     complex_args
 
     complex_integral_args

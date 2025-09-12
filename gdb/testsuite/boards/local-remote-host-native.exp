@@ -52,7 +52,7 @@ save_vars {rsh_cmd res} {
 		  -l [board_info $board username] \
 		  [board_info $board hostname]]]
 
-    if [info exists HOST_DIR] {
+    if { [info exists HOST_DIR] } {
 	set_board_info remotedir $HOST_DIR
     } else {
 	# Set remotedir by default, to force remote_download target to give an

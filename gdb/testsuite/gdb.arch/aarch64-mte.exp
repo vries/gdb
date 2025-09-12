@@ -50,7 +50,7 @@ if { [prepare_for_testing "failed to prepare" ${testfile} ${srcfile}] } {
     return -1
 }
 
-if ![runto_main] {
+if { ![runto_main] } {
     return -1
 }
 
@@ -63,7 +63,7 @@ if {![supports_memtag]} {
 
 gdb_breakpoint "access_memory"
 
-if [gdb_continue "access_memory"] {
+if { [gdb_continue "access_memory"] } {
     return -1
 }
 
@@ -334,13 +334,13 @@ gdb_test "continue" \
 
 # Restart to execute the async tag fault test.
 with_test_prefix "async" {
-    if ![runto_main] {
+    if { ![runto_main] } {
 	return -1
     }
 
     gdb_breakpoint "access_memory"
 
-    if [gdb_continue "access_memory"] {
+    if { [gdb_continue "access_memory"] } {
 	fail "could not run to tagged memory test function"
 	return -1
     }

@@ -223,7 +223,7 @@ gdb_test "maint set per-command off" \
 # The timeout value is raised, because printing all the symbols and
 # statistical information about Cygwin and Windows libraries takes a lot
 # of time.
-if [istarget "*-*-cygwin*"] {
+if { [istarget "*-*-cygwin*"] } {
 	set oldtimeout $timeout
 	set timeout [expr $timeout + 500]
 }
@@ -378,7 +378,7 @@ gdb_test_multiple "maint print type argc" $msg {
     }
 }
 
-if [istarget "hppa*-*-11*"] {
+if { [istarget "hppa*-*-11*"] } {
     setup_xfail hppa*-*-*11* CLLbs14860
     gdb_test_multiple "maint print unwind &main" "maint print unwind" {
         -re ".*unwind_table_entry \\($hex\\):\r\n\tregion_start = $hex <main>\r\n\tregion_end = $hex <main\\+\[0-9\]*>\r\n\tflags = Args_stored Save_RP\r\n\tRegion_description = $hex\r\n\tEntry_FR = $hex\r\n\tEntry_GR = $hex\r\n\tTotal_frame_size = $hex\r\n$gdb_prompt $" {
@@ -522,7 +522,7 @@ send_gdb "maint internal-error\n"
 gdb_expect {
     -re "A problem internal to GDB has been detected" {
 	pass "maint internal-error"
-	if [gdb_internal_error_resync] {
+	if { [gdb_internal_error_resync] } {
 	    pass "internal-error resync"
 	} else {
 	    fail "internal-error resync"

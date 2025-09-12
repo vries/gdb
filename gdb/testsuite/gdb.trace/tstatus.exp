@@ -25,11 +25,11 @@ if [prepare_for_testing "failed to prepare" $executable $srcfile \
     return -1
 }
 
-if ![runto_main] {
+if { ![runto_main] } {
     return -1
 }
 
-if ![gdb_target_supports_trace] {
+if { ![gdb_target_supports_trace] } {
     unsupported "target does not support trace"
     return -1
 }
@@ -60,10 +60,10 @@ proc run_trace_experiment {} {
 
     set test "tstatus reports trace note"
     gdb_test_multiple "tstatus" $test {
-	-re "Trace is running.*Trace will stop if GDB disconnects\.\[\r\n\]+Trace notes: my tracing note\.\[\r\n\]+Not looking at any trace frame\..*\r\n$gdb_prompt $" {
+	-re "Trace is running.*Trace will stop if { GDB disconnects\.\[\r\n\]+Trace notes: my tracing note\.\[\r\n\]+Not looking at any trace frame\..*\r\n$gdb_prompt $" } {
 	    pass $test
 	}
-	-re "Trace is running.*Trace will stop if GDB disconnects\.\[\r\n\]+Not looking at any trace frame.*\r\n$gdb_prompt $" {
+	-re "Trace is running.*Trace will stop if { GDB disconnects\.\[\r\n\]+Not looking at any trace frame.*\r\n$gdb_prompt $" } {
 	    unsupported $test
 	}
     }
@@ -72,10 +72,10 @@ proc run_trace_experiment {} {
 
     set test "tstatus reports different trace note"
     gdb_test_multiple "tstatus" $test {
-	-re "Trace is running.*Trace will stop if GDB disconnects\.\[\r\n\]+Trace notes: different note\.\[\r\n\]+Not looking at any trace frame\..*\r\n$gdb_prompt $" {
+	-re "Trace is running.*Trace will stop if { GDB disconnects\.\[\r\n\]+Trace notes: different note\.\[\r\n\]+Not looking at any trace frame\..*\r\n$gdb_prompt $" } {
 	    pass $test
 	}
-	-re "Trace is running.*Trace will stop if GDB disconnects\.\[\r\n\]+Not looking at any trace frame.*\r\n$gdb_prompt $" {
+	-re "Trace is running.*Trace will stop if { GDB disconnects\.\[\r\n\]+Not looking at any trace frame.*\r\n$gdb_prompt $" } {
 	    unsupported $test
 	}
     }
@@ -84,10 +84,10 @@ proc run_trace_experiment {} {
 
     set test "tstatus reports trace user"
     gdb_test_multiple "tstatus" $test {
-	-re "Trace is running.*Trace will stop if GDB disconnects\.\[\r\n\]+Trace user is me me me\.\[\r\n\]+Trace notes: different note\.\[\r\n\]+Not looking at any trace frame\..*\r\n$gdb_prompt $" {
+	-re "Trace is running.*Trace will stop if { GDB disconnects\.\[\r\n\]+Trace user is me me me\.\[\r\n\]+Trace notes: different note\.\[\r\n\]+Not looking at any trace frame\..*\r\n$gdb_prompt $" } {
 	    pass $test
 	}
-	-re "Trace is running.*Trace will stop if GDB disconnects\.\[\r\n\]+Not looking at any trace frame.*\r\n$gdb_prompt $" {
+	-re "Trace is running.*Trace will stop if { GDB disconnects\.\[\r\n\]+Not looking at any trace frame.*\r\n$gdb_prompt $" } {
 	    unsupported $test
 	}
     }
@@ -96,7 +96,7 @@ proc run_trace_experiment {} {
 
     set test "tstatus reports trace stop reason"
     gdb_test_multiple "tstatus" $test {
-	-re "(Trace stopped by a tstop command \\(because I can\\)\..*Trace will stop if GDB disconnects\.\[\r\n\]+Trace user is me me me\.\[\r\n\]+Trace notes: different note\.\[\r\n\]+Not looking at any trace frame\.).*\r\n$gdb_prompt $" {
+	-re "(Trace stopped by a tstop command \\(because I can\\)\..*Trace will stop if { GDB disconnects\.\[\r\n\]+Trace user is me me me\.\[\r\n\]+Trace notes: different note\.\[\r\n\]+Not looking at any trace frame\.).*\r\n$gdb_prompt $" } {
 	    set tstatus_output $expect_out(1,string)
 	    pass $test
 	}

@@ -628,7 +628,7 @@ namespace eval $testfile {
 	"clear condition for explicit breakpoint"
     set tst "info break of cleared condition of explicit breakpoint"
     gdb_test_multiple "info break" $tst {
-	-re ".*in myfunction at .*$srcfile:.*stop only if arg == 0.*" {
+	-re ".*in myfunction at .*$srcfile:.*stop only if { arg == 0.*" } {
 	    fail $tst
 	}
 	-re ".*in myfunction at .*$srcfile:.*$gdb_prompt $" {

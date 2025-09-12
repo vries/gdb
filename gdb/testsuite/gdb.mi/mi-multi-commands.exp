@@ -38,7 +38,7 @@ proc run_test { args } {
     global mi_gdb_prompt
     global decimal
 
-    if [mi_clean_restart "" $args] {
+    if { [mi_clean_restart "" $args] } {
 	return
     }
 

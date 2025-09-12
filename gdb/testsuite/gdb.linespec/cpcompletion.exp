@@ -1344,7 +1344,7 @@ proc_with_prefix no-data-symbols {} {
 
 proc_with_prefix if-expression {} {
     foreach cmd_prefix {"b" "b -function"} {
-	test_gdb_complete_multiple "$cmd_prefix function() if " "code_" "" {
+	test_gdb_complete_multiple "$cmd_prefix function() if { " "code_" "" } {
 	    "code_data"
 	    "code_function()"
 	}

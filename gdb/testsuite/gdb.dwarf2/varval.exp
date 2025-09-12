@@ -314,7 +314,7 @@ with_test_prefix "pre-main" {
 }
 
 # DW_OP_GNU_variable_value implementation requires a valid frame.
-if ![runto_main] {
+if { ![runto_main] } {
     return -1
 }
 
@@ -343,7 +343,7 @@ if { [setup_exec 1] == -1 } {
 }
 
 # DW_OP_GNU_variable_value implementation requires a valid frame.
-if ![runto_main] {
+if { ![runto_main] } {
     return -1
 }
 gdb_test "print badval" "value has been optimized out"

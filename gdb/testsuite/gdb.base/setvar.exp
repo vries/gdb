@@ -78,7 +78,7 @@ proc test_set { args } {
 		set mess "$message -- $match"
 	    }
 	    verbose "doing $arg $match"
-	    if [gdb_test -nopass "$arg" "$match" "$mess"] {
+	    if { [gdb_test -nopass "$arg" "$match" "$mess"] } {
 		return 1
 	    }
 	}

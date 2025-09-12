@@ -42,7 +42,7 @@ if [build_executable_and_dwo_files "$testfile.exp" "${binfile}" \
 
 clean_restart $::testfile
 
-if ![runto_main] {
+if { ![runto_main] } {
     return -1
 }
 

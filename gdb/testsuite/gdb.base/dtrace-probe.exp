@@ -30,7 +30,7 @@ proc dtrace_test {} {
     clean_restart
     gdb_load $binfile
     
-    if ![runto_main] {
+    if { ![runto_main] } {
         return -1
     }
 
@@ -71,7 +71,7 @@ proc dtrace_test {} {
     # test:progress-counter probe.  Set a breakpoint on it and see
     # that it gets reached.
 
-    if ![runto_main] {
+    if { ![runto_main] } {
 	return -1
     }
 

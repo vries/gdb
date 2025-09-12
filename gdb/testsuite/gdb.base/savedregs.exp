@@ -109,7 +109,7 @@ proc process_saved_regs { current inner outer } {
     foreach func $outer {
 	set test [concat "Check $func info frame; stack contains" \
 		      $current $inner $outer]
-	if $ok {
+	if { $ok } {
 	    set ok 0
 	    set pat [string_to_regexp "$saved_regs($func)"]
 	    gdb_test_multiple "info frame $level" "$test" {

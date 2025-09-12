@@ -119,7 +119,7 @@ proc test_1 { _cv _cdw64 _lv _ldw64 {_string_form ""}} {
 	return -1
     }
 
-    if ![runto_main] {
+    if { ![runto_main] } {
 	return -1
     }
 

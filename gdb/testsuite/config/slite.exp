@@ -48,17 +48,17 @@ proc gdb_load { arg } {
 
     gdb_file_cmd $arg
 
-    if [target_info exists gdb_protocol] {
+    if { [target_info exists gdb_protocol] } {
 	set protocol [target_info gdb_protocol]
     } else {
 	set protocol "sparclite"
     }
 
-    if [target_info exists serial] {
+    if { [target_info exists serial] } {
 	set targetname [target_info serial]
 	set command "target $protocol [target_info serial]\n"
     } else {
-	if ![target_info exists netport] {
+	if { ![target_info exists netport] } {
 	    perror "Need either netport or gdb_serial entry for [target_info name]."
 	    return -1
 	}
@@ -95,13 +95,13 @@ proc gdb_load { arg } {
 	}
     }
     
-    if [target_info exists gdb_load_offset] {
+    if { [target_info exists gdb_load_offset] } {
 	set offset "[target_info gdb_load_offset]"
     } else {
 	set offset ""
     }
     if { 1 } {
-	if [is_remote host] {
+	if { [is_remote host] } {
 	    set arg [remote_download host $arg]
 	    if { $arg == "" } {
 		error "download failed"
@@ -132,7 +132,7 @@ proc gdb_load { arg } {
     }
     # Some SPARClite boards automagically do a run after the program is
     # loaded.
-    if [target_info exists need_monitor_run] {
+    if { [target_info exists need_monitor_run] } {
 	set timeout 10
 	verbose "Timeout is now $timeout seconds, doing monitor run" 2
 	send_gdb "monitor run\n"
@@ -148,7 +148,7 @@ proc gdb_load { arg } {
 	sleep 2
     }
 
-    if [target_info exists gdb_serial] {
+    if { [target_info exists gdb_serial] } {
 	set serial [target_info gdb_serial]
     } else {
 	set serial [target_info serial]

@@ -17,7 +17,7 @@
 # The result is 1 (true) for success, 0 (false) for failure.
 
 proc set_lang_d {} {
-    if [gdb_test_no_output "set language d"] {
+    if { [gdb_test_no_output "set language d"] } {
 	return 0
     }
     if [gdb_test "show language" ".* source language is \"d\"." \

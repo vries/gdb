@@ -34,7 +34,7 @@ proc_with_prefix check_regs { vl svl } {
     gdb_test "print \$svg" "= ${expected_svg}"
 
     # Make sure there is no SM or ZA state.
-    if [gdb_test "print \$svcr" "= \\\[ \\\]"] {
+    if { [gdb_test "print \$svcr" "= \\\[ \\\]"] } {
 	fail "incorrect ZA state"
 	return -1
     }
@@ -92,7 +92,7 @@ proc_with_prefix check_regs { vl svl } {
     }
 
     # Exercise reading from SME2 registers.
-    if [is_sme2_available] {
+    if { [is_sme2_available] } {
 	# The target supports SME2.
 	set zt_size 64
 	gdb_test "print sizeof \$zt0" " = $zt_size"
@@ -128,7 +128,7 @@ proc test_sme_registers_unavailable { id_start id_end } {
 	return -1
     }
 
-    if ![runto_main] {
+    if { ![runto_main] } {
 	untested "could not run to main"
 	return -1
     }

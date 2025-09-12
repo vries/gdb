@@ -45,7 +45,7 @@ if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {deb
 # procedures work, so it makes no sense using them here.
 
 gdb_exit
-if [mi_gdb_start separate-inferior-tty] {
+if { [mi_gdb_start separate-inferior-tty] } {
     return
 }
 
@@ -61,7 +61,7 @@ proc test_mi_interpreter_selection {} {
 
     # All this test expects is to get the prompt back
     # with no syntax error message
-    if ![mi_gdb_test "-gdb-version" "~\"GNU gdb.*" "acceptance of MI operations"] {
+    if { ![mi_gdb_test "-gdb-version" "~\"GNU gdb.*" "acceptance of MI operations"] } {
 	return 1
     } 
 
@@ -73,7 +73,7 @@ proc test_exec_and_symbol_mi_operatons {} {
     global mi_gdb_prompt
     global binfile testfile
 
-    if [is_remote host] {
+    if { [is_remote host] } {
 	set filename ${testfile}
 	remote_download host ${binfile} ${filename}
     } else {
@@ -176,7 +176,7 @@ proc test_cwd_specification {} {
 
     # The canonical name of the working directory may differ on a
     # remote host from that on the build system.
-    if ![is_remote host] {
+    if { ![is_remote host] } {
 	mi_gdb_test "206-environment-pwd" \
              "206\\\^done,cwd=\"${escapedobjdir}\"" \
              "environment-pwd operation"

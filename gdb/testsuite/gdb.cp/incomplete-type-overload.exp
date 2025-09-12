@@ -33,11 +33,11 @@ set flags_nodebug {}
 lappend flags_nodebug nodebug
 lappend flags_nodebug c++
 
-if [prepare_for_testing "failed to prepare" $testfile $srcfile $flags_debug] {
+if { [prepare_for_testing "failed to prepare" $testfile $srcfile $flags_debug] } {
     return
 }
 
-if ![runto_main] {
+if { ![runto_main] } {
     return
 }
 
@@ -172,7 +172,7 @@ if [prepare_for_testing "failed to prepare" $testfile \
     return
 }
 
-if ![runto_main] {
+if { ![runto_main] } {
     return
 }
 

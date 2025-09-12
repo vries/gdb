@@ -27,7 +27,7 @@
 # storage to `-DSTORAGE=static' which changes the datastructures to be
 # allocated in data segment.
 set storage "-DSTORAGE="
-if [target_info exists gdb,small_stack_section] {
+if { [target_info exists gdb,small_stack_section] } {
     set storage "-DSTORAGE=static"
 }
 

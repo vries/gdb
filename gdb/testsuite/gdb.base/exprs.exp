@@ -224,10 +224,10 @@ gdb_test_multiple "print sizeof (long long) > sizeof (long)" \
 	pass "sizeof (long long) > sizeof (long) (false)"
     }
 }
-if [expr ! $ok] { setup_xfail "*-*-*" }
+if { ! $ok } { setup_xfail "*-*-*" }
 gdb_test "print (void*) ((long long) (unsigned long) -1 + 1)" \
 	"warning: value truncated.*" "truncate (void*) 0x00000000ffffffff + 1"
-if [expr ! $ok] { setup_xfail "*-*-*" }
+if { ! $ok } { setup_xfail "*-*-*" }
 gdb_test "print (void*) (~((long long)(unsigned long) -1) - 1)" \
 	"warning: value truncated.*" "truncate (void*) 0xffffffff00000000 - 1"
 

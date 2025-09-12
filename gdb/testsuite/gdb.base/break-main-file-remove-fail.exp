@@ -55,7 +55,7 @@ proc test_remove_bp { initial_load } {
 	    gdb_reload
 	}
 
-	if ![runto start] {
+	if { ![runto start] } {
 	    return
 	}
 

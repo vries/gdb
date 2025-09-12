@@ -169,7 +169,7 @@ proc test_sme_core_file { id_start id_end } {
 		return -1
 	    }
 
-	    if ![runto_main] {
+	    if { ![runto_main] } {
 		untested "could not run to main"
 		return -1
 	    }

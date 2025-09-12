@@ -65,7 +65,7 @@ proc initialize {} {
     }
 
 
-    if [gdb_test "info break" "1\[ \]*breakpoint.*marker1.*\r\n2\[ \]*breakpoint.*marker2.*" "info break" ] {
+    if { [gdb_test "info break" "1\[ \]*breakpoint.*marker1.*\r\n2\[ \]*breakpoint.*marker2.*" "info break" ] } {
       return 0
     }
 
@@ -80,7 +80,7 @@ proc initialize {} {
     # to use it.  This allows the test program to run at full speed until
     # we get to the first marker function.
 
-    if [gdb_test_no_output "disable 3" "disable watchpoint" ] {
+    if { [gdb_test_no_output "disable 3" "disable watchpoint" ] } {
       return 0
     }
 
@@ -121,7 +121,7 @@ proc test_simple_watchpoint {} {
 
     # After reaching the marker function, enable the watchpoint.
 
-    if [gdb_test_no_output "enable 3" "enable watchpoint" ] {
+    if { [gdb_test_no_output "enable 3" "enable watchpoint" ] } {
       return
     }
 
@@ -188,7 +188,7 @@ Continuing.*\[Ww\]atchpoint.*ival3.*Old value = -1.*New value = 0.*ival3 = count
 
     # Disable the watchpoint so we run at full speed until we exit.
 
-    if [gdb_test_no_output "disable 3" "watchpoint disabled" ] {
+    if { [gdb_test_no_output "disable 3" "watchpoint disabled" ] } {
       return
     }
 
@@ -236,7 +236,7 @@ proc test_disabling_watchpoints {} {
 
     # After reaching the marker function, enable the watchpoint.
 
-    if [gdb_test_no_output "enable 3" "watchpoint enabled" ] {
+    if { [gdb_test_no_output "enable 3" "watchpoint enabled" ] } {
       return
     }
 
@@ -357,7 +357,7 @@ proc test_watchpoint_triggered_in_syscall {} {
     global gdb_prompt
 
     # These tests won't work without printf support.
-    if [gdb_skip_stdio_test "watchpoints triggered in syscall"] {
+    if { [gdb_skip_stdio_test "watchpoints triggered in syscall"] } {
 	return
     }
     # Run until we get to the first marker function.
@@ -964,7 +964,7 @@ proc do_tests {} {
 
 	test_disabling_watchpoints
 
-	if ![target_info exists gdb,cannot_call_functions] {
+	if { ![target_info exists gdb,cannot_call_functions] } {
 	    test_stepping
 	}
     }

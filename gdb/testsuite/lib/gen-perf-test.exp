@@ -51,12 +51,12 @@
 #    not clear that's simpler than our chosen mechanism which is to record
 #    sums of all the inputs, and detect if an input has changed that way.
 
-if ![info exists CAT_PROGRAM] {
+if { ![info exists CAT_PROGRAM] } {
     set CAT_PROGRAM "/bin/cat"
 }
 
 # TODO(dje): Time md5sum vs sha1sum with our testcases.
-if ![info exists SHA1SUM_PROGRAM] {
+if { ![info exists SHA1SUM_PROGRAM] } {
     set SHA1SUM_PROGRAM "/usr/bin/sha1sum"
 }
 
@@ -322,7 +322,7 @@ namespace eval GenPerfTest {
 			nr_methods - nr_static_methods -
 			nr_inline_methods - nr_static_inline_methods
 			{
-			    if ![string is integer $value] {
+			    if { ![string is integer $value] } {
 				error "Non-integer value $value for key $key in class_specs: $class_specs"
 			    }
 			}
@@ -428,7 +428,7 @@ namespace eval GenPerfTest {
 	# description file.
 	set bindir [file dirname $self(binfile)]
 	# Put the pieces in a subdirectory, there are a lot of them.
-	if $static {
+	if { $static } {
 	    return "$bindir/pieces"
 	} else {
 	    set run_name [_convert_spaces [lindex $self(run_names) $run_nr]]
@@ -854,7 +854,7 @@ namespace eval GenPerfTest {
 	puts $f ""
 	puts $f "#ifndef $header_macro"
 	puts $f "#define $header_macro"
-	if [_classes_enabled_p self $run_nr] {
+	if { [_classes_enabled_p self $run_nr] } {
 	    _write_class_definitions self $f $static $run_nr $so_nr $cu_nr
 	}
 	puts $f ""
@@ -875,7 +875,7 @@ namespace eval GenPerfTest {
 	_write_extern_globals self $f $run_nr "" $cu_nr
 	_write_static_functions self $f $run_nr
 	_write_extern_functions self $f $run_nr "" $cu_nr
-	if [_classes_enabled_p self $run_nr] {
+	if { [_classes_enabled_p self $run_nr] } {
 	    _write_class_implementations self $f $static $run_nr "" $cu_nr
 	}
 	close $f
@@ -917,7 +917,7 @@ namespace eval GenPerfTest {
 	_write_extern_globals self $f $run_nr "shlib${so_nr}_" $cu_nr
 	_write_static_functions self $f $run_nr
 	_write_extern_functions self $f $run_nr "shlib${so_nr}_" $cu_nr
-	if [_classes_enabled_p self $run_nr] {
+	if { [_classes_enabled_p self $run_nr] } {
 	    _write_class_implementations self $f $static $run_nr $so_nr $cu_nr
 	}
 	close $f
@@ -998,7 +998,7 @@ namespace eval GenPerfTest {
 	set vars { CC_FOR_TARGET CXX_FOR_TARGET CFLAGS_FOR_TARGET }
 	foreach v $vars {
 	    global $v
-	    if [info exists $v] {
+	    if { [info exists $v] } {
 		eval set value $$v
 		puts $f "$v: $value"
 	    }
@@ -1100,10 +1100,10 @@ namespace eval GenPerfTest {
 	    return "sha1sum generation error: [lindex $sha1sum 1]"
 	}
 	set sha1sum [lindex $sha1sum 1]
-	if ![file exists $dest] {
+	if { ![file exists $dest] } {
 	    file delete $sha1sum_file
 	}
-	if [file exists $sha1sum_file] {
+	if { [file exists $sha1sum_file] } {
 	    set last_sha1sum [_read_file $sha1sum_file]
 	    verbose -log "last: $last_sha1sum, new: $sha1sum"
 	    if { $sha1sum == $last_sha1sum } {
@@ -1234,7 +1234,7 @@ namespace eval GenPerfTest {
 	set static [_static_object_files_p self]
 	verbose -log "_compile_pieces: static flag: $static"
 	file mkdir "[file dirname $self(binfile)]/pieces"
-	if $static {
+	if { $static } {
 	    # All the generated pieces look the same (run over run) so just
 	    # build all the shlibs of the last run (which is the largest).
 	    set last_run [expr $nr_runs - 1]
@@ -1412,7 +1412,7 @@ namespace eval GenPerfTest {
 
     proc standard_compile_driver { exp_file_name make_config_thunk_name } {
 	global GDB_PERFTEST_MODE GDB_PERFTEST_SUBMODE
-	if ![info exists GDB_PERFTEST_SUBMODE] {
+	if { ![info exists GDB_PERFTEST_SUBMODE] } {
 	    # Probably a plain "make check-perf", nothing to do.
 	    # Give the user a reason why we're not running this test.
 	    verbose -log "Test must be compiled/run in separate steps."
@@ -1504,6 +1504,6 @@ namespace eval GenPerfTest {
     }
 }
 
-if ![info exists PERF_TEST_COMPILE_PARALLELISM] {
+if { ![info exists PERF_TEST_COMPILE_PARALLELISM] } {
     set PERF_TEST_COMPILE_PARALLELISM $GenPerfTest::DEFAULT_PERF_TEST_COMPILE_PARALLELISM
 }

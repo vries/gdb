@@ -127,7 +127,7 @@ if {![runto_main]} {
 }
 gdb_breakpoint "*$foo_last"
 gdb_test "continue" "Breakpoint \[0-9\]*,.* in foo.*" "$test: continue to breakpoint"
-if [gen_core $test] {
+if { [gen_core $test] } {
   test_core_bt $test
 }
 
@@ -138,6 +138,6 @@ if {![runto_main]} {
 gdb_breakpoint "*$foo_last"
 gdb_test "continue" "Breakpoint \[0-9\]*,.* in foo.*" "$test: continue to breakpoint"
 gdb_test "stepi" ".*in foo.*" "$test: step to nullified instruction"
-if [gen_core $test] {
+if { [gen_core $test] } {
   test_core_bt $test
 }

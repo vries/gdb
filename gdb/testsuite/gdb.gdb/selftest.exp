@@ -56,7 +56,7 @@ proc test_with_self { } {
     }
 
     # start the "xgdb" process
-    if [target_info exists gdb,noinferiorio] {
+    if { [target_info exists gdb,noinferiorio] } {
 	# With no way to interact with the inferior GDB, all we can do
 	# is let it run.
 	send_gdb "continue\n"
@@ -98,7 +98,7 @@ proc test_with_self { } {
     }
 
     # kill the xgdb process
-    if ![target_info exists gdb,nointerrupts] {
+    if { ![target_info exists gdb,nointerrupts] } {
 	set description "send ^C to child process"
 	send_gdb "\003"
 	# "Thread 1" is displayed iff Guile support is linked in.

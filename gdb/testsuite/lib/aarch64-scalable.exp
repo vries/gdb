@@ -251,7 +251,7 @@ proc check_state { state vl svl } {
     check_sme_regs 170 $state $svl
 
     # Check SME2 registers
-    if [is_sme2_available] {
+    if { [is_sme2_available] } {
 	# The SME2 ZT0 register will always be zero, except when ZA is active.
 	set sme2_byte 0
 	if {$state == "za" || $state == "za_ssve"} {

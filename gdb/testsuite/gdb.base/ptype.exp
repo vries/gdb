@@ -586,7 +586,7 @@ gdb_test "ptype foo" "type = char" "ptype foo typedef after second list of charf
 
 if {[runto_main]} {
 
-  if [target_info exists gdb,cannot_call_functions] {
+  if { [target_info exists gdb,cannot_call_functions] } {
     unsupported "this target can not call functions"
     return
   }

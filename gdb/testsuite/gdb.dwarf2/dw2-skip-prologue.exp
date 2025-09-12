@@ -37,7 +37,7 @@ require dwarf2_support
 standard_testfile
 set executable ${testfile}
 
-if [is_ilp32_target] {
+if { [is_ilp32_target] } {
     set ptrbits 32
 } else {
     set ptrbits 64
@@ -67,7 +67,7 @@ pass $test
 
 clean_restart $executable
 
-if ![runto_main] {
+if { ![runto_main] } {
     return -1
 }
 

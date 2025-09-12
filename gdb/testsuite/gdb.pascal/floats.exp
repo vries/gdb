@@ -126,7 +126,7 @@ gdb_test_multiple "print s" $msg {
 	-re ".* = (0|-?\[0-9\]\\.\[0-9\]*\[eE\](-?\[0-9\]*))\[\r\n\]+$gdb_prompt $" {
 	  set value "$expect_out(1,string)"
 	  verbose "value is $value" 1
-	  if [info exists expect_out(2,string)] {
+	  if { [info exists expect_out(2,string)] } {
 	    set expo $expect_out(2,string)
 	    verbose "expo found: $expo" 1
 	  } else {

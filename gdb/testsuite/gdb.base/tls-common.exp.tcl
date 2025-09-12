@@ -43,7 +43,7 @@ if [is_any_target {*}$internal_tls_linux_targets] {
 # issue gdb_test with command CMD and regular expression RE.
 
 proc gdb_test_with_kfail {cmd re kfail_cond kfail_msg} {
-    if [uplevel 1 [list expr $kfail_cond]] {
+    if { [uplevel 1 [list expr $kfail_cond]] } {
 	setup_kfail $kfail_msg *-*-*
     }
     gdb_test $cmd $re

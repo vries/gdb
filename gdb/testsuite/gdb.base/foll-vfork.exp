@@ -53,7 +53,7 @@ if { [is_remote target] } {
 proc setup_gdb { binfile srcfile } {
     clean_restart $binfile
 
-    if ![runto_main] {
+    if { ![runto_main] } {
 	return -code return
     }
 
@@ -96,7 +96,7 @@ proc_with_prefix vfork_parent_follow_through_step { binfile srcfile } {
     gdb_test_no_output "set follow-fork parent"
 
     gdb_test_multiple "next" "" {
-	-re -wrap "\\\[Detaching after vfork from.*if \\(pid == 0\\).*" {
+	-re -wrap "\\\[Detaching after vfork from.*if { \\(pid == 0\\).*" } {
 	    pass $gdb_test_name
 	}
     }
@@ -156,7 +156,7 @@ proc_with_prefix vfork_and_exec_child_follow_through_step { binfile srcfile } {
     # before it execs.  Thus, "next" lands on the next line after
     # the vfork.
     gdb_test_multiple "next" "next over vfork" {
-	-re -wrap "\\\[Attaching after .* vfork to child.*if \\(pid == 0\\).*" {
+	-re -wrap "\\\[Attaching after .* vfork to child.*if { \\(pid == 0\\).*" } {
 	    pass $gdb_test_name
 	}
     }
@@ -251,7 +251,7 @@ proc_with_prefix vfork_relations_in_info_inferiors { variant binfile srcfile non
     gdb_test_no_output "set follow-fork child"
 
     gdb_test_multiple "next" "next over vfork" {
-	-re -wrap "\\\[Attaching after .* vfork to child.*if \\(pid == 0\\).*" {
+	-re -wrap "\\\[Attaching after .* vfork to child.*if { \\(pid == 0\\).*" } {
 	    pass $gdb_test_name
 	}
     }

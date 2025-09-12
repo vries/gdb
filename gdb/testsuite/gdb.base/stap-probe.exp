@@ -133,7 +133,7 @@ proc stap_test {exec_name {args ""}} {
 		"get original address of relocation_marker"]
     }
 
-    if ![runto_main] {
+    if { ![runto_main] } {
 	return -1
     }
 
@@ -219,7 +219,7 @@ proc stap_test {exec_name {args ""}} {
     "print \$_probe_arg1 for probe ps"
 
     # Check the probe is using the xmm0 register.
-    if [check_for_usable_xmm0_probe $exec_name] {
+    if { [check_for_usable_xmm0_probe $exec_name] } {
 
 	delete_breakpoints
 	if {[runto "-pstap test:xmmreg"]} {

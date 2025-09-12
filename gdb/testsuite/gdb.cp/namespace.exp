@@ -171,7 +171,7 @@ gdb_test_multiple $test $test {
     }
     -re "\\$\[0-9\].* = 318\r\n$gdb_prompt $" {
 	# Do not permit to XFAIL on recent GCCs.
-	if $xfail_class_types {
+	if { $xfail_class_types } {
 	    setup_xfail *-*-* 
 	    fail $test
 	    # Unresolved means human intervention is required to determine

@@ -44,7 +44,7 @@ proc set_listsize { arg } {
     global set_listsize_count
 
     incr set_listsize_count
-    if [gdb_test_no_output "set listsize $arg" "setting listsize to $arg #$set_listsize_count"] {
+    if { [gdb_test_no_output "set listsize $arg" "setting listsize to $arg #$set_listsize_count"] } {
 	return 0
     }
     if { $arg == 0 } {
@@ -75,14 +75,14 @@ proc test_listsize {} {
 
     # Ensure we can limit printouts to one line
 
-    if [set_listsize 1] {
+    if { [set_listsize 1] } {
 	gdb_test "list 1" "1\[ \t\]+#include \"list0.h\"" "list line 1 with listsize 1"
 	gdb_test "list 2" "2\[ \t\]+" "list line 2 with listsize 1"
     }    
 
     # Try just two lines
     
-    if [ set_listsize 2 ] {
+    if { [ set_listsize 2 ] } {
 	gdb_test "list 1" "1\[ \t\]+#include \"list0.h\"\r\n2\[ \t\]+" "list line 1 with listsize 2"
 	gdb_test "list 2" "1\[ \t\]+#include \"list0.h\"\r\n2\[ \t\]+" "list line 2 with listsize 2"
 	gdb_test "list 3" "2\[ \t\]+\r\n3\[ \t\]+int main \[)(\]+" "list line 3 with listsize 2"
@@ -90,7 +90,7 @@ proc test_listsize {} {
 
     # Try small listsize > 1 that is an odd number
 
-    if [ set_listsize 3 ] {
+    if { [ set_listsize 3 ] } {
 	gdb_test "list 1" "1\[ \t\]+#include \"list0.h\".*3\[ \t\]+int main \[)(\]+" "list line 1 with listsize 3"
 	gdb_test "list 2" "1\[ \t\]+#include \"list0.h\".*3\[ \t\]+int main \[)(\]+" "list line 2 with listsize 3"
 	gdb_test "list 3" "2\[ \t\]+\r\n3\[ \t\]+int main \[(\]+\[)\]+\r\n4\[ \t\]+\{" "list line 3 with listsize 3"

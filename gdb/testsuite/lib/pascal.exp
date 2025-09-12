@@ -48,7 +48,7 @@ proc pascal_init {} {
     set gpc_compiler [transform gpc]
     set fpc_compiler [transform fpc]
 
-    if ![is_remote host] {
+    if { ![is_remote host] } {
 	if { [info exists env(GPC)] } {
 	    set pascal_compiler_is_gpc 1
 	    set gpc_compiler $env(GPC)
@@ -87,14 +87,14 @@ proc gpc_compile {source destfile type options} {
 
     foreach i $options {
 	if { $i == "debug" } {
-	    if [board_info $dest exists debug_flags] {
+	    if { [board_info $dest exists debug_flags] } {
 		append add_flags " [board_info $dest debug_flags]"
 	    } else {
 		append add_flags " -g"
 	    }
 	}
 	if { $i == "class" } {
-	    if [board_info $dest exists pascal_class_flags] {
+	    if { [board_info $dest exists pascal_class_flags] } {
 		append add_flags " [board_info $dest pascal_class_flags]"
 	    } else {
 		append add_flags " --extended-syntax"
@@ -125,14 +125,14 @@ proc fpc_compile {source destfile type options} {
 
     foreach i $options {
 	if { $i == "debug" } {
-	    if [board_info $dest exists debug_flags] {
+	    if { [board_info $dest exists debug_flags] } {
 		append add_flags " [board_info $dest debug_flags]"
 	    } else {
 		append add_flags " -g"
 	    }
 	}
 	if { $i == "class" } {
-	    if [board_info $dest exists pascal_class_flags] {
+	    if { [board_info $dest exists pascal_class_flags] } {
 		append add_flags " [board_info $dest pascal_class_flags]"
 	    } else {
 		append add_flags " -Mobjfpc"
@@ -164,7 +164,7 @@ proc gdb_compile_pascal {source destfile type options} {
 	return "No pascal compiler. Compilation failed."
     }
 
-    if ![file exists $destfile] {
+    if { ![file exists $destfile] } {
         unsupported "Pascal compilation failed: $result"
         return "Pascal compilation failed."
     }
@@ -174,7 +174,7 @@ proc gdb_compile_pascal {source destfile type options} {
 # The result is 1 (true) for success, 0 (false) for failure.
 
 proc set_lang_pascal {} {
-    if [gdb_test_no_output "set language pascal"] {
+    if { [gdb_test_no_output "set language pascal"] } {
 	return 0
     }
     if [gdb_test "show language" ".* source language is \"pascal\"." \

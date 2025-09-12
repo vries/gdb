@@ -31,7 +31,7 @@ if { [prepare_for_testing "failed to prepare" ${testfile} ${srcfile} \
     return -1
 }
 
-if ![runto_main] {
+if { ![runto_main] } {
     return -1
 }
 
@@ -89,7 +89,7 @@ gdb_test "break [gdb_get_line_number "third breakpoint here"]" \
     "set third breakpoint in main"
 gdb_continue_to_breakpoint "continue to third breakpoint in main"
 
-if [is_amd64_regs_target] {
+if { [is_amd64_regs_target] } {
     set nr_regs 32
 } else {
     set nr_regs 8

@@ -49,7 +49,7 @@ proc file_copy {src dest} {
     set test "copy [file tail $src] to [file tail $dest]"
     set command "file copy -force -- $src $dest"
     verbose -log "command is $command"
-    if [catch $command] {
+    if { [catch $command] } {
 	fail $test
 	return 0
     } else {
@@ -182,7 +182,7 @@ proc prelink_no {arg {name {}}} {
 	# have already been prelinked).
 	set test "$test (missing /usr/sbin/prelink)"
 	foreach bin [split $arg] {
-	    if [string match "-*" $bin] {
+	    if { [string match "-*" $bin] } {
 		# Skip prelink options.
 		continue
 	    }
@@ -230,7 +230,7 @@ proc prelink_yes {arg {name ""}} {
     # Try to unprelink it first so that, if it has been already prelinked
     # before, we get a different address now, making the new result unaffected
     # by any previous prelinking.
-    if ![prelink_no $arg "$name pre-unprelink"] {
+    if { ![prelink_no $arg "$name pre-unprelink"] } {
 	return 0
     }
 

@@ -107,7 +107,7 @@ foreach nonstop { 0 1 } { with_test_prefix "non-stop $nonstop" {
 	}
 	-re ".*\r\n$gdb_prompt " {
 	    # Do not anchor end, there may be more output in non-stop mode.
-	    if ($ok) {
+	    if { ($ok) } {
 		pass $test
 	    } else {
 		fail $test

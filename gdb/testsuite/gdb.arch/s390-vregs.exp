@@ -19,7 +19,7 @@ require {is_any_target s390-*-* s390x-*-*}
 
 standard_testfile .S
 
-if [isnative] {
+if { [isnative] } {
     # Create a temporary directory, to take a core dump there later.
     set coredir [standard_output_file ${testfile}.d]
     remote_exec build "rm -rf $coredir"
@@ -31,7 +31,7 @@ if { [prepare_for_testing "failed to prepare" $testfile $srcfile \
     return -1
 }
 
-if ![runto_main] {
+if { ![runto_main] } {
     return -1
 }
 
@@ -71,7 +71,7 @@ gdb_test_multiple "x/i \$pc" "get PC after vector insn" {
     }
 }
 
-if [expr $before_pc + 6 != $after_pc] {
+if { $before_pc + 6 != $after_pc } {
     fail "stepping first vector insn"
 }
 
@@ -121,7 +121,7 @@ set vregs [capture_command_output "x/64xg &save_area" ""]
 
 set i 0
 foreach {- left right} [regexp -all -inline -line {^.*:\s+(\w+)\s+(\w+)} $vregs] {
-    if [expr $left != $a * ($i + 1) || $right != $b * (32 - $i)] {
+    if { $left != $a * ($i + 1) || $right != $b * (32 - $i) } {
 	fail "verify \$v$i after set"
     }
     if { $i < 16 } {

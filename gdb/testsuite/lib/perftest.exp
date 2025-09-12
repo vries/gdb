@@ -90,7 +90,7 @@ namespace eval PerfTest {
     proc assemble {compile startup run} {
 	global GDB_PERFTEST_MODE
 
-	if ![info exists GDB_PERFTEST_MODE] {
+	if { ![info exists GDB_PERFTEST_MODE] } {
 	    return
 	}
 
@@ -134,7 +134,7 @@ namespace eval PerfTest {
 proc allow_perf_tests { } {
     global GDB_PERFTEST_MODE
 
-    if [info exists GDB_PERFTEST_MODE] {
+    if { [info exists GDB_PERFTEST_MODE] } {
 	if { "$GDB_PERFTEST_MODE" != "compile"
 	     && "$GDB_PERFTEST_MODE" != "run"
 	     && "$GDB_PERFTEST_MODE" != "both" } {

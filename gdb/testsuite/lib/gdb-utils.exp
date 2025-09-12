@@ -20,10 +20,10 @@
 
 proc gdb_init_commands {} {
     set commands ""
-    if [target_info exists gdb_init_command] {
+    if { [target_info exists gdb_init_command] } {
 	lappend commands [target_info gdb_init_command]
     }
-    if [target_info exists gdb_init_commands] {
+    if { [target_info exists gdb_init_commands] } {
 	set commands [concat $commands [target_info gdb_init_commands]]
     }
     return $commands

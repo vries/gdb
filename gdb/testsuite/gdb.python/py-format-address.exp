@@ -34,7 +34,7 @@ set binary_bar [standard_output_file $testfile_bar]
 
 clean_restart $testfile_foo
 
-if ![runto_main] {
+if { ![runto_main] } {
    return -1
 }
 

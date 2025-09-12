@@ -70,13 +70,13 @@ gdb_test_no_output -prompt "$gdb_prompt$" "set annotate 3" \
 #
 # if construct:
 #
-gdb_test_multiple "if 1" "start if construct" {
-    -re "^if 1\r\n\r\n\032\032post-prompt\r\n\r\n\032\032pre-commands\r\n >\r\n\032\032commands\r\n$" {
+gdb_test_multiple "if { 1" "start if construct" } {
+    -re "^if { 1\r\n\r\n\032\032post-prompt\r\n\r\n\032\032pre-commands\r\n >\r\n\032\032commands\r\n$" } {
 	pass "start if construct"
     }
 }
 
-gdb_test_multiple "end" "end if construct" {
+gdb_test_multiple "end" "end if { construct" } {
     -re "^end\r\n\r\n\032\032post-commands\r\n$gdb_prompt$" {
  	pass "end if construct"
     }
@@ -186,7 +186,7 @@ gdb_expect_list "backtrace from shlibrary" "$gdb_prompt$" {
 # test printing a frame with some arguments: 
 #
 
-if [target_info exists gdb,nosignals] {
+if { [target_info exists gdb,nosignals] } {
     unsupported "send SIGUSR1"
     unsupported "backtrace @ signal handler"
 } else {
@@ -345,7 +345,7 @@ gdb_test_multiple "info inferior 1" "$test" {
 
 # Send a signal that is not handled
 
-if [target_info exists gdb,nosignals] {
+if { [target_info exists gdb,nosignals] } {
     unsupported "signal sent"
 } else {
     send_gdb "signal SIGTRAP\n"

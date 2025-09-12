@@ -80,7 +80,7 @@ gdb_test "print \$gcspr == \$gcspr_in_main - 16" ". = 1" \
 # Test writing to GCSPR.
 clean_restart
 gdb_load $binfile
-if ![runto normal_function0] {
+if { ![runto normal_function0] } {
     return
 }
 

@@ -28,12 +28,12 @@ load_board_description "stdio-gdbserver-base"
 
 # Test machine info. The generic_config gdbserver reads some of these
 # values from board_info, so this file must set them there.
-if [info exists REMOTE_USERNAME] {
+if { [info exists REMOTE_USERNAME] } {
     set_board_info username $REMOTE_USERNAME
 } else {
     set_board_info username unspecified_username
 }
-if [info exists REMOTE_HOSTNAME] {
+if { [info exists REMOTE_HOSTNAME] } {
     set_board_info hostname $REMOTE_HOSTNAME
 } else {
     set_board_info hostname unspecified_hostname
@@ -43,7 +43,7 @@ set_board_info rsh_prog /usr/bin/ssh
 set_board_info rcp_prog /usr/bin/scp
 
 # Some remote machines don't have writable home directories.
-if [info exists REMOTE_TMPDIR] {
+if { [info exists REMOTE_TMPDIR] } {
     set_board_info remotedir $REMOTE_TMPDIR
 } else {
     # Set remotedir by default, to force remote_download target to give an
@@ -63,7 +63,7 @@ if [info exists REMOTE_TMPDIR] {
     }
 }
 
-if [info exists GDBSERVER] {
+if { [info exists GDBSERVER] } {
     unset_board_info gdb_server_prog
     set_board_info gdb_server_prog $GDBSERVER
 }

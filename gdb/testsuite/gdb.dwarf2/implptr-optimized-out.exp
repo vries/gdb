@@ -81,7 +81,7 @@ if [prepare_for_testing "failed to prepare" $executable "${asm_file} ${srcfile}"
 }
 
 # DW_OP_GNU_implicit_pointer implementation requires a valid frame.
-if ![runto_main] {
+if { ![runto_main] } {
     return -1
 }
 

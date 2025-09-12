@@ -52,7 +52,7 @@ clean_restart ${testfile}
 gdb_test_no_output "set language c++" \
     "Set language to C++"
 
-if ![runto_main] {
+if { ![runto_main] } {
     return -1
 }
 

@@ -25,7 +25,7 @@ if [prepare_for_testing "failed to prepare" ${testfile}] {
 
 gdb_test "handle SIGUSR1 stop print pass" "SIGUSR1\[ \t\]+Yes\[ \t\]+Yes\[ \t\]+Yes\[ \t\]+.*"
 
-if ![runto_main] {
+if { ![runto_main] } {
     return -1
 }
 

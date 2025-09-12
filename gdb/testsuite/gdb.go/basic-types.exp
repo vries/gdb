@@ -102,7 +102,7 @@ proc test_complex_literal_types_accepted {} {
 
 clean_restart
 
-if [set_lang_go] {
+if { [set_lang_go] } {
     test_integer_literal_types_accepted
     test_logical_literal_types_accepted
     test_character_literal_types_accepted

@@ -67,11 +67,11 @@ for {set i 0} {$i < 30} {incr i} {
 	# At least one hardware watchpoint was hit.  Check if both were.
 	set string $expect_out(1,string)
 
-	if [regexp "Hardware watchpoint 2: args\\\[0\\\]\[^\r\]*\r\[^\r\]*\r\[^\r\]*Old value = $args_0\[^\r\]*\r\[^\r\]*New value = [expr $args_0+1]\r" $string] {
+	if { [regexp "Hardware watchpoint 2: args\\\[0\\\]\[^\r\]*\r\[^\r\]*\r\[^\r\]*Old value = $args_0\[^\r\]*\r\[^\r\]*New value = [expr $args_0+1]\r" $string] } {
 	    incr args_0
 	    incr test_flag_0
 	}
-	if [regexp "Hardware watchpoint 3: args\\\[1\\\]\[^\r\]*\r\[^\r\]*\r\[^\r\]*Old value = $args_1\[^\r\]*\r\[^\r\]*New value = [expr $args_1+1]\r" $string] {
+	if { [regexp "Hardware watchpoint 3: args\\\[1\\\]\[^\r\]*\r\[^\r\]*\r\[^\r\]*Old value = $args_1\[^\r\]*\r\[^\r\]*New value = [expr $args_1+1]\r" $string] } {
 	    incr args_1
 	    incr test_flag_1
 	}
@@ -97,7 +97,7 @@ for {set i 0} {$i < 30} {incr i} {
 	    }
 	}
 
-	if [ regexp "$expected_loc" $string ] {
+	if { [ regexp "$expected_loc" $string ] } {
 	    set test_flag 1
 	} else {
 	    fail "threaded watch loop"

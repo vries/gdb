@@ -149,7 +149,7 @@ proc do_test { test_name lines_version DW_AT_name main_file_idx directories
 		}
 	    }
 
-	    if ![runto_main] {
+	    if { ![runto_main] } {
 		return
 	    }
 

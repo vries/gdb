@@ -81,7 +81,7 @@ proc do_test { use_header } {
 
     clean_restart $executable
 
-    if ![runto $main_location qualified] {
+    if { ![runto $main_location qualified] } {
 	return
     }
 
@@ -109,7 +109,7 @@ proc do_test { use_header } {
 
     set ok 1
     gdb_test_multiple "next" "next step 1" {
-	-re -wrap "if \\(t->x != i\\)" {
+	-re -wrap "if { \\(t->x != i\\)" } {
 	    set ok 0
 	    send_gdb "next\n"
 	    exp_continue
@@ -206,7 +206,7 @@ proc do_test { use_header } {
 
     clean_restart ${executable}
 
-    if ![runto_main] {
+    if { ![runto_main] } {
 	return
     }
 

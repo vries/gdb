@@ -213,7 +213,7 @@ proc test_register_match {reg_name reg_var_name hex} {
     # In some infrequent cases CXER doesn't match the
     # pre-transactional XER, possibly due to a linux kernel bug.
     set should_xfail 0
-    if [istarget "powerpc*-*-linux*" && reg_name == "cxer"] {
+    if { [istarget "powerpc*-*-linux*" && reg_name == "cxer"] } {
 	set should_xfail 1
     }
 
@@ -268,7 +268,7 @@ test_register_match "ctar" "tar" 1
 
 # Support for writing to the checkpointed registers is not
 # currently available in the gdbserver stub.
-if [target_is_gdbserver] {
+if { [target_is_gdbserver] } {
     unsupported "write to checkpointed registers"
     return
 }

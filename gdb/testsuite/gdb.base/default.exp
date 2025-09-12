@@ -38,7 +38,7 @@ gdb_test "append value"  "Missing filename\."
 gdb_test "append binary memory" "Missing filename\." 
 gdb_test "append binary value"  "Missing filename\." 
 
-if !$use_gdb_stub {
+if { !$use_gdb_stub } {
     gdb_test_multiple "attach" "attach" {
 	-re "Argument required .(process-id|program) to attach.*$gdb_prompt $"\
 	    { pass "attach" }
@@ -269,7 +269,7 @@ proc test_info_command { command message } {
 	    set saw_help_info 1
 	    exp_continue
 	}
-	-re "\r\nCommand name abbreviations are allowed if unambiguous\\." {
+	-re "\r\nCommand name abbreviations are allowed if { unambiguous\\." } {
 	    verbose "Command name abbreviations displayed"
 	    set saw_command_abbrev 1
 	    exp_continue
@@ -527,7 +527,7 @@ gdb_test "ptype" "The history is empty."
 gdb_test "pwd" "Working directory .*"
 
 #test run "r" abbreviation
-if $use_gdb_stub {
+if { $use_gdb_stub } {
     # Only extended-remote supports "run".
 } else {
     gdb_test_multiple "r" "run \"r\" abbreviation" {
@@ -549,7 +549,7 @@ if $use_gdb_stub {
 }
 
 #test run
-if $use_gdb_stub {
+if { $use_gdb_stub } {
     # Only extended-remote supports "run".
 } else {
     gdb_test_multiple "run" "run" {
@@ -650,7 +650,7 @@ proc test_set_print { command message } {
 	    set saw_help_info 1
 	    exp_continue
 	}
-	-re "\r\nCommand name abbreviations are allowed if unambiguous\\." {
+	-re "\r\nCommand name abbreviations are allowed if { unambiguous\\." } {
 	    verbose "Command name abbreviations displayed"
 	    set saw_command_abbrev 1
 	    exp_continue
@@ -771,7 +771,7 @@ set show_conv_list \
 	{$_linker_namespace_count = 0} \
 	{$_linker_namespace = <error: No registers.>}\
     }
-if [allow_python_tests] {
+if { [allow_python_tests] } {
     append show_conv_list \
 	{
 	    {$_memeq = <internal function _memeq>} \

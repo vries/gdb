@@ -34,7 +34,7 @@ set bp_location21 [gdb_get_line_number "set breakpoint 21 here"]
 
 runto_main
 
-if [supports_process_record] {
+if { [supports_process_record] } {
     # Activate process record/replay
     gdb_test_no_output "record" "turn on process record"
 }
