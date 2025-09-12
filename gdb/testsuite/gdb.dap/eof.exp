@@ -30,8 +30,8 @@ if {[dap_initialize] == ""} {
     return
 }
 
-catch "close -i $gdb_spawn_id"
-catch "wait -i $gdb_spawn_id"
+catch {close -i $gdb_spawn_id}
+catch {wait -i $gdb_spawn_id}
 unset gdb_spawn_id
 
 dap_check_log_file

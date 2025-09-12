@@ -45,7 +45,7 @@ proc gdbreplay_write_cmd_file { cmdline } {
     set logfile [standard_output_file_with_gdb_instance gdbreplay.cmd]
     set cmd_file [open $logfile w]
     puts $cmd_file $cmdline
-    catch "close $cmd_file"
+    catch {close $cmd_file}
 }
 
 # Start gdbreplay using REMOTELOG as the log file.  Return a list of

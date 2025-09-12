@@ -482,7 +482,7 @@ proc gdb_default_target_compile_1 {source destfile type options} {
 	}
 	if {[isnative]} {
 	    # This is a lose.
-	    catch "glob -nocomplain $tool_root_dir/libstdc++/libstdc++.so* $tool_root_dir/libstdc++/libstdc++.sl" tmp
+	    catch {glob -nocomplain $tool_root_dir/libstdc++/libstdc++.so* $tool_root_dir/libstdc++/libstdc++.sl} tmp
 	    if { ${tmp} != "" } {
 		if {[regexp ".*solaris2.*" $target_triplet]} {
 		    # Solaris 2

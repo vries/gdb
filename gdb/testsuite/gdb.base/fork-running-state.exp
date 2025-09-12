@@ -54,7 +54,7 @@ proc do_test { detach_on_fork follow_fork non_stop schedule_multiple } {
 	}
     }
 
-    # We want to catch "[New inferior ...]" below, to avoid sleeping.
+    # We want to catch {[New inferior ...]} below, to avoid sleeping.
     if {$detach_on_fork == "off" || $follow_fork == "child"} {
 	gdb_test_no_output "set print inferior-events on"
     }

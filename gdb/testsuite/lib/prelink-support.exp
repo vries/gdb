@@ -99,7 +99,7 @@ proc build_executable_own_libs {testname executable sources options {interp ""} 
     set ldd [gdb_find_ldd]
     set command "$ldd $binfile"
     set test "ldd $executable"
-    set result [catch "exec $command" output]
+    set result [catch {exec $command} output]
     verbose -log "result of $command is $result"
     verbose -log "output of $command is $output"
     if {$result != 0 || $output == ""} {

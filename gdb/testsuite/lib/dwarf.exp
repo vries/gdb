@@ -36,7 +36,7 @@ proc extract_dwo_information { object_file dwo_file } {
     set objcopy [gdb_find_objcopy]
     set command "$objcopy --extract-dwo $object_file $dwo_file"
     verbose -log "Executing $command"
-    set result [catch "exec $command" output]
+    set result [catch {exec $command} output]
     verbose -log "objcopy --extract-dwo output: $output"
     if { $result == 1 } {
 	return -1
@@ -52,7 +52,7 @@ proc strip_dwo_information { filename } {
     set objcopy [gdb_find_objcopy]
     set command "$objcopy --strip-dwo $filename"
     verbose -log "Executing $command"
-    set result [catch "exec $command" output]
+    set result [catch {exec $command} output]
     verbose -log "objcopy --strip-dwo output: $output"
     if { $result == 1 } {
 	return -1

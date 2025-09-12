@@ -136,7 +136,7 @@ proc load_lib { file } {
        set known_globals($varname) 1
     }
 
-    set code [catch "saved_load_lib $file" result]
+    set code [catch {saved_load_lib $file} result]
 
     foreach varname [info globals] {
        if { ![info exists known_globals($varname)] } {
@@ -5665,7 +5665,7 @@ if [info exists compiler_info] {
 #   others) does not work with "-E -o ...".  Most targets used to do
 #   this, and it mostly worked, because it works with gcc.
 #
-# [ catch "exec $compiler -E $ifile > $binfile.ci" exec_output ]
+# [ catch {exec $compiler -E $ifile > $binfile.ci} exec_output ]
 # source $binfile.ci
 # 
 #   This avoids the problem with -E and -o together.  This almost works
@@ -7250,7 +7250,7 @@ proc kill_wait_spawned_process { proc_spawn_id } {
     remote_exec build "kill -9 ${pid}"
 
     verbose -log "closing ${proc_spawn_id}"
-    catch "close -i $proc_spawn_id"
+    catch {close -i $proc_spawn_id}
     verbose -log "waiting for ${proc_spawn_id}"
 
     # If somehow GDB ends up still attached to the process here, a
@@ -8945,7 +8945,7 @@ proc get_build_id { filename } {
     } else {
 	set tmp [standard_output_file "${filename}-tmp"]
 	set objcopy_program [gdb_find_objcopy]
-	set result [catch "exec $objcopy_program -j .note.gnu.build-id -O binary $filename $tmp" output]
+	set result [catch {exec $objcopy_program -j .note.gnu.build-id -O binary $filename $tmp} output]
 	verbose "result is $result"
 	verbose "output is $output"
 	if {$result == 1} {
@@ -9760,7 +9760,7 @@ gdb_caching_proc gdb_target_symbol_prefix {} {
     set prefix ""
 
     set objdump_program [gdb_find_objdump]
-    set result [catch "exec $objdump_program --syms $obj" output]
+    set result [catch {exec $objdump_program --syms $obj} output]
 
     if { $result == 0 \
 	&& ![regexp -lineanchor \
@@ -10302,7 +10302,7 @@ proc gdb_stdin_log_init { } {
 
     if {[info exists in_file]} {
       # Close existing file.
-      catch "close $in_file"
+      catch {close $in_file}
     }
 
     set logfile [standard_output_file_with_gdb_instance gdb.in]
@@ -10348,7 +10348,7 @@ proc gdb_write_cmd_file { cmdline } {
     set logfile [standard_output_file_with_gdb_instance gdb.cmd]
     set cmd_file [open $logfile w]
     puts $cmd_file $cmdline
-    catch "close $cmd_file"
+    catch {close $cmd_file}
 }
 
 # Compare contents of FILE to string STR.  Pass with MSG if equal, otherwise
@@ -10524,7 +10524,7 @@ proc add_gdb_index { program {style ""} } {
     global srcdir GDB env
     set contrib_dir "$srcdir/../contrib"
     set env(GDB) [append_gdb_data_directory_option $GDB]
-    set result [catch "exec $contrib_dir/gdb-add-index.sh $style $program" output]
+    set result [catch {exec $contrib_dir/gdb-add-index.sh $style $program} output]
     if { $result != 0 } {
 	verbose -log "result is $result"
 	verbose -log "output is $output"

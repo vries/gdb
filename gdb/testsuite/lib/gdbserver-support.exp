@@ -490,13 +490,13 @@ proc close_gdbserver {} {
 
     verbose "Quitting GDBserver"
 
-    catch "close -i $server_spawn_id"
+    catch {close -i $server_spawn_id}
 
     # If gdbserver misbehaves, and ignores the close, waiting for it
     # without the -nowait flag will cause testing to hang.  Passing
     # -nowait makes expect tell Tcl to wait for the process in the
     # background.
-    catch "wait -nowait -i $server_spawn_id"
+    catch {wait -nowait -i $server_spawn_id}
     clean_up_spawn_id target $server_spawn_id
     unset server_spawn_id
 }
@@ -731,7 +731,7 @@ proc gdbserver_write_cmd_file { cmdline } {
     set logfile [standard_output_file_with_gdb_instance gdbserver.cmd]
     set cmd_file [open $logfile w]
     puts $cmd_file $cmdline
-    catch "close $cmd_file"
+    catch {close $cmd_file}
 }
 
 # Override gdb_debug_init so that we can set replay logging in GDB if required.
