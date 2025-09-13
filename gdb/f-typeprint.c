@@ -414,9 +414,11 @@ f_language::f_type_print_base (struct type *type, struct ui_file *stream,
       if (show > 0)
 	f_type_print_derivation_info (type, stream);
 
-      gdb_puts (" ", stream);
-
-      gdb_puts (type->name (), stream);
+      if (type->name () != nullptr)
+	{
+	  gdb_puts (" ", stream);
+	  gdb_puts (type->name (), stream);
+	}
 
       /* According to the definition,
 	 we only print structure elements in case show > 0.  */
@@ -435,7 +437,8 @@ f_language::f_type_print_base (struct type *type, struct ui_file *stream,
 	      gdb_puts ("\n", stream);
 	    }
 	  gdb_printf (stream, "%*sEnd Type ", level, "");
-	  gdb_puts (type->name (), stream);
+	  if (type->name () != nullptr)
+	    gdb_puts (type->name (), stream);
 	}
       break;
 
