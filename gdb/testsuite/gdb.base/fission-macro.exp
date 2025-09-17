@@ -38,13 +38,10 @@ proc do_tests { dwarf_version dwarf_bits strict_dwarf } {
     set id v$dwarf_version-b$dwarf_bits-s$strict_dwarf
 
     set srcfiles [list $::srcfile $::srcfile2]
-    if { [build_executable "failed to prepare" $::testfile-$id $srcfiles $opts] } {
+    if { [prepare_for_testing "failed to prepare" $::testfile-$id $srcfiles \
+	      $opts] } {
 	return -1
     }
-
-    clean_restart
-
-    gdb_load_no_complaints $::binfile-$id
 
     if {![runto_main]} {
 	return 0
