@@ -91,7 +91,7 @@ for { set i 0 } { $i < 256 } { incr i } {
 	    continue
 	}
 
-	if { [expr $size > $offset_d] } {
+	if {$size > $offset_d} {
 	    # Field d fits in the size.
 	    continue
 	}
