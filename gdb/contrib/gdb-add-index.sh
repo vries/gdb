@@ -38,7 +38,9 @@ fi
 file="$1"
 
 if test -L "$file"; then
-    if ! command -v readlink >/dev/null 2>&1; then
+    target=$(readlink "$file")
+    st=$?
+    if [ $st -eq 127 ]; then
 	echo "$myname: 'readlink' missing.  Failed to follow symlink $1." 1>&2
 	exit 1
     fi
