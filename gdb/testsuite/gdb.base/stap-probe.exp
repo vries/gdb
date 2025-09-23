@@ -74,7 +74,7 @@ proc check_for_usable_xmm0_probe { binfile } {
     set binfile [standard_output_file $binfile]
     set command "exec $readelf_program -n $binfile"
     verbose -log "command is $command"
-    set result [catch {$command} output]
+    set result [catch {{*}$command} output]
     verbose -log "result is $result"
     verbose -log "output is $output"
 
