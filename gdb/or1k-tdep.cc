@@ -44,7 +44,7 @@
 
 /* OpenRISC specific includes.  */
 #include "or1k-tdep.h"
-#include "features/or1k.c"
+#include "features/or1k.cc"
 
 
 /* Global debug flag.  */

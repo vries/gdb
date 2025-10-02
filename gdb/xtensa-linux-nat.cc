@@ -42,7 +42,7 @@
 /* Extended register set depends on hardware configs.
    Keeping these definitions separately allows to introduce
    hardware-specific overlays.  */
-#include "xtensa-xtregs.c"
+#include "xtensa-xtregs.cc"
 
 class xtensa_linux_nat_target final : public linux_nat_target
 {

@@ -222,27 +222,27 @@ SFILES = \
 	$(srcdir)/win32-i386-low.cc \
 	$(srcdir)/win32-low.cc \
 	$(srcdir)/x86-low.cc \
-	$(srcdir)/../gdb/alloc.c \
-	$(srcdir)/../gdb/arch/arc.c \
-	$(srcdir)/../gdb/arch/arm.c \
-	$(srcdir)/../gdb/arch/arm-get-next-pcs.c \
-	$(srcdir)/../gdb/arch/arm-linux.c \
-	$(srcdir)/../gdb/arch/csky.c \
-	$(srcdir)/../gdb/arch/loongarch.c \
-	$(srcdir)/../gdb/arch/ppc-linux-common.c \
-	$(srcdir)/../gdb/arch/riscv.c \
-	$(srcdir)/../gdb/nat/aarch64-mte-linux-ptrace.c \
-	$(srcdir)/../gdb/nat/aarch64-scalable-linux-ptrace.c \
-	$(srcdir)/../gdb/nat/linux-btrace.c \
-	$(srcdir)/../gdb/nat/linux-namespaces.c \
-	$(srcdir)/../gdb/nat/linux-osdata.c \
-	$(srcdir)/../gdb/nat/linux-personality.c \
-	$(srcdir)/../gdb/nat/mips-linux-watch.c \
-	$(srcdir)/../gdb/nat/ppc-linux.c \
-	$(srcdir)/../gdb/nat/riscv-linux-tdesc.c \
-	$(srcdir)/../gdb/nat/fork-inferior.c \
-	$(srcdir)/../gdb/target/target.c \
-	$(srcdir)/../gdb/target/waitstatus.c
+	$(srcdir)/../gdb/alloc.cc \
+	$(srcdir)/../gdb/arch/arc.cc \
+	$(srcdir)/../gdb/arch/arm.cc \
+	$(srcdir)/../gdb/arch/arm-get-next-pcs.cc \
+	$(srcdir)/../gdb/arch/arm-linux.cc \
+	$(srcdir)/../gdb/arch/csky.cc \
+	$(srcdir)/../gdb/arch/loongarch.cc \
+	$(srcdir)/../gdb/arch/ppc-linux-common.cc \
+	$(srcdir)/../gdb/arch/riscv.cc \
+	$(srcdir)/../gdb/nat/aarch64-mte-linux-ptrace.cc \
+	$(srcdir)/../gdb/nat/aarch64-scalable-linux-ptrace.cc \
+	$(srcdir)/../gdb/nat/linux-btrace.cc \
+	$(srcdir)/../gdb/nat/linux-namespaces.cc \
+	$(srcdir)/../gdb/nat/linux-osdata.cc \
+	$(srcdir)/../gdb/nat/linux-personality.cc \
+	$(srcdir)/../gdb/nat/mips-linux-watch.cc \
+	$(srcdir)/../gdb/nat/ppc-linux.cc \
+	$(srcdir)/../gdb/nat/riscv-linux-tdesc.cc \
+	$(srcdir)/../gdb/nat/fork-inferior.cc \
+	$(srcdir)/../gdb/target/target.cc \
+	$(srcdir)/../gdb/target/waitstatus.cc
 
 DEPFILES = @GDBSERVER_DEPFILES@
 
@@ -414,7 +414,7 @@ TAGS:	${TAGFILES}
 	  `for i in yzzy ${DEPFILES}; do \
 	     if [ x$$i != xyzzy ]; then \
 	       echo ${srcdir}/$$i | \
-		 sed -e 's,/\(\(arch\|nat\|target\)/.*\)\.o$$,/../gdb/\1.c,' \
+		 sed -e 's,/\(\(arch\|nat\|target\)/.*\)\.o$$,/../gdb/\1.cc,' \
 		     -e 's/\.o$$/\.cc/'; \
 	     fi; \
 	   done` \
@@ -520,7 +520,7 @@ ax.o: ax.cc
 
 # Rules for objects that go in the in-process agent.
 
-arch/%-ipa.o: ../gdb/arch/%.c
+arch/%-ipa.o: ../gdb/arch/%.cc
 	$(IPAGENT_COMPILE) -x c++ $<
 	$(POSTCOMPILE)
 
@@ -536,7 +536,7 @@ gdbsupport/%-ipa.o: ../gdbsupport/%.cc
 	$(IPAGENT_COMPILE) $<
 	$(POSTCOMPILE)
 
-%-ipa.o: ../gdb/%.c
+%-ipa.o: ../gdb/%.cc
 	$(IPAGENT_COMPILE) -x c++ $<
 	$(POSTCOMPILE)
 
@@ -553,7 +553,7 @@ gdbsupport/%-ipa.o: ../gdbsupport/%.cc
 
 # Rules for objects that go in the gdbserver binary.
 
-arch/%.o: ../gdb/arch/%.c
+arch/%.o: ../gdb/arch/%.cc
 	$(COMPILE) -x c++ $<
 	$(POSTCOMPILE)
 
@@ -565,15 +565,15 @@ arch/%.o: ../gdb/arch/%.c
 	$(COMPILE) $<
 	$(POSTCOMPILE)
 
-nat/%.o: ../gdb/nat/%.c
+nat/%.o: ../gdb/nat/%.cc
 	$(COMPILE) -x c++ $<
 	$(POSTCOMPILE)
 
-target/%.o: ../gdb/target/%.c
+target/%.o: ../gdb/target/%.cc
 	$(COMPILE) -x c++ $<
 	$(POSTCOMPILE)
 
-%.o: ../gdb/%.c
+%.o: ../gdb/%.cc
 	$(COMPILE) -x c++ $<
 	$(POSTCOMPILE)
 

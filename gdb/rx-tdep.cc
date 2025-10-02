@@ -42,7 +42,7 @@
 #include "elf-bfd.h"
 #include <algorithm>
 
-#include "features/rx.c"
+#include "features/rx.cc"
 
 /* Certain important register numbers.  */
 enum

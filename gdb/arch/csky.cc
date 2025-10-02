@@ -18,7 +18,7 @@
 #include "csky.h"
 #include <stdlib.h>
 
-#include "../features/cskyv2-linux.c"
+#include "../features/cskyv2-linux.cc"
 
 target_desc_up
 csky_create_target_description (void)

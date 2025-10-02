@@ -20,15 +20,15 @@
 #include "gdbsupport/common-regcache.h"
 #include "arm.h"
 
-#include "../features/arm/arm-core.c"
-#include "../features/arm/arm-tls.c"
-#include "../features/arm/arm-vfpv2.c"
-#include "../features/arm/arm-vfpv3.c"
-#include "../features/arm/xscale-iwmmxt.c"
-#include "../features/arm/arm-m-profile.c"
-#include "../features/arm/arm-m-profile-with-fpa.c"
-#include "../features/arm/arm-m-profile-mve.c"
-#include "../features/arm/arm-m-system.c"
+#include "../features/arm/arm-core.cc"
+#include "../features/arm/arm-tls.cc"
+#include "../features/arm/arm-vfpv2.cc"
+#include "../features/arm/arm-vfpv3.cc"
+#include "../features/arm/xscale-iwmmxt.cc"
+#include "../features/arm/arm-m-profile.cc"
+#include "../features/arm/arm-m-profile-with-fpa.cc"
+#include "../features/arm/arm-m-profile-mve.cc"
+#include "../features/arm/arm-m-system.cc"
 
 /* See arm.h.  */
 

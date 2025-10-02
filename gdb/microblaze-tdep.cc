@@ -39,8 +39,8 @@
 #include "microblaze-tdep.h"
 #include "remote.h"
 
-#include "features/microblaze-with-stack-protect.c"
-#include "features/microblaze.c"
+#include "features/microblaze-with-stack-protect.cc"
+#include "features/microblaze.cc"
 
 /* Instruction macros used for analyzing the prologue.  */
 /* This set of instruction macros need to be changed whenever the

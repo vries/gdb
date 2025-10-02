@@ -21,10 +21,10 @@
 #include <string>
 
 /* Target description features.  */
-#include "features/arc/v1-core.c"
-#include "features/arc/v1-aux.c"
-#include "features/arc/v2-core.c"
-#include "features/arc/v2-aux.c"
+#include "features/arc/v1-core.cc"
+#include "features/arc/v1-aux.cc"
+#include "features/arc/v2-core.cc"
+#include "features/arc/v2-aux.cc"
 
 #ifndef GDBSERVER
 #define STATIC_IN_GDB static

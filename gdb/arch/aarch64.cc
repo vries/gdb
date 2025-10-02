@@ -18,16 +18,16 @@
 #include "aarch64.h"
 #include <stdlib.h>
 
-#include "../features/aarch64-core.c"
-#include "../features/aarch64-fpu.c"
-#include "../features/aarch64-sve.c"
-#include "../features/aarch64-pauth.c"
-#include "../features/aarch64-mte.c"
-#include "../features/aarch64-sme.c"
-#include "../features/aarch64-sme2.c"
-#include "../features/aarch64-tls.c"
-#include "../features/aarch64-gcs.c"
-#include "../features/aarch64-gcs-linux.c"
+#include "../features/aarch64-core.cc"
+#include "../features/aarch64-fpu.cc"
+#include "../features/aarch64-sve.cc"
+#include "../features/aarch64-pauth.cc"
+#include "../features/aarch64-mte.cc"
+#include "../features/aarch64-sme.cc"
+#include "../features/aarch64-sme2.cc"
+#include "../features/aarch64-tls.cc"
+#include "../features/aarch64-gcs.cc"
+#include "../features/aarch64-gcs-linux.cc"
 
 /* See arch/aarch64.h.  */
 

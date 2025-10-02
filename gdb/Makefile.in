@@ -268,66 +268,66 @@ INCSUPPORT = \
 # CLI sub directory definitions
 #
 SUBDIR_CLI_SRCS = \
-	cli/cli-cmds.c \
-	cli/cli-decode.c \
-	cli/cli-dump.c \
-	cli/cli-interp.c \
-	cli/cli-logging.c \
-	cli/cli-option.c \
-	cli/cli-script.c \
-	cli/cli-setshow.c \
-	cli/cli-style.c \
-	cli/cli-utils.c
+	cli/cli-cmds.cc \
+	cli/cli-decode.cc \
+	cli/cli-dump.cc \
+	cli/cli-interp.cc \
+	cli/cli-logging.cc \
+	cli/cli-option.cc \
+	cli/cli-script.cc \
+	cli/cli-setshow.cc \
+	cli/cli-style.cc \
+	cli/cli-utils.cc
 
-SUBDIR_CLI_OBS = $(patsubst %.c,%.o,$(SUBDIR_CLI_SRCS))
+SUBDIR_CLI_OBS = $(patsubst %.cc,%.o,$(SUBDIR_CLI_SRCS))
 
 #
 # MI sub directory definitions
 #
 SUBDIR_MI_SRCS = \
-	mi/mi-cmd-break.c \
-	mi/mi-cmd-catch.c \
-	mi/mi-cmd-disas.c \
-	mi/mi-cmd-env.c \
-	mi/mi-cmd-file.c \
-	mi/mi-cmd-info.c \
-	mi/mi-cmd-stack.c \
-	mi/mi-cmd-target.c \
-	mi/mi-cmd-var.c \
-	mi/mi-cmds.c \
-	mi/mi-common.c \
-	mi/mi-console.c \
-	mi/mi-getopt.c \
-	mi/mi-interp.c \
-	mi/mi-main.c \
-	mi/mi-out.c \
-	mi/mi-parse.c \
-	mi/mi-symbol-cmds.c
+	mi/mi-cmd-break.cc \
+	mi/mi-cmd-catch.cc \
+	mi/mi-cmd-disas.cc \
+	mi/mi-cmd-env.cc \
+	mi/mi-cmd-file.cc \
+	mi/mi-cmd-info.cc \
+	mi/mi-cmd-stack.cc \
+	mi/mi-cmd-target.cc \
+	mi/mi-cmd-var.cc \
+	mi/mi-cmds.cc \
+	mi/mi-common.cc \
+	mi/mi-console.cc \
+	mi/mi-getopt.cc \
+	mi/mi-interp.cc \
+	mi/mi-main.cc \
+	mi/mi-out.cc \
+	mi/mi-parse.cc \
+	mi/mi-symbol-cmds.cc
 
-SUBDIR_MI_OBS = $(patsubst %.c,%.o,$(SUBDIR_MI_SRCS))
+SUBDIR_MI_OBS = $(patsubst %.cc,%.o,$(SUBDIR_MI_SRCS))
 
 #
 # TUI sub directory definitions
 #
 SUBDIR_TUI_SRCS = \
-	tui/tui.c \
-	tui/tui-command.c \
-	tui/tui-data.c \
-	tui/tui-disasm.c \
-	tui/tui-file.c \
-	tui/tui-hooks.c \
-	tui/tui-interp.c \
-	tui/tui-io.c \
-	tui/tui-layout.c \
-	tui/tui-location.c \
-	tui/tui-regs.c \
-	tui/tui-source.c \
-	tui/tui-status.c \
-	tui/tui-win.c \
-	tui/tui-wingeneral.c \
-	tui/tui-winsource.c
+	tui/tui.cc \
+	tui/tui-command.cc \
+	tui/tui-data.cc \
+	tui/tui-disasm.cc \
+	tui/tui-file.cc \
+	tui/tui-hooks.cc \
+	tui/tui-interp.cc \
+	tui/tui-io.cc \
+	tui/tui-layout.cc \
+	tui/tui-location.cc \
+	tui/tui-regs.cc \
+	tui/tui-source.cc \
+	tui/tui-status.cc \
+	tui/tui-win.cc \
+	tui/tui-wingeneral.cc \
+	tui/tui-winsource.cc
 
-SUBDIR_TUI_OBS = $(patsubst %.c,%.o,$(SUBDIR_TUI_SRCS))
+SUBDIR_TUI_OBS = $(patsubst %.cc,%.o,$(SUBDIR_TUI_SRCS))
 
 SUBDIR_TUI_DEPS =
 SUBDIR_TUI_LDFLAGS =
@@ -337,50 +337,50 @@ SUBDIR_TUI_CFLAGS = -DTUI=1
 # GCC Compile support sub-directory definitions
 #
 SUBDIR_GCC_COMPILE_SRCS = \
-	compile/compile.c \
-	compile/compile-c-support.c \
-	compile/compile-c-symbols.c \
-	compile/compile-c-types.c \
-	compile/compile-cplus-symbols.c \
-	compile/compile-cplus-types.c \
-	compile/compile-loc2c.c \
-	compile/compile-object-load.c \
-	compile/compile-object-run.c
+	compile/compile.cc \
+	compile/compile-c-support.cc \
+	compile/compile-c-symbols.cc \
+	compile/compile-c-types.cc \
+	compile/compile-cplus-symbols.cc \
+	compile/compile-cplus-types.cc \
+	compile/compile-loc2c.cc \
+	compile/compile-object-load.cc \
+	compile/compile-object-run.cc
 
-SUBDIR_GCC_COMPILE_OBS = $(patsubst %.c,%.o,$(filter %.c,$(SUBDIR_GCC_COMPILE_SRCS)))
+SUBDIR_GCC_COMPILE_OBS = $(patsubst %.cc,%.o,$(filter %.cc,$(SUBDIR_GCC_COMPILE_SRCS)))
 
 #
 # Guile sub directory definitions for guile support.
 #
 SUBDIR_GUILE_SRCS = \
-	guile/guile.c \
-	guile/scm-arch.c \
-	guile/scm-auto-load.c \
-	guile/scm-block.c \
-	guile/scm-breakpoint.c \
-	guile/scm-cmd.c \
-	guile/scm-color.c \
-	guile/scm-disasm.c \
-	guile/scm-exception.c \
-	guile/scm-frame.c \
-	guile/scm-gsmob.c \
-	guile/scm-iterator.c \
-	guile/scm-lazy-string.c \
-	guile/scm-math.c \
-	guile/scm-objfile.c \
-	guile/scm-param.c \
-	guile/scm-ports.c \
-	guile/scm-pretty-print.c \
-	guile/scm-progspace.c \
-	guile/scm-safe-call.c \
-	guile/scm-string.c \
-	guile/scm-symbol.c \
-	guile/scm-symtab.c \
-	guile/scm-type.c \
-	guile/scm-utils.c \
-	guile/scm-value.c
+	guile/guile.cc \
+	guile/scm-arch.cc \
+	guile/scm-auto-load.cc \
+	guile/scm-block.cc \
+	guile/scm-breakpoint.cc \
+	guile/scm-cmd.cc \
+	guile/scm-color.cc \
+	guile/scm-disasm.cc \
+	guile/scm-exception.cc \
+	guile/scm-frame.cc \
+	guile/scm-gsmob.cc \
+	guile/scm-iterator.cc \
+	guile/scm-lazy-string.cc \
+	guile/scm-math.cc \
+	guile/scm-objfile.cc \
+	guile/scm-param.cc \
+	guile/scm-ports.cc \
+	guile/scm-pretty-print.cc \
+	guile/scm-progspace.cc \
+	guile/scm-safe-call.cc \
+	guile/scm-string.cc \
+	guile/scm-symbol.cc \
+	guile/scm-symtab.cc \
+	guile/scm-type.cc \
+	guile/scm-utils.cc \
+	guile/scm-value.cc
 
-SUBDIR_GUILE_OBS = $(patsubst %.c,%.o,$(SUBDIR_GUILE_SRCS))
+SUBDIR_GUILE_OBS = $(patsubst %.cc,%.o,$(SUBDIR_GUILE_SRCS))
 
 SUBDIR_GUILE_DEPS =
 SUBDIR_GUILE_LDFLAGS =
@@ -390,115 +390,115 @@ SUBDIR_GUILE_CFLAGS =
 # python sub directory definitions
 #
 SUBDIR_PYTHON_SRCS = \
-	python/py-arch.c \
-	python/py-auto-load.c \
-	python/py-block.c \
-	python/py-bpevent.c \
-	python/py-breakpoint.c \
-	python/py-cmd.c \
-	python/py-color.c \
-	python/py-connection.c \
-	python/py-continueevent.c \
-	python/py-dap.c \
-	python/py-disasm.c \
-	python/py-event.c \
-	python/py-evtregistry.c \
-	python/py-evts.c \
-	python/py-exitedevent.c \
-	python/py-finishbreakpoint.c \
-	python/py-frame.c \
-	python/py-framefilter.c \
-	python/py-function.c \
-	python/py-gdb-readline.c \
-	python/py-inferior.c \
-	python/py-infevents.c \
-	python/py-infthread.c \
-	python/py-instruction.c \
-	python/py-lazy-string.c \
-	python/py-linetable.c \
-	python/py-membuf.c \
-	python/py-mi.c \
-	python/py-micmd.c \
-	python/py-newobjfileevent.c \
-	python/py-objfile.c \
-	python/py-param.c \
-	python/py-prettyprint.c \
-	python/py-progspace.c \
-	python/py-record.c \
-	python/py-record-btrace.c \
-	python/py-record-full.c \
-	python/py-registers.c \
-	python/py-signalevent.c \
-	python/py-stopevent.c \
-	python/py-symbol.c \
-	python/py-symtab.c \
-	python/py-threadevent.c \
-	python/py-tui.c \
-	python/py-type.c \
-	python/py-unwind.c \
-	python/py-utils.c \
-	python/py-value.c \
-	python/py-varobj.c \
-	python/py-xmethods.c \
-	python/python.c
+	python/py-arch.cc \
+	python/py-auto-load.cc \
+	python/py-block.cc \
+	python/py-bpevent.cc \
+	python/py-breakpoint.cc \
+	python/py-cmd.cc \
+	python/py-color.cc \
+	python/py-connection.cc \
+	python/py-continueevent.cc \
+	python/py-dap.cc \
+	python/py-disasm.cc \
+	python/py-event.cc \
+	python/py-evtregistry.cc \
+	python/py-evts.cc \
+	python/py-exitedevent.cc \
+	python/py-finishbreakpoint.cc \
+	python/py-frame.cc \
+	python/py-framefilter.cc \
+	python/py-function.cc \
+	python/py-gdb-readline.cc \
+	python/py-inferior.cc \
+	python/py-infevents.cc \
+	python/py-infthread.cc \
+	python/py-instruction.cc \
+	python/py-lazy-string.cc \
+	python/py-linetable.cc \
+	python/py-membuf.cc \
+	python/py-mi.cc \
+	python/py-micmd.cc \
+	python/py-newobjfileevent.cc \
+	python/py-objfile.cc \
+	python/py-param.cc \
+	python/py-prettyprint.cc \
+	python/py-progspace.cc \
+	python/py-record.cc \
+	python/py-record-btrace.cc \
+	python/py-record-full.cc \
+	python/py-registers.cc \
+	python/py-signalevent.cc \
+	python/py-stopevent.cc \
+	python/py-symbol.cc \
+	python/py-symtab.cc \
+	python/py-threadevent.cc \
+	python/py-tui.cc \
+	python/py-type.cc \
+	python/py-unwind.cc \
+	python/py-utils.cc \
+	python/py-value.cc \
+	python/py-varobj.cc \
+	python/py-xmethods.cc \
+	python/python.cc
 
-SUBDIR_PYTHON_OBS = $(patsubst %.c,%.o,$(SUBDIR_PYTHON_SRCS))
+SUBDIR_PYTHON_OBS = $(patsubst %.cc,%.o,$(SUBDIR_PYTHON_SRCS))
 
 SUBDIR_PYTHON_DEPS =
 SUBDIR_PYTHON_LDFLAGS =
 SUBDIR_PYTHON_CFLAGS =
 
 SELFTESTS_SRCS = \
-	disasm-selftests.c \
-	gdbarch-selftests.c \
-	selftest-arch.c \
-	unittests/array-view-selftests.c \
-	unittests/child-path-selftests.c \
-	unittests/cli-utils-selftests.c \
-	unittests/command-def-selftests.c \
-	unittests/common-utils-selftests.c \
-	unittests/copy_bitwise-selftests.c \
-	unittests/enum-flags-selftests.c \
-	unittests/environ-selftests.c \
-	unittests/filtered_iterator-selftests.c \
-	unittests/format_pieces-selftests.c \
-	unittests/frame_info_ptr-selftests.c \
-	unittests/function-view-selftests.c \
-	unittests/gdb_tilde_expand-selftests.c \
-	unittests/gmp-utils-selftests.c \
-	unittests/intrusive_list-selftests.c \
-	unittests/lookup_name_info-selftests.c \
-	unittests/memory-map-selftests.c \
-	unittests/memrange-selftests.c \
-	unittests/offset-type-selftests.c \
-	unittests/observable-selftests.c \
-	unittests/packed-selftests.c \
-	unittests/parallel-for-selftests.c \
-	unittests/parse-connection-spec-selftests.c \
-	unittests/path-join-selftests.c \
-	unittests/ptid-selftests.c \
-	unittests/main-thread-selftests.c \
-	unittests/mkdir-recursive-selftests.c \
-	unittests/remote-arg-selftests.c \
-	unittests/rsp-low-selftests.c \
-	unittests/scoped_fd-selftests.c \
-	unittests/scoped_ignore_signal-selftests.c \
-	unittests/scoped_mmap-selftests.c \
-	unittests/scoped_restore-selftests.c \
-	unittests/search-memory-selftests.c \
-	unittests/style-selftests.c \
-	unittests/tracepoint-selftests.c \
-	unittests/tui-selftests.c \
-	unittests/ui-file-selftests.c \
-	unittests/unique_xmalloc_ptr_char.c \
-	unittests/unpack-selftests.c \
-	unittests/vec-utils-selftests.c \
-	unittests/xml-utils-selftests.c
+	disasm-selftests.cc \
+	gdbarch-selftests.cc \
+	selftest-arch.cc \
+	unittests/array-view-selftests.cc \
+	unittests/child-path-selftests.cc \
+	unittests/cli-utils-selftests.cc \
+	unittests/command-def-selftests.cc \
+	unittests/common-utils-selftests.cc \
+	unittests/copy_bitwise-selftests.cc \
+	unittests/enum-flags-selftests.cc \
+	unittests/environ-selftests.cc \
+	unittests/filtered_iterator-selftests.cc \
+	unittests/format_pieces-selftests.cc \
+	unittests/frame_info_ptr-selftests.cc \
+	unittests/function-view-selftests.cc \
+	unittests/gdb_tilde_expand-selftests.cc \
+	unittests/gmp-utils-selftests.cc \
+	unittests/intrusive_list-selftests.cc \
+	unittests/lookup_name_info-selftests.cc \
+	unittests/memory-map-selftests.cc \
+	unittests/memrange-selftests.cc \
+	unittests/offset-type-selftests.cc \
+	unittests/observable-selftests.cc \
+	unittests/packed-selftests.cc \
+	unittests/parallel-for-selftests.cc \
+	unittests/parse-connection-spec-selftests.cc \
+	unittests/path-join-selftests.cc \
+	unittests/ptid-selftests.cc \
+	unittests/main-thread-selftests.cc \
+	unittests/mkdir-recursive-selftests.cc \
+	unittests/remote-arg-selftests.cc \
+	unittests/rsp-low-selftests.cc \
+	unittests/scoped_fd-selftests.cc \
+	unittests/scoped_ignore_signal-selftests.cc \
+	unittests/scoped_mmap-selftests.cc \
+	unittests/scoped_restore-selftests.cc \
+	unittests/search-memory-selftests.cc \
+	unittests/style-selftests.cc \
+	unittests/tracepoint-selftests.cc \
+	unittests/tui-selftests.cc \
+	unittests/ui-file-selftests.cc \
+	unittests/unique_xmalloc_ptr_char.cc \
+	unittests/unpack-selftests.cc \
+	unittests/vec-utils-selftests.cc \
+	unittests/xml-utils-selftests.cc
 
-SELFTESTS_OBS = $(patsubst %.c,%.o,$(SELFTESTS_SRCS))
+SELFTESTS_OBS = $(patsubst %.cc,%.o,$(SELFTESTS_SRCS))
 
-SUBDIR_TARGET_SRCS = target/target.c target/waitstatus.c
-SUBDIR_TARGET_OBS = $(patsubst %.c,%.o,$(SUBDIR_TARGET_SRCS))
+SUBDIR_TARGET_SRCS = target/target.cc target/waitstatus.cc
+SUBDIR_TARGET_OBS = $(patsubst %.cc,%.o,$(SUBDIR_TARGET_SRCS))
 
 
 # Opcodes currently live in one of two places.  Either they are in the
@@ -914,14 +914,14 @@ ALL_TARGET_OBS = \
 	z80-tdep.o
 
 # Object files for reading specific types of debug information.
-coff_SRCS = coffread.c coff-pe-read.c
-dbx_SRCS = dbxread.c
-elf_SRCS = elfread.c stap-probe.c dtrace-probe.c
-macho_SRCS = machoread.c
-mips_SRCS = mipsread.c
-xcoff_SRCS = xcoffread.c
+coff_SRCS = coffread.cc coff-pe-read.cc
+dbx_SRCS = dbxread.cc
+elf_SRCS = elfread.cc stap-probe.cc dtrace-probe.cc
+macho_SRCS = machoread.cc
+mips_SRCS = mipsread.cc
+xcoff_SRCS = xcoffread.cc
 FORMAT_SRCS = @FORMAT_SRCS@
-FORMAT_OBS = $(patsubst %.c,%.o,$(FORMAT_SRCS))
+FORMAT_OBS = $(patsubst %.cc,%.o,$(FORMAT_SRCS))
 
 # The following native-target dependent variables are defined on
 # configure.nat.
@@ -1041,226 +1041,226 @@ TARGET_FLAGS_TO_PASS = \
 # Files that should wind up in SFILES and whose corresponding .o
 # should be in COMMON_OBS.
 COMMON_SFILES = \
-	ada-lang.c \
-	ada-tasks.c \
-	ada-typeprint.c \
-	ada-valprint.c \
-	ada-varobj.c \
-	addrmap.c \
-	agent.c \
-	alloc.c \
-	annotate.c \
-	arch-utils.c \
-	async-event.c \
-	auto-load.c \
-	auxv.c \
-	ax-gdb.c \
-	ax-general.c \
-	bcache.c \
-	bfd-target.c \
-	block.c \
-	blockframe.c \
-	break-catch-exec.c \
-	break-catch-fork.c \
-	break-catch-load.c \
-	break-catch-sig.c \
-	break-catch-syscall.c \
-	break-catch-throw.c \
-	break-cond-parse.c \
-	breakpoint.c \
-	bt-utils.c \
-	btrace.c \
-	build-id.c \
-	buildsym-legacy.c \
-	buildsym.c \
-	c-lang.c \
-	c-typeprint.c \
-	c-valprint.c \
-	c-varobj.c \
-	charset.c \
-	cli-out.c \
-	complaints.c \
-	completer.c \
-	copying.c \
-	corefile.c \
-	corelow.c \
-	cp-abi.c \
-	cp-namespace.c \
-	cp-support.c \
-	cp-valprint.c \
-	ctfread.c \
-	d-lang.c \
-	d-namespace.c \
-	d-valprint.c \
-	dcache.c \
-	debug.c \
-	debuginfod-support.c \
-	dictionary.c \
-	disasm.c \
-	displaced-stepping.c \
-	dummy-frame.c \
-	extract-store-integer.c \
-	eval.c \
-	event-top.c \
-	exceptions.c \
-	exec.c \
-	expprint.c \
-	extension.c \
-	f-lang.c \
-	f-typeprint.c \
-	f-valprint.c \
-	filesystem.c \
-	findcmd.c \
-	findvar.c \
-	frame.c \
-	frame-base.c \
-	frame-unwind.c \
-	gcore.c \
-	gdb-demangle.c \
-	gdb_bfd.c \
-	gdbtypes.c \
-	gmp-utils.c \
-	gnu-v2-abi.c \
-	gnu-v3-abi.c \
-	go-lang.c \
-	go-typeprint.c \
-	go-valprint.c \
-	inf-child.c \
-	inf-loop.c \
-	infcall.c \
-	infcmd.c \
-	inferior.c \
-	inflow.c \
-	infrun.c \
-	inline-frame.c \
-	interps.c \
-	jit.c \
-	language.c \
-	linespec.c \
-	location.c \
-	m2-lang.c \
-	m2-typeprint.c \
-	m2-valprint.c \
-	macrocmd.c \
-	macroexp.c \
-	macroscope.c \
-	macrotab.c \
-	main.c \
-	maint.c \
-	maint-test-options.c \
-	maint-test-settings.c \
-	mem-break.c \
-	memattr.c \
-	memory-map.c \
-	memrange.c \
-	memtag.c \
-	minidebug.c \
-	minsyms.c \
-	namespace.c \
-	objc-lang.c \
-	objfiles.c \
-	observable.c \
-	opencl-lang.c \
-	osabi.c \
-	osdata.c \
-	p-lang.c \
-	p-typeprint.c \
-	p-valprint.c \
-	parse.c \
-	printcmd.c \
-	probe.c \
-	process-stratum-target.c \
-	producer.c \
-	progspace.c \
-	progspace-and-thread.c \
-	prologue-value.c \
-	psymtab.c \
-	record.c \
-	record-btrace.c \
-	record-full.c \
-	regcache.c \
-	regcache-dump.c \
-	reggroups.c \
-	remote.c \
-	remote-fileio.c \
-	remote-notif.c \
-	reverse.c \
-	run-on-main-thread.c \
-	rust-lang.c \
-	rust-parse.c \
-	sentinel-frame.c \
-	ser-event.c \
-	serial.c \
-	skip.c \
-	solib.c \
-	solib-target.c \
-	source.c \
-	source-cache.c \
-	split-name.c \
-	stabsread.c \
-	stack.c \
-	std-regs.c \
-	symfile.c \
-	symfile-debug.c \
-	symmisc.c \
-	symtab.c \
-	target.c \
-	target-connection.c \
-	target-dcache.c \
-	target-descriptions.c \
-	target-memory.c \
-	test-target.c \
-	thread.c \
-	thread-iter.c \
-	tid-parse.c \
-	top.c \
-	tracectf.c \
-	tracefile.c \
-	tracefile-tfile.c \
-	tracepoint.c \
-	trad-frame.c \
-	tramp-frame.c \
-	target-float.c \
-	type-stack.c \
-	typeprint.c \
-	ui.c \
-	ui-file.c \
-	ui-out.c \
-	ui-style.c \
-	user-regs.c \
-	utils.c \
-	valarith.c \
-	valops.c \
-	valprint.c \
-	value.c \
-	varobj.c \
-	xml-support.c \
-	xml-syscall.c \
-	xml-tdesc.c
+	ada-lang.cc \
+	ada-tasks.cc \
+	ada-typeprint.cc \
+	ada-valprint.cc \
+	ada-varobj.cc \
+	addrmap.cc \
+	agent.cc \
+	alloc.cc \
+	annotate.cc \
+	arch-utils.cc \
+	async-event.cc \
+	auto-load.cc \
+	auxv.cc \
+	ax-gdb.cc \
+	ax-general.cc \
+	bcache.cc \
+	bfd-target.cc \
+	block.cc \
+	blockframe.cc \
+	break-catch-exec.cc \
+	break-catch-fork.cc \
+	break-catch-load.cc \
+	break-catch-sig.cc \
+	break-catch-syscall.cc \
+	break-catch-throw.cc \
+	break-cond-parse.cc \
+	breakpoint.cc \
+	bt-utils.cc \
+	btrace.cc \
+	build-id.cc \
+	buildsym-legacy.cc \
+	buildsym.cc \
+	c-lang.cc \
+	c-typeprint.cc \
+	c-valprint.cc \
+	c-varobj.cc \
+	charset.cc \
+	cli-out.cc \
+	complaints.cc \
+	completer.cc \
+	copying.cc \
+	corefile.cc \
+	corelow.cc \
+	cp-abi.cc \
+	cp-namespace.cc \
+	cp-support.cc \
+	cp-valprint.cc \
+	ctfread.cc \
+	d-lang.cc \
+	d-namespace.cc \
+	d-valprint.cc \
+	dcache.cc \
+	debug.cc \
+	debuginfod-support.cc \
+	dictionary.cc \
+	disasm.cc \
+	displaced-stepping.cc \
+	dummy-frame.cc \
+	extract-store-integer.cc \
+	eval.cc \
+	event-top.cc \
+	exceptions.cc \
+	exec.cc \
+	expprint.cc \
+	extension.cc \
+	f-lang.cc \
+	f-typeprint.cc \
+	f-valprint.cc \
+	filesystem.cc \
+	findcmd.cc \
+	findvar.cc \
+	frame.cc \
+	frame-base.cc \
+	frame-unwind.cc \
+	gcore.cc \
+	gdb-demangle.cc \
+	gdb_bfd.cc \
+	gdbtypes.cc \
+	gmp-utils.cc \
+	gnu-v2-abi.cc \
+	gnu-v3-abi.cc \
+	go-lang.cc \
+	go-typeprint.cc \
+	go-valprint.cc \
+	inf-child.cc \
+	inf-loop.cc \
+	infcall.cc \
+	infcmd.cc \
+	inferior.cc \
+	inflow.cc \
+	infrun.cc \
+	inline-frame.cc \
+	interps.cc \
+	jit.cc \
+	language.cc \
+	linespec.cc \
+	location.cc \
+	m2-lang.cc \
+	m2-typeprint.cc \
+	m2-valprint.cc \
+	macrocmd.cc \
+	macroexp.cc \
+	macroscope.cc \
+	macrotab.cc \
+	main.cc \
+	maint.cc \
+	maint-test-options.cc \
+	maint-test-settings.cc \
+	mem-break.cc \
+	memattr.cc \
+	memory-map.cc \
+	memrange.cc \
+	memtag.cc \
+	minidebug.cc \
+	minsyms.cc \
+	namespace.cc \
+	objc-lang.cc \
+	objfiles.cc \
+	observable.cc \
+	opencl-lang.cc \
+	osabi.cc \
+	osdata.cc \
+	p-lang.cc \
+	p-typeprint.cc \
+	p-valprint.cc \
+	parse.cc \
+	printcmd.cc \
+	probe.cc \
+	process-stratum-target.cc \
+	producer.cc \
+	progspace.cc \
+	progspace-and-thread.cc \
+	prologue-value.cc \
+	psymtab.cc \
+	record.cc \
+	record-btrace.cc \
+	record-full.cc \
+	regcache.cc \
+	regcache-dump.cc \
+	reggroups.cc \
+	remote.cc \
+	remote-fileio.cc \
+	remote-notif.cc \
+	reverse.cc \
+	run-on-main-thread.cc \
+	rust-lang.cc \
+	rust-parse.cc \
+	sentinel-frame.cc \
+	ser-event.cc \
+	serial.cc \
+	skip.cc \
+	solib.cc \
+	solib-target.cc \
+	source.cc \
+	source-cache.cc \
+	split-name.cc \
+	stabsread.cc \
+	stack.cc \
+	std-regs.cc \
+	symfile.cc \
+	symfile-debug.cc \
+	symmisc.cc \
+	symtab.cc \
+	target.cc \
+	target-connection.cc \
+	target-dcache.cc \
+	target-descriptions.cc \
+	target-memory.cc \
+	test-target.cc \
+	thread.cc \
+	thread-iter.cc \
+	tid-parse.cc \
+	top.cc \
+	tracectf.cc \
+	tracefile.cc \
+	tracefile-tfile.cc \
+	tracepoint.cc \
+	trad-frame.cc \
+	tramp-frame.cc \
+	target-float.cc \
+	type-stack.cc \
+	typeprint.cc \
+	ui.cc \
+	ui-file.cc \
+	ui-out.cc \
+	ui-style.cc \
+	user-regs.cc \
+	utils.cc \
+	valarith.cc \
+	valops.cc \
+	valprint.cc \
+	value.cc \
+	varobj.cc \
+	xml-support.cc \
+	xml-syscall.cc \
+	xml-tdesc.cc
 
 # Links made at configuration time should not be specified here, since
 # SFILES is used in building the distribution archive.
 SFILES = \
 	ada-exp.y \
-	arch/i386.c \
+	arch/i386.cc \
 	c-exp.y \
 	cp-name-parser.y \
 	d-exp.y \
-	dtrace-probe.c \
-	elf-none-tdep.c \
+	dtrace-probe.cc \
+	elf-none-tdep.cc \
 	f-exp.y \
-	gcore-elf.c \
-	gdb.c \
+	gcore-elf.cc \
+	gdb.cc \
 	go-exp.y \
 	m2-exp.y \
 	p-exp.y \
 	proc-service.list \
-	ser-base.c \
-	ser-unix.c \
-	sol-thread.c \
-	stap-probe.c \
-	stub-termcap.c \
-	symfile-mem.c \
+	ser-base.cc \
+	ser-unix.cc \
+	sol-thread.cc \
+	stap-probe.cc \
+	stub-termcap.cc \
+	symfile-mem.cc \
 	ui-file.h \
 	$(SUBDIR_CLI_SRCS) \
 	$(SUBDIR_MI_SRCS) \
@@ -1762,239 +1762,239 @@ HFILES_WITH_SRCDIR = \
 DEPFILES = $(TARGET_OBS) $(SER_HARDWIRE) $(NATDEPFILES) $(SIM_OBS)
 
 ALLDEPFILES = \
-	arch/aarch32.c \
-	arch/aarch64.c \
-	arch/aarch64-insn.c \
-	arch/aarch64-mte.c \
-	arch/aarch64-mte-linux.c \
-	arch/aarch64-scalable-linux.c \
-	arch/amd64.c \
-	arch/arc.c \
-	arch/arm.c \
-	arch/arm-get-next-pcs.c \
-	arch/arm-linux.c \
-	arch/i386.c \
-	arch/loongarch.c \
-	arch/ppc-linux-common.c \
-	arch/riscv.c \
-	arch/tic6x.c \
-	aarch32-tdep.c \
-	aarch64-fbsd-nat.c \
-	aarch64-fbsd-tdep.c \
-	aarch64-linux-nat.c \
-	aarch64-linux-tdep.c \
-	aarch64-newlib-tdep.c \
-	aarch64-ravenscar-thread.c \
-	aarch64-tdep.c \
-	aix-thread.c \
-	alpha-bsd-nat.c \
-	alpha-bsd-tdep.c \
-	alpha-linux-nat.c \
-	alpha-linux-tdep.c \
-	alpha-mdebug-tdep.c \
-	alpha-netbsd-tdep.c \
-	alpha-obsd-tdep.c \
-	alpha-tdep.c \
-	amd-dbgapi-target.c \
-	amd64-bsd-nat.c \
-	amd64-darwin-tdep.c \
-	amd64-dicos-tdep.c \
-	amd64-fbsd-nat.c \
-	amd64-fbsd-tdep.c \
-	amd64-gnu-tdep.c \
-	amd64-linux-nat.c \
-	amd64-linux-tdep.c \
-	amd64-nat.c \
-	amd64-netbsd-nat.c \
-	amd64-netbsd-tdep.c \
-	amd64-obsd-nat.c \
-	amd64-obsd-tdep.c \
-	amd64-ravenscar-thread.c \
-	amd64-sol2-tdep.c \
-	amd64-tdep.c \
-	amdgpu-tdep.c \
-	arc-linux-nat.c \
-	arc-tdep.c \
-	arm-bsd-tdep.c \
-	arm-fbsd-nat.c \
-	arm-fbsd-tdep.c \
-	arm-linux-nat.c \
-	arm-linux-tdep.c \
-	arm-netbsd-nat.c \
-	arm-netbsd-tdep.c \
-	arm-none-tdep.c \
-	arm-obsd-tdep.c \
-	arm-tdep.c \
-	avr-tdep.c \
-	bfin-linux-tdep.c \
-	bfin-tdep.c \
-	bpf-tdep.c \
-	bsd-kvm.c \
-	bsd-uthread.c \
-	csky-linux-tdep.c \
-	csky-tdep.c \
-	darwin-nat.c \
-	dicos-tdep.c \
-	fbsd-nat.c \
-	fbsd-tdep.c \
-	fork-child.c \
-	ft32-tdep.c \
-	glibc-tdep.c \
-	go32-nat.c \
-	h8300-tdep.c \
-	hppa-bsd-tdep.c \
-	hppa-linux-nat.c \
-	hppa-linux-tdep.c \
-	hppa-netbsd-nat.c \
-	hppa-netbsd-tdep.c \
-	hppa-obsd-nat.c \
-	hppa-obsd-tdep.c \
-	hppa-tdep.c \
-	i386-bsd-nat.c \
-	i386-bsd-tdep.c \
-	i386-darwin-nat.c \
-	i386-darwin-tdep.c \
-	i386-dicos-tdep.c \
-	i386-fbsd-nat.c \
-	i386-fbsd-tdep.c \
-	i386-gnu-tdep.c \
-	i386-linux-nat.c \
-	i386-linux-tdep.c \
-	i386-netbsd-nat.c \
-	i386-netbsd-tdep.c \
-	i386-obsd-nat.c \
-	i386-obsd-tdep.c \
-	i386-sol2-nat.c \
-	i386-sol2-tdep.c \
-	i386-tdep.c \
-	i386-windows-tdep.c \
-	i387-tdep.c \
-	ia64-libunwind-tdep.c \
-	ia64-linux-nat.c \
-	ia64-linux-tdep.c \
-	ia64-tdep.c \
-	ia64-vms-tdep.c \
-	inf-ptrace.c \
-	linux-fork.c \
-	linux-record.c \
-	linux-tdep.c \
-	lm32-tdep.c \
-	loongarch-linux-nat.c \
-	loongarch-linux-tdep.c \
-	loongarch-tdep.c \
-	m32r-linux-nat.c \
-	m32r-linux-tdep.c \
-	m32r-tdep.c \
-	m68hc11-tdep.c \
-	m68k-bsd-nat.c \
-	m68k-bsd-tdep.c \
-	m68k-linux-nat.c \
-	m68k-linux-tdep.c \
-	m68k-tdep.c \
-	microblaze-linux-tdep.c \
-	microblaze-tdep.c \
-	mingw-hdep.c \
-	mips-fbsd-nat.c \
-	mips-fbsd-tdep.c \
-	mips-linux-nat.c \
-	mips-linux-tdep.c \
-	mips-netbsd-nat.c \
-	mips-netbsd-tdep.c \
-	mips-sde-tdep.c \
-	mips-tdep.c \
-	mips64-obsd-nat.c \
-	mips64-obsd-tdep.c \
-	msp430-tdep.c \
-	netbsd-nat.c \
-	netbsd-tdep.c \
-	nds32-tdep.c \
-	obsd-nat.c \
-	obsd-tdep.c \
-	or1k-linux-nat.c \
-	posix-hdep.c \
-	ppc-fbsd-nat.c \
-	ppc-fbsd-tdep.c \
-	ppc-linux-nat.c \
-	ppc-linux-tdep.c \
-	ppc-netbsd-nat.c \
-	ppc-netbsd-tdep.c \
-	ppc-obsd-nat.c \
-	ppc-obsd-tdep.c \
-	ppc-ravenscar-thread.c \
-	ppc-sysv-tdep.c \
-	ppc64-tdep.c \
-	procfs.c \
-	ravenscar-thread.c \
-	remote-sim.c \
-	riscv-fbsd-nat.c \
-	riscv-fbsd-tdep.c \
-	riscv-linux-nat.c \
-	riscv-linux-tdep.c \
-	riscv-none-tdep.c \
-	riscv-ravenscar-thread.c \
-	riscv-tdep.c \
-	rl78-tdep.c \
-	rs6000-aix-nat.c \
-	rs6000-lynx178-tdep.c \
-	rs6000-tdep.c \
-	rx-tdep.c \
-	s390-linux-nat.c \
-	s390-linux-tdep.c \
-	s390-tdep.c \
-	ser-go32.c \
-	ser-mingw.c \
-	ser-pipe.c \
-	ser-tcp.c \
-	ser-uds.c \
-	sh-netbsd-nat.c \
-	sh-netbsd-tdep.c \
-	sh-tdep.c \
-	sol2-tdep.c \
-	solib-aix.c \
-	solib-rocm.c \
-	solib-svr4.c \
-	sparc-linux-nat.c \
-	sparc-linux-tdep.c \
-	sparc-nat.c \
-	sparc-netbsd-nat.c \
-	sparc-netbsd-tdep.c \
-	sparc-obsd-tdep.c \
-	sparc-ravenscar-thread.c \
-	sparc-sol2-nat.c \
-	sparc-sol2-tdep.c \
-	sparc-tdep.c \
-	sparc64-fbsd-nat.c \
-	sparc64-fbsd-tdep.c \
-	sparc64-linux-nat.c \
-	sparc64-linux-tdep.c \
-	sparc64-nat.c \
-	sparc64-netbsd-nat.c \
-	sparc64-netbsd-tdep.c \
-	sparc64-obsd-nat.c \
-	sparc64-obsd-tdep.c \
-	sparc64-sol2-tdep.c \
-	sparc64-tdep.c \
-	svr4-tls-tdep.c \
-	tilegx-linux-nat.c \
-	tilegx-linux-tdep.c \
-	tilegx-tdep.c \
-	v850-tdep.c \
-	vax-bsd-nat.c \
-	vax-netbsd-tdep.c \
-	vax-tdep.c \
-	windows-nat.c \
-	windows-tdep.c \
-	x86-gnu-nat.c \
-	x86-nat.c \
-	x86-tdep.c \
-	xstormy16-tdep.c \
-	xtensa-config.c \
-	xtensa-linux-nat.c \
-	xtensa-linux-tdep.c \
-	xtensa-tdep.c \
-	xtensa-xtregs.c
+	arch/aarch32.cc \
+	arch/aarch64.cc \
+	arch/aarch64-insn.cc \
+	arch/aarch64-mte.cc \
+	arch/aarch64-mte-linux.cc \
+	arch/aarch64-scalable-linux.cc \
+	arch/amd64.cc \
+	arch/arc.cc \
+	arch/arm.cc \
+	arch/arm-get-next-pcs.cc \
+	arch/arm-linux.cc \
+	arch/i386.cc \
+	arch/loongarch.cc \
+	arch/ppc-linux-common.cc \
+	arch/riscv.cc \
+	arch/tic6x.cc \
+	aarch32-tdep.cc \
+	aarch64-fbsd-nat.cc \
+	aarch64-fbsd-tdep.cc \
+	aarch64-linux-nat.cc \
+	aarch64-linux-tdep.cc \
+	aarch64-newlib-tdep.cc \
+	aarch64-ravenscar-thread.cc \
+	aarch64-tdep.cc \
+	aix-thread.cc \
+	alpha-bsd-nat.cc \
+	alpha-bsd-tdep.cc \
+	alpha-linux-nat.cc \
+	alpha-linux-tdep.cc \
+	alpha-mdebug-tdep.cc \
+	alpha-netbsd-tdep.cc \
+	alpha-obsd-tdep.cc \
+	alpha-tdep.cc \
+	amd-dbgapi-target.cc \
+	amd64-bsd-nat.cc \
+	amd64-darwin-tdep.cc \
+	amd64-dicos-tdep.cc \
+	amd64-fbsd-nat.cc \
+	amd64-fbsd-tdep.cc \
+	amd64-gnu-tdep.cc \
+	amd64-linux-nat.cc \
+	amd64-linux-tdep.cc \
+	amd64-nat.cc \
+	amd64-netbsd-nat.cc \
+	amd64-netbsd-tdep.cc \
+	amd64-obsd-nat.cc \
+	amd64-obsd-tdep.cc \
+	amd64-ravenscar-thread.cc \
+	amd64-sol2-tdep.cc \
+	amd64-tdep.cc \
+	amdgpu-tdep.cc \
+	arc-linux-nat.cc \
+	arc-tdep.cc \
+	arm-bsd-tdep.cc \
+	arm-fbsd-nat.cc \
+	arm-fbsd-tdep.cc \
+	arm-linux-nat.cc \
+	arm-linux-tdep.cc \
+	arm-netbsd-nat.cc \
+	arm-netbsd-tdep.cc \
+	arm-none-tdep.cc \
+	arm-obsd-tdep.cc \
+	arm-tdep.cc \
+	avr-tdep.cc \
+	bfin-linux-tdep.cc \
+	bfin-tdep.cc \
+	bpf-tdep.cc \
+	bsd-kvm.cc \
+	bsd-uthread.cc \
+	csky-linux-tdep.cc \
+	csky-tdep.cc \
+	darwin-nat.cc \
+	dicos-tdep.cc \
+	fbsd-nat.cc \
+	fbsd-tdep.cc \
+	fork-child.cc \
+	ft32-tdep.cc \
+	glibc-tdep.cc \
+	go32-nat.cc \
+	h8300-tdep.cc \
+	hppa-bsd-tdep.cc \
+	hppa-linux-nat.cc \
+	hppa-linux-tdep.cc \
+	hppa-netbsd-nat.cc \
+	hppa-netbsd-tdep.cc \
+	hppa-obsd-nat.cc \
+	hppa-obsd-tdep.cc \
+	hppa-tdep.cc \
+	i386-bsd-nat.cc \
+	i386-bsd-tdep.cc \
+	i386-darwin-nat.cc \
+	i386-darwin-tdep.cc \
+	i386-dicos-tdep.cc \
+	i386-fbsd-nat.cc \
+	i386-fbsd-tdep.cc \
+	i386-gnu-tdep.cc \
+	i386-linux-nat.cc \
+	i386-linux-tdep.cc \
+	i386-netbsd-nat.cc \
+	i386-netbsd-tdep.cc \
+	i386-obsd-nat.cc \
+	i386-obsd-tdep.cc \
+	i386-sol2-nat.cc \
+	i386-sol2-tdep.cc \
+	i386-tdep.cc \
+	i386-windows-tdep.cc \
+	i387-tdep.cc \
+	ia64-libunwind-tdep.cc \
+	ia64-linux-nat.cc \
+	ia64-linux-tdep.cc \
+	ia64-tdep.cc \
+	ia64-vms-tdep.cc \
+	inf-ptrace.cc \
+	linux-fork.cc \
+	linux-record.cc \
+	linux-tdep.cc \
+	lm32-tdep.cc \
+	loongarch-linux-nat.cc \
+	loongarch-linux-tdep.cc \
+	loongarch-tdep.cc \
+	m32r-linux-nat.cc \
+	m32r-linux-tdep.cc \
+	m32r-tdep.cc \
+	m68hc11-tdep.cc \
+	m68k-bsd-nat.cc \
+	m68k-bsd-tdep.cc \
+	m68k-linux-nat.cc \
+	m68k-linux-tdep.cc \
+	m68k-tdep.cc \
+	microblaze-linux-tdep.cc \
+	microblaze-tdep.cc \
+	mingw-hdep.cc \
+	mips-fbsd-nat.cc \
+	mips-fbsd-tdep.cc \
+	mips-linux-nat.cc \
+	mips-linux-tdep.cc \
+	mips-netbsd-nat.cc \
+	mips-netbsd-tdep.cc \
+	mips-sde-tdep.cc \
+	mips-tdep.cc \
+	mips64-obsd-nat.cc \
+	mips64-obsd-tdep.cc \
+	msp430-tdep.cc \
+	netbsd-nat.cc \
+	netbsd-tdep.cc \
+	nds32-tdep.cc \
+	obsd-nat.cc \
+	obsd-tdep.cc \
+	or1k-linux-nat.cc \
+	posix-hdep.cc \
+	ppc-fbsd-nat.cc \
+	ppc-fbsd-tdep.cc \
+	ppc-linux-nat.cc \
+	ppc-linux-tdep.cc \
+	ppc-netbsd-nat.cc \
+	ppc-netbsd-tdep.cc \
+	ppc-obsd-nat.cc \
+	ppc-obsd-tdep.cc \
+	ppc-ravenscar-thread.cc \
+	ppc-sysv-tdep.cc \
+	ppc64-tdep.cc \
+	procfs.cc \
+	ravenscar-thread.cc \
+	remote-sim.cc \
+	riscv-fbsd-nat.cc \
+	riscv-fbsd-tdep.cc \
+	riscv-linux-nat.cc \
+	riscv-linux-tdep.cc \
+	riscv-none-tdep.cc \
+	riscv-ravenscar-thread.cc \
+	riscv-tdep.cc \
+	rl78-tdep.cc \
+	rs6000-aix-nat.cc \
+	rs6000-lynx178-tdep.cc \
+	rs6000-tdep.cc \
+	rx-tdep.cc \
+	s390-linux-nat.cc \
+	s390-linux-tdep.cc \
+	s390-tdep.cc \
+	ser-go32.cc \
+	ser-mingw.cc \
+	ser-pipe.cc \
+	ser-tcp.cc \
+	ser-uds.cc \
+	sh-netbsd-nat.cc \
+	sh-netbsd-tdep.cc \
+	sh-tdep.cc \
+	sol2-tdep.cc \
+	solib-aix.cc \
+	solib-rocm.cc \
+	solib-svr4.cc \
+	sparc-linux-nat.cc \
+	sparc-linux-tdep.cc \
+	sparc-nat.cc \
+	sparc-netbsd-nat.cc \
+	sparc-netbsd-tdep.cc \
+	sparc-obsd-tdep.cc \
+	sparc-ravenscar-thread.cc \
+	sparc-sol2-nat.cc \
+	sparc-sol2-tdep.cc \
+	sparc-tdep.cc \
+	sparc64-fbsd-nat.cc \
+	sparc64-fbsd-tdep.cc \
+	sparc64-linux-nat.cc \
+	sparc64-linux-tdep.cc \
+	sparc64-nat.cc \
+	sparc64-netbsd-nat.cc \
+	sparc64-netbsd-tdep.cc \
+	sparc64-obsd-nat.cc \
+	sparc64-obsd-tdep.cc \
+	sparc64-sol2-tdep.cc \
+	sparc64-tdep.cc \
+	svr4-tls-tdep.cc \
+	tilegx-linux-nat.cc \
+	tilegx-linux-tdep.cc \
+	tilegx-tdep.cc \
+	v850-tdep.cc \
+	vax-bsd-nat.cc \
+	vax-netbsd-tdep.cc \
+	vax-tdep.cc \
+	windows-nat.cc \
+	windows-tdep.cc \
+	x86-gnu-nat.cc \
+	x86-nat.cc \
+	x86-tdep.cc \
+	xstormy16-tdep.cc \
+	xtensa-config.cc \
+	xtensa-linux-nat.cc \
+	xtensa-linux-tdep.cc \
+	xtensa-tdep.cc \
+	xtensa-xtregs.cc
 
-# Don't include YYFILES (*.c) because we already include *.y in SFILES,
+# Don't include YYFILES (*.cc) because we already include *.y in SFILES,
 # and it's more useful to see it in the .y file.
 TAGFILES_NO_SRCDIR = $(SFILES) $(HFILES_NO_SRCDIR) $(ALLDEPFILES) \
 	$(CONFIG_SRCS)
@@ -2002,44 +2002,44 @@ TAGFILES_WITH_SRCDIR = $(HFILES_WITH_SRCDIR)
 
 # Files that are used to support certain debuginfo formats
 DWARF2_SRCS = \
-	dwarf2/abbrev.c \
-	dwarf2/abbrev-table-cache.c \
-	dwarf2/ada-imported.c \
-	dwarf2/aranges.c \
-	dwarf2/attribute.c \
-	dwarf2/cooked-index.c \
-	dwarf2/cooked-index-entry.c \
-	dwarf2/cooked-index-shard.c \
-	dwarf2/cooked-index-worker.c \
-	dwarf2/cooked-indexer.c \
-	dwarf2/cu.c \
-	dwarf2/die.c \
-	dwarf2/dwz.c \
-	dwarf2/expr.c \
-	dwarf2/frame-tailcall.c \
-	dwarf2/frame.c \
-	dwarf2/index-cache.c \
-	dwarf2/index-common.c \
-	dwarf2/index-write.c \
-	dwarf2/leb.c \
-	dwarf2/line-header.c \
-	dwarf2/line-program.c \
-	dwarf2/loc.c \
-	dwarf2/macro.c \
-	dwarf2/parent-map.c \
-	dwarf2/read.c \
-	dwarf2/read-debug-names.c \
-	dwarf2/read-gdb-index.c \
-	dwarf2/section.c \
-	dwarf2/stringify.c \
-	dwarf2/unit-head.c
-DWARF2_OBS = $(patsubst %.c,%.o, $(DWARF2_SRCS))
+	dwarf2/abbrev.cc \
+	dwarf2/abbrev-table-cache.cc \
+	dwarf2/ada-imported.cc \
+	dwarf2/aranges.cc \
+	dwarf2/attribute.cc \
+	dwarf2/cooked-index.cc \
+	dwarf2/cooked-index-entry.cc \
+	dwarf2/cooked-index-shard.cc \
+	dwarf2/cooked-index-worker.cc \
+	dwarf2/cooked-indexer.cc \
+	dwarf2/cu.cc \
+	dwarf2/die.cc \
+	dwarf2/dwz.cc \
+	dwarf2/expr.cc \
+	dwarf2/frame-tailcall.cc \
+	dwarf2/frame.cc \
+	dwarf2/index-cache.cc \
+	dwarf2/index-common.cc \
+	dwarf2/index-write.cc \
+	dwarf2/leb.cc \
+	dwarf2/line-header.cc \
+	dwarf2/line-program.cc \
+	dwarf2/loc.cc \
+	dwarf2/macro.cc \
+	dwarf2/parent-map.cc \
+	dwarf2/read.cc \
+	dwarf2/read-debug-names.cc \
+	dwarf2/read-gdb-index.cc \
+	dwarf2/section.cc \
+	dwarf2/stringify.cc \
+	dwarf2/unit-head.cc
+DWARF2_OBS = $(patsubst %.cc,%.o, $(DWARF2_SRCS))
 
 COMMON_OBS = $(DEPFILES) $(CONFIG_OBS) $(YYOBJ) \
 	mi/mi-common.o \
 	version.o \
 	xml-builtin.o \
-	$(patsubst %.c,%.o,$(COMMON_SFILES)) \
+	$(patsubst %.cc,%.o,$(COMMON_SFILES)) \
 	$(SUBDIR_CLI_OBS) \
 	$(SUBDIR_MI_OBS) \
 	$(SUBDIR_TARGET_OBS) \
@@ -2056,19 +2056,19 @@ REQUIRED_SUBDIRS = doc | testsuite | data-directory
 
 # Parser intermediate files.
 YYFILES = \
-	ada-exp.c \
-	ada-lex.c \
-	c-exp.c \
-	cp-name-parser.c \
-	d-exp.c \
-	f-exp.c \
-	go-exp.c \
-	m2-exp.c \
-	p-exp.c
+	ada-exp.cc \
+	ada-lex.cc \
+	c-exp.cc \
+	cp-name-parser.cc \
+	d-exp.cc \
+	f-exp.cc \
+	go-exp.cc \
+	m2-exp.cc \
+	p-exp.cc
 
-# ada-lex.c is included by another file, so it shouldn't wind up as a
+# ada-lex.cc is included by another file, so it shouldn't wind up as a
 # .o itself.
-YYOBJ = $(filter-out ada-lex.o,$(patsubst %.c,%.o,$(YYFILES)))
+YYOBJ = $(filter-out ada-lex.o,$(patsubst %.cc,%.o,$(YYFILES)))
 
 # Things which need to be built when making a distribution.
 
@@ -2077,7 +2077,7 @@ DISTSTUFF = $(YYFILES)
 
 # All generated files which can be included by another file.
 generated_files = \
-	ada-lex.c \
+	ada-lex.cc \
 	config.h \
 	jit-reader.h \
 	$(NAT_GENERATED_FILES) \
@@ -2089,9 +2089,9 @@ PYTHON_CFLAGS = @PYTHON_CFLAGS@
 all: gdb$(EXEEXT) $(CONFIG_ALL) gdb-gdb.py gdb-gdb.gdb gcore gstack gdb-add-index
 	@$(MAKE) $(FLAGS_TO_PASS) DO=all "DODIRS=$(SUBDIRS)" subdir_do
 
-# Rule for compiling .c files in the top-level gdb directory.
+# Rule for compiling .cc files in the top-level gdb directory.
 # The order-only dependencies ensure that we create the build subdirectories.
-%.o: %.c | $(CONFIG_DEP_SUBDIR)
+%.o: %.cc | $(CONFIG_DEP_SUBDIR)
 	$(COMPILE) $<
 	$(POSTCOMPILE)
 
@@ -2101,7 +2101,7 @@ $(CONFIG_DEP_SUBDIR):
 # Python files need special flags.
 python/%.o: INTERNAL_CFLAGS += $(PYTHON_CFLAGS)
 
-# Rules for compiling .c files in the various source subdirectories.
+# Rules for compiling .cc files in the various source subdirectories.
 %.o: $(srcdir)/gdbtk/generic/%.c
 	$(COMPILE) $(all_gdbtk_cflags) $<
 	$(POSTCOMPILE)
@@ -2341,20 +2341,20 @@ INIT_FILES_FILTER_OUT = \
 	%_U.o
 
 INIT_FILES = \
-	$(patsubst %.o,%.c, \
+	$(patsubst %.o,%.cc, \
 	  $(patsubst %-exp.o,%-exp.y, \
 	    $(filter-out $(INIT_FILES_FILTER_OUT), $(COMMON_OBS))))
 
-init.c: stamp-init; @true
+init.cc: stamp-init; @true
 stamp-init: $(INIT_FILES) config.status $(srcdir)/make-init-c
 	$(ECHO_INIT_C)
 	$(SILENCE) $(srcdir)/make-init-c \
 		$(filter-out config.status $(srcdir)/make-init-c,$^) \
-		> init.c-tmp
-	$(SILENCE) $(SHELL) $(srcdir)/../move-if-change init.c-tmp init.c
+		> init.cc-tmp
+	$(SILENCE) $(SHELL) $(srcdir)/../move-if-change init.cc-tmp init.cc
 	$(SILENCE) echo stamp > stamp-init
 
-.PRECIOUS: init.c
+.PRECIOUS: init.cc
 
 # Create a library of the gdb object files and build GDB by linking
 # against that.
@@ -2400,24 +2400,24 @@ TAGS: $(TAGFILES_NO_SRCDIR) $(TAGFILES_WITH_SRCDIR)
 		echo $(srcdir)/$$i ; \
 	done ; for i in $(TAGFILES_WITH_SRCDIR); do \
 		echo $$i ; \
-	done) | sed -e 's/\.o$$/\.c/'`
+	done) | sed -e 's/\.o$$/\.cc/'`
 
 tags: TAGS
 
 clean mostlyclean: $(CONFIG_CLEAN)
 	@$(MAKE) $(FLAGS_TO_PASS) DO=clean "DODIRS=$(CLEANDIRS)" subdir_do
-	rm -f *.o *.a *~ init.c-tmp init.l-tmp version.c-tmp
-	rm -f init.c stamp-init version.c stamp-version
+	rm -f *.o *.a *~ init.cc-tmp init.l-tmp version.cc-tmp
+	rm -f init.cc stamp-init version.cc stamp-version
 	rm -f gdb$(EXEEXT) core make.log
 	rm -f gdb[0-9]$(EXEEXT)
-	rm -f xml-builtin.c stamp-xml
+	rm -f xml-builtin.cc stamp-xml
 	rm -f $(DEPDIR)/*
 	for i in $(CONFIG_SRC_SUBDIR); do \
 		rm -f $$i/*.o;	\
 		rm -f $$i/$(DEPDIR)/*; \
 	done
 
-# This used to depend on c-exp.c m2-exp.c TAGS
+# This used to depend on c-exp.cc m2-exp.cc TAGS
 # I believe this is wrong; the makefile standards for distclean just
 # describe removing files; the only sort of "re-create a distribution"
 # functionality described is if the distributed files are unmodified.
@@ -2440,10 +2440,10 @@ realclean: maintainer-clean
 local-maintainer-clean:
 	@echo "This command is intended for maintainers to use;"
 	@echo "it deletes files that may require special tools to rebuild."
-	rm -f c-exp.c \
-		cp-name-parser.c \
-		ada-lex.c ada-exp.c \
-		d-exp.c f-exp.c go-exp.c m2-exp.c p-exp.c
+	rm -f c-exp.cc \
+		cp-name-parser.cc \
+		ada-lex.cc ada-exp.cc \
+		d-exp.cc f-exp.cc go-exp.cc m2-exp.cc p-exp.cc
 	rm -f TAGS
 	rm -f $(YYFILES)
 	rm -f nm.h config.status
@@ -2487,9 +2487,9 @@ gstack.in gcore.in: %.in : $(srcdir)/%-1.in config.status
 gdb-add-index.in : $(srcdir)/contrib/gdb-add-index.sh config.status
 	$(ECHO_GEN) $(SHELL) config.status $(SILENT_FLAG) $@
 
-gstack gcore gdb-add-index: % : %.in version.c
+gstack gcore gdb-add-index: % : %.in version.cc
 	$(ECHO_GEN) \
-	vv=`grep 'version\[\] = ' version.c | grep -o '".*"' | tr -d \"`; \
+	vv=`grep 'version\[\] = ' version.cc | grep -o '".*"' | tr -d \"`; \
 	sed -e "s,@VERSION@,$$vv," $< > $@
 	@chmod +x $@
 
@@ -2588,19 +2588,19 @@ doc/gdb.dvi:
 doc/gdb.info:
 	cd doc; $(MAKE) gdb.info $(FLAGS_TO_PASS)
 
-# Make copying.c from COPYING
-$(srcdir)/copying.c: @MAINTAINER_MODE_TRUE@ $(srcdir)/../COPYING3 $(srcdir)/copying.awk
+# Make copying.cc from COPYING
+$(srcdir)/copying.cc: @MAINTAINER_MODE_TRUE@ $(srcdir)/../COPYING3 $(srcdir)/copying.awk
 	awk -f $(srcdir)/copying.awk \
 		< $(srcdir)/../COPYING3 > $(srcdir)/copying.tmp
-	mv $(srcdir)/copying.tmp $(srcdir)/copying.c
+	mv $(srcdir)/copying.tmp $(srcdir)/copying.cc
 
-version.c: stamp-version; @true
+version.cc: stamp-version; @true
 # Note that the obvious names for the temp file are taken by
 # create-version.sh.
 stamp-version: Makefile version.in $(srcdir)/../bfd/version.h $(srcdir)/../gdbsupport/create-version.sh
 	$(ECHO_GEN) $(SHELL) $(srcdir)/../gdbsupport/create-version.sh $(srcdir) \
 	    $(host_alias) $(target_alias) version-t.t
-	@$(SHELL) $(srcdir)/../move-if-change version-t.t version.c
+	@$(SHELL) $(srcdir)/../move-if-change version-t.t version.cc
 	@echo stamp > stamp-version
 
 
@@ -2623,11 +2623,11 @@ MAKEOVERRIDES =
 # Some files need explicit build rules (due to -Werror problems) or due
 # to sub-directory fun 'n' games.
 
-# ada-exp.c can appear in srcdir, for releases; or in ., for
+# ada-exp.cc can appear in srcdir, for releases; or in ., for
 # development builds.
-ADA_EXP_C = `if test -f ada-exp.c; then echo ada-exp.c; else echo $(srcdir)/ada-exp.c; fi`
+ADA_EXP_C = `if test -f ada-exp.cc; then echo ada-exp.cc; else echo $(srcdir)/ada-exp.cc; fi`
 
-ada-exp.o: ada-exp.c
+ada-exp.o: ada-exp.cc
 	$(COMPILE) $(ADA_EXP_C)
 	$(POSTCOMPILE)
 
@@ -2706,15 +2706,15 @@ po/$(PACKAGE).pot: force
 #
 # YACC/LEX dependencies
 #
-# LANG-exp.c is generated in objdir from LANG-exp.y if it doesn't
+# LANG-exp.cc is generated in objdir from LANG-exp.y if it doesn't
 # exist in srcdir, then compiled in objdir to LANG-exp.o.  If we
-# said LANG-exp.c rather than ./c-exp.c some makes would
-# sometimes re-write it into $(srcdir)/c-exp.c.  Remove bogus
+# said LANG-exp.cc rather than ./c-exp.cc some makes would
+# sometimes re-write it into $(srcdir)/c-exp.cc.  Remove bogus
 # decls for malloc/realloc/free which conflict with everything else.
-# Strictly speaking c-exp.c should therefore depend on
+# Strictly speaking c-exp.cc should therefore depend on
 # Makefile.in, but that was a pretty big annoyance.
 
-%.c: %.y
+%.cc: %.y
 	$(ECHO_YACC) $(SHELL) $(YLWRAP) $< y.tab.c $@.tmp -- \
 		$(YACC) $(YFLAGS) || (rm -f $@.tmp; false)
 	@sed -e '/extern.*malloc/d' \
@@ -2733,7 +2733,7 @@ po/$(PACKAGE).pot: force
 	  < $@.tmp > $@.new && \
 	  rm -f $@.tmp && \
 	  mv $@.new $@
-%.c: %.l
+%.cc: %.l
 	$(ECHO_LEX) $(FLEX) -t $< > $@.tmp || (rm -f $@.tmp; false)
 	@sed -e '/extern.*malloc/d' \
 	     -e '/extern.*realloc/d' \
@@ -2750,16 +2750,16 @@ po/$(PACKAGE).pot: force
 
 # XML rules
 
-xml-builtin.c: stamp-xml; @true
+xml-builtin.cc: stamp-xml; @true
 stamp-xml: $(srcdir)/features/feature_to_c.sh Makefile $(XMLFILES)
 	$(SILENCE) rm -f xml-builtin.tmp
 	$(ECHO_GEN_XML_BUILTIN) AWK="$(AWK)" \
 	  $(SHELL) $(srcdir)/features/feature_to_c.sh \
 	  xml-builtin.tmp $(XMLFILES)
-	$(SILENCE) $(SHELL) $(srcdir)/../move-if-change xml-builtin.tmp xml-builtin.c
+	$(SILENCE) $(SHELL) $(srcdir)/../move-if-change xml-builtin.tmp xml-builtin.cc
 	$(SILENCE) echo stamp > stamp-xml
 
-.PRECIOUS: xml-builtin.c
+.PRECIOUS: xml-builtin.cc
 
 #
 # GDBTK sub-directory

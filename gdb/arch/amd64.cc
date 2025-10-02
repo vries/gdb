@@ -20,17 +20,17 @@
 #include "gdbsupport/osabi.h"
 #include <stdlib.h>
 
-#include "../features/i386/64bit-avx.c"
-#include "../features/i386/64bit-avx512.c"
-#include "../features/i386/64bit-core.c"
-#include "../features/i386/64bit-linux.c"
-#include "../features/i386/64bit-segments.c"
-#include "../features/i386/64bit-sse.c"
-#include "../features/i386/pkeys.c"
+#include "../features/i386/64bit-avx.cc"
+#include "../features/i386/64bit-avx512.cc"
+#include "../features/i386/64bit-core.cc"
+#include "../features/i386/64bit-linux.cc"
+#include "../features/i386/64bit-segments.cc"
+#include "../features/i386/64bit-sse.cc"
+#include "../features/i386/pkeys.cc"
 
-#include "../features/i386/64bit-ssp.c"
-#include "../features/i386/32bit-ssp.c"
-#include "../features/i386/x32-core.c"
+#include "../features/i386/64bit-ssp.cc"
+#include "../features/i386/32bit-ssp.cc"
+#include "../features/i386/x32-core.cc"
 
 /* See arch/amd64.h.  */
 

@@ -41,10 +41,10 @@
 #include "gdbsupport/gdb_signals.h"
 #include "inferior.h"
 
-#include "features/mips-linux.c"
-#include "features/mips-dsp-linux.c"
-#include "features/mips64-linux.c"
-#include "features/mips64-dsp-linux.c"
+#include "features/mips-linux.cc"
+#include "features/mips-dsp-linux.cc"
+#include "features/mips64-linux.cc"
+#include "features/mips64-dsp-linux.cc"
 
 /* This enum represents the signals' numbers on the MIPS
    architecture.  It just contains the signal definitions which are

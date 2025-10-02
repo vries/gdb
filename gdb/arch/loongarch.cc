@@ -20,12 +20,12 @@
 
 /* Target description features.  */
 
-#include "../features/loongarch/base32.c"
-#include "../features/loongarch/base64.c"
-#include "../features/loongarch/fpu.c"
-#include "../features/loongarch/lsx.c"
-#include "../features/loongarch/lasx.c"
-#include "../features/loongarch/lbt.c"
+#include "../features/loongarch/base32.cc"
+#include "../features/loongarch/base64.cc"
+#include "../features/loongarch/fpu.cc"
+#include "../features/loongarch/lsx.cc"
+#include "../features/loongarch/lasx.cc"
+#include "../features/loongarch/lbt.cc"
 
 #ifndef GDBSERVER
 #define STATIC_IN_GDB static

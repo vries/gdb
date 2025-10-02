@@ -44,7 +44,7 @@
 #include <algorithm>
 
 #include "target-descriptions.h"
-#include "features/alpha.c"
+#include "features/alpha.cc"
 
 /* Instruction decoding.  The notations for registers, immediates and
    opcodes are the same as the one used in Compaq's Alpha architecture

@@ -20,7 +20,7 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT
 AC_CONFIG_MACRO_DIRS([.. ../config])
-AC_CONFIG_SRCDIR([main.c])
+AC_CONFIG_SRCDIR([main.cc])
 AC_CONFIG_HEADERS(config.h:config.in, [echo > stamp-h])
 AM_MAINTAINER_MODE
 

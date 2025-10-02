@@ -18,11 +18,11 @@
 #include "riscv.h"
 #include <unordered_map>
 
-#include "../features/riscv/32bit-cpu.c"
-#include "../features/riscv/64bit-cpu.c"
-#include "../features/riscv/32bit-fpu.c"
-#include "../features/riscv/64bit-fpu.c"
-#include "../features/riscv/rv32e-xregs.c"
+#include "../features/riscv/32bit-cpu.cc"
+#include "../features/riscv/64bit-cpu.cc"
+#include "../features/riscv/32bit-fpu.cc"
+#include "../features/riscv/64bit-fpu.cc"
+#include "../features/riscv/rv32e-xregs.cc"
 
 #ifndef GDBSERVER
 #define STATIC_IN_GDB static

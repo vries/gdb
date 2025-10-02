@@ -95,8 +95,8 @@ outdir = ../regformats
 OUTPUTS = $(patsubst %,$(outdir)/%.dat,$(WHICH))
 
 # For targets without feature based target descriptions,
-# the set of xml files we'll generate .c files for GDB from.  By
-# default we'll build all .c files, which requires an
+# the set of xml files we'll generate .cc files for GDB from.  By
+# default we'll build all .cc files, which requires an
 # --enable-targets=all GDB.  You can override this by passing XMLTOC
 # to make on the command line.
 XMLTOC = \
@@ -170,7 +170,7 @@ XMLTOC = \
 	sparc/sparc64-solaris.xml \
 	z80.xml
 
-TDESC_CFILES = $(patsubst %.xml,%.c,$(XMLTOC))
+TDESC_CFILES = $(patsubst %.xml,%.cc,$(XMLTOC))
 GDB = false
 
 #Targets which use feature based target descriptions.
@@ -199,7 +199,7 @@ $(outdir)/%.dat: %.xml number-regs.xsl sort-regs.xsl gdbserver-regs.xsl
 	sh ../../move-if-change $(outdir)/$*.tmp $(outdir)/$*.dat
 
 # For targets with feature based target descriptions,
-# the set of xml files we'll generate .c files for GDB from.
+# the set of xml files we'll generate .cc files for GDB from.
 FEATURE_XMLFILES = aarch64-core.xml \
 	aarch64-fpu.xml \
 	aarch64-pauth.xml \
@@ -253,15 +253,15 @@ FEATURE_XMLFILES = aarch64-core.xml \
 	tic6x-core.xml \
 	tic6x-gp.xml
 
-FEATURE_CFILES = $(patsubst %.xml,%.c,$(FEATURE_XMLFILES))
+FEATURE_CFILES = $(patsubst %.xml,%.cc,$(FEATURE_XMLFILES))
 
 cfiles: $(TDESC_CFILES) $(FEATURE_CFILES)
 
-$(TDESC_CFILES): %.c: %.xml
+$(TDESC_CFILES): %.cc: %.xml
 	$(GDB) -nx -q -batch -ex 'maint print c-tdesc $<' > $@.tmp
 	sh ../../move-if-change $@.tmp $@
 
-$(FEATURE_CFILES): %.c: %.xml.tmp
+$(FEATURE_CFILES): %.cc: %.xml.tmp
 	$(GDB) -nx -q -batch \
 	  -ex 'maint print c-tdesc -single-feature $<' > $@.tmp
 	sh ../../move-if-change $@.tmp $@

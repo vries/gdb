@@ -91,7 +91,7 @@ extern const struct target_desc *tdesc_xtensa;
 #include "arch/xtensa.h"
 #include "gdb_proc_service.h"
 
-#include "xtensa-xtregs.c"
+#include "xtensa-xtregs.cc"
 
 enum regnum {
 	R_PC=0,	R_PS,

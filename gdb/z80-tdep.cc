@@ -33,7 +33,7 @@
 #include "gdbarch.h"
 
 #include "z80-tdep.h"
-#include "features/z80.c"
+#include "features/z80.cc"
 
 /* You need to define __gdb_break_handler symbol pointing to the breakpoint
    handler.  The value of the symbol will be used to determine the instruction

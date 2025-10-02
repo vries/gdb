@@ -27,7 +27,7 @@
 #include "trad-frame.h"
 #include "gdbarch.h"
 
-#include "features/or1k-linux.c"
+#include "features/or1k-linux.cc"
 
 /* Define the general register mapping.  The kernel and GDB put registers
    r1 to r31 in the same place.  The NPC register is stored at index 32 in

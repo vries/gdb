@@ -19,9 +19,9 @@
 #include "gdbsupport/osabi.h"
 #include "tic6x.h"
 
-#include "../features/tic6x-core.c"
-#include "../features/tic6x-gp.c"
-#include "../features/tic6x-c6xp.c"
+#include "../features/tic6x-core.cc"
+#include "../features/tic6x-gp.cc"
+#include "../features/tic6x-c6xp.cc"
 
 /* Create tic6x target descriptions according to FEATURE.  */
 

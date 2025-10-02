@@ -43,7 +43,7 @@
 #include "opcode/nds32.h"
 #include <algorithm>
 
-#include "features/nds32.c"
+#include "features/nds32.cc"
 
 /* Simple macros for instruction analysis.  */
 #define CHOP_BITS(insn, n)	(insn & ~__MASK (n))

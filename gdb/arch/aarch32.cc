@@ -17,9 +17,9 @@
 
 #include "aarch32.h"
 
-#include "../features/arm/arm-core.c"
-#include "../features/arm/arm-tls.c"
-#include "../features/arm/arm-vfpv3.c"
+#include "../features/arm/arm-core.cc"
+#include "../features/arm/arm-tls.cc"
+#include "../features/arm/arm-vfpv3.cc"
 
 /* See aarch32.h.  */
 

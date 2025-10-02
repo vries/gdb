@@ -44,8 +44,8 @@
 #include "gdbsupport/selftest.h"
 #include "gdb/disasm-selftests.h"
 
-#include "features/s390-linux32.c"
-#include "features/s390x-linux64.c"
+#include "features/s390-linux32.cc"
+#include "features/s390x-linux64.cc"
 
 /* Holds the current set of options to be passed to the disassembler.  */
 static std::string s390_disassembler_options;
