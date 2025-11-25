@@ -50,12 +50,14 @@ elf_core_file_matches_executable_p (bfd *core_bfd, bfd *exec_bfd)
     }
 
   /* If both BFDs have identical build-ids, then they match.  */
-  if (core_bfd->build_id != NULL
-      && exec_bfd->build_id != NULL
-      && core_bfd->build_id->size == exec_bfd->build_id->size
-      && memcmp (core_bfd->build_id->data, exec_bfd->build_id->data,
-		 core_bfd->build_id->size) == 0)
-    return true;
+  if (core_bfd->build_id != NULL)
+    {
+      const struct bfd_build_id *idx;
+      for (idx = core_bfd->build_id; idx != NULL; idx = idx->next)
+	if (idx->size == exec_bfd->build_id->size
+	    && memcmp (idx->data, exec_bfd->build_id->data, idx->size) == 0)
+	  return true;
+    }
 
   /* See if the name in the corefile matches the executable name.  */
   corename = elf_tdata (core_bfd)->core->program;
@@ -389,11 +391,11 @@ NAME(_bfd_elf, core_find_build_id)
 			offset + i_ehdr.e_phoff + (i + 1) * sizeof (x_phdr),
 			SEEK_SET) != 0)
 	    goto fail;
-
-	  if (abfd->build_id != NULL)
-	    return true;
 	}
     }
+
+  if (abfd->build_id != NULL)
+    return true;
 
   /* Having gotten this far, we have a valid ELF section, but no
      build-id was found.  */

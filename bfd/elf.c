@@ -3471,7 +3471,7 @@ bfd_section_from_phdr (bfd *abfd, Elf_Internal_Phdr *hdr, int hdr_index)
     case PT_LOAD:
       if (! _bfd_elf_make_section_from_phdr (abfd, hdr, hdr_index, "load"))
 	return false;
-      if (bfd_get_format (abfd) == bfd_core && abfd->build_id == NULL)
+      if (bfd_get_format (abfd) == bfd_core)
 	_bfd_elf_core_find_build_id (abfd, hdr->p_offset);
       return true;
 
@@ -11294,9 +11294,16 @@ elfobj_grok_gnu_build_id (bfd *abfd, Elf_Internal_Note *note)
   if (build_id == NULL)
     return false;
 
+  build_id->next = NULL;
   build_id->size = note->descsz;
   memcpy (build_id->data, note->descdata, note->descsz);
-  abfd->build_id = build_id;
+  const struct bfd_build_id **next = &abfd->build_id;
+  while (*next != NULL)
+    {
+      const struct bfd_build_id *tmp = *next;
+      next = (const struct bfd_build_id **)&tmp->next;
+    }
+  *next = build_id;
 
   return true;
 }
