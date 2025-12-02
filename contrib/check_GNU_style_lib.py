@@ -402,7 +402,6 @@ def check_GNU_style_file(file, format):
             continue
 
         for hunk in pfile:
-            delta = 0
             for line in hunk:
                 if line.is_added and line.target_line_no != None:
                     for check in checks:
