@@ -95,12 +95,18 @@ class SpacesCheck:
         self.re = re.compile(r'^\t*(' + self.expanded_tab + ')')
 
     def check(self, filename, lineno, line):
+        return self.check_(filename, lineno, "", line, "")
+
+    def check_(self, filename, lineno, prefix, line, postfix):
+        if prefix != "":
+            return
         m = self.re.search(line)
         if m is None:
             return
         start = m.start(1)
         end = m.end(1)
-        error_line = line[0:start] + error_string(ws_char * ts) + line[end:]
+        error_line = (line[0:start] + error_string(ws_char * ts) + line[end:]
+                      + postfix)
         return CheckError(filename, lineno, error_line,
                           'blocks of 8 spaces should be replaced with tabs',
                           start)
@@ -110,13 +116,18 @@ class SpacesAndTabsMixedCheck:
         self.re = re.compile(r'^\t*( +)\t')
 
     def check(self, filename, lineno, line):
+        return self.check_(filename, lineno, "", line, "")
+
+    def check_(self, filename, lineno, prefix, line, postfix):
+        if prefix != "":
+            return
         m = self.re.search(line)
         if m is None:
             return
         start = m.start(1)
         end = m.end(1)
         error_line = (line[0:start] + error_string(m.group(1) + ws_char * ts)
-                      + line[end+1:])
+                      + line[end+1:] + postfix)
         return CheckError(filename, lineno, error_line,
                 'a space should not precede a tab', 0)
 
@@ -125,15 +136,20 @@ class TrailingWhitespaceCheck:
         self.re = re.compile(r'(\s+)$')
 
     def check(self, filename, lineno, line):
+        return self.check_(filename, lineno, "", line, "")
+
+    def check_(self, filename, lineno, prefix, line, postfix):
+        if postfix != "":
+            return
         assert(len(line) == 0 or line[-1] != '\n')
         if line == '':
             return
         m = self.re.search(line)
         if m != None:
             return CheckError(filename, lineno,
-                line[:m.start(1)] + error_string(ws_char * len(m.group(1)))
+                prefix + line[:m.start(1)] + error_string(ws_char * len(m.group(1)))
                 + line[m.end(1):],
-                'trailing whitespace', m.start(1))
+                'trailing whitespace', len(prefix) + m.start(1))
 
 class SentenceSeparatorCheck:
     def __init__(self):
@@ -141,6 +157,9 @@ class SentenceSeparatorCheck:
                              + r'\w')
 
     def check(self, filename, lineno, line):
+        return self.check_(filename, lineno, "", line, "")
+
+    def check_(self, filename, lineno, prefix, line, postfix):
         m = self.re.search(line)
         if m == None:
             return
@@ -153,32 +172,44 @@ class SentenceSeparatorCheck:
         start = m.start(3)
         end = m.end(3)
         n_spaces = len(m.group(3))
-        error_line = (line[:start] + error_string(ws_char * n_spaces)
-                      + line[end:])
+        error_line = (prefix + line[:start] + error_string(ws_char * n_spaces)
+                      + line[end:] + postfix)
         return CheckError(filename, lineno, error_line,
-                          'dot, space, space, new sentence', start)
+                          'dot, space, space, new sentence', len(prefix) + start)
+
 
 class SentenceEndOfCommentCheck:
     def __init__(self):
-        self.re = re.compile(r'\w\.(\s{0,1}|\s{3,})\*/')
+        self.re = re.compile(r'\w\.(\s{0,1}|\s{3,})$')
 
     def check(self, filename, lineno, line):
+        return self.check_(filename, lineno, "", line, "")
+
+    def check_(self, filename, lineno, prefix, line, postfix):
+        if not postfix.startswith("*/"):
+            return
         m = self.re.search(line)
         if m != None:
             return CheckError(filename, lineno,
-                line[:m.start(1)] + error_string(ws_char * len(m.group(1)))
-                + line[m.end(1):],
-                'dot, space, space, end of comment', m.start(1))
+                prefix + line[:m.start(1)] + error_string(ws_char * len(m.group(1)))
+                + line[m.end(1):] + postfix,
+                'dot, space, space, end of comment', len(prefix) + m.start(1))
 
 class SentenceDotEndCheck:
     def __init__(self):
-        self.re = re.compile(r'\w \w+(\s*\*/)')
+        self.re = re.compile(r'\w \w+(\s*)$')
 
     def check(self, filename, lineno, line):
+        return self.check_(filename, lineno, "", line, "")
+
+    def check_(self, filename, lineno, prefix, line, postfix):
+        if not postfix.startswith("*/"):
+            return
         m = self.re.search(line)
         if m != None:
             return CheckError(filename, lineno,
-                line[:m.start(1)] + error_string(m.group(1)) + line[m.end(1):],
+                prefix + line[:m.start(1)] + error_string(m.group(1) + "*/")
+                + postfix[2:],
                 'dot, space, space, end of comment', m.start(1))
 
 class FunctionParenthesisCheck:
@@ -187,6 +218,9 @@ class FunctionParenthesisCheck:
         self.re = re.compile(r'\w+(\s{2,})?(\()')
 
     def check(self, filename, lineno, line):
+        return self.check_(filename, lineno, "", line, "")
+
+    def check_(self, filename, lineno, prefix, line, postfix):
         if '#define' in line:
             return None
 
@@ -195,34 +229,43 @@ class FunctionParenthesisCheck:
             if m.group() == '_(' or m.group() == 'operator(':
                 return None
             return CheckError(filename, lineno,
-                line[:m.start(2)] + error_string(m.group(2)) + line[m.end(2):],
+                prefix + line[:m.start(2)] + error_string(m.group(2))
+                + line[m.end(2):] + postfix,
                 'there should be exactly one space between function name ' \
-                'and parenthesis', m.start(2))
+                'and parenthesis', len(prefix) + m.start(2))
 
 class SquareBracketCheck:
     def __init__(self):
         self.re = re.compile(r'\w\s+(\[)')
 
     def check(self, filename, lineno, line):
+        return self.check_(filename, lineno, "", line, "")
+
+    def check_(self, filename, lineno, prefix, line, postfix):
         if filename.endswith('.md'):
             return None
 
         m = self.re.search(line)
         if m != None:
             return CheckError(filename, lineno,
-                line[:m.start(1)] + error_string(m.group(1)) + line[m.end(1):],
+                prefix + line[:m.start(1)] + error_string(m.group(1))
+                + line[m.end(1):] + postfix,
                 'there should be no space before a left square bracket',
-                m.start(1))
+                len(prefix) + m.start(1))
 
 class ClosingParenthesisCheck:
     def __init__(self):
         self.re = re.compile(r'\S\s+(\))')
 
     def check(self, filename, lineno, line):
+        return self.check_(filename, lineno, "", line, "")
+
+    def check_(self, filename, lineno, prefix, line, postfix):
         m = self.re.search(line)
         if m != None:
             return CheckError(filename, lineno,
-                line[:m.start(1)] + error_string(m.group(1)) + line[m.end(1):],
+                prefix + line[:m.start(1)] + error_string(m.group(1))
+                + line[m.end(1):] + postfix,
                 'there should be no space before closing parenthesis',
                 m.start(1))
 
@@ -233,10 +276,14 @@ class BracesOnSeparateLineCheck:
         self.re = re.compile(r'(\)|else)\s*({)')
 
     def check(self, filename, lineno, line):
+        return self.check_(filename, lineno, "", line, "")
+
+    def check_(self, filename, lineno, prefix, line, postfix):
         m = self.re.search(line)
         if m != None:
             return CheckError(filename, lineno,
-                line[:m.start(2)] + error_string(m.group(2)) + line[m.end(2):],
+                prefix + line[:m.start(2)] + error_string(m.group(2))
+                + line[m.end(2):] + postfix,
                 'braces should be on a separate line', m.start(2))
 
 class TrailingOperatorCheck:
@@ -245,10 +292,14 @@ class TrailingOperatorCheck:
         self.re = re.compile(regex)
 
     def check(self, filename, lineno, line):
+        return self.check_(filename, lineno, "", line, "")
+
+    def check_(self, filename, lineno, prefix, line, postfix):
         m = self.re.search(line)
         if m != None:
             return CheckError(filename, lineno,
-                line[:m.start(1)] + error_string(m.group(1)) + line[m.end(1):],
+                prefix + line[:m.start(1)] + error_string(m.group(1))
+                + line[m.end(1):] + postfix,
                 'trailing operator', m.start(1))
 
 class UnitTest(unittest.TestCase):
@@ -402,13 +453,223 @@ class TrailingOperatorTest(UnitTest):
         self.check_match('  a =', 4,
                          '  a ' + error_string('='))
 
+# Checks for text.
+line_checks = [LineLengthCheck()]
+
+# Checks for both comments and code.
+common_checks = [SpacesCheck(),
+                 TrailingWhitespaceCheck(),
+                 SpacesAndTabsMixedCheck()]
+
+# Checks for comments.
+comment_checks = common_checks + [SentenceSeparatorCheck(),
+                                  SentenceEndOfCommentCheck(),
+                                  SentenceDotEndCheck()]
+
+# Checks for code.
+code_checks = common_checks + [FunctionParenthesisCheck(),
+                               SquareBracketCheck(),
+                               ClosingParenthesisCheck(),
+                               BracesOnSeparateLineCheck(),
+                               TrailingOperatorCheck()]
+
+# Regexp constants.
+re_start = re.compile(r'[/][*/]|R["][(]|["]|[\']')
+re_end_of_comment = re.compile(r"(([^*]|[*][^/])*)\*\/")
+re_end_of_string = re.compile(r'([^"\\]*)(["\\])')
+re_end_of_raw_string = re.compile(r'(.*)([)]["])')
+re_end_of_char = re.compile(r"([^'\\]*)(['\\])")
+
+
+def handle_comment(errors, filename, linenr, prefix, str, postfix):
+    for check in comment_checks:
+        e = check.check_(filename, linenr, prefix, str, postfix)
+        if e is None:
+            continue
+        errors.append(e)
+
+
+def handle_code(errors, filename, linenr, prefix, str, postfix):
+    for check in code_checks:
+        e = check.check_(filename, linenr, prefix, str, postfix)
+        if e is None:
+            continue
+        errors.append(e)
+
+
+def handle_line(errors, filename, linenr, line, do_checks):
+    global in_comment
+    global in_string
+    global in_raw_string
+    global in_char
+
+    head = ""
+    tail = line
+
+    while True:
+
+        if in_comment:
+            m = re_end_of_comment.search(tail)
+            if m is None:
+                if do_checks:
+                    handle_comment(errors, filename, linenr, head, tail, "")
+                return
+
+            # Found end of comment.
+            in_comment = 0
+            prefix = head + tail[0 : m.start(0)]
+            str = m.group(0)[0:-2]
+            token = "*/"
+            postfix = tail[m.start(0) + len(m.group(0)) :]
+            if do_checks:
+                handle_comment(errors, filename, linenr, prefix, str, token + postfix)
+
+            head = prefix + str + token
+            tail = postfix
+            continue
+
+        if in_string:
+            m = re_end_of_string.search(tail)
+            if m is None:
+                return
+
+            if m.group(2) == '"':
+                # Found end of string.
+                in_string = False
+                head = head + tail[0 : m.start(1)] + m.group(1) + '"'
+                tail = tail[m.start(0) + len(m.group(0)) :]
+            else:
+                # Found backslash.
+                head = head + tail[0 : m.start(0)] + m.group(0)
+                tail = tail[m.start(0) + len(m.group(0)) :]
+                if tail != "":
+                    # Backslash not at end of line.
+                    head = head + tail[0]
+                    tail = tail[1:]
+
+            continue
+
+        if in_raw_string:
+            m = re_end_of_raw_string.search(tail)
+            if m is None:
+                return
+
+            # Found end of raw string.
+            in_raw_string = False
+            head = head + tail[0 : m.start(1)] + m.group(1) + ')"'
+            tail = tail[m.start(0) + len(m.group(0)) :]
+            continue
+
+        if in_char:
+            m = re_end_of_char.search(tail)
+            if m is None:
+                return
+
+            if m.group(2) == "'":
+                # Found end of char.
+                in_char = False
+                head = head + tail[0 : m.start(1)] + m.group(1) + "'"
+                tail = tail[m.start(0) + len(m.group(0)) :]
+            else:
+                # Found backslash.
+                head = head + tail[0 : m.start(1)] + m.group(1)
+                tail = tail[m.start(0) + len(m.group(0)) :]
+                if tail != "":
+                    # Backslash not at end of line.
+                    head = head + tail[0]
+                    tail = tail[1:]
+            continue
+
+        m = re_start.search(tail)
+        if m is None:
+            if do_checks:
+                handle_code(errors, filename, linenr, head, tail, "")
+            return
+
+        if do_checks:
+            handle_code(errors, filename, linenr, head, tail[0:m.start(0)],
+                        tail[m.start(0):])
+
+        # Skip over match.
+        after = m.start(0) + len(m.group(0))
+        head = head + tail[0:after]
+        tail = tail[after:]
+
+        if m.group(0) == "/*":
+            # Start of C comment.
+            in_comment = True
+        elif m.group(0) == "//":
+            # Start of C++ comment.
+            if do_checks:
+                handle_comment(errors, filename, linenr, head, tail, "")
+            return
+        elif m.group(0) == '"':
+            # Start of string literal.
+            in_string = True
+        elif m.group(0) == "'":
+            # Start of char literal.
+            in_char = True
+        elif m.group(0) == 'R"(':
+            # Start of raw string literal.
+            in_raw_string = True
+        else:
+            assert False, "unreachable"
+
+    return head + tail
+
+
+def handle_patched_file(errors, filename, pfile):
+    patch_lines = []
+    for hunk in pfile:
+        for line in hunk:
+            if not line.is_added or line.target_line_no is None:
+                continue
+            patch_lines.append(line)
+
+    for patch_line in patch_lines:
+        patch_line_chomp = patch_line.value.replace('\n', '')
+        for check in line_checks:
+            e = check.check(filename, patch_line.target_line_no, patch_line_chomp)
+            if e is None:
+                continue
+            errors.append(e)
+
+    with open(filename, "r") as f:
+        lines = f.read().split("\n")
+
+    global in_comment
+    global in_string
+    global in_raw_string
+    global in_char
+    in_comment = False
+    in_string = False
+    in_raw_string = False
+    in_char = False
+
+    patch_line_index = 0
+    linenr = 1
+    for line in lines:
+        if patch_line_index >= len(patch_lines):
+            break
+
+        patch_line = patch_lines[patch_line_index]
+        do_checks = linenr == patch_line.target_line_no
+
+        patch_line_str = patch_line.value.replace('\n', '')
+        if do_checks and line != patch_line_str:
+            print("patch does not match %s at line %s:" % (filename, linenr))
+            print("PATCH: '%s'" % patch_line_str)
+            print("FILE : '%s'" % line)
+            exit(1)
+
+        handle_line(errors, filename, linenr, line, do_checks)
+        linenr += 1
+        if do_checks:
+            patch_line_index += 1
+
+
+>>>>>>> bdda8a291ce ([contrib] Reduce false positives in comments and strings in check_GNU_style_lib.py)
 def check_GNU_style_file(file, format):
-    checks = [LineLengthCheck(), SpacesCheck(), TrailingWhitespaceCheck(),
-        SentenceSeparatorCheck(), SentenceEndOfCommentCheck(),
-        SentenceDotEndCheck(), FunctionParenthesisCheck(),
-        SquareBracketCheck(), ClosingParenthesisCheck(),
-        BracesOnSeparateLineCheck(), TrailingOperatorCheck(),
-        SpacesAndTabsMixedCheck()]
     errors = []
 
     patch = PatchSet(file)
@@ -427,15 +688,7 @@ def check_GNU_style_file(file, format):
             or t == 'gdb/gdbarch-gen.c'
             or t == 'gdb/target-delegates-gen.c'):
             continue
-
-        for hunk in pfile:
-            for line in hunk:
-                if line.is_added and line.target_line_no != None:
-                    for check in checks:
-                        line_chomp = line.value.replace('\n', '')
-                        e = check.check(t, line.target_line_no, line_chomp)
-                        if e != None:
-                            errors.append(e)
+        handle_patched_file(errors, t, pfile)
 
     if format == 'stdio':
         fn = lambda x: x.error_message
