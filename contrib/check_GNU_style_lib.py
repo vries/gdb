@@ -78,10 +78,9 @@ class CheckError:
 class LineLengthCheck:
     def __init__(self):
         self.limit = 80
-        self.expanded_tab = ' ' * ts
 
     def check(self, filename, lineno, line):
-        line_expanded = line.replace('\t', self.expanded_tab)
+        line_expanded = line.expandtabs(ts)
         if len(line_expanded) > self.limit:
             return CheckError(filename, lineno,
                 line_expanded[:self.limit]
@@ -261,6 +260,7 @@ class LineLengthTest(UnitTest):
         self.check_match(limit_str + 'a', self.check.limit)
         self.check_match(limit_str + ' = 123;', self.check.limit,
                          limit_str + error_string(' = 123;'))
+        self.check_no_match('a' + '\t' + (self.check.limit - ts) * 'a')
 
 class SpacesTest(UnitTest):
     def setUp(self):
