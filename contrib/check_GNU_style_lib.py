@@ -107,14 +107,17 @@ class SpacesCheck:
 
 class SpacesAndTabsMixedCheck:
     def __init__(self):
-        self.re = re.compile(r'\ \t')
+        self.re = re.compile(r'^\t*( +)\t')
 
     def check(self, filename, lineno, line):
-        stripped = line.lstrip()
-        start = line[:len(line) - len(stripped)]
-        if self.re.search(line):
-            return CheckError(filename, lineno,
-                error_string(start.replace('\t', ws_char * ts)) + line[len(start):],
+        m = self.re.search(line)
+        if m is None:
+            return
+        start = m.start(1)
+        end = m.end(1)
+        error_line = (line[0:start] + error_string(m.group(1) + ws_char * ts)
+                      + line[end+1:])
+        return CheckError(filename, lineno, error_line,
                 'a space should not precede a tab', 0)
 
 class TrailingWhitespaceCheck:
@@ -300,6 +303,7 @@ class SpacesAndTabsMixedTest(UnitTest):
                          error_string('   ' + ts * ws_char) + code_str)
         self.check_match('   \t  ' + code_str, 0)
         self.check_no_match('\t  ' + code_str)
+        self.check_no_match('foo (); \tfoo ();')
 
 class SentenceSeparatorTest(UnitTest):
     def setUp(self):
