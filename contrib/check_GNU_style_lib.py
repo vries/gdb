@@ -92,13 +92,18 @@ class LineLengthCheck:
 class SpacesCheck:
     def __init__(self):
         self.expanded_tab = ' ' * ts
+        self.re = re.compile(r'^\t*(' + self.expanded_tab + ')')
 
     def check(self, filename, lineno, line):
-        i = line.find(self.expanded_tab)
-        if i != -1:
-            return CheckError(filename, lineno,
-                line.replace(self.expanded_tab, error_string(ws_char * ts)),
-                'blocks of 8 spaces should be replaced with tabs', i)
+        m = self.re.search(line)
+        if m is None:
+            return
+        start = m.start(1)
+        end = m.end(1)
+        error_line = line[0:start] + error_string(ws_char * ts) + line[end:]
+        return CheckError(filename, lineno, error_line,
+                          'blocks of 8 spaces should be replaced with tabs',
+                          start)
 
 class SpacesAndTabsMixedCheck:
     def __init__(self):
@@ -272,6 +277,7 @@ class SpacesTest(UnitTest):
                          error_string (ts * ws_char) + code_str)
         # Todo: Fix column, should be 8.
         self.check_match('\t' + (ts * ' ') + code_str, 1)
+        self.check_no_match((ts * 'a') + (ts * ' ') + 'foo ()')
 
 class TrailingWhitespaceTest(UnitTest):
     def setUp(self):
