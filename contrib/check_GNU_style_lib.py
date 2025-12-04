@@ -126,6 +126,8 @@ class TrailingWhitespaceCheck:
 
     def check(self, filename, lineno, line):
         assert(len(line) == 0 or line[-1] != '\n')
+        if line == '':
+            return
         m = self.re.search(line)
         if m != None:
             return CheckError(filename, lineno,
@@ -292,6 +294,7 @@ class TrailingWhitespaceTest(UnitTest):
         self.check_match(no_tws_str + ' ', len(no_tws_str),
                          no_tws_str + error_string(ws_char))
         self.check_match(no_tws_str + '\t', len(no_tws_str))
+        self.check_no_match('')
 
 class SpacesAndTabsMixedTest(UnitTest):
     def setUp(self):
