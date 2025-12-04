@@ -285,7 +285,14 @@ def check_GNU_style_file(file, format):
         if t.startswith('b/'):
             t = t[2:]
         # Skip testsuite files
-        if 'testsuite' in t or t.endswith('.py'):
+        if ('testsuite' in t or t.endswith('.py')
+            or t.startswith('gdbsupport/unordered_dense')
+            or t.startswith('gdb/features')
+            or t == 'gdb/ada-casefold.h'
+            or t == 'gdb/copying.c'
+            or t == 'gdb/gdbarch-gen.h'
+            or t == 'gdb/gdbarch-gen.c'
+            or t == 'gdb/target-delegates-gen.c'):
             continue
 
         for hunk in pfile:
