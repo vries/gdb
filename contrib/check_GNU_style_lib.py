@@ -137,15 +137,26 @@ class TrailingWhitespaceCheck:
 
 class SentenceSeparatorCheck:
     def __init__(self):
-        self.re = re.compile(r'\w\.(\s|\s{3,})\w')
+        self.re = re.compile(r'(?:((?:\w[.])+)|(\w+[.]))' + r'(\s|\s{3,})'
+                             + r'\w')
 
     def check(self, filename, lineno, line):
         m = self.re.search(line)
-        if m != None:
-            return CheckError(filename, lineno,
-                line[:m.start(1)] + error_string(ws_char * len(m.group(1)))
-                + line[m.end(1):],
-                'dot, space, space, new sentence', m.start(1))
+        if m == None:
+            return
+        abbrev = m.group(1)
+        if abbrev is not None:
+            return
+        word = m.group(2)
+        if word.lower() in ['ie.', 'eg.', 'etc.', 'dr.', 'aka.', 'vs.', 'Nov.']:
+            return
+        start = m.start(3)
+        end = m.end(3)
+        n_spaces = len(m.group(3))
+        error_line = (line[:start] + error_string(ws_char * n_spaces)
+                      + line[end:])
+        return CheckError(filename, lineno, error_line,
+                          'dot, space, space, new sentence', start)
 
 class SentenceEndOfCommentCheck:
     def __init__(self):
@@ -317,6 +328,8 @@ class SentenceSeparatorTest(UnitTest):
         self.check_match('foo. Bar', 4,
                          'foo.' + error_string(ws_char) + 'Bar')
         self.check_match('foo.   Bar', 4)
+        self.check_no_match('i.e. one that is preceded by a prefix')
+        self.check_no_match('ie. one that is preceded by a prefix')
 
 class SentenceEndOfCommentTest(UnitTest):
     def setUp(self):
