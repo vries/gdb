@@ -172,7 +172,7 @@ class SentenceEndOfCommentCheck:
 
 class SentenceDotEndCheck:
     def __init__(self):
-        self.re = re.compile(r'\w(\s*\*/)')
+        self.re = re.compile(r'\w \w+(\s*\*/)')
 
     def check(self, filename, lineno, line):
         m = self.re.search(line)
@@ -351,6 +351,7 @@ class SentenceDotEndTest(UnitTest):
         self.check_match(' A sentence */', 11)
         self.check_match(' A sentence  */', 11,
                          ' A sentence' + error_string ('  */'))
+        self.check_no_match(' Word */')
 
 class FunctionParenthesisTest(UnitTest):
     def setUp(self):
