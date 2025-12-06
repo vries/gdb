@@ -262,6 +262,17 @@ class LineLengthTest(UnitTest):
         self.check_match(limit_str + ' = 123;', self.check.limit,
                          limit_str + error_string(' = 123;'))
 
+class SpacesTest(UnitTest):
+    def setUp(self):
+        self.check = SpacesCheck()
+
+    def test_spaces_check_basic(self):
+        code_str = 'foo ()'
+        self.check_match((ts * ' ') + code_str, 0,
+                         error_string (ts * ws_char) + code_str)
+        # Todo: Fix column, should be 8.
+        self.check_match('\t' + (ts * ' ') + code_str, 1)
+
 class TrailingWhitespaceTest(UnitTest):
     def setUp(self):
         self.check = TrailingWhitespaceCheck()
@@ -283,6 +294,86 @@ class SpacesAndTabsMixedTest(UnitTest):
                          error_string('   ' + ts * ws_char) + code_str)
         self.check_match('   \t  ' + code_str, 0)
         self.check_no_match('\t  ' + code_str)
+
+class SentenceSeparatorTest(UnitTest):
+    def setUp(self):
+        self.check = SentenceSeparatorCheck()
+
+    def test_sentence_separator_check_basic(self):
+        self.check_no_match('foo.  Bar')
+        self.check_match('foo. Bar', 4,
+                         'foo.' + error_string(ws_char) + 'Bar')
+        self.check_match('foo.   Bar', 4)
+
+class SentenceEndOfCommentTest(UnitTest):
+    def setUp(self):
+        self.check = SentenceEndOfCommentCheck()
+
+    def test_sentence_end_of_comment_check_basic(self):
+        self.check_match("foo.*/", 4)
+        self.check_match("foo. */", 4)
+        self.check_no_match("foo.  */")
+        self.check_match("foo.   */", 4,
+                         "foo." + error_string (3 * ws_char) + "*/")
+
+class SentenceDotEndTest(UnitTest):
+    def setUp(self):
+        self.check = SentenceDotEndCheck()
+
+    def test_sentence_dot_end_check_basic(self):
+        self.check_no_match(' A sentence.  */')
+        self.check_match(' A sentence */', 11)
+        self.check_match(' A sentence  */', 11,
+                         ' A sentence' + error_string ('  */'))
+
+class FunctionParenthesisTest(UnitTest):
+    def setUp(self):
+        self.check = FunctionParenthesisCheck()
+
+    def test_function_parenthesis_check_basic(self):
+        self.check_no_match('foo ()')
+        self.check_no_match('#define foo(a)')
+        self.check_no_match('_("foo")')
+        self.check_no_match('operator()')
+        self.check_match('foo()')
+
+class SquareBracketTest(UnitTest):
+    def setUp(self):
+        self.check = SquareBracketCheck()
+
+    def test_square_bracket_check_basic(self):
+        self.check_no_match('a[i] = 1;')
+        self.check_match('a [i] = 1;', 2,
+                         'a ' + error_string('[') + 'i] = 1;')
+
+class ClosingParenthesisTest(UnitTest):
+    def setUp(self):
+        self.check = ClosingParenthesisCheck()
+
+    def test_closing_parenthesis_check_basic(self):
+        self.check_no_match('foo (1, 2);')
+        self.check_match('foo (1, 2 );', 10,
+                         'foo (1, 2 ' + error_string (')') + ';')
+
+class BracesOnSeparateLineTest(UnitTest):
+    def setUp(self):
+        self.check = BracesOnSeparateLineCheck()
+
+    def test_braces_on_separate_line_check_basic(self):
+        self.check_no_match('    {')
+        self.check_no_match('    }')
+        self.check_match('if (c) {', 7,
+                         'if (c) ' + error_string('{'))
+        self.check_match('else {', 5)
+
+class TrailingOperatorTest(UnitTest):
+    def setUp(self):
+        self.check = TrailingOperatorCheck()
+
+    def test_trailing_operator_check_basic(self):
+        self.check_no_match('  a = 1')
+        self.check_match('  a =', 4,
+                         '  a ' + error_string('='))
 
 def check_GNU_style_file(file, format):
     checks = [LineLengthCheck(), SpacesCheck(), TrailingWhitespaceCheck(),
