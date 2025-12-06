@@ -231,43 +231,58 @@ class TrailingOperatorCheck:
                 line[:m.start(1)] + error_string(m.group(1)) + line[m.end(1):],
                 'trailing operator', m.start(1))
 
-class LineLengthTest(unittest.TestCase):
+class UnitTest(unittest.TestCase):
+    def setUp(self):
+        self.check = None
+
+    def check_match(self, line, column = -1, console_error = None):
+        r = self.check.check('foo', 123, line)
+        self.assertIsNotNone(r)
+        self.assertEqual('foo', r.filename)
+        self.assertEqual(123, r.lineno)
+        if column != -1:
+            self.assertEqual(column, r.column)
+        self.assertIsNotNone(r.console_error)
+        if console_error != None:
+            self.assertEqual(console_error, r.console_error)
+        return r
+
+    def check_no_match(self, line):
+        r = self.check.check('foo', 123, line)
+        self.assertIsNone(r)
+
+class LineLengthTest(UnitTest):
     def setUp(self):
         self.check = LineLengthCheck()
 
     def test_line_length_check_basic(self):
-        r = self.check.check('foo', 123, self.check.limit * 'a' + ' = 123;')
-        self.assertIsNotNone(r)
-        self.assertEqual('foo', r.filename)
-        self.assertEqual(80, r.column)
-        self.assertEqual(r.console_error,
-            self.check.limit * 'a' + error_string(' = 123;'))
+        limit_str = self.check.limit * 'a'
+        self.check_no_match(limit_str)
+        self.check_match(limit_str + 'a', self.check.limit)
+        self.check_match(limit_str + ' = 123;', self.check.limit,
+                         limit_str + error_string(' = 123;'))
 
-class TrailingWhitespaceTest(unittest.TestCase):
+class TrailingWhitespaceTest(UnitTest):
     def setUp(self):
         self.check = TrailingWhitespaceCheck()
 
     def test_trailing_whitespace_check_basic(self):
-        r = self.check.check('foo', 123, 'a = 123;')
-        self.assertIsNone(r)
-        r = self.check.check('foo', 123, 'a = 123; ')
-        self.assertIsNotNone(r)
-        r = self.check.check('foo', 123, 'a = 123;\t')
-        self.assertIsNotNone(r)
+        no_tws_str = 'a = 123;'
+        self.check_no_match(no_tws_str)
+        self.check_match(no_tws_str + ' ', len(no_tws_str),
+                         no_tws_str + error_string(ws_char))
+        self.check_match(no_tws_str + '\t', len(no_tws_str))
 
-class SpacesAndTabsMixedTest(unittest.TestCase):
+class SpacesAndTabsMixedTest(UnitTest):
     def setUp(self):
         self.check = SpacesAndTabsMixedCheck()
 
-    def test_trailing_whitespace_check_basic(self):
-        r = self.check.check('foo', 123, '   \ta = 123;')
-        self.assertEqual('foo', r.filename)
-        self.assertEqual(0, r.column)
-        self.assertIsNotNone(r.console_error)
-        r = self.check.check('foo', 123, '   \t  a = 123;')
-        self.assertIsNotNone(r.console_error)
-        r = self.check.check('foo', 123, '\t  a = 123;')
-        self.assertIsNone(r)
+    def test_spaces_and_tabs_mixed_check_basic(self):
+        code_str = 'a = 123;'
+        self.check_match('   \t' + code_str, 0,
+                         error_string('   ' + ts * ws_char) + code_str)
+        self.check_match('   \t  ' + code_str, 0)
+        self.check_no_match('\t  ' + code_str)
 
 def check_GNU_style_file(file, format):
     checks = [LineLengthCheck(), SpacesCheck(), TrailingWhitespaceCheck(),
