@@ -72,6 +72,19 @@ gdb_continue_to_breakpoint "stop at test breakpoint"
 gdb_test_no_output "source ${pyfile}"\
     "import python scripts"
 
+foreach_with_prefix n { 0 1 2 3 4 5 6 } {
+    set sp 0x0
+    set pc 0x0
+    gdb_test_multiple "maint print frame-id $n" "" {
+	-re -wrap "frame-id for frame #$n: {stack=($hex),code=($hex),.*}" {
+	    set sp $expect_out(1,string)
+	    set pc $expect_out(2,string)
+	    gdb_test_no_output "python frame_id_sp.append($sp)"
+	    gdb_test_no_output "python frame_id_pc.append($pc)"
+	}
+    }
+}
+
 # Test with and without filters.
 foreach bt_cmd { "bt" "bt -no-filters" } {
     with_test_prefix "$bt_cmd" {

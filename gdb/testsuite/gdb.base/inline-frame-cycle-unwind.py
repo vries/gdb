@@ -26,6 +26,9 @@ stop_at_level = None
 # function called recursively.
 stack_adjust = None
 
+frame_id_sp = []
+frame_id_pc = []
+
 
 class FrameId(object):
     def __init__(self, sp, pc):
@@ -55,9 +58,8 @@ class TestUnwinder(Unwinder):
         if stop_at_level not in [1, 3, 5]:
             raise gdb.GdbError("invalid stop_at_level")
 
-        sp_desc = pending_frame.architecture().registers().find("sp")
-        sp = pending_frame.read_register(sp_desc) + stack_adjust
-        pc = (gdb.lookup_symbol("normal_func"))[0].value().address
+        sp = frame_id_sp[stop_at_level]
+        pc = frame_id_pc[stop_at_level]
         unwinder = pending_frame.create_unwind_info(FrameId(sp, pc))
 
         for reg in pending_frame.architecture().registers("general"):
