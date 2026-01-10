@@ -268,6 +268,60 @@ tui_remove_some_windows ()
   tui_apply_current_layout (true);
 }
 
+/* Whether rerendering of TUI windows is deferred.  */
+
+static bool defer_tui_rerender = false;
+
+/* Deferred rerenderings of TUI windows.  */
+
+static std::vector<std::function<void ()>> deferred_rerender;
+
+/* See tui-layout.h.  */
+
+scoped_defer_tui_rerender::scoped_defer_tui_rerender ()
+{
+  m_saved_defer_tui_rerender = defer_tui_rerender;
+  defer_tui_rerender = true;
+}
+
+/* See tui-layout.h.  */
+
+scoped_defer_tui_rerender::~scoped_defer_tui_rerender ()
+{
+  release ();
+}
+
+/* See tui-layout.h.  */
+
+void
+scoped_defer_tui_rerender::release ()
+{
+  if (!m_saved_defer_tui_rerender.has_value ())
+    return;
+
+  defer_tui_rerender = *m_saved_defer_tui_rerender;
+  m_saved_defer_tui_rerender.reset ();
+  if (defer_tui_rerender)
+    return;
+
+  for (auto f: deferred_rerender)
+    {
+      f ();
+    }
+  deferred_rerender.clear ();
+}
+
+/* See tui-layout.h.  */
+
+void
+maybe_deferred_rerender (std::function<void ()> &&rerender)
+{
+  if (defer_tui_rerender)
+    deferred_rerender.push_back (std::move (rerender));
+  else
+    rerender ();
+}
+
 void
 tui_win_info::resize (int height_, int width_,
 		      int origin_x_, int origin_y_)
@@ -296,7 +350,10 @@ tui_win_info::resize (int height_, int width_,
   if (handle == nullptr)
     make_window ();
 
-  rerender ();
+  maybe_deferred_rerender ([this] ()
+    {
+      rerender ();
+    });
 }
 
 

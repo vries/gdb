@@ -32,6 +32,7 @@
 #include "tui/tui-wingeneral.h"
 #include "tui/tui-winsource.h"
 #include "tui/tui-location.h"
+#include "tui/tui-layout.h"
 
 #include "gdb_curses.h"
 
@@ -316,7 +317,10 @@ void
 tui_show_status_content ()
 {
   if (tui_is_window_visible (STATUS_WIN))
-    tui_status_win ()->rerender ();
+    maybe_deferred_rerender ([] ()
+      {
+	tui_status_win ()->rerender ();
+      });
 }
 
 /* Command to update the display with the current execution point.  */

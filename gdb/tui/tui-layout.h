@@ -417,4 +417,29 @@ using known_window_names_range
 
 extern known_window_names_range all_known_window_names ();
 
+/* RAII class to support scoped deferral of rerendering of TUI windows.  */
+
+class scoped_defer_tui_rerender
+{
+public:
+  /* Start scoped deferral of rerendering of TUI windows.  */
+  scoped_defer_tui_rerender ();
+  /* End scoped deferral of rerendering of TUI windows, unless already
+     ended.  */
+  ~scoped_defer_tui_rerender ();
+
+  DISABLE_COPY_AND_ASSIGN (scoped_defer_tui_rerender);
+
+  /* End scoped deferral of rerendering of TUI windows.  */
+  void release ();
+
+private:
+  /* Variable to save original value of defer_tui_rerender.  */
+  std::optional<bool> m_saved_defer_tui_rerender;
+};
+
+/* If deferred, queue RERENDER, otherwise run it.  */
+
+extern void maybe_deferred_rerender (std::function<void ()> &&rerender);
+
 #endif /* GDB_TUI_TUI_LAYOUT_H */

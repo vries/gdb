@@ -120,7 +120,10 @@ void
 tui_data_window::set_register_group (const reggroup *group)
 {
   update_register_data (group);
-  rerender ();
+  maybe_deferred_rerender ([this] ()
+    {
+      rerender ();
+    });
 }
 
 /* Set the data window to display the registers of the register group

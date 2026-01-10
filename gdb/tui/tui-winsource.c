@@ -37,6 +37,7 @@
 #include "tui/tui-disasm.h"
 #include "tui/tui-location.h"
 #include "tui/tui-wingeneral.h"
+#include "tui/tui-layout.h"
 #include "gdb_curses.h"
 
 /* Function to display the "main" routine.  */
@@ -434,7 +435,10 @@ void
 tui_source_window_base::update_tab_width ()
 {
   werase (handle.get ());
-  rerender ();
+  maybe_deferred_rerender ([this] ()
+    {
+      rerender ();
+    });
 }
 
 void

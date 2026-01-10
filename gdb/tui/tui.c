@@ -407,6 +407,9 @@ tui_enable (void)
 
   tui_batch_rendering defer;
 
+  /* Start deferral of rerendering of TUI windows.  */
+  scoped_defer_tui_rerender defer_tui_rerender;
+
   /* To avoid to initialize curses when gdb starts, there is a deferred
      curses initialization.  This initialization is made only once
      and the first time the curses mode is entered.  */
@@ -515,6 +518,10 @@ tui_enable (void)
     tui_rehighlight_all ();
 
   tui_setup_io (1);
+
+  /* Now that io is setup, stop deferral of rerendering of TUI windows,
+     allowing secondary prompts like the debuginfod query to trigger.  */
+  defer_tui_rerender.release ();
 
   /* Resize windows before anything might display/refresh a
      window.  */
