@@ -140,7 +140,10 @@ tui_rl_switch_mode (int notused1, int notused2)
 
 	  /* If tui_enable throws, we'll re-prep below.  */
 	  rl_deprep_terminal ();
-	  tui_enable ();
+	  {
+	    scoped_restore_gdb_rl_callback_handler restore;
+	    tui_enable ();
+	  }
 	}
     }
   catch (const gdb_exception_forced_quit &ex)

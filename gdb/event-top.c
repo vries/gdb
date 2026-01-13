@@ -361,6 +361,7 @@ change_line_handler (int editing)
 
 /* Whether we've registered a callback handler with readline.  */
 static bool callback_handler_installed;
+static std::optional<std::string> callback_handler_installed_prompt;
 
 /* See event-top.h, and above.  */
 
@@ -371,6 +372,7 @@ gdb_rl_callback_handler_remove (void)
 
   rl_callback_handler_remove ();
   callback_handler_installed = false;
+  callback_handler_installed_prompt.reset ();
 }
 
 /* See event-top.h, and above.  Note this wrapper doesn't have an
@@ -406,6 +408,10 @@ gdb_rl_callback_handler_install (const char *prompt)
 
   rl_callback_handler_install (prompt, gdb_rl_callback_handler);
   callback_handler_installed = true;
+  if (prompt == nullptr)
+    callback_handler_installed_prompt.reset ();
+  else
+    callback_handler_installed_prompt.emplace (prompt);
 }
 
 /* See event-top.h, and above.  */
@@ -420,6 +426,31 @@ gdb_rl_callback_handler_reinstall (void)
       /* Passing NULL as prompt argument tells readline to not display
 	 a prompt.  */
       gdb_rl_callback_handler_install (NULL);
+    }
+}
+
+scoped_restore_gdb_rl_callback_handler::scoped_restore_gdb_rl_callback_handler
+  () : m_installed (callback_handler_installed),
+       m_prompt (callback_handler_installed_prompt)
+{
+}
+
+scoped_restore_gdb_rl_callback_handler::~scoped_restore_gdb_rl_callback_handler
+  ()
+{
+  if (m_installed)
+    {
+      if (!callback_handler_installed)
+	gdb_rl_callback_handler_remove ();
+
+      const char *prompt
+	= m_prompt.has_value () ? m_prompt->c_str () : nullptr;
+      gdb_rl_callback_handler_install (prompt);
+    }
+  else
+    {
+      if (callback_handler_installed)
+	gdb_rl_callback_handler_remove ();
     }
 }
 

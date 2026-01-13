@@ -166,4 +166,15 @@ class scoped_segv_handler_restore
   segv_handler_t m_old_handler;
 };
 
+class scoped_restore_gdb_rl_callback_handler
+{
+ public:
+  scoped_restore_gdb_rl_callback_handler ();
+  ~scoped_restore_gdb_rl_callback_handler ();
+
+private:
+  bool m_installed;
+  std::optional<std::string> m_prompt;
+};
+
 #endif /* GDB_EVENT_TOP_H */
