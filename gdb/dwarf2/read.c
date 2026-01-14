@@ -1957,7 +1957,12 @@ dw2_get_file_names (dwarf2_per_cu_data *this_cu,
     return this_cu->file_names;
 
   cutu_reader reader (this_cu, per_objfile);
-  if (!reader.dummy_p)
+  if (reader.dummy_p)
+    {
+      /* Make sure we don't re-read the dummy CU.  */
+      this_cu->files_read = true;
+    }
+  else
     dw2_get_file_names_reader (&reader, reader.comp_unit_die);
 
   return this_cu->file_names;
