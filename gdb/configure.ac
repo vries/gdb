@@ -101,6 +101,16 @@ AC_SUBST(PACKAGE)
 # But preserve it for config.status --recheck.
 AC_ARG_VAR(MAKEINFO,
   [Parent configure detects if it is of sufficient version.])
+case "$MAKEINFO" in
+    *)
+      case x"`$MAKEINFO --version | grep 'GNU texinfo'`" in
+       x*\ [[1-4]].* )
+	 AC_MSG_WARN([gdb: $MAKEINFO is too old. Info documentation will not be built.])
+	 MAKEINFO="@echo $MAKEINFO is too old, 5.0 or newer required; true"
+	 ;;
+      esac
+      ;;
+esac
 AC_ARG_VAR(MAKEINFOFLAGS,
   [Parameters for MAKEINFO.])
 
