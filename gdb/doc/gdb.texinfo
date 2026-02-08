@@ -2950,6 +2950,13 @@ Heap (malloc storage), stack and custom mmap areas are always placed randomly
 Show the current setting of the explicit disable of the native randomization of
 the virtual address space of the started program.
 
+@kindex maintenance set ignore-disable-randomization @r{[}on|off@r{]}
+@item maintenance set ignore-disable-randomization @r{[}on|off@r{]}
+When set to @samp{on}, the disable-randomization setting is ignored, and
+assumed to be @samp{off}.  The purpose of this is to simulate the case that
+@value{GDBN} cannot disable randomization, for instance in a container where
+that is not permitted.  Defaults to @samp{off}.
+
 @end table
 
 @node Arguments

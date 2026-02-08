@@ -195,9 +195,18 @@ show_debug_infrun (struct ui_file *file, int from_tty,
   gdb_printf (file, _("Inferior debugging is %s.\n"), value);
 }
 
-/* Support for disabling address space randomization.  */
+/* Whether address space randomization is disabled or not.  */
 
 bool disable_randomization = true;
+
+/* Latest setting according to set disable-randomization.  */
+
+static bool disable_randomization_setting = disable_randomization;
+
+/* Whether the disable-randomization setting is ignored, simulating a setup in
+   which security hardening prevents disabling address space randomization.  */
+
+static bool ignore_disable_randomization = false;
 
 static void
 show_disable_randomization (struct ui_file *file, int from_tty,
@@ -214,6 +223,24 @@ show_disable_randomization (struct ui_file *file, int from_tty,
 		"this platform.\n"), file);
 }
 
+/* Set the disable_randomization variable, according to the
+   disable-randomization and ignore-disable-randomization settings.  */
+
+static void
+set_disable_randomization ()
+{
+  if (ignore_disable_randomization)
+    {
+      /* Ignore the disable-randomization setting.  Don't disable address
+	 space randomization.  */
+      disable_randomization = false;
+      return;
+    }
+
+  /* Use the disable-randomization setting.  */
+  disable_randomization = disable_randomization_setting;
+}
+
 static void
 set_disable_randomization (const char *args, int from_tty,
 			   struct cmd_list_element *c)
@@ -222,6 +249,23 @@ set_disable_randomization (const char *args, int from_tty,
     error (_("Disabling randomization of debuggee's "
 	     "virtual address space is unsupported on\n"
 	     "this platform."));
+  set_disable_randomization ();
+}
+
+static void
+show_ignore_disable_randomization (struct ui_file *file, int from_tty,
+				   struct cmd_list_element *c, const char *value)
+{
+  gdb_printf (file,
+	      _("Ignoring disable-randomization is %s.\n"),
+	      value);
+}
+
+static void
+set_ignore_disable_randomization (const char *args, int from_tty,
+			   struct cmd_list_element *c)
+{
+  set_disable_randomization ();
 }
 
 /* User interface for non-stop mode.  */
@@ -10852,7 +10896,7 @@ Tells gdb whether to detach the child of a fork."),
   /* Set/show disable address space randomization mode.  */
 
   add_setshow_boolean_cmd ("disable-randomization", class_support,
-			   &disable_randomization, _("\
+			   &disable_randomization_setting, _("\
 Set disabling of debuggee's virtual address space randomization."), _("\
 Show disabling of debuggee's virtual address space randomization."), _("\
 When this mode is on (which is the default), randomization of the virtual\n\
@@ -10861,6 +10905,16 @@ enabled by default on some platforms."),
 			   &set_disable_randomization,
 			   &show_disable_randomization,
 			   &setlist, &showlist);
+
+  add_setshow_boolean_cmd ("ignore-disable-randomization", class_maintenance,
+			   &ignore_disable_randomization, _("\
+Set ignoring of disable-randomization."), _("\
+Show ignoring of disable-randomization."), _("\
+When this mode is on (off by default), the disable-randomization setting is\n\
+ignored, and an off value is used."),
+			   &set_ignore_disable_randomization,
+			   &show_ignore_disable_randomization,
+			   &maintenance_set_cmdlist, &maintenance_show_cmdlist);
 
   /* ptid initializations */
   inferior_ptid = null_ptid;
