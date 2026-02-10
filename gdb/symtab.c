@@ -2785,6 +2785,11 @@ basic_lookup_transparent_type_1 (struct objfile *objfile,
 
   for (compunit_symtab *cust : objfile->compunits ())
     {
+      /* Skip included compunits, to avoid searching them and their canonical
+	 includers more than once.  */
+      if (cust->user != nullptr)
+	continue;
+
       bv = cust->blockvector ();
       block = bv->block (block_index);
       sym = block_find_symbol (block, name, flags, nullptr);
