@@ -127,7 +127,7 @@ proc start_debuginfod { db debugdir } {
 	    set old_spawn_id $spawn_id
 	}
 
-	spawn debuginfod -vvvv -d $db -p $port -F $debugdir
+	spawn debuginfod -d $db -p $port -F $debugdir
 	set debuginfod_spawn_id $spawn_id
 
 	if { [info exists old_spawn_id] } {
