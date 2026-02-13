@@ -48,7 +48,11 @@ array set _quotemeta {}
 #    match an optional decimal we can't use "@/(@DECIMAL)?/" but instead need
 #    "@/(/@DECIMAL@/)?/"
 #
-# 5. "@{...}", "@{{...}}", etc.  This is "raw string" style, where any
+# 5. "@%xyz%".  As "@/xyz/", but allows special matches inside "xyz", with the
+#    exception of "@/xyz/" and "@%xyz%".
+#    Consequently, an optional decimal to be specified as @%(@DECIMAL)?%.
+#
+# 6. "@{...}", "@{{...}}", etc.  This is "raw string" style, where any
 #    number of leading braces can be used, and then the substitution
 #    must end with the corresponding number of closing braces.  The
 #    contents are then recognized as in cases 1..4.  For example,
@@ -61,7 +65,7 @@ array set _quotemeta {}
 # Finally, a space in a quotemeta string always matches any amount of
 # whitespace (at least one).  So, "@HEX hi" will match "0x23 hi" but
 # also "0x23   hi".  This is handy when dissecting gdb table output.
-proc quotemeta {str} {
+proc quotemeta {str {in_regexp 0}} {
     set result ""
 
     # Perform the quotemeta substitutions.  This is done in a somewhat
@@ -70,7 +74,11 @@ proc quotemeta {str} {
     # excess quoting.
     while true {
 	regexp -- {^([^@]*)(@(.*))?$} $str ignore prefix full_at at_text
-	append result [string_to_regexp $prefix]
+	if {$in_regexp == 0} {
+	    append result [string_to_regexp $prefix]
+	} else {
+	    append result $prefix
+	}
 	if {$full_at == ""} {
 	    # No more substitutions, we're done.
 	    break
@@ -86,22 +94,24 @@ proc quotemeta {str} {
 	    }
 	} else {
 	    # Match the usual forms.
-	    if {![regexp -- {^(\.\.\.|[A-Z][A-Z_]*|@|/[^/]*/)(.*)$} \
+	    if {![regexp -- {^(\.\.\.|[A-Z][A-Z_]*|@|/[^/]*/|%[^%]*%)(.*)$} \
 		      $at_text ignore at_text remainder]} {
 		error "invalid quotemeta expression @$at_text"
 	    }
 	}
-
+	verbose -log "at_text: $at_text"
 	# Now AT_TEXT is the quotemeta substitution.
 	if {$at_text == "..."} {
 	    append result ".*"
 	} elseif {$at_text == "@"} {
 	    append result "@"
-	} elseif {[regexp -- "^/(.*)/$" $at_text ignore rx]} {
+	} elseif {$in_regexp == 0 && [regexp -- "^/(.*)/$" $at_text ignore rx]} {
 	    # Note that here we don't use [^/] in the regexp, because
 	    # we want to support @{/blah/blah/}, where the regexp has
 	    # an embedded "/".
 	    append result $rx
+	} elseif {$in_regexp == 0 && [regexp -- "^%(.*)%$" $at_text ignore rx]} {
+	    append result [quotemeta $rx 1]
 	} else {
 	    if {![info exists ::_quotemeta($at_text)]} {
 		error "undefined quotemeta expression @$at_text"

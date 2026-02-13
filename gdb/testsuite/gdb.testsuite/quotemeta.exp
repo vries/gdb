@@ -60,6 +60,13 @@ check_quotemeta regexp-3 "@/(/@DECIMAL@/)?/" "($decimal)?"
 check_quotemeta regexp-4 "@/(@DECIMAL)?/" "(@DECIMAL)?"
 check_quotemeta quoting ".*" {\.\*}
 
+check_quotemeta recursive-regexp "@%(@DECIMAL)?%" "($decimal)?"
+check_quotemeta recursive-regexp-2 "@%(@{DECIMAL})?%" "($decimal)?"
+check_quotemeta recursive-regexp-3 "@{%(@DECIMAL)?%}" "($decimal)?"
+check_quotemeta recursive-regexp-4 "@{%(@{DECIMAL})?%}" "($decimal)?"
+check_quotemeta recursive-regexp-5 "@%@...%" ".*"
+check_quotemeta recursive-regexp-6 "@%@@?%" "@?"
+
 check_quotemeta dots @... .*
 check_quotemeta at @@ @
 
