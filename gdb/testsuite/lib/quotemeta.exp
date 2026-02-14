@@ -44,6 +44,9 @@ array set _quotemeta {}
 #
 # 4. "@/xyz/".  This matches the regular expression "xyz".  Note that
 #    in this case, "xyz" may not contain a "/".
+#    Also note that "@" has no special meaning inside "xyz", so in order to
+#    match an optional decimal we can't use "@/(@DECIMAL)?/" but instead need
+#    "@/(/@DECIMAL@/)?/"
 #
 # 5. "@{...}", "@{{...}}", etc.  This is "raw string" style, where any
 #    number of leading braces can be used, and then the substitution

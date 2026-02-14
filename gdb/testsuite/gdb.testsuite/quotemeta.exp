@@ -56,6 +56,8 @@ check_quotemeta multi-brace "@{{{DECIMAL}}}" "$decimal"
 
 check_quotemeta regexp "@/hello/" hello
 check_quotemeta regexp-2 "@/hello/@/.*/" "hello.*"
+check_quotemeta regexp-3 "@/(/@DECIMAL@/)?/" "($decimal)?"
+check_quotemeta regexp-4 "@/(@DECIMAL)?/" "(@DECIMAL)?"
 check_quotemeta quoting ".*" {\.\*}
 
 check_quotemeta dots @... .*
