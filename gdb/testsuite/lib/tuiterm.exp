@@ -1237,7 +1237,7 @@ proc Term::wait_for_line { regexp {pos ""} } {
 
 proc Term::with_term { term body } {
     save_vars { Term::_TERM } {
-	set Term::_TERM $term
+	set _TERM $term
 	uplevel $body
     }
 }
@@ -1248,15 +1248,15 @@ proc Term::with_tuiterm {rows cols body} {
     global env stty_init
     variable _TERM
     save_vars {env(TERM) env(NO_COLOR) stty_init} {
-	if { $Term::_TERM != "" } {
-	    setenv TERM $Term::_TERM
+	if { $_TERM != "" } {
+	    setenv TERM $_TERM
 	} elseif { [ishost *-*-*bsd*] } {
 	    setenv TERM ansiw
 	} else {
 	    setenv TERM ansi
 	}
 	# Save active TERM variable.
-	set Term::_TERM $env(TERM)
+	set _TERM $env(TERM)
 
 	setenv NO_COLOR ""
 	_setup $rows $cols
