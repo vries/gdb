@@ -14,11 +14,13 @@
 --  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 with Pack; use Pack;
+with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Prog is
    -- The name is chosen to use a character that is not in Latin-1.
    -- This should be var_Ubf.
    VAR_¯ : Integer := FUNC_¯ (23);
 begin
-   Do_Nothing (var_¿'Address); --  BREAK
+   Put_Line("Hello, world!");  --  BREAK
+   Do_Nothing (var_¿'Address);
 end Prog;

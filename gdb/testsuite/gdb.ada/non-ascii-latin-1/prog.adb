@@ -14,10 +14,12 @@
 --  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 with Pack; use Pack;
+with Ada.Text_IO; use Ada.Text_IO;
 
 procedure Prog is
    -- This should be var_Ufe.
    VAR_Þ : Integer := FUNC_Þ (23);
 begin
-   Do_Nothing (var_þ'Address); --  BREAK
+   Put_Line("Hello, world!");  --  BREAK
+   Do_Nothing (var_þ'Address);
 end Prog;
