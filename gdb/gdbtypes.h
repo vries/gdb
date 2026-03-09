@@ -2629,6 +2629,10 @@ extern struct type *resolve_dynamic_type
    "dynamic".  */
 extern bool is_dynamic_type (struct type *type);
 
+/* Return true if TYPE cannot be printed using ptype /o.  */
+
+extern bool cannot_print_offsets (struct type *type);
+
 extern struct type *check_typedef (struct type *);
 
 extern void check_stub_method_group (struct type *, int);
