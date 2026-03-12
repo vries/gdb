@@ -129,7 +129,7 @@ struct thread_control_state
   /* Set step_start_function according to PC.  */
   void set_step_start_function (CORE_ADDR pc)
   {
-    m_step_start_function = find_symbol_for_pc (pc);
+    m_step_start_function = find_symbol_for_pc_maybe_inline (pc);
   }
 
   /* Reset step_start_function.  */
@@ -141,7 +141,7 @@ struct thread_control_state
   /* Return true if PC is in step_start_function.  */
   bool in_step_start_function (CORE_ADDR pc)
   {
-    return m_step_start_function == find_symbol_for_pc (pc);
+    return m_step_start_function == find_symbol_for_pc_maybe_inline (pc);
   }
 
   /* Return true if step_start_function is set.  */
