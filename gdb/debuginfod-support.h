@@ -105,4 +105,9 @@ extern scoped_fd debuginfod_section_query (const unsigned char *build_id,
 					   const char *section_name,
 					   gdb::unique_xmalloc_ptr<char>
 					     *destname);
+
+/* Check if debuginfod enabled is set to ask.  */
+
+extern bool debuginfod_enabled_ask_p ();
+
 #endif /* GDB_DEBUGINFOD_SUPPORT_H */
