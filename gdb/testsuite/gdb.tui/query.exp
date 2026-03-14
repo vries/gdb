@@ -1,0 +1,92 @@
+# Copyright 2026 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Check that a debuginfod query during TUI initialization doesn't cause a
+# crash.
+
+require allow_tui_tests
+
+load_lib debuginfod-support.exp
+require allow_debuginfod_tests
+
+tuiterm_env
+
+standard_testfile -main.c -foo.c
+
+set tmpfile [standard_output_file $srcfile]
+set srcfiles [list $tmpfile $srcfile2]
+
+set fd [open $tmpfile w]
+puts $fd {
+    extern int foo (void);
+    int
+    main (void)
+    {
+	return foo ();
+    }
+}
+close $fd
+
+if { [build_executable "failed to prepare" $testfile $srcfiles] == -1 } {
+    return
+}
+
+# Delete query-main.c to trigger the debuginfod query during TUI
+# initialization.
+file delete $tmpfile
+
+set l {}
+lappend l "command"
+lappend l "keys"
+
+foreach_with_prefix how $l {
+    save_vars { env(DEBUGINFOD_URLS) } {
+	setenv DEBUGINFOD_URLS "foo"
+	Term::clean_restart 24 80 $testfile
+    }
+
+    if {![Term::prepare_for_tui]} {
+	return 0
+    }
+
+    Term::gen_prompt
+
+    if { $how == "command" } {
+	send_gdb "tui enable\n"
+    } else {
+	send_gdb "\030\001"
+    }
+    set re \
+	"Please set debuginfod enabled to on or off before enabling TUI"
+    gdb_assert { [Term::wait_for_region_contents 0 0 80 24 $re] }
+
+    # Check that prompt is responsive.
+    gdb_assert { [Term::command "print 1"] } "responsive prompt"
+
+    set cmd "set debuginfod enabled off"
+    gdb_assert { [Term::command "$cmd"] } $cmd
+
+    with_test_prefix tui {
+	if { $how == "command" } {
+	    send_gdb "tui enable\n"
+	} else {
+	    send_gdb "\030\001"
+	}
+	gdb_assert { [Term::wait_for ""] } "entered"
+
+	# Check that prompt is responsive.
+	gdb_assert { [Term::command "print 1"] } "responsive prompt"
+    }
+}

@@ -41,6 +41,7 @@
 #include "top.h"
 #include "ui.h"
 #include "observable.h"
+#include "debuginfod-support.h"
 
 #include <fcntl.h>
 
@@ -391,6 +392,10 @@ tui_enable (void)
 
   if (tui_active)
     return;
+
+  if (debuginfod_enabled_ask_p ()
+      && defaulted_query_auto_answers_p () != TRIBOOL_TRUE)
+    error (_("Please set debuginfod enabled to on or off before enabling TUI"));
 
   /* To avoid to initialize curses when gdb starts, there is a deferred
      curses initialization.  This initialization is made only once
