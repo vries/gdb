@@ -222,20 +222,20 @@ get_debuginfod_client ()
   return global_client;
 }
 
-/* Check if debuginfod is enabled.  If configured to do so, ask the user
-   whether to enable debuginfod.  */
+/* Check if debuginfod is enabled.  If configured to do so and ALLOW_ASK, ask
+   the user whether to enable debuginfod.  */
 
-static bool
-debuginfod_is_enabled ()
+static const char *
+debuginfod_is_enabled_1 (bool allow_ask)
 {
   const char *urls = skip_spaces (getenv (DEBUGINFOD_URLS_ENV_VAR));
 
   if (urls == nullptr
       || *urls == '\0')
-    return false;
+    return debuginfod_off;
 
-  if (debuginfod_enabled != debuginfod_ask)
-    return debuginfod_enabled == debuginfod_on;
+  if (debuginfod_enabled != debuginfod_ask || !allow_ask)
+    return debuginfod_enabled;
 
   gdb_printf (_("\nThis GDB supports auto-downloading debuginfo " \
 		"from the following URLs:\n"));
@@ -280,8 +280,18 @@ debuginfod_is_enabled ()
       debuginfod_enabled = debuginfod_on;
     }
 
-  gdb_assert (debuginfod_enabled != debuginfod_ask);
-  return debuginfod_enabled == debuginfod_on;
+  return debuginfod_enabled;
+}
+
+/* Check if debuginfod is enabled.  If configured to do so, ask the user
+   whether to enable debuginfod.  */
+
+static bool
+debuginfod_is_enabled ()
+{
+  const char *res = debuginfod_is_enabled_1 (true);
+  gdb_assert (res != debuginfod_ask);
+  return res == debuginfod_on;
 }
 
 /* Print the result of the most recent attempted download.  */
@@ -483,6 +493,18 @@ debuginfod_section_query (const unsigned char *build_id,
 }
 
 #endif
+
+/* See debuginfod-support.h.  */
+
+bool
+debuginfod_enabled_ask_p ()
+{
+#if defined(HAVE_LIBDEBUGINFOD)
+  return debuginfod_is_enabled_1 (false) == debuginfod_ask;
+#else
+  return false;
+#endif
+}
 
 /* Set callback for "set debuginfod enabled".  */
 
