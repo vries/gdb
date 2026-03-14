@@ -743,6 +743,54 @@ private:
 };
 
 
+/* Return true if defaulted queries should be answered:
+   - if VERBOSELY, automatically and verbosely
+   - otherwise, automatically and quietly.  */
+
+static bool
+defaulted_query_auto_answers_p (bool verbosely)
+{
+  if (verbosely)
+    {
+      /* Automatically answer verbosely if input isn't coming from the user
+	 directly.  */
+      return (current_ui->instream != current_ui->stdin_stream
+	      || !current_ui->input_interactive_p ()
+	      /* Restrict queries to the main UI.  */
+	      || current_ui != main_ui);
+    }
+  else
+    {
+      /* Automatically answer quietly if:
+	 - the user did not want prompts, or
+	 - the command was issued with the server prefix.  */
+      return !confirm || server_command;
+    }
+}
+
+/* See utils.h.  */
+
+tribool
+defaulted_query_auto_answers_p ()
+{
+  if (defaulted_query_auto_answers_p (false)
+      || defaulted_query_auto_answers_p (true))
+    return TRIBOOL_TRUE;
+
+  if (deprecated_query_hook)
+    {
+      /* The only user of deprecated_query_hook in core gdb seems to be
+	 mi_interp_query_hook, for which we could return TRIBOOL_TRUE here.
+	 If that turns out to be required, we could accomplish this by
+	 changing the hook interface to say:
+	   int (*deprecated_query_hook) (const char *, va_list,
+					 bool auto_answers_p = false)
+	 and calling it here with auto_answers_p == true.  */
+      return TRIBOOL_UNKNOWN;
+    }
+
+  return TRIBOOL_FALSE;
+}
 
 /* This function supports the query, nquery, and yquery functions.
    Ask user a y-or-n question and return 0 if answer is no, 1 if
@@ -790,17 +838,14 @@ defaulted_query (const char *ctlstr, const char defchar, va_list args)
 
   /* Automatically answer the default value if the user did not want
      prompts or the command was issued with the server prefix.  */
-  if (!confirm || server_command)
+  if (defaulted_query_auto_answers_p (false))
     return def_value;
 
   /* If input isn't coming from the user directly, just say what
      question we're asking, and then answer the default automatically.  This
      way, important error messages don't get lost when talking to GDB
      over a pipe.  */
-  if (current_ui->instream != current_ui->stdin_stream
-      || !current_ui->input_interactive_p ()
-      /* Restrict queries to the main UI.  */
-      || current_ui != main_ui)
+  if (defaulted_query_auto_answers_p (true))
     {
       target_terminal::scoped_restore_terminal_state term_state;
       target_terminal::ours_for_output ();
