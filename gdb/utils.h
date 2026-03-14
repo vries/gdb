@@ -483,4 +483,8 @@ private:
   std::vector<string_file> m_warnings;
 };
 
+/* Whether defaulted queries are answered automatically.  */
+
+extern tribool defaulted_query_auto_answers_p ();
+
 #endif /* GDB_UTILS_H */
