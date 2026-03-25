@@ -19,7 +19,7 @@ require allow_ada_tests
 
 standard_ada_testfile expr_r821_013
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug ]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     return
 }
 
@@ -28,27 +28,27 @@ clean_restart ${testfile}
 set bp_location [gdb_get_line_number "STOP" ${testdir}/expr_r821_013.adb]
 runto "expr_r821_013.adb:$bp_location"
 
-gdb_test "print something()"     " = 124"
+gdb_test "print something()" " = 124"
 gdb_test "print something() + 1" " = 125"
 gdb_test "print something() - 2" " = 122"
 gdb_test "print something() * 3" " = 372"
 gdb_test "print something() / 4" " = 31"
 
-gdb_test "print 1 + something()"   " = 125"
+gdb_test "print 1 + something()" " = 125"
 gdb_test "print 246 - something()" " = 122"
-gdb_test "print 3 * something()"   " = 372"
+gdb_test "print 3 * something()" " = 372"
 gdb_test "print 496 / something()" " = 4"
 
 # Same as above, but without using the parentheses in the call to
 # function "Something".
 
-gdb_test "print something"     " = 124"
+gdb_test "print something" " = 124"
 gdb_test "print something + 1" " = 125"
 gdb_test "print something - 2" " = 122"
 gdb_test "print something * 3" " = 372"
 gdb_test "print something / 4" " = 31"
 
-gdb_test "print 1 + something"   " = 125"
+gdb_test "print 1 + something" " = 125"
 gdb_test "print 246 - something" " = 122"
-gdb_test "print 3 * something"   " = 372"
+gdb_test "print 3 * something" " = 372"
 gdb_test "print 496 / something" " = 4"

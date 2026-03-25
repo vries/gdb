@@ -19,7 +19,7 @@ require allow_ada_tests
 
 standard_ada_testfile foo
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug ]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     return
 }
 
@@ -30,7 +30,7 @@ set ws "\[ \t\r\n\]+"
 # Start the program in order to have some tasks running...
 set bp_location [gdb_get_line_number "STOP_HERE" ${testdir}/foo.adb]
 gdb_test "break foo.adb:$bp_location" \
-    "Breakpoint $decimal.*" \
+    "Breakpoint $decimal.*"
 
 gdb_run_cmd
 gdb_test "" "Breakpoint $decimal, foo \\(\\).*" \

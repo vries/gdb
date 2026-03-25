@@ -19,12 +19,11 @@ require allow_ada_tests
 
 standard_ada_testfile homonym_main
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     return
 }
 
 clean_restart ${testfile}
-
 
 # Do these tests before running, so we are operating in a known
 # environment.

@@ -22,7 +22,7 @@ standard_ada_testfile mi_access
 load_lib mi-support.exp
 set MIFLAGS "-i=mi"
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable debug] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable debug] != ""} {
     return
 }
 

@@ -40,7 +40,6 @@ if {[gdb_compile_ada "${srcfile}" "${binfile}" executable $options] != ""} {
 
 clean_restart ${testfile}
 
-
 # Depending on the version of gnat, the location of the set breakpoint may
 # be reported as being at the requested location in file callee.adb or in
 # file caller.adb where the callee function was inlined.  Either way, only

@@ -19,7 +19,7 @@ require allow_ada_tests
 
 standard_ada_testfile foo
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     return
 }
 
@@ -35,7 +35,7 @@ gdb_test "info exceptions" \
 	 "program_error: $hex" \
 	 "storage_error: $hex" \
 	 "tasking_error: $hex" \
-	 ".*\[\r\n\]*const.aint_global_gdb_e: $hex\[\r\n\]*.*" ]
+	 ".*\[\r\n\]*const.aint_global_gdb_e: $hex\[\r\n\]*.*"]
 
 gdb_test "info exceptions task" \
     [multi_line "All Ada exceptions matching regular expression \"task\":" \

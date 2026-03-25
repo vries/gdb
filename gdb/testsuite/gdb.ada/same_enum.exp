@@ -19,7 +19,7 @@ require allow_ada_tests
 
 standard_ada_testfile a
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug ]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     return
 }
 
@@ -34,4 +34,4 @@ gdb_test "print red" "= red"
 
 # Check that both types are in fact present.
 gdb_test "ptype Color " "^type = .*"
-gdb_test "ptype RGB_Color"  "^type = .*"
+gdb_test "ptype RGB_Color" "^type = .*"

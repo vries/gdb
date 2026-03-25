@@ -19,7 +19,7 @@ require allow_ada_tests
 
 standard_ada_testfile foo
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug ]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     return
 }
 
@@ -34,7 +34,6 @@ gdb_test_no_output "set breakpoint pending off" "disable pending breakpoints"
 
 gdb_test "break pck.my_global_variable" \
     "Function \"pck\\.my_global_variable\" not defined\\."
-
 
 # Test inserting breakpoint on pck.my_hidden_variable.
 

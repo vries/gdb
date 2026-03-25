@@ -19,7 +19,7 @@ require allow_ada_tests
 
 standard_ada_testfile foo
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     return
 }
 
@@ -34,7 +34,7 @@ runto "foo.adb:$bp_location"
 # the function call.
 
 gdb_test "print procedure_result" \
-    "= 32 ' '"  \
+    "= 32 ' '" \
     "print procedure_result before calling same"
 
 gdb_test "call same (first)" \
@@ -42,7 +42,7 @@ gdb_test "call same (first)" \
     "call same"
 
 gdb_test "print procedure_result" \
-    "= 97 'a'"  \
+    "= 97 'a'" \
     "print procedure_result after calling same"
 
 gdb_test "call next (first)" \
@@ -50,5 +50,5 @@ gdb_test "call next (first)" \
     "call next"
 
 gdb_test "print procedure_result" \
-    "= 98 'b'"  \
+    "= 98 'b'" \
     "print procedure_result after calling next"

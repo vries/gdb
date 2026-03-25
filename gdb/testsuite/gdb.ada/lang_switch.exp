@@ -23,7 +23,7 @@ set csrcfile ${srcdir}/${subdir}/${testdir}/${cfile}.c
 set cobject [standard_output_file ${cfile}.o]
 
 gdb_compile "${csrcfile}" "${cobject}" object [list debug]
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     return
 }
 

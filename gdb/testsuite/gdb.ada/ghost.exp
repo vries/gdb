@@ -20,7 +20,7 @@ require allow_ada_tests
 standard_ada_testfile main
 
 set flags [list debug additional_flags=-gnata]
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable $flags] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable $flags] != ""} {
     return
 }
 

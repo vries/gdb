@@ -21,7 +21,7 @@ require {gnat_version_compare >= 8}
 
 standard_ada_testfile pb30_012
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     return
 }
 

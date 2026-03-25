@@ -37,7 +37,7 @@ if { [gdb_compile "${csrcfile}" "${cobject}" object [list debug]] != "" } {
     untested "failed to compile"
     return
 }
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     untested "failed to compile"
     return
 }
@@ -49,8 +49,8 @@ if {![runto "some_c.c:$bp_location"]} {
     return
 }
 
-set func_in_c(c_syntax)      "${decimal}:	void proc_in_c\\\(void\\\);"
-set func_in_c(ada_syntax)    "${decimal}:	procedure proc_in_c;"
+set func_in_c(c_syntax) "${decimal}:	void proc_in_c\\\(void\\\);"
+set func_in_c(ada_syntax) "${decimal}:	procedure proc_in_c;"
 set func_in_ada(c_syntax) \
     [string cat \
 	 "${decimal}:	void proc_in_ada\\\(void\\\);\r\n" \
@@ -64,20 +64,19 @@ set type_in_c(c_syntax) "${decimal}:	typedef struct {\\.\\.\\.} some_type_in_c;"
 set type_in_c(ada_syntax) [multi_line \
 			       "${decimal}:	record" \
 			       "    some_component_in_c: int;" \
-			       "end record" ]
+			       "end record"]
 set type_in_ada(c_syntax) "${decimal}:	struct global_pack__some_type_in_ada"
-set type_in_ada(ada_syntax)  "${decimal}:	global_pack.some_type_in_ada"
+set type_in_ada(ada_syntax) "${decimal}:	global_pack.some_type_in_ada"
 
-set var_in_c(c_syntax)     "${decimal}:	some_type_in_c some_struct_in_c;"
-set var_in_c(ada_syntax)   "${decimal}:	some_struct_in_c: some_type_in_c;"
-set var_in_ada(c_syntax)   "${decimal}:	struct global_pack__some_type_in_ada global_pack.some_struct_in_ada;"
+set var_in_c(c_syntax) "${decimal}:	some_type_in_c some_struct_in_c;"
+set var_in_c(ada_syntax) "${decimal}:	some_struct_in_c: some_type_in_c;"
+set var_in_ada(c_syntax) "${decimal}:	struct global_pack__some_type_in_ada global_pack.some_struct_in_ada;"
 set var_in_ada(ada_syntax) "${decimal}:	global_pack.some_struct_in_ada: global_pack.some_type_in_ada;"
 
-set rbreak_func_in_c(c_syntax)      "void proc_in_c\\\(void\\\);"
-set rbreak_func_in_c(ada_syntax)    "procedure proc_in_c;"
-set rbreak_func_in_ada(c_syntax)    "void proc_in_ada\\\(void\\\);"
-set rbreak_func_in_ada(ada_syntax)  "procedure proc_in_ada;"
-
+set rbreak_func_in_c(c_syntax) "void proc_in_c\\\(void\\\);"
+set rbreak_func_in_c(ada_syntax) "procedure proc_in_c;"
+set rbreak_func_in_ada(c_syntax) "void proc_in_ada\\\(void\\\);"
+set rbreak_func_in_ada(ada_syntax) "procedure proc_in_ada;"
 
 foreach_with_prefix language_choice { "auto" "ada" "c" } {
 

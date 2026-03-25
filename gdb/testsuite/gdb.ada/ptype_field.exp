@@ -19,7 +19,7 @@ require allow_ada_tests
 
 standard_ada_testfile foo
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug additional_flags=-gnat05 ]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug additional_flags=-gnat05]] != ""} {
     return
 }
 
@@ -32,13 +32,13 @@ gdb_test "ptype circle" \
     [multi_line "type = record" \
 	 "    pos: pck\\.position;" \
 	 "    radius: integer;" \
-	 "end record" ]
+	 "end record"]
 
 gdb_test "ptype circle.pos" \
     [multi_line "type = record" \
 	 "    x: integer;" \
 	 "    y: integer;" \
-	 "end record" ]
+	 "end record"]
 
 gdb_test "ptype circle.pos.x" \
     "type = <${::decimal}-byte integer>"

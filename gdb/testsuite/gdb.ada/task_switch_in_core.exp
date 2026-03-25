@@ -19,7 +19,7 @@ require allow_ada_tests gcore_cmd_available
 
 standard_ada_testfile crash
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     return
 }
 
@@ -57,7 +57,6 @@ if { $core_loaded == -1 } {
 
 gdb_test "task 1" \
     "crash\\.request_for_crash \\(\\) at .*crash\\.adb:$decimal.*"
-
 
 gdb_test "info tasks" \
     [multi_line "\\s+ID\\s+TID\\s+P-ID\\s+Pri\\s+State\\s+Name" \

@@ -19,7 +19,7 @@ require allow_ada_tests
 
 standard_ada_testfile bar_o203_012
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug ]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     return
 }
 

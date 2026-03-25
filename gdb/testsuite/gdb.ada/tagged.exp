@@ -21,7 +21,7 @@ require gnat_runtime_has_debug_info
 
 standard_ada_testfile foo
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     return
 }
 
@@ -36,7 +36,7 @@ runto "foo.adb:$bp_location"
 gdb_test "ptype segm" \
     [multi_line "type = new pck\\.object with record" \
 	 "    width: integer;" \
-	 "end record" ]
+	 "end record"]
 
 gdb_test "print segm" \
     "= \\(position => 74, width => 8\\)"
@@ -46,7 +46,7 @@ gdb_test "print segm" \
 gdb_test "ptype obj" \
     [multi_line "type = new pck\\.object with record" \
 	 "    width: integer;" \
-	 "end record" ]
+	 "end record"]
 
 gdb_test "print obj" \
     "= \\(position => 74, width => 8\\)"

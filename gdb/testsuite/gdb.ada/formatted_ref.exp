@@ -30,7 +30,7 @@ require allow_ada_tests
 
 standard_ada_testfile formatted_ref
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug ]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug]] != ""} {
     untested formatted-ref.exp
     return
 }
@@ -121,7 +121,7 @@ gdb_test_multiple "" "Runto to $bp_location" {
     }
 }
 
-set s1_address  [get_address "s1"]
+set s1_address [get_address "s1"]
 
 test_p_x "s" "(x => 0xd, y => 0x13)" $s1_address
 

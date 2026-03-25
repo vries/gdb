@@ -77,7 +77,6 @@ gdb_test "next" \
 
 # And finally, one more continue.
 
-
 gdb_test "cont" \
     "Breakpoint ${::decimal}.*pck\\.increment.*" \
     "continuing to breakpoint in pck.increment"

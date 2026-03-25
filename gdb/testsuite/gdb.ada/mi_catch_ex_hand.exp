@@ -19,7 +19,7 @@ require allow_ada_tests gnat_runtime_has_debug_info
 
 standard_ada_testfile foo
 
-if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug additional_flags=-gnata ]] != "" } {
+if {[gdb_compile_ada "${srcfile}" "${binfile}" executable [list debug additional_flags=-gnata]] != ""} {
     return
 }
 
@@ -45,7 +45,6 @@ mi_gdb_test "-catch-handlers" \
 # Continue to exception handler.
 
 proc continue_to_exception_handler { test line } {
-
     global decimal
 
     mi_send_resuming_command "exec-continue" "$test"
