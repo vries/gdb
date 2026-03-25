@@ -39,4 +39,7 @@ max-blank-lines = 1
 indent-namespace-eval = true
 
 # Used by tclfmt.
-spaces-in-braces = false
+spaces-in-braces = "balanced-no"
+
+# Used by tclfmt.
+emacs = true
