@@ -1034,6 +1034,9 @@ void
 tui_inject_newline_into_command_window ()
 {
   gdb_assert (tui_active);
+  if (tui_cmd_win () == nullptr || tui_cmd_win ()->width == 0
+      || tui_cmd_win ()->height == 0)
+    return;
 
   WINDOW *w = tui_cmd_win ()->handle.get ();
 
