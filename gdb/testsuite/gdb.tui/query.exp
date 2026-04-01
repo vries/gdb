@@ -65,12 +65,18 @@ foreach_with_prefix how $l {
 
     if { $how == "command" } {
 	send_gdb "tui enable\n"
+	set re \
+	    [string_to_regexp \
+		 {(y or [n]) }]
+	gdb_assert { [Term::wait_for_region_contents 0 0 80 24 $re] }
+	send_gdb "n\n"
+	Term::wait_for ""
     } else {
 	send_gdb "\030\001"
+	set re \
+	    "Please set debuginfod enabled to on or off before enabling TUI"
+	gdb_assert { [Term::wait_for_region_contents 0 0 80 24 $re] }
     }
-    set re \
-	"Please set debuginfod enabled to on or off before enabling TUI"
-    gdb_assert { [Term::wait_for_region_contents 0 0 80 24 $re] }
 
     # Check that prompt is responsive.
     gdb_assert { [Term::command "print 1"] } "responsive prompt"
