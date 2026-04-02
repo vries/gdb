@@ -163,6 +163,10 @@ struct ui
     {
       return current_ui->*F;
     }
+    bool operator== (nullptr_t p) const
+    {
+      return current_ui->*F == nullptr;
+    }
   };
 
   /* A ui_file that simply forwards.  */

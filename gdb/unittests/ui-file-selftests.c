@@ -48,6 +48,20 @@ run_tests ()
   scoped_restore save_7 = make_scoped_restore (&sevenbit_strings, true);
   check_one ("more weird stuff: \xa5", '\\',
 	     "more weird stuff: \\245");
+
+  {
+    /* There's a bug that has the effect "*redirectable_stderr () == nullptr".
+       In that case, gdb_stderr is not nullptr, but the underlying pointer is
+       a nullptr.  Check that "gdb_stderr->fd ()" doesn't dereference the
+       underlying nullptr.
+       This allows us to check for a usable gdb_stderr using
+       "gdb_stderr != nullptr && gdb_stderr->fd () == -1", as we do in
+       sig_write.  */
+    scoped_restore restore_stderr
+      = make_scoped_restore (redirectable_stderr (), nullptr);
+    SELF_CHECK (gdb_stderr != nullptr);
+    SELF_CHECK (gdb_stderr->fd () == -1);
+  }
 }
 
 } /* namespace file*/

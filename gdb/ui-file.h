@@ -420,7 +420,7 @@ public:
   { m_stream->emit_style_escape (style); }
 
   int fd () const override
-  { return m_stream->fd (); }
+  { return m_stream == nullptr ? -1 : m_stream->fd (); }
 
   void puts_unfiltered (const char *str) override
   { m_stream->puts_unfiltered (str); }
