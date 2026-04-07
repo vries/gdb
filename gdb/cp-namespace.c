@@ -431,7 +431,14 @@ cp_lookup_symbol_via_imports (const char *scope,
       if (search_parents)
 	{
 	  if (len == 0)
-	    directive_match = 1;
+	    {
+	      const char *current_scope = (block->function () != nullptr
+					   ? block->scope ()
+					   : nullptr /* Don't know.  */);
+	      directive_match = (current_scope != nullptr
+				 ? streq (scope, current_scope)
+				 : 1 /* Assume there's a match.  */);
+	    }
 	  else
 	    directive_match = (startswith (scope, current->import_dest)
 			       && (scope[len] == ':'
