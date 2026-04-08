@@ -3910,6 +3910,7 @@ process_queue (dwarf2_per_objfile *per_objfile, domain_search_flags domain)
       gdb_assert (!per_objfile->compunit_symtab_set_p (per_cu));
 
       bool skip = (domain == SEARCH_FUNCTION_DOMAIN
+		   && cu->header.unit_type != DW_UT_partial
 		   && !per_cu->addresses_seen);
       if (skip)
 	{
