@@ -1372,7 +1372,7 @@ protected:
     (dwarf2_per_cu *per_cu, dwarf2_per_objfile *per_objfile,
      auto_bool_vector &cus_to_skip,
      compunit_symtab_iteration_callback compunit_callback,
-     search_symtabs_lang_matcher lang_matcher);
+     search_symtabs_lang_matcher lang_matcher, domain_search_flags domain);
 };
 
 /* Return pointer to string at .debug_str offset STR_OFFSET.  */
