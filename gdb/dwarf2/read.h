@@ -1324,7 +1324,8 @@ protected:
 		   auto_bool_vector &cus_to_skip,
 		   search_symtabs_file_matcher file_matcher,
 		   search_symtabs_expansion_listener listener,
-		   search_symtabs_lang_matcher lang_matcher);
+		   search_symtabs_lang_matcher lang_matcher,
+		   domain_search_flags domain);
 };
 
 /* Return pointer to string at .debug_str offset STR_OFFSET.  */

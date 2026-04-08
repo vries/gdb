@@ -935,7 +935,8 @@ static struct type *get_die_type (struct die_info *die, struct dwarf2_cu *cu);
 
 static void queue_comp_unit (dwarf2_cu *cu);
 
-static void process_queue (dwarf2_per_objfile *per_objfile);
+static void process_queue (dwarf2_per_objfile *per_objfile,
+			   domain_search_flags domain = 0);
 
 /* Class, the destructor of which frees all allocated queue entries.  This
    will only have work to do if an error was thrown while processing the
@@ -1481,7 +1482,7 @@ struct readnow_functions : public dwarf2_base_index_functions
 	    || per_objfile->get_compunit_symtab (per_cu.get ()) == nullptr)
 	  continue;
 	if (!search_one (per_cu.get (), per_objfile, cus_to_skip, file_matcher,
-			 listener, lang_matcher))
+			 listener, lang_matcher, domain))
 	  return false;
       }
     return true;
@@ -1532,7 +1533,8 @@ load_cu (dwarf2_per_cu *per_cu, dwarf2_per_objfile *per_objfile,
 
 static void
 dw2_do_instantiate_symtab (dwarf2_per_cu *per_cu,
-			   dwarf2_per_objfile *per_objfile, bool skip_partial)
+			   dwarf2_per_objfile *per_objfile, bool skip_partial,
+			   domain_search_flags domain = 0)
 {
   {
     /* The destructor of dwarf2_queue_guard frees any entries left on
@@ -1560,7 +1562,7 @@ dw2_do_instantiate_symtab (dwarf2_per_cu *per_cu,
 	    && per_objfile->per_bfd->dwp_file == nullptr)
 	  queue_and_load_all_dwo_tus (cu);
 
-	process_queue (per_objfile);
+	process_queue (per_objfile, domain);
       }
   }
 
@@ -1576,7 +1578,7 @@ dw2_do_instantiate_symtab (dwarf2_per_cu *per_cu,
 
 static struct compunit_symtab *
 dw2_instantiate_symtab (dwarf2_per_cu *per_cu, dwarf2_per_objfile *per_objfile,
-			bool skip_partial)
+			bool skip_partial, domain_search_flags domain = 0)
 {
   /* Expand the corresponding canonical outermost CU.  This will
      expand the desired CU as a side effect when following the
@@ -1587,7 +1589,7 @@ dw2_instantiate_symtab (dwarf2_per_cu *per_cu, dwarf2_per_objfile *per_objfile,
     {
       free_cached_comp_units freer (per_objfile);
       scoped_restore decrementer = increment_reading_symtab ();
-      dw2_do_instantiate_symtab (per_cu, per_objfile, skip_partial);
+      dw2_do_instantiate_symtab (per_cu, per_objfile, skip_partial, domain);
     }
 
   return per_objfile->get_compunit_symtab (per_cu);
@@ -1925,7 +1927,8 @@ dwarf2_base_index_functions::search_one
    auto_bool_vector &cus_to_skip,
    search_symtabs_file_matcher file_matcher,
    search_symtabs_expansion_listener listener,
-   search_symtabs_lang_matcher lang_matcher)
+   search_symtabs_lang_matcher lang_matcher,
+   domain_search_flags domain)
 {
   /* Already visited, or intentionally skipped.  */
   if (cus_to_skip.is_set (per_cu->index))
@@ -1941,7 +1944,7 @@ dwarf2_base_index_functions::search_one
     }
 
   compunit_symtab *symtab
-    = dw2_instantiate_symtab (per_cu, per_objfile, false);
+    = dw2_instantiate_symtab (per_cu, per_objfile, false, domain);
   gdb_assert (symtab != nullptr);
 
   if (listener != nullptr)
@@ -3886,7 +3889,7 @@ maybe_queue_comp_unit (dwarf2_cu *cu, dwarf2_cu *dependent_cu)
 /* Process the queue.  */
 
 static void
-process_queue (dwarf2_per_objfile *per_objfile)
+process_queue (dwarf2_per_objfile *per_objfile, domain_search_flags domain)
 {
   DWARF_READ_SCOPED_DEBUG_START_END
     ("Expanding one or more symtabs of objfile %s ...",
@@ -14057,7 +14060,7 @@ cooked_index_functions::search
 	  QUIT;
 
 	  if (!search_one (per_cu, per_objfile, cus_to_skip, file_matcher,
-			   listener, lang_matcher))
+			   listener, lang_matcher, domain))
 	    return false;
 	}
       return true;
@@ -14225,7 +14228,7 @@ cooked_index_functions::search
 	  bool check = entry->visit_defining_cus ([&] (dwarf2_per_cu *per_cu)
 	    {
 	      return search_one (per_cu, per_objfile, cus_to_skip,
-				 file_matcher, listener, nullptr);
+				 file_matcher, listener, nullptr, domain);
 	    });
 	  if (!check)
 	    return false;
