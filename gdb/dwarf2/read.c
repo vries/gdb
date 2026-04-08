@@ -1794,7 +1794,8 @@ dwarf2_base_index_functions::search_one
 
   compunit_symtab *symtab
     = dw2_instantiate_symtab (per_cu, per_objfile, false, domain);
-  gdb_assert (symtab != nullptr);
+  if (symtab == nullptr)
+    return iteration_status::keep_going;
 
   if (compunit_callback != nullptr)
     {
@@ -3763,6 +3764,18 @@ process_queue (dwarf2_per_objfile *per_objfile, domain_search_flags domain)
       dwarf2_per_cu *per_cu = cu->per_cu;
 
       gdb_assert (!per_objfile->compunit_symtab_set_p (per_cu));
+
+      bool skip
+	= (domain == SEARCH_FUNCTION_DOMAIN
+	   && cu->header.unit_type == DW_UT_compile
+	   && (per_cu->addresses_seen == addresses_seen_empty
+	       || per_cu->addresses_seen == addresses_seen_gathering_empty));
+      if (skip)
+	{
+	  cu->queued = false;
+	  per_objfile->queue->pop ();
+	  continue;
+	}
 
       namespace chr = std::chrono;
 
