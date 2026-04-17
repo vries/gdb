@@ -66,7 +66,6 @@ foreach_with_prefix n {1 2 3 4} {
     # Function main is using namespace mod_b, and namespace mod_b is using
     # namespace mod_a, so mod_a::xxx is available as xxx.  Regression test for
     # PR34034.
-    setup_kfail exp/34034 *-*-*
     gdb_test "print xxx" " = 10"
 
     # This used to print " $<n> = 20".  Regression test for PR34051.
