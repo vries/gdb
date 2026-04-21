@@ -397,4 +397,6 @@ DEF_ENUM_FLAGS_TYPE (enum user_selected_what_flag, user_selected_what);
   extern void _initialize_ ## NAME (); \
   void _initialize_ ## NAME ()
 
+#else
+#  error gdb/defs.h should not be included twice
 #endif /* GDB_DEFS_H */

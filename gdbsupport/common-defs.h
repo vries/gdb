@@ -237,4 +237,6 @@
 #define HAVE_USEFUL_SBRK 1
 #endif
 
+#else
+#  error gdbsupport/common-defs.h should not be included twice
 #endif /* GDBSUPPORT_COMMON_DEFS_H */
