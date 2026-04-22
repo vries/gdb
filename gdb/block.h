@@ -108,6 +108,27 @@ struct blockranges
 
 struct block : public allocate_on_obstack<block>
 {
+  /* Variant of next_iterator using the superblock field instead of next.  */
+  struct superblock_iterator
+    : base_next_iterator<const block, superblock_iterator>
+  {
+    typedef superblock_iterator self_type;
+
+    explicit superblock_iterator (value_type item)
+      : base_next_iterator (item)
+    {
+    }
+
+    superblock_iterator () = default;
+
+    value_type next ()
+    {
+      return m_item->superblock ();
+    }
+  };
+
+  using superblock_range = iterator_range<superblock_iterator>;
+
   /* Return this block's start address.  */
   CORE_ADDR start () const
   { return m_start; }
@@ -310,6 +331,26 @@ struct block : public allocate_on_obstack<block>
      static link.  Return NULL if there is no such property.  */
 
   struct dynamic_prop *static_link () const;
+
+  /* Return a range adapter that iterates over this block and its
+     superblocks.  */
+
+  superblock_range block_and_superblocks () const
+  {
+    superblock_range::iterator begin (this);
+
+    return superblock_range (std::move (begin));
+  }
+
+  /* Return a range adapter that iterates over B and its superblocks.  */
+
+  static superblock_range block_and_superblocks (const block *b)
+  {
+    if (b == nullptr)
+      return superblock_range ();
+
+    return b->block_and_superblocks ();
+  }
 
   /* Return true if block A is lexically nested within this block, or
      if A and this block have the same pc range.  Return false
