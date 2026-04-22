@@ -217,7 +217,7 @@ inline_frame_sniffer (const struct frame_unwind *self,
 		      void **this_cache)
 {
   CORE_ADDR this_pc;
-  const struct block *frame_block, *cur_block;
+  const struct block *frame_block;
   int depth;
   frame_info_ptr next_frame;
   struct inline_state *state = find_inline_frame_state (inferior_thread ());
@@ -230,15 +230,15 @@ inline_frame_sniffer (const struct frame_unwind *self,
   /* Calculate DEPTH, the number of inlined functions at this
      location.  */
   depth = 0;
-  cur_block = frame_block;
-  while (cur_block->superblock ())
+  for (auto cur_block : frame_block->block_and_superblocks ())
     {
+      if (cur_block->superblock () == nullptr)
+	break;
+
       if (cur_block->inlined_p ())
 	depth++;
       else if (cur_block->function () != NULL)
 	break;
-
-      cur_block = cur_block->superblock ();
     }
 
   /* Check how many inlined functions already have frames.  */

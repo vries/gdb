@@ -1195,11 +1195,10 @@ iterate_over_file_blocks
    domain_search_flags domain,
    for_each_symbol_callback_ftype callback)
 {
-  const struct block *block;
+  const struct block *static_block
+    = symtab->compunit ().blockvector ()->static_block ();
 
-  for (block = symtab->compunit ().blockvector ()->static_block ();
-       block != NULL;
-       block = block->superblock ())
+  for (auto block : block::block_and_superblocks (static_block))
     current_language->for_each_symbol (block, name, domain, callback);
 }
 

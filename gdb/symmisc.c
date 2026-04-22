@@ -959,13 +959,7 @@ maintenance_expand_symtabs (const char *args, int from_tty)
 static int
 block_depth (const struct block *block)
 {
-  int i = 0;
-
-  while ((block = block->superblock ()) != NULL)
-    {
-      i++;
-    }
-  return i;
+  return block::block_and_superblocks (block).size () - 1;
 }
 
 

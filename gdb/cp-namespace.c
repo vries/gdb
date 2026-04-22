@@ -649,13 +649,11 @@ cp_lookup_symbol_via_all_imports (const char *scope, const char *name,
 {
   struct block_symbol sym;
 
-  while (block != NULL)
+  for (auto b : block::block_and_superblocks (block))
     {
-      sym = cp_lookup_symbol_via_imports (scope, name, block, domain, 0, 1);
+      sym = cp_lookup_symbol_via_imports (scope, name, b, domain, 0, 1);
       if (sym.symbol != nullptr)
 	return sym;
-
-      block = block->superblock ();
     }
 
   return {};

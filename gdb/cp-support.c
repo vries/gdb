@@ -1408,15 +1408,11 @@ add_symbol_overload_list_using (const char *func_name,
 				const char *the_namespace,
 				std::vector<symbol *> *overload_list)
 {
-  const struct block *block;
-
   /* First, go through the using directives.  If any of them apply,
      look in the appropriate namespaces for new functions to match
      on.  */
 
-  for (block = get_selected_block (0);
-       block != NULL;
-       block = block->superblock ())
+  for (auto block : block::block_and_superblocks (get_selected_block (0)))
     for (using_direct *current : block->get_using ())
       {
 	/* Prevent recursive calls.  */
@@ -1459,7 +1455,7 @@ add_symbol_overload_list_qualified (const char *func_name,
   /* Search upwards from currently selected frame (so that we can
      complete on local vars.  */
 
-  for (const block *b = selected_block; b != nullptr; b = b->superblock ())
+  for (auto b : block::block_and_superblocks (selected_block))
     add_symbol_overload_list_block (func_name, b, overload_list);
 
   const block *surrounding_static_block = (selected_block == nullptr

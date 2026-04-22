@@ -443,10 +443,12 @@ get_out_value_type (struct symbol *func_sym, struct objfile *objfile,
 	continue;
 
       function_block = block;
-      while (function_block != bv->static_block ()
-	     && function_block != bv->global_block ())
+      for (auto b : block::block_and_superblocks (block))
 	{
-	  function_block = function_block->superblock ();
+	  if (b == bv->static_block () || b == bv->global_block ())
+	    break;
+
+	  function_block = b->superblock ();
 	  function = function_block->function ();
 	  if (function != NULL)
 	    break;

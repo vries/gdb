@@ -5404,17 +5404,15 @@ ada_add_local_symbols (std::vector<struct block_symbol> &result,
 		       const lookup_name_info &lookup_name,
 		       const struct block *block, domain_search_flags domain)
 {
-  while (block != NULL)
+  for (auto b : block::block_and_superblocks (block))
     {
-      ada_add_block_symbols (result, block, lookup_name, domain, NULL);
+      ada_add_block_symbols (result, b, lookup_name, domain, nullptr);
 
       /* If we found a non-function match, assume that's the one.  We
 	 only check this when finding a function boundary, so that we
 	 can accumulate all results from intervening blocks first.  */
-      if (block->function () != nullptr && is_nonfunction (result))
+      if (b->function () != nullptr && is_nonfunction (result))
 	return;
-
-      block = block->superblock ();
     }
 }
 
@@ -13741,9 +13739,7 @@ public:
     /* Search upwards from currently selected frame (so that we can
        complete on local vars.  */
 
-    for (const block *b = get_selected_block (0);
-	 b != nullptr;
-	 b = b->superblock ())
+    for (auto b : block::block_and_superblocks (get_selected_block (0)))
       {
 	if (b->is_static_block ())
 	  surrounding_static_block = b;   /* For elmin of dups */
@@ -13768,9 +13764,9 @@ public:
 	auto callback = [&] (compunit_symtab *s)
 	  {
 	    QUIT;
-	    for (const block *b = s->blockvector ()->static_block ();
-		 b != nullptr;
-		 b = b->superblock ())
+	    const struct block *static_block
+	      = s->blockvector ()->static_block ();
+	    for (auto b : block::block_and_superblocks (static_block))
 	      {
 		/* Don't do this block twice.  */
 		if (b == surrounding_static_block)

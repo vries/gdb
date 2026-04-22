@@ -373,21 +373,15 @@ dwarf_find_and_extend_inline_block_range (dwarf2_cu *cu,
      the child of a non-inline block.  This is new inline block is our
      candidate for extending.  */
   struct block *block = nullptr;
-  for (const struct block *b = it->second;
-       b != nullptr;
-       b = b->superblock ())
-    {
-      if (b->inlined_p ())
-	{
-	  if (b->superblock () != nullptr
-	      && b->superblock ()->function () != nullptr
-	      && !b->superblock ()->inlined_p ())
-	    {
-	      block = const_cast<struct block *> (b);
-	      break;
-	    }
-	}
-    }
+  for (auto b : block::block_and_superblocks (it->second))
+    if (b->inlined_p ()
+	&& b->superblock () != nullptr
+	&& b->superblock ()->function () != nullptr
+	&& !b->superblock ()->inlined_p ())
+      {
+	block = const_cast<struct block *> (b);
+	break;
+      }
 
   /* If we didn't find a block, or the block we found wasn't called from
      the expected LINE, then we're done.  Maybe we should try harder to

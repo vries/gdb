@@ -481,14 +481,12 @@ d_lookup_symbol_module (const char *scope, const char *name,
 
   /* Search for name in modules imported to this and parent
      blocks.  */
-  while (block != NULL)
+  for (auto b : block::block_and_superblocks (block))
     {
-      sym = d_lookup_symbol_imports (scope, name, block, domain);
+      sym = d_lookup_symbol_imports (scope, name, b, domain);
 
       if (sym.symbol != NULL)
 	return sym;
-
-      block = block->superblock ();
     }
 
   return {};

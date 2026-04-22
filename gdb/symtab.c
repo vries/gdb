@@ -2181,14 +2181,17 @@ lookup_local_symbol (const char *name,
 
   const char *scope = block->scope ();
 
-  while (!block->is_global_block () && !block->is_static_block ())
+  for (auto b : block->block_and_superblocks ())
     {
-      struct symbol *sym = lookup_symbol_in_block (name, match_type,
-						   block, domain);
-      if (sym != NULL)
-	return (struct block_symbol) {sym, block};
+      if (b->is_global_block () || b->is_static_block ())
+	break;
 
-      struct symbol *function = block->function ();
+      struct symbol *sym = lookup_symbol_in_block (name, match_type,
+						   b, domain);
+      if (sym != NULL)
+	return (struct block_symbol) {sym, b};
+
+      struct symbol *function = b->function ();
       if (function != nullptr && function->is_template_function ())
 	{
 	  struct template_symbol *templ = (struct template_symbol *) function;
@@ -2196,17 +2199,16 @@ lookup_local_symbol (const char *name,
 				    templ->n_template_arguments,
 				    templ->template_arguments);
 	  if (sym != nullptr)
-	    return (struct block_symbol) {sym, block};
+	    return (struct block_symbol) {sym, b};
 	}
 
       struct block_symbol blocksym
-	= langdef->lookup_symbol_local (scope, name, block, domain);
+	= langdef->lookup_symbol_local (scope, name, b, domain);
       if (blocksym.symbol != nullptr)
 	return blocksym;
 
-      if (block->inlined_p ())
+      if (b->inlined_p ())
 	break;
-      block = block->superblock ();
     }
 
   /* We've reached the end of the function without finding a result.  */
@@ -3829,13 +3831,17 @@ skip_prologue_sal (struct symtab_and_line *sal)
      use the call site of the function instead.  */
   const block *function_block = nullptr;
 
-  for (const block *b = block_for_pc_sect (sal->pc, sal->section);
-       b != nullptr;
-       b = b->superblock ())
-    if (b->inlined_p ())
-      function_block = b;
-    else if (b->function () != NULL)
-      break;
+  const block *pc_block = block_for_pc_sect (sal->pc, sal->section);
+  for (auto b: block::block_and_superblocks (pc_block))
+    {
+      if (b->function () == nullptr)
+	continue;
+
+      if (b->inlined_p ())
+	function_block = b;
+      else
+	break;
+    }
 
   if (function_block != NULL
       && function_block->function ()->line () != 0)
@@ -5864,7 +5870,7 @@ default_collect_symbol_completion_matches_break_on
      frees them.  I'm not going to worry about this; hopefully there
      won't be that many.  */
 
-  const struct block *b;
+  const struct block *selected_block;
   const struct block *surrounding_static_block, *surrounding_global_block;
   /* The symbol we are completing on.  Points in same buffer as text.  */
   const char *sym_text;
@@ -5973,12 +5979,17 @@ default_collect_symbol_completion_matches_break_on
      this places which match our text string.  Only complete on types
      visible from current context.  */
 
-  b = get_selected_block (0);
-  surrounding_static_block = b == nullptr ? nullptr : b->static_block ();
-  surrounding_global_block = b == nullptr ? nullptr : b->global_block ();
+  selected_block = get_selected_block (0);
+  surrounding_static_block
+    = selected_block == nullptr ? nullptr : selected_block->static_block ();
+  surrounding_global_block
+    = selected_block == nullptr ? nullptr : selected_block->global_block ();
   if (surrounding_static_block != NULL)
-    while (b != surrounding_static_block)
+    for (auto b : block::block_and_superblocks (selected_block))
       {
+	if (b == surrounding_static_block)
+	  break;
+
 	QUIT;
 
 	for (struct symbol *sym : block_iterator_range (b))
@@ -6001,7 +6012,6 @@ default_collect_symbol_completion_matches_break_on
 	   are in scope for a nested function.  */
 	if (b->inlined_p ())
 	  break;
-	b = b->superblock ();
       }
 
   /* Add fields from the file's types; symbols will be added below.  */
