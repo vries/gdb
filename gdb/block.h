@@ -127,7 +127,42 @@ struct block : public allocate_on_obstack<block>
     }
   };
 
+  /* Variant of next_iterator using the superblock field instead of next.  */
+  struct function_block_iterator
+    : base_next_iterator<const block, function_block_iterator>
+  {
+    typedef function_block_iterator self_type;
+
+    explicit function_block_iterator (value_type item)
+      : base_next_iterator (item->is_global_block () || item->is_static_block ()
+			    ? nullptr : item)
+    {
+    }
+
+    function_block_iterator () = default;
+
+    value_type next ()
+    {
+      if (m_item->function () != nullptr)
+	return nullptr;
+
+      value_type next = m_item->superblock ();
+      if (next->is_global_block () || next->is_static_block ())
+	{
+	  /* This shouldn't be reachable in well-formed block hierarchies, given
+	     that we avoid global and static block in the constructor, and
+	     stop iterating when encountering a function.  But let's try to be
+	     robust and ensure that this iterator never points to a static or
+	     global block.  */
+	  return nullptr;
+	}
+
+      return next;
+    }
+  };
+
   using superblock_range = iterator_range<superblock_iterator>;
+  using function_block_range = iterator_range<function_block_iterator>;
 
   /* Return this block's start address.  */
   CORE_ADDR start () const
@@ -350,6 +385,27 @@ struct block : public allocate_on_obstack<block>
       return superblock_range ();
 
     return b->block_and_superblocks ();
+  }
+
+  /* Return a range adapter that iterates over this block and its
+     superblocks in the same function.  */
+
+  function_block_range block_and_superblocks_in_fn () const
+  {
+    function_block_range::iterator begin (this);
+
+    return function_block_range (std::move (begin));
+  }
+
+  /* Return a range adapter that iterates over B and its superblocks in the
+     same function.  */
+
+  static function_block_range block_and_superblocks_in_fn (const block *b)
+  {
+    if (b == nullptr)
+      return function_block_range ();
+
+    return b->block_and_superblocks_in_fn ();
   }
 
   /* Return true if block A is lexically nested within this block, or
