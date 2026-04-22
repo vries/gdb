@@ -120,10 +120,9 @@ get_frame_function (const frame_info_ptr &frame)
   if (bl == NULL)
     return NULL;
 
-  while (bl->function () == NULL && bl->superblock () != NULL)
-    bl = bl->superblock ();
+  bl = bl->function_block ();
 
-  return bl->function ();
+  return bl == nullptr ? nullptr : bl->function ();
 }
 
 
