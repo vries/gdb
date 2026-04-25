@@ -1,0 +1,6 @@
+DEFAULT:
+  perform_check: yes
+
+allowed_licenses:
+    - GPL-3.0-or-later
+  license_for_new_files: GPL-3.0-or-later

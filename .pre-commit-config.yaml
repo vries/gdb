@@ -119,3 +119,8 @@ repos:
       args: [--trust-plugins]
       types_or: [file]
       files: '^gdb/testsuite/.*\.(exp|tcl)$'
+  - repo: https://github.com/espressif/check-copyright/
+    rev: v1.0.0
+    hooks:
+    - id: check-copyright
+      args: ['--config', 'gdb/contrib/check_copyright_config.yaml']
