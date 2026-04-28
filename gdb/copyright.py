@@ -87,6 +87,13 @@ def update_files(update_list: Iterable[str]):
 
     We use gnulib's update-copyright script for that.
     """
+
+    update_list = list(update_list)
+    if not update_list:
+        # When running gnulib/import/extra/update-copyright with no arguments,
+        # it reads from stdin, causing a hang.
+        return
+
     # We want to use year intervals in the copyright notices, and
     # all years should be collapsed to one single year interval,
     # even if there are "holes" in the list of years found in the
