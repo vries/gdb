@@ -42,6 +42,20 @@ import sys
 from typing import Iterable
 
 
+def filter_excluded(files: list[str]) -> list[str]:
+    full_exclude_list = EXCLUDE_LIST + BY_HAND
+
+    def include_file(filename: str):
+        path = pathlib.Path(filename)
+        for pattern in full_exclude_list:
+            if path.full_match(pattern):
+                return False
+
+        return True
+
+    return filter(include_file, files)
+
+
 def get_update_list():
     """Return the list of files to update.
 
@@ -49,7 +63,7 @@ def get_update_list():
     of the GDB source tree (NOT the gdb/ subdirectory!).  The names of
     the files are relative to that root directory.
     """
-    result = (
+    return (
         subprocess.check_output(
             [
                 "git",
@@ -68,18 +82,6 @@ def get_update_list():
         .rstrip("\0")
         .split("\0")
     )
-
-    full_exclude_list = EXCLUDE_LIST + BY_HAND
-
-    def include_file(filename: str):
-        path = pathlib.Path(filename)
-        for pattern in full_exclude_list:
-            if path.full_match(pattern):
-                return False
-
-        return True
-
-    return filter(include_file, result)
 
 
 def update_files(update_list: Iterable[str]):
@@ -191,6 +193,7 @@ def main(argv: list[str]) -> int | None:
         sys.exit("Error: This script must be called from the top-level directory.")
 
     update_list = get_update_list()
+    update_list = filter_excluded(update_list)
     update_files(update_list)
 
     run_autoreconf()
