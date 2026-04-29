@@ -112,6 +112,13 @@ repos:
       additional_dependencies: ["pyyaml"]
       always_run: true
       require_serial: true
+    - id: copyright-years
+      name: copyright-years
+      language: python
+      entry: gdb/copyright.py
+      args: [--pre-commit]
+      files: '^(gdb|gdbsupport|gdbserver)/.*$'
+      pass_filenames: true
   - repo: https://github.com/nmoroze/tclint
     rev: v0.8.0
     hooks:

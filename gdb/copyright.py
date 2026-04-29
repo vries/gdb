@@ -181,6 +181,7 @@ def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
+    parser.add_argument("--pre-commit", nargs="+")
     return parser
 
 
@@ -192,14 +193,22 @@ def main(argv: list[str]) -> int | None:
         sys.exit("Error: This script requires python >= 3.13.")
 
     parser = get_parser()
-    _ = parser.parse_args(argv)
+    args = parser.parse_args(argv)
 
     if not os.path.isfile("gnulib/import/extra/update-copyright"):
         sys.exit("Error: This script must be called from the top-level directory.")
 
-    update_list = get_update_list()
+    # Get the update list from pre-commit, or create the list.
+    update_list = args.pre_commit if args.pre_commit else get_update_list()
+
     update_list = filter_excluded(update_list)
     update_files(update_list)
+
+    if args.pre_commit:
+        # Running autoreconf requires a specific version, and asking for
+        # but not checking manual updates doesn't fit well with pre-commit.
+        # Let's just use the automatic update part.
+        return
 
     run_autoreconf()
 
