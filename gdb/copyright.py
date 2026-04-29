@@ -186,6 +186,11 @@ def get_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str]) -> int | None:
     """The main subprogram."""
+
+    # We require >= 3.13 because of using pathlib.Path.full_match.
+    if not sys.version_info >= (3, 13):
+        sys.exit("Error: This script requires python >= 3.13.")
+
     parser = get_parser()
     _ = parser.parse_args(argv)
 
