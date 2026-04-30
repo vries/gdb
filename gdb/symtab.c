@@ -3929,19 +3929,13 @@ skip_prologue_using_sal (struct gdbarch *gdbarch, CORE_ADDR func_addr)
 	     same function, not something inlined.  If it's inlined,
 	     then there is no point comparing the line numbers.  */
 	  bl = block_for_pc (prologue_sal.end);
-	  while (bl)
+	  if (bl != nullptr)
 	    {
-	      if (bl->inlined_p ())
+	      struct symbol *containing_function = bl->containing_function ();
+	      if (containing_function != nullptr
+		  && containing_function->is_inlined ())
 		break;
-	      if (bl->function ())
-		{
-		  bl = NULL;
-		  break;
-		}
-	      bl = bl->superblock ();
 	    }
-	  if (bl != NULL)
-	    break;
 
 	  /* The case in which compiler's optimizer/scheduler has
 	     moved instructions into the prologue.  We look ahead in

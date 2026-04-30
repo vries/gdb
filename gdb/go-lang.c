@@ -430,28 +430,21 @@ go_symbol_package_name (const struct symbol *sym)
 gdb::unique_xmalloc_ptr<char>
 go_block_package_name (const struct block *block)
 {
-  while (block != NULL)
-    {
-      struct symbol *function = block->function ();
+  struct symbol *function
+    = block != nullptr ? block->containing_function () : nullptr;
+  if (function == nullptr)
+    return nullptr;
 
-      if (function != NULL)
-	{
-	  gdb::unique_xmalloc_ptr<char> package_name
-	    = go_symbol_package_name (function);
+  gdb::unique_xmalloc_ptr<char> package_name
+    = go_symbol_package_name (function);
 
-	  if (package_name != NULL)
-	    return package_name;
+  if (package_name != nullptr)
+    return package_name;
 
-	  /* Stop looking if we find a function without a package name.
-	     We're most likely outside of Go and thus the concept of the
-	     "current" package is gone.  */
-	  return NULL;
-	}
-
-      block = block->superblock ();
-    }
-
-  return NULL;
+  /* Stop looking if we find a function without a package name.
+     We're most likely outside of Go and thus the concept of the
+     "current" package is gone.  */
+  return nullptr;
 }
 
 /* See language.h.  */
