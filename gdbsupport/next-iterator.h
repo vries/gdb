@@ -21,27 +21,27 @@
 
 #include "gdbsupport/iterator-range.h"
 
-/* An iterator that uses the 'next' field of a type to iterate.  This
-   can be used with various GDB types that are stored as linked
-   lists.  */
+/* An iterator base class for iterating over a field of a type.  In order to
+   form a functioning iterator, classes inheriting this should define a next
+   function, which determines the actual field that is iterated over.  */
 
-template<typename T>
-struct next_iterator
+template<typename T, class D>
+struct base_next_iterator
 {
-  using self_type = next_iterator;
+  using self_type = base_next_iterator;
   using value_type = T *;
   using reference = T *&;
   using pointer = T **;
   using iterator_category = std::forward_iterator_tag;
   using difference_type = int;
 
-  explicit next_iterator (T *item)
+  explicit base_next_iterator (T *item)
     : m_item (item)
   {
   }
 
   /* Create a one-past-the-end iterator.  */
-  next_iterator ()
+  base_next_iterator ()
     : m_item (nullptr)
   {
   }
@@ -63,13 +63,29 @@ struct next_iterator
 
   self_type &operator++ ()
   {
-    m_item = m_item->next;
+    m_item = static_cast<D *> (this)->next ();
     return *this;
   }
 
-private:
+protected:
 
   T *m_item;
+};
+
+/* An iterator that uses the 'next' field of a type to iterate.  This
+   can be used with various GDB types that are stored as linked
+   lists.  Note that we're using CRTP here.  */
+
+template<typename T>
+struct next_iterator : base_next_iterator<T, next_iterator<T>>
+{
+  using base_next_iterator<T, next_iterator<T>>::base_next_iterator;
+  using base_next_iterator<T, next_iterator<T>>::m_item;
+
+  T *next ()
+  {
+    return m_item->next;
+  }
 };
 
 /* A convenience wrapper to make a range type around a next_iterator.  */
