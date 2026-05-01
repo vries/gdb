@@ -258,6 +258,11 @@ struct block : public allocate_on_obstack<block>
 
   struct symbol *containing_function () const;
 
+  /* Return the block for the closest enclosing function, which might be an
+     inline function.  */
+
+  const struct block *containing_function_block () const;
+
   /* Return the static block associated with this block.  Return NULL
      if block is a global block.  */
 

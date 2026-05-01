@@ -99,15 +99,25 @@ block::linkage_function () const
 
 /* See block.h.  */
 
-struct symbol *
-block::containing_function () const
+const struct block *
+block::containing_function_block () const
 {
   const block *bl = this;
 
-  while (bl->function () == NULL && bl->superblock () != NULL)
+  while (bl->function () == nullptr && bl->superblock () != nullptr)
     bl = bl->superblock ();
 
-  return bl->function ();
+  return bl->function () != nullptr ? bl : nullptr;
+}
+
+/* See block.h.  */
+
+struct symbol *
+block::containing_function () const
+{
+  const block *bl = containing_function_block ();
+
+  return bl != nullptr ? bl->function () : nullptr;
 }
 
 /* See block.h.  */
