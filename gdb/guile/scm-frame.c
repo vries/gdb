@@ -598,7 +598,7 @@ static SCM
 gdbscm_frame_block (SCM self)
 {
   frame_smob *f_smob;
-  const struct block *block = NULL, *fn_block;
+  const struct block *block = nullptr;
   bool found = false;
 
   f_smob = frscm_get_frame_smob_arg_unsafe (self, SCM_ARG1, FUNC_NAME);
@@ -625,12 +625,11 @@ gdbscm_frame_block (SCM self)
 				   _("<gdb:frame>"));
     }
 
-  for (fn_block = block;
-       fn_block != NULL && fn_block->function () == NULL;
-       fn_block = fn_block->superblock ())
-    continue;
-
-  if (block == NULL || fn_block == NULL || fn_block->function () == NULL)
+  const struct block *fn_block
+    = (block != nullptr
+       ? block->containing_function_block ()
+       : nullptr);
+  if (fn_block == nullptr)
     {
       scm_misc_error (FUNC_NAME, _("cannot find block for frame"),
 		      scm_list_1 (self));

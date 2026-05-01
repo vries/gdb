@@ -55,7 +55,6 @@ get_frame_block (const frame_info_ptr &frame, CORE_ADDR *addr_in_block)
 {
   CORE_ADDR pc;
   const struct block *bl;
-  int inline_count;
 
   if (!get_frame_address_in_block_if_available (frame, &pc))
     return NULL;
@@ -67,15 +66,13 @@ get_frame_block (const frame_info_ptr &frame, CORE_ADDR *addr_in_block)
   if (bl == NULL)
     return NULL;
 
-  inline_count = frame_inlined_callees (frame);
-
-  while (inline_count > 0)
+  for (int inline_count = frame_inlined_callees (frame); inline_count > 0;
+       inline_count--)
     {
-      if (bl->inlined_p ())
-	inline_count--;
+      bl = bl->containing_function_block ();
+      gdb_assert (bl->inlined_p ());
 
       bl = bl->superblock ();
-      gdb_assert (bl != NULL);
     }
 
   return bl;

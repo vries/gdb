@@ -3872,17 +3872,16 @@ find_label_symbols (struct linespec_state *self,
       set_current_program_space (self->program_space);
       block = get_current_search_block ();
 
-      for (;
-	   block && !block->function ();
-	   block = block->superblock ())
-	;
-
-      if (!block)
+      const struct block *fn_block
+	= (block != nullptr
+	   ? block->containing_function_block ()
+	   : nullptr);
+      if (fn_block == nullptr)
 	return {};
 
-      fn_sym = block->function ();
+      fn_sym = fn_block->function ();
 
-      find_label_symbols_in_block (block, name, fn_sym, completion_mode,
+      find_label_symbols_in_block (fn_block, name, fn_sym, completion_mode,
 				   &result, label_funcs_ret);
     }
   else

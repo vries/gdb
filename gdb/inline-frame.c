@@ -370,10 +370,9 @@ gather_inline_frames (CORE_ADDR this_pc)
     return {};
 
   std::vector<const symbol *> function_symbols;
-  for (; cur_block != nullptr; cur_block = cur_block->superblock ())
+  for (cur_block = cur_block->containing_function_block (); cur_block != nullptr;
+       cur_block = cur_block->superblock ()->containing_function_block ())
     {
-      if (cur_block->function () == nullptr)
-	continue;
       function_symbols.push_back (cur_block->function ());
 
       /* See comments in inline_frame_this_id about this use

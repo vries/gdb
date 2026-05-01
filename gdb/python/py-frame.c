@@ -287,7 +287,7 @@ static PyObject *
 frapy_block (PyObject *self, PyObject *args)
 {
   frame_info_ptr frame;
-  const struct block *block = NULL, *fn_block;
+  const struct block *block = nullptr;
 
   try
     {
@@ -299,12 +299,11 @@ frapy_block (PyObject *self, PyObject *args)
       return gdbpy_handle_gdb_exception (nullptr, except);
     }
 
-  for (fn_block = block;
-       fn_block != NULL && fn_block->function () == NULL;
-       fn_block = fn_block->superblock ())
-    ;
-
-  if (block == NULL || fn_block == NULL || fn_block->function () == NULL)
+  const struct block *fn_block
+    = (block != nullptr
+       ? block->containing_function_block ()
+       : nullptr);
+  if (fn_block == nullptr)
     {
       PyErr_SetString (PyExc_RuntimeError,
 		       _("Cannot locate block for frame."));

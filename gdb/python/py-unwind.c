@@ -658,14 +658,11 @@ pending_framepy_block (PyObject *self, PyObject *args)
       return gdbpy_handle_gdb_exception (nullptr, except);
     }
 
-  for (fn_block = block;
-       fn_block != nullptr && fn_block->function () == nullptr;
-       fn_block = fn_block->superblock ())
-    ;
-
-  if (block == nullptr
-      || fn_block == nullptr
-      || fn_block->function () == nullptr)
+  const struct block *fn_block
+    = (block != nullptr
+       ? block->containing_function_block ()
+       : nullptr);
+  if (fn_block == nullptr)
     {
       PyErr_SetString (PyExc_RuntimeError,
 		       _("Cannot locate block for frame."));
