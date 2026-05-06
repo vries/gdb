@@ -66,6 +66,9 @@ cooked_indexer::check_bounds (cutu_reader *reader)
 	  m_index_storage->get_addrmap ()->set_empty (start, end_inclusive,
 						      cu->per_cu);
 	}
+      [[fallthrough]];
+
+    case PC_BOUNDS_RANGES:
       cu->per_cu->addresses_seen = (non_empty_p
 				    ? addresses_seen_non_empty
 				    : addresses_seen_empty);
