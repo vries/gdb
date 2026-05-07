@@ -41,26 +41,37 @@ cooked_indexer::check_bounds (cutu_reader *reader)
 {
   dwarf2_cu *cu = reader->cu ();
 
-  if (cu->per_cu->addresses_seen)
+  if (cu->per_cu->addresses_seen != addresses_seen_dont_know)
     return;
+  cu->per_cu->addresses_seen = addresses_seen_gathering_empty;
 
-  unrelocated_addr best_lowpc = {}, best_highpc = {};
+    unrelocated_addr best_lowpc = {}, best_highpc = {};
   /* Possibly set the default values of LOWPC and HIGHPC from
      `DW_AT_ranges'.  */
   dwarf2_find_base_address (reader->top_level_die (), cu);
   enum pc_bounds_kind cu_bounds_kind
     = dwarf2_get_pc_bounds (reader->top_level_die (), &best_lowpc, &best_highpc,
 			    cu, m_index_storage->get_addrmap (), cu->per_cu);
-  if (cu_bounds_kind == PC_BOUNDS_HIGH_LOW && best_lowpc < best_highpc)
+  bool non_empty_p = best_lowpc < best_highpc;
+  switch (cu_bounds_kind)
     {
-      /* Store the contiguous range if it is not empty; it can be
-	 empty for CUs with no code.  addrmap requires CORE_ADDR, so
-	 we cast here.  */
-      m_index_storage->get_addrmap ()->set_empty ((CORE_ADDR) best_lowpc,
-						  (CORE_ADDR) best_highpc - 1,
-						  cu->per_cu);
-
-      cu->per_cu->addresses_seen = true;
+    case PC_BOUNDS_HIGH_LOW:
+      if (non_empty_p)
+	{
+	  /* Store the contiguous range if it is not empty; it can be
+	     empty for CUs with no code.  addrmap requires CORE_ADDR, so
+	     we cast here.  */
+	  CORE_ADDR start = (CORE_ADDR) best_lowpc;
+	  CORE_ADDR end_inclusive = (CORE_ADDR) best_highpc - 1;
+	  m_index_storage->get_addrmap ()->set_empty (start, end_inclusive,
+						      cu->per_cu);
+	}
+      cu->per_cu->addresses_seen = (non_empty_p
+				    ? addresses_seen_non_empty
+				    : addresses_seen_empty);
+      break;
+    default:
+      break;
     }
 }
 
@@ -255,7 +266,8 @@ cooked_indexer::scan_attributes (dwarf2_per_cu *scanning_per_cu,
 	  break;
 
 	case DW_AT_ranges:
-	  if (!scanning_per_cu->addresses_seen)
+	  if (scanning_per_cu->addresses_seen == addresses_seen_gathering_empty
+	      || scanning_per_cu->addresses_seen == addresses_seen_gathering_non_empty)
 	    {
 	      /* Offset in the .debug_ranges or .debug_rnglist section
 		 (depending on DWARF version).  */
@@ -265,10 +277,13 @@ cooked_indexer::scan_attributes (dwarf2_per_cu *scanning_per_cu,
 		 want to add this value.  */
 	      ranges_offset += reader->cu ()->gnu_ranges_base;
 
-	      dwarf2_ranges_read (ranges_offset, nullptr, nullptr,
-				  reader->cu (),
-				  m_index_storage->get_addrmap (),
-				  scanning_per_cu, abbrev->tag);
+	      bool non_empty_p
+		= dwarf2_ranges_read (ranges_offset, nullptr, nullptr,
+				      reader->cu (),
+				      m_index_storage->get_addrmap (),
+				      scanning_per_cu, abbrev->tag);
+	      if (non_empty_p)
+		scanning_per_cu->addresses_seen = addresses_seen_gathering_non_empty;
 	    }
 	  break;
 
@@ -372,7 +387,9 @@ cooked_indexer::scan_attributes (dwarf2_per_cu *scanning_per_cu,
 	  && strstr (*name, "__") != nullptr)
 	*linkage_name = *name;
 
-      if (!scanning_per_cu->addresses_seen && low_pc.has_value ()
+      if ((scanning_per_cu->addresses_seen == addresses_seen_gathering_empty
+	   || scanning_per_cu->addresses_seen == addresses_seen_gathering_non_empty)
+	  && low_pc.has_value ()
 	  && (reader->cu ()->per_objfile->per_bfd->has_section_at_zero
 	      || *low_pc != (unrelocated_addr) 0)
 	  && high_pc.has_value ())
@@ -387,6 +404,7 @@ cooked_indexer::scan_attributes (dwarf2_per_cu *scanning_per_cu,
 	      m_index_storage->get_addrmap ()->set_empty
 		((CORE_ADDR) *low_pc, (CORE_ADDR) *high_pc - 1,
 		 scanning_per_cu);
+	      scanning_per_cu->addresses_seen = addresses_seen_gathering_non_empty;
 	    }
 	}
 

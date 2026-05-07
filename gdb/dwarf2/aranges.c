@@ -209,9 +209,11 @@ read_addrmap_from_aranges (dwarf2_per_objfile *per_objfile,
 	    }
 	  ULONGEST end = start + length;
 	  mutable_map->set_empty (start, end - 1, per_cu);
+	  per_cu->addresses_seen = addresses_seen_non_empty;
 	}
 
-      per_cu->addresses_seen = true;
+      if (per_cu->addresses_seen == addresses_seen_dont_know)
+	per_cu->addresses_seen = addresses_seen_empty;
     }
 
   return true;

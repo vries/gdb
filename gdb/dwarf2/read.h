@@ -86,6 +86,15 @@ struct dwarf2_per_cu_deleter
 /* A specialization of unique_ptr for dwarf2_per_cu and subclasses.  */
 using dwarf2_per_cu_up = std::unique_ptr<dwarf2_per_cu, dwarf2_per_cu_deleter>;
 
+enum addresses_seen
+{
+  addresses_seen_dont_know,
+  addresses_seen_gathering_empty,
+  addresses_seen_gathering_non_empty,
+  addresses_seen_empty,
+  addresses_seen_non_empty
+};
+
 /* Persistent data held for a compilation unit, even when not
    processing it.  We put a pointer to this structure in the
    psymtab.  */
@@ -172,7 +181,7 @@ public:
 
   /* If addresses have been read for this CU (usually from
      .debug_aranges), then this flag is set.  */
-  packed<bool, 1> addresses_seen = false;
+  packed<enum addresses_seen, 1> addresses_seen = addresses_seen_dont_know;
 
   /* True if we've tried to read the file table.  There will be no
      point in trying to read it again next time.  */
