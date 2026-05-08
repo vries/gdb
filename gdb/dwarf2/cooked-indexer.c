@@ -254,27 +254,6 @@ cooked_indexer::scan_attributes (dwarf2_per_cu *scanning_per_cu,
 	    high_pc_relative = true;
 	  break;
 
-	case DW_AT_location:
-	  if (!scanning_per_cu->addresses_seen && attr.form_is_block ())
-	    {
-	      struct dwarf_block *locdesc = attr.as_block ();
-	      CORE_ADDR addr;
-	      dwarf2_cu *cu = reader->cu ();
-
-	      if (decode_locdesc (locdesc, cu, &addr)
-		  && (addr != 0
-		      || cu->per_objfile->per_bfd->has_section_at_zero))
-		{
-		  low_pc = (unrelocated_addr) addr;
-		  /* For variables, we don't want to try decoding the
-		     type just to find the size -- for gdb's purposes
-		     we only need the address of a variable.  */
-		  high_pc = (unrelocated_addr) (addr + 1);
-		  high_pc_relative = false;
-		}
-	    }
-	  break;
-
 	case DW_AT_ranges:
 	  if (!scanning_per_cu->addresses_seen)
 	    {
