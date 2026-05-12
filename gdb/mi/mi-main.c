@@ -214,14 +214,13 @@ mi_cmd_exec_return (const char *command, const char *const *argv, int argc)
 {
   /* This command doesn't really execute the target, it just pops the
      specified number of frames.  */
-  if (argc)
-    /* Call return_command with from_tty argument equal to 0 so as to
-       avoid being queried.  */
-    return_command (*argv, 0);
-  else
-    /* Call return_command with from_tty argument equal to 0 so as to
-       avoid being queried.  */
-    return_command (NULL, 0);
+
+  /* Call return_command with from_tty argument equal to 0 so as to
+     avoid being queried.  */
+  return_command ((argc
+		   ? *argv
+		   : nullptr),
+		  0);
 
   /* Because we have called return_command with from_tty = 0, we need
      to print the frame here.  */

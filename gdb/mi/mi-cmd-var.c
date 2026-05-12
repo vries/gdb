@@ -194,15 +194,20 @@ mi_parse_format (const char *arg)
 
       if (strncmp (arg, "natural", len) == 0)
 	return FORMAT_NATURAL;
-      else if (strncmp (arg, "binary", len) == 0)
+
+      if (strncmp (arg, "binary", len) == 0)
 	return FORMAT_BINARY;
-      else if (strncmp (arg, "decimal", len) == 0)
+
+      if (strncmp (arg, "decimal", len) == 0)
 	return FORMAT_DECIMAL;
-      else if (strncmp (arg, "hexadecimal", len) == 0)
+
+      if (strncmp (arg, "hexadecimal", len) == 0)
 	return FORMAT_HEXADECIMAL;
-      else if (strncmp (arg, "octal", len) == 0)
+
+      if (strncmp (arg, "octal", len) == 0)
 	return FORMAT_OCTAL;
-      else if (strncmp (arg, "zero-hexadecimal", len) == 0)
+
+      if (strncmp (arg, "zero-hexadecimal", len) == 0)
 	return FORMAT_ZHEXADECIMAL;
     }
 
@@ -331,10 +336,9 @@ mi_print_value_p (struct varobj *var, enum print_values print_values)
     return 1;
 
   type = varobj_get_gdb_type (var);
-  if (type == NULL)
-    return 1;
-  else
-    return mi_simple_type_p (type);
+  return (type != nullptr
+	  ? mi_simple_type_p (type)
+	  : 1);
 }
 
 /* See mi-cmds.h.  */

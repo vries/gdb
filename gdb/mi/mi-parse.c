@@ -474,12 +474,14 @@ mi_parse_print_values (const char *name)
 {
   if (streq (name, "0") || streq (name, mi_no_values))
     return PRINT_NO_VALUES;
-  else if (streq (name, "1") || streq (name, mi_all_values))
+
+  if (streq (name, "1") || streq (name, mi_all_values))
     return PRINT_ALL_VALUES;
-  else if (streq (name, "2") || streq (name, mi_simple_values))
+
+  if (streq (name, "2") || streq (name, mi_simple_values))
     return PRINT_SIMPLE_VALUES;
-  else
-    error (_("Unknown value for PRINT_VALUES: must be: \
+
+  error (_("Unknown value for PRINT_VALUES: must be: \
 0 or \"%s\", 1 or \"%s\", 2 or \"%s\""),
-	   mi_no_values, mi_all_values, mi_simple_values);
+	 mi_no_values, mi_all_values, mi_simple_values);
 }

@@ -184,10 +184,9 @@ mi_command::mi_command (const char *name, int *suppress_notification)
 std::optional<scoped_restore_tmpl<int>>
 mi_command::do_suppress_notification () const
 {
-  if (m_suppress_notification != nullptr)
-    return scoped_restore_tmpl<int> (m_suppress_notification, 1);
-  else
-    return {};
+  return (m_suppress_notification != nullptr
+	  ? scoped_restore_tmpl<int> (m_suppress_notification, 1)
+	  : {});
 }
 
 /* Initialize the available MI commands.  */

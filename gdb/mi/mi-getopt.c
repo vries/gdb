@@ -73,8 +73,8 @@ mi_getopt_1 (const char *prefix, int argc, const char *const *argv,
 
   if (error_on_unknown)
     error (_("%s: Unknown option ``%s''"), prefix, arg + 1);
-  else
-    return -1;
+
+  return -1;
 }
 
 int
@@ -105,8 +105,7 @@ mi_valid_noargs (const char *prefix, int argc, const char *const *argv)
       { 0, 0, 0 }
     };
 
-  if (mi_getopt (prefix, argc, argv, opts, &oind, &oarg) == -1)
-    return 1;
-  else
-    return 0;
+  return (mi_getopt (prefix, argc, argv, opts, &oind, &oarg) == -1
+	  ? 1
+	  : 0);
 }
