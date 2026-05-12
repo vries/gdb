@@ -135,8 +135,8 @@ plongest (LONGEST l)
 {
   if (l < 0)
     return decimal2str ("-", -l, 0);
-  else
-    return decimal2str ("", l, 0);
+
+  return decimal2str ("", l, 0);
 }
 
 /* Eliminate warning from compiler on 32-bit systems.  */
@@ -280,17 +280,16 @@ int_string (LONGEST val, int radix, int is_signed, int width,
 	     'long int'; cast to an unsigned type to negate this value to
 	     itself.  */
 	  return decimal2str ("-", -(ULONGEST)val, width);
-	else
-	  return decimal2str ("", val, width);
+
+	return decimal2str ("", val, width);
       }
     case 8:
       {
 	char *result = octal2str (val, width);
 
-	if (use_c_format || val == 0)
-	  return result;
-	else
-	  return result + 1;
+	return (use_c_format || val == 0
+		? result
+		: result + 1);
       }
     default:
       internal_error (_("failed internal consistency check"));

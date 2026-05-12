@@ -24,10 +24,9 @@
 int
 tohex (int nib)
 {
-  if (nib < 10)
-    return '0' + nib;
-  else
-    return 'a' + nib - 10;
+  return ((nib < 10)
+	  ? '0' + nib
+	  : 'a' + nib - 10);
 }
 
 /* Encode 64 bits in 16 chars of hex.  */

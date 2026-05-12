@@ -77,10 +77,9 @@ osabi_from_tdesc_string (const char *name)
 	   to enum gdb_osabi.  */
 	enum gdb_osabi osabi = (enum gdb_osabi) i;
 
-	if (osabi == GDB_OSABI_INVALID)
-	  return GDB_OSABI_UNKNOWN;
-	else
-	  return osabi;
+	return (osabi != GDB_OSABI_INVALID
+		? osabi
+		: GDB_OSABI_UNKNOWN);
       }
 
   return GDB_OSABI_UNKNOWN;

@@ -271,19 +271,19 @@ is_digit_in_base (unsigned char digit, int base)
 {
   if (!c_isalnum (digit))
     return 0;
+
   if (base <= 10)
     return (c_isdigit (digit) && digit < base + '0');
-  else
-    return (c_isdigit (digit) || c_tolower (digit) < base - 10 + 'a');
+
+  return (c_isdigit (digit) || c_tolower (digit) < base - 10 + 'a');
 }
 
 static int
 digit_to_int (unsigned char c)
 {
-  if (c_isdigit (c))
-    return c - '0';
-  else
-    return c_tolower (c) - 'a' + 10;
+  return (c_isdigit (c)
+	  ? c - '0'
+	  : c_tolower (c) - 'a' + 10);
 }
 
 /* As for strtoul, but for ULONGEST results.  */
@@ -351,10 +351,9 @@ strtoulst (const char *num, const char **trailer, int base)
     *trailer = &num[i];
 
   result = result + ((ULONGEST) high_part << HIGH_BYTE_POSN);
-  if (minus)
-    return -result;
-  else
-    return result;
+  return (minus
+	  ? -result
+	  : result);
 }
 
 /* See documentation in common-utils.h.  */
@@ -439,12 +438,14 @@ fromhex (int a)
 {
   if (a >= '0' && a <= '9')
     return a - '0';
-  else if (a >= 'a' && a <= 'f')
+
+  if (a >= 'a' && a <= 'f')
     return a - 'a' + 10;
-  else if (a >= 'A' && a <= 'F')
+
+  if (a >= 'A' && a <= 'F')
     return a - 'A' + 10;
-  else
-    error (_("Invalid hex digit %d"), a);
+
+  error (_("Invalid hex digit %d"), a);
 }
 
 /* See gdbsupport/common-utils.h.  */

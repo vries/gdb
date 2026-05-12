@@ -66,8 +66,8 @@ gdb_signal_to_string (enum gdb_signal sig)
 {
   if ((int) sig >= GDB_SIGNAL_FIRST && (int) sig <= GDB_SIGNAL_LAST)
     return signals[sig].string;
-  else
-    return signals[GDB_SIGNAL_UNKNOWN].string;
+
+  return signals[GDB_SIGNAL_UNKNOWN].string;
 }
 
 /* Return the name for a signal.  */
@@ -77,10 +77,10 @@ gdb_signal_to_name (enum gdb_signal sig)
   if ((int) sig >= GDB_SIGNAL_FIRST && (int) sig <= GDB_SIGNAL_LAST
       && signals[sig].name != NULL)
     return signals[sig].name;
-  else
-    /* I think the code which prints this will always print it along
-       with the string, so no need to be verbose (very old comment).  */
-    return "?";
+
+  /* I think the code which prints this will always print it along
+     with the string, so no need to be verbose (very old comment).  */
+  return "?";
 }
 
 /* Given a name, return its signal.  */
@@ -339,13 +339,15 @@ gdb_signal_from_host (int hostsig)
       if (33 <= hostsig && hostsig <= 63)
 	return (enum gdb_signal)
 	  (hostsig - 33 + (int) GDB_SIGNAL_REALTIME_33);
-      else if (hostsig == 32)
+
+      if (hostsig == 32)
 	return GDB_SIGNAL_REALTIME_32;
-      else if (64 <= hostsig && hostsig <= 127)
+
+      if (64 <= hostsig && hostsig <= 127)
 	return (enum gdb_signal)
 	  (hostsig - 64 + (int) GDB_SIGNAL_REALTIME_64);
-      else
-	error (_("GDB bug: target.c (gdb_signal_from_host): "
+
+      error (_("GDB bug: target.c (gdb_signal_from_host): "
 	       "unrecognized real-time signal"));
     }
 #endif
