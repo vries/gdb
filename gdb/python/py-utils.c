@@ -197,8 +197,8 @@ gdbpy_err_fetch::to_string () const
   gdbpy_ref<> value = this->value ();
   if (value.get () != nullptr && value.get () != Py_None)
     return gdbpy_obj_to_string (value.get ());
-  else
-    return gdbpy_obj_to_string (this->type ().get ());
+
+  return gdbpy_obj_to_string (this->type ().get ());
 }
 
 /* See python-internal.h.  */

@@ -137,10 +137,9 @@ build_line_table_tuple_from_entries
       gdbpy_ref<> obj (build_linetable_entry
 			(entry->line, entry->pc (objfile)));
 
-      if (obj == NULL)
-	return NULL;
-      else if (PyTuple_SetItem (tuple.get (), i, obj.release ()) != 0)
-	return NULL;
+      if (obj == null
+	  || PyTuple_SetItem (tuple.get (), i, obj.release ()) != 0)
+	return nullptr;
     }
 
   return tuple.release ();

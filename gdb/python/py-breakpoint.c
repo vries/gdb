@@ -236,8 +236,8 @@ bppy_set_silent (PyObject *self, PyObject *newvalue, void *closure)
   cmp = PyObject_IsTrue (newvalue);
   if (cmp < 0)
     return -1;
-  else
-    breakpoint_set_silent (self_bp->bp, cmp);
+
+  breakpoint_set_silent (self_bp->bp, cmp);
 
   return 0;
 }

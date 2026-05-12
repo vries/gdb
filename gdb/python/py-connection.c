@@ -271,10 +271,10 @@ connpy_get_connection_details (PyObject *self, void *closure)
   CONNPY_REQUIRE_VALID (conn);
 
   const char *details = conn->target->connection_string ();
-  if (details != nullptr)
-    return host_string_to_python_string (details).release ();
-  else
+  if (details == nullptr)
     Py_RETURN_NONE;
+
+  return host_string_to_python_string (details).release ();
 }
 
 /* Python specific initialization for this file.  */

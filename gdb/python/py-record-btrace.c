@@ -510,11 +510,12 @@ btpy_list_item (PyObject *self, Py_ssize_t index)
 
   if (obj->element_type == &recpy_func_type)
     return recpy_func_new (obj->thread, RECORD_METHOD_BTRACE, number);
-  else if (obj->element_type == &recpy_insn_type
+
+  if (obj->element_type == &recpy_insn_type
 	   || obj->element_type == &recpy_aux_type)
     return btpy_item_new (obj->thread, number);
-  else
-    return PyErr_Format (gdbpy_gdb_error, _("Not a valid BtraceList object."));
+
+  return PyErr_Format (gdbpy_gdb_error, _("Not a valid BtraceList object."));
 }
 
 /* Implementation of BtraceList.__getitem__ (self, slice) -> BtraceList.  */

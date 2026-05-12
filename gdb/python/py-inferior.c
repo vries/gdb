@@ -683,10 +683,10 @@ infpy_search_memory (PyObject *self, PyObject *args, PyObject *kw)
       return gdbpy_handle_gdb_exception (nullptr, ex);
     }
 
-  if (found)
-    return gdb_py_object_from_ulongest (found_addr).release ();
-  else
+  if (!found)
     Py_RETURN_NONE;
+
+  return gdb_py_object_from_ulongest (found_addr).release ();
 }
 
 /* Implementation of gdb.Inferior.is_valid (self) -> Boolean.

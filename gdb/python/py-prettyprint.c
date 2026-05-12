@@ -82,7 +82,8 @@ search_pp_list (PyObject *list, PyObject *value)
 							 NULL));
       if (printer == NULL)
 	return NULL;
-      else if (printer != Py_None)
+
+      if (printer != Py_None)
 	return printer;
     }
 

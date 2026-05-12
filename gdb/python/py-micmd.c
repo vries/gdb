@@ -518,10 +518,9 @@ micmdpy_set_installed (PyObject *self, PyObject *newvalue, void *closure)
   if (installed_p == (micmd_obj->mi_command != nullptr))
     return 0;
 
-  if (installed_p)
-    return micmdpy_install_command (micmd_obj);
-  else
-    return micmdpy_uninstall_command (micmd_obj);
+  return (installed_p
+	  ? micmdpy_install_command (micmd_obj);
+	  : micmdpy_uninstall_command (micmd_obj));
 }
 
 /* The gdb.MICommand properties.   */

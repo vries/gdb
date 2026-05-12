@@ -1117,10 +1117,9 @@ bootstrap_python_frame_filters (const frame_info_ptr &frame,
   if (iterable == NULL)
     return NULL;
 
-  if (iterable != Py_None)
-    return PyObject_GetIter (iterable.get ());
-  else
-    return iterable.release ();
+  return (iterable != Py_None
+	  ? PyObject_GetIter (iterable.get ());
+	  : iterable.release ());
 }
 
 /*  This is the only publicly exported function in this file.  FRAME

@@ -152,20 +152,26 @@ make_setting (parmpy_object *s)
 
   if (var_type_uses<bool> (type))
     return setting (type, &s->value.boolval);
-  else if (var_type_uses<int> (type))
+
+  if (var_type_uses<int> (type))
     return setting (type, &s->value.intval, s->extra_literals);
-  else if (var_type_uses<auto_boolean> (type))
+
+  if (var_type_uses<auto_boolean> (type))
     return setting (type, &s->value.autoboolval);
-  else if (var_type_uses<unsigned int> (type))
+
+  if (var_type_uses<unsigned int> (type))
     return setting (type, &s->value.uintval, s->extra_literals);
-  else if (var_type_uses<std::string> (type))
+
+  if (var_type_uses<std::string> (type))
     return setting (type, s->value.stringval);
-  else if (var_type_uses<const char *> (type))
+
+  if (var_type_uses<const char *> (type))
     return setting (type, &s->value.cstringval);
-  else if (var_type_uses<ui_file_style::color> (s->type))
+
+  if (var_type_uses<ui_file_style::color> (s->type))
     return setting (s->type, &s->value.color);
-  else
-    gdb_assert_not_reached ("unhandled var type");
+
+  gdb_assert_not_reached ("unhandled var type");
 }
 
 extern PyTypeObject parmpy_object_type;
