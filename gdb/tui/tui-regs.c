@@ -84,23 +84,21 @@ tui_data_window::last_regs_line_no () const
 int
 tui_data_window::line_from_reg_element_no (int element_no) const
 {
-  if (element_no < m_regs_content.size ())
+  if (element_no >= m_regs_content.size ())
+    return -1;
+
+  int line = -1;
+
+  int i = 1;
+  while (line == -1)
     {
-      int i, line = (-1);
-
-      i = 1;
-      while (line == (-1))
-	{
-	  if (element_no < m_regs_column_count * i)
-	    line = i - 1;
-	  else
-	    i++;
-	}
-
-      return line;
+      if (element_no < m_regs_column_count * i)
+	line = i - 1;
+      else
+	i++;
     }
-  else
-    return (-1);
+
+  return line;
 }
 
 /* See tui-regs.h.  */
@@ -108,10 +106,9 @@ tui_data_window::line_from_reg_element_no (int element_no) const
 int
 tui_data_window::first_reg_element_no_inline (int line_no) const
 {
-  if (line_no * m_regs_column_count <= m_regs_content.size ())
-    return ((line_no + 1) * m_regs_column_count) - m_regs_column_count;
-  else
-    return (-1);
+  return (line_no * m_regs_column_count <= m_regs_content.size ()
+	  ? ((line_no + 1) * m_regs_column_count) - m_regs_column_count
+	  : -1);
 }
 
 /* See tui-regs.h.  */

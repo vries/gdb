@@ -125,10 +125,9 @@ tui_interp::suspend ()
 ui_out *
 tui_interp::interp_ui_out ()
 {
-  if (tui_active)
-    return tui_out;
-  else
-    return tui_old_uiout;
+  return (tui_active
+	  ? tui_out
+	  : tui_old_uiout);
 }
 
 void

@@ -168,7 +168,8 @@ tui_find_backward_disassembly_start_address (CORE_ADDR addr)
 					   &msym_prev);
   if (msym.minsym != nullptr)
     return msym.value_address ();
-  else if (msym_prev.minsym != nullptr)
+
+  if (msym_prev.minsym != nullptr)
     return msym_prev.value_address ();
 
   /* Find the section that ADDR is in, and look for the start of the

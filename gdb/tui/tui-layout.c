@@ -506,10 +506,9 @@ tui_layout_window::specification (ui_file *output, int depth)
 std::string
 tui_layout_window::layout_fingerprint () const
 {
-  if (streq (get_name (), "cmd"))
-    return "C";
-  else
-    return "";
+  return (streq (get_name (), "cmd")
+	  ? "C"
+	  : "");
 }
 
 /* See tui-layout.h.  */

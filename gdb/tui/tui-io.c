@@ -1240,15 +1240,19 @@ tui_getc_1 (FILE *fp)
 	  /* ctrl-arrow keys */
 	  if (name == "kLFT5") /* ctrl-left */
 	    return start_sequence ("\033[1;5D");
-	  else if (name == "kRIT5") /* ctrl-right */
+
+	  if (name == "kRIT5") /* ctrl-right */
 	    return start_sequence ("\033[1;5C");
-	  else if (name == "kDC5") /* ctrl-del */
+
+	  if (name == "kDC5") /* ctrl-del */
 	    return start_sequence ("\033[3;5~");
 
 	  /* alt-arrow keys */
-	  else if (name == "kLFT3") /* alt-left */
+
+	  if (name == "kLFT3") /* alt-left */
 	    return start_sequence ("\033[1;3D");
-	  else if (name == "kRIT3") /* alt-right */
+
+	  if (name == "kRIT3") /* alt-right */
 	    return start_sequence ("\033[1;3C");
 	}
     }
