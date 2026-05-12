@@ -140,8 +140,8 @@ find_end_options_delimiter (const char *args)
 	{
 	  if (check_for_argument (&p, "--"))
 	    return p;
-	  else
-	    p = skip_to_space (p);
+
+	  p = skip_to_space (p);
 	  p = skip_spaces (p);
 	}
     }
@@ -188,13 +188,15 @@ parse_option (gdb::array_view<const option_def_group> options_group,
 {
   if (*args == nullptr)
     return {};
-  else if (**args != '-')
+
+  if (**args != '-')
     {
       if (have_delimiter)
 	error (_("Unrecognized option at: %s"), *args);
       return {};
     }
-  else if (check_for_argument (args, "--"))
+
+  if (check_for_argument (args, "--"))
     return {};
 
   /* Skip the initial '-'.  */

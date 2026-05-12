@@ -38,16 +38,11 @@ scan_expression (const char **cmd, const char *def)
 {
   if ((*cmd) == NULL || (**cmd) == '\0')
     return make_unique_xstrdup (def);
-  else
-    {
-      char *exp;
-      const char *end;
 
-      end = (*cmd) + strcspn (*cmd, " \t");
-      exp = savestring ((*cmd), end - (*cmd));
-      (*cmd) = skip_spaces (end);
-      return gdb::unique_xmalloc_ptr<char> (exp);
-    }
+  const char *end = (*cmd) + strcspn (*cmd, " \t");
+  char *exp = savestring ((*cmd), end - (*cmd));
+  (*cmd) = skip_spaces (end);
+  return gdb::unique_xmalloc_ptr<char> (exp);
 }
 
 

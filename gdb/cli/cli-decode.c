@@ -2434,44 +2434,39 @@ lookup_cmd (const char **line, struct cmd_list_element *list,
 	(last_list ? *(last_list->subcommands) : list);
 
       if (local_allow_unknown < 0)
-	{
-	  if (last_list)
-	    return last_list;	/* Found something.  */
-	  else
-	    return 0;		/* Found nothing.  */
-	}
-      else
-	{
-	  /* Report as error.  */
-	  int amb_len;
-	  char ambbuf[100];
+	return (last_list
+		? last_list	/* Found something.  */
+		: 0);		/* Found nothing.  */
 
-	  for (amb_len = 0;
-	       ((*line)[amb_len] && (*line)[amb_len] != ' '
-		&& (*line)[amb_len] != '\t');
-	       amb_len++)
-	    ;
+      /* Report as error.  */
+      int amb_len;
+      char ambbuf[100];
 
-	  ambbuf[0] = 0;
-	  for (c = local_list; c; c = c->next)
-	    if (!strncmp (*line, c->name, amb_len))
+      for (amb_len = 0;
+	   ((*line)[amb_len] && (*line)[amb_len] != ' '
+	    && (*line)[amb_len] != '\t');
+	   amb_len++)
+	;
+
+      ambbuf[0] = 0;
+      for (c = local_list; c; c = c->next)
+	if (!strncmp (*line, c->name, amb_len))
+	  {
+	    if (strlen (ambbuf) + strlen (c->name) + 6
+		< (int) sizeof ambbuf)
 	      {
-		if (strlen (ambbuf) + strlen (c->name) + 6
-		    < (int) sizeof ambbuf)
-		  {
-		    if (strlen (ambbuf))
-		      strcat (ambbuf, ", ");
-		    strcat (ambbuf, c->name);
-		  }
-		else
-		  {
-		    strcat (ambbuf, "..");
-		    break;
-		  }
+		if (strlen (ambbuf))
+		  strcat (ambbuf, ", ");
+		strcat (ambbuf, c->name);
 	      }
-	  error (_("Ambiguous %scommand \"%s\": %s."),
-		 local_cmdtype.c_str (), *line, ambbuf);
-	}
+	    else
+	      {
+		strcat (ambbuf, "..");
+		break;
+	      }
+	  }
+      error (_("Ambiguous %scommand \"%s\": %s."),
+	     local_cmdtype.c_str (), *line, ambbuf);
     }
   else
     {
@@ -2663,17 +2658,16 @@ lookup_cmd_composition_1 (const char *text,
 	  *cmd = CMD_LIST_AMBIGUOUS;
 	  return 0;
 	}
-      else if (*cmd == nullptr)
+
+      if (*cmd == nullptr)
 	return 0;
-      else
+
+      if ((*cmd)->is_alias ())
 	{
-	  if ((*cmd)->is_alias ())
-	    {
-	      /* If the command was actually an alias, we note that an
-		 alias was used (by assigning *ALIAS) and we set *CMD.  */
-	      *alias = *cmd;
-	      *cmd = (*cmd)->alias_target;
-	    }
+	  /* If the command was actually an alias, we note that an
+	     alias was used (by assigning *ALIAS) and we set *CMD.  */
+	  *alias = *cmd;
+	  *cmd = (*cmd)->alias_target;
 	}
 
       text += len;
