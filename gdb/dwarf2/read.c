@@ -1413,6 +1413,15 @@ dw2_instantiate_symtab (dwarf2_per_cu *per_cu, dwarf2_per_objfile *per_objfile,
       scoped_restore decrementer = increment_reading_symtab ();
       dw2_do_instantiate_symtab (per_cu, per_objfile, skip_partial, domain);
     }
+  else if (!per_cu->imported_symtabs.empty ())
+    {
+      for (auto imported: per_cu->imported_symtabs)
+	{
+	  if (!per_objfile->compunit_symtab_set_p (imported))
+	    dw2_do_instantiate_symtab (imported, per_objfile, skip_partial, domain);
+	}
+      process_cu_includes (per_objfile, {per_cu});
+    }
 
   return per_objfile->get_compunit_symtab (per_cu);
 }
@@ -3730,13 +3739,20 @@ maybe_queue_comp_unit (dwarf2_cu *cu, dwarf2_cu *dependent_cu)
   if (!per_objfile->compunit_symtab_set_p (cu->per_cu))
     {
       /* Add it to the queue.  */
-      queue_comp_unit (cu);
 
-      dwarf_read_debug_printf ("Queuing CU for expansion: "
-			       "section offset = 0x%" PRIx64 ", "
-			       "queue size = %zu",
-			       to_underlying (cu->per_cu->sect_off ()),
-			       cu->per_objfile->queue->size ());
+      if (cu->per_objfile->queue.has_value ())
+	{
+	  queue_comp_unit (cu);
+
+	  dwarf_read_debug_printf ("Queuing CU for expansion: "
+				   "section offset = 0x%" PRIx64 ", "
+				   "queue size = %zu",
+				   to_underlying (cu->per_cu->sect_off ()),
+				   cu->per_objfile->queue->size ());
+	}
+      else
+	dw2_do_instantiate_symtab (cu->per_cu, per_objfile, false,
+				   SEARCH_ALL_DOMAINS);
     }
 
   /* Mark it as used.  */
