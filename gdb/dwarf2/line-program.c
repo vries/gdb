@@ -377,7 +377,7 @@ dwarf_find_and_extend_inline_block_range (dwarf2_cu *cu,
        b != nullptr;
        b = b->superblock ())
     {
-      if (b->function () != nullptr && b->inlined_p ())
+      if (b->inlined_p ())
 	{
 	  if (b->superblock () != nullptr
 	      && b->superblock ()->function () != nullptr

@@ -8985,7 +8985,7 @@ dwarf2_maybe_record_inline_function (struct dwarf2_cu *cu, struct block *block,
 				     unrelocated_addr unrel_high)
 {
   /* If this is the end of an inline block, then record its end address.  */
-  if (block->inlined_p () && block->function () != nullptr)
+  if (block->inlined_p ())
     cu->inline_block_ends.insert ({unrel_high, block});
 }
 

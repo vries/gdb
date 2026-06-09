@@ -365,8 +365,6 @@ gather_inline_frames (CORE_ADDR this_pc)
     {
       if (cur_block->inlined_p ())
 	{
-	  gdb_assert (cur_block->function () != nullptr);
-
 	  /* See comments in inline_frame_this_id about this use
 	     of BLOCK_ENTRY_PC.  */
 	  if (cur_block->entry_pc () == this_pc

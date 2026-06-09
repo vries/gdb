@@ -3832,7 +3832,7 @@ skip_prologue_sal (struct symtab_and_line *sal)
   for (const block *b = block_for_pc_sect (sal->pc, sal->section);
        b != nullptr;
        b = b->superblock ())
-    if (b->function () != NULL && b->inlined_p ())
+    if (b->inlined_p ())
       function_block = b;
     else if (b->function () != NULL)
       break;
@@ -6005,7 +6005,7 @@ default_collect_symbol_completion_matches_break_on
 	/* Stop when we encounter an enclosing function.  Do not stop for
 	   non-inlined functions - the locals of the enclosing function
 	   are in scope for a nested function.  */
-	if (b->function () != NULL && b->inlined_p ())
+	if (b->inlined_p ())
 	  break;
 	b = b->superblock ();
       }
