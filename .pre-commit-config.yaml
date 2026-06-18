@@ -94,6 +94,21 @@ repos:
       args: [--trust-plugins]
       files: '^gdb/testsuite/.*\.(exp|tcl)$'
 
+  # Pureshellcheck hooks.  The repo is a clone of pureshellcheck
+  # ( https://github.com/adam2go/pureshellcheck ), with a
+  # .pre-commit-hooks.yaml file added.  Use a commit hash rather than a tag to
+  # guard against supply chain attacks.
+  - repo: https://github.com/vries/pureshellcheck
+    # The commit hash corresponds to v0.2.2, that is:
+    # $ git diff --stat v0.2.2 <rev>
+    # .pre-commit-hooks.yaml | 5 +++++
+    rev: a41d65d3a941325e6cb901e60b0a7e7975d1fb64
+    hooks:
+    - id: pureshellcheck
+      files: '^(gdb|gdbsupport|gdbserver)/'
+      types: ['shell']
+      exclude: '^(gdb/config/djgpp/(djcheck.sh|djconfig.sh)|gdb/contrib/ari/(create-web-ari-in-src.sh|gdb_ari.sh|update-web-ari.sh)|gdb/contrib/(cc-with-tweaks.sh|expect-read1.sh|gdb-add-index.sh|license-check-new-files.sh)|gdb/gdb_buildall.sh|gdb/gdb_mbuild.sh|gdb/regformats/regdat.sh|gdb/syscalls/update-linux-from-src.sh|gdb/testsuite/make-check-all.sh|gdb/gcore-1.in|gdb/po/gdbtext|gdb/testsuite/lib/pdtrace.in)$|/configure$'
+
   # Local hooks.
   - repo: local
     hooks:
