@@ -71,6 +71,8 @@ repos:
     - id: isort
       types_or: [file]
       files: '^gdb/.*\.py(\.in)?$'
+      # Override isort default setting.
+      stages: [pre-commit]
 
   # Codespell hooks.
   - repo: https://github.com/codespell-project/codespell
