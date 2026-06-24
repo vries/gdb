@@ -132,3 +132,11 @@ repos:
       language: unsupported_script
       entry: gdb/contrib/check-file-mode.sh
       files: '^(gdb|gdbserver|gdbsupport)/.*$'
+    - id: &id5 check-file-license
+      name: *id5
+      language: python
+      entry: gdb/contrib/license-check-files.py
+      additional_dependencies: ["scancode-toolkit"]
+      files: '^(gdb|gdbserver|gdbsupport)/'
+      pass_filenames: false
+      stages: [manual]
