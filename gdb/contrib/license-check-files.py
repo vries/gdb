@@ -579,7 +579,7 @@ def get_md5sums(files):
 def main():
 
     files = find_files()
-    # md5sums = get_md5sums(files)
+    md5sums = get_md5sums(files)
 
     global db
     db = load_db(db_file)
@@ -596,12 +596,10 @@ def main():
             gen_db(db, db_tmp)
         write_db(db, db_file)
 
-    for f in files:
-        if f not in db:
-            print("SKIPPED: " + f)
-
     exit_code = 0
 
+
+    
     for entry in db:
         if not handle_file(entry):
             exit_code = 1
