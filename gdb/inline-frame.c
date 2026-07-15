@@ -370,22 +370,22 @@ gather_inline_frames (CORE_ADDR this_pc)
     return {};
 
   std::vector<const symbol *> function_symbols;
-  while (cur_block != nullptr)
+  for (; cur_block != nullptr; cur_block = cur_block->superblock ())
     {
-      if (cur_block->inlined_p ())
-	{
-	  /* See comments in inline_frame_this_id about this use
-	     of BLOCK_ENTRY_PC.  */
-	  if (cur_block->entry_pc () == this_pc
-	      || block_starting_point_at (bv, this_pc, cur_block))
-	    function_symbols.push_back (cur_block->function ());
-	  else
-	    break;
-	}
-      else if (cur_block->function () != nullptr)
-	break;
+      if (cur_block->function () == nullptr)
+	continue;
 
-      cur_block = cur_block->superblock ();
+      /* See comments in inline_frame_this_id about this use
+	 of BLOCK_ENTRY_PC.  */
+      if (cur_block->inlined_p ()
+	  && (cur_block->entry_pc () == this_pc
+	      || block_starting_point_at (bv, this_pc, cur_block)))
+	{
+	  function_symbols.push_back (cur_block->function ());
+	  continue;
+	}
+
+      break;
     }
 
   /* We should only leave the above loop when CUR_BLOCK is pointing to a
