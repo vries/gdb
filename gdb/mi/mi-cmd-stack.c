@@ -573,11 +573,11 @@ list_args_or_locals (const frame_print_options &fp_opts,
 		     enum what_to_list what, enum print_values values,
 		     const frame_info_ptr &fi, int skip_unavailable)
 {
-  const struct block *block;
+  const struct block *frame_block;
   const char *name_of_result;
   struct ui_out *uiout = current_uiout;
 
-  block = get_frame_block (fi, 0);
+  frame_block = get_frame_block (fi, 0);
 
   switch (what)
     {
@@ -596,7 +596,7 @@ list_args_or_locals (const frame_print_options &fp_opts,
 
   ui_out_emit_list list_emitter (uiout, name_of_result);
 
-  while (block != 0)
+  for (auto block : block::block_and_superblocks_in_fn (frame_block))
     {
       for (struct symbol *sym : block_iterator_range (block))
 	{

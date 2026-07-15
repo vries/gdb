@@ -8260,14 +8260,15 @@ process_event_stop_test (struct execution_control_state *ecs)
       int depth = 0;
       const struct block *prev
 	= block_for_pc (ecs->event_thread->control.step_frame_id.code_addr);
-      const struct block *curr = block_for_pc (ecs->event_thread->stop_pc ());
-      while (curr != nullptr && !curr->contains (prev))
+      const struct block *stop_block
+	= block_for_pc (ecs->event_thread->stop_pc ());
+      for (auto b : block::block_and_superblocks_in_fn (stop_block))
 	{
-	  if (curr->inlined_p ())
-	    depth++;
-	  else if (curr->function () != nullptr)
+	  if (b->contains (prev))
 	    break;
-	  curr = curr->superblock ();
+
+	  if (b->inlined_p ())
+	    depth++;
        }
       while (inline_skipped_frames (ecs->event_thread) > depth)
 	step_into_inline_frame (ecs->event_thread);

@@ -2002,22 +2002,19 @@ lookup_language_this (const struct language_defn *lang,
   lookup_name_info this_name (lang->name_of_this (),
 			      symbol_name_match_type::SEARCH_NAME);
 
-  while (block)
+  for (auto b : block::block_and_superblocks_in_fn (block))
     {
       struct symbol *sym;
 
-      sym = block_lookup_symbol (block, this_name, SEARCH_VFT);
+      sym = block_lookup_symbol (b, this_name, SEARCH_VFT);
       if (sym != NULL)
 	{
 	  symbol_lookup_debug_printf_v
 	    ("lookup_language_this (...) = %s (%s, block %s)",
 	     sym->print_name (), host_address_to_string (sym),
-	     host_address_to_string (block));
-	  return (struct block_symbol) {sym, block};
+	     host_address_to_string (b));
+	  return (struct block_symbol) {sym, b};
 	}
-      if (block->function ())
-	break;
-      block = block->superblock ();
     }
 
   symbol_lookup_debug_printf_v ("lookup_language_this (...) = NULL");

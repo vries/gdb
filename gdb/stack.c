@@ -2168,16 +2168,11 @@ void
 iterate_over_block_local_vars (const struct block *block,
 			       iterate_over_block_arg_local_vars_cb cb)
 {
-  while (block)
-    {
-      iterate_over_block_locals (block, cb);
-      /* After handling the function's top-level block, stop.  Don't
-	 continue to its superblock, the block of per-file
-	 symbols.  */
-      if (block->function ())
-	break;
-      block = block->superblock ();
-    }
+  /* After handling the function's top-level block, stop.  Don't
+     continue to its superblock, the block of per-file
+     symbols.  */
+  for (auto b : block::block_and_superblocks_in_fn (block))
+    iterate_over_block_locals (b, cb);
 }
 
 /* Data to be passed around in the calls to the locals and args

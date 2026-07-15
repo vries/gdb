@@ -588,20 +588,14 @@ generate_c_for_variable_locations (compile_instance *compiler,
      reality of shadowing.  */
   gdb::unordered_set<std::string_view> symset;
 
-  while (1)
+  for (auto b : block->block_and_superblocks_in_fn ())
     {
       /* Iterate over symbols in this block, generating code to
 	 compute the location of each local variable.  */
-      for (struct symbol *sym : block_iterator_range (block))
+      for (struct symbol *sym : block_iterator_range (b))
 	if (symset.insert (sym->natural_name ()).second)
 	  generate_c_for_for_one_variable (compiler, stream, gdbarch,
 					   registers_used, pc, sym);
-
-      /* If we just finished the outermost block of a function, we're
-	 done.  */
-      if (block->function () != NULL)
-	break;
-      block = block->superblock ();
     }
 
   return registers_used;

@@ -2456,7 +2456,6 @@ tfind_outside_command (const char *args, int from_tty)
 static void
 info_scope_command (const char *args_in, int from_tty)
 {
-  const struct block *block;
   const char *symname;
   const char *save_args = args_in;
   int j, count = 0;
@@ -2481,9 +2480,9 @@ info_scope_command (const char *args_in, int from_tty)
 
   /* Resolve line numbers to PC.  */
   resolve_sal_pc (&sals[0]);
-  block = block_for_pc (sals[0].pc);
+  const struct block *pc_block = block_for_pc (sals[0].pc);
 
-  while (block != 0)
+  for (auto block : block::block_and_superblocks_in_fn (pc_block))
     {
       QUIT;			/* Allow user to bail out with ^C.  */
       for (struct symbol *sym : block_iterator_range (block))
@@ -2607,10 +2606,6 @@ info_scope_command (const char *args_in, int from_tty)
 	      gdb_printf (", length %s.\n", pulongest (t->length ()));
 	    }
 	}
-      if (block->function ())
-	break;
-      else
-	block = block->superblock ();
     }
   if (count <= 0)
     gdb_printf ("Scope for %s contains no locals or arguments.\n",

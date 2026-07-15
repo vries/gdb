@@ -682,7 +682,7 @@ static void
 info_common_command (const char *comname, int from_tty)
 {
   frame_info_ptr fi;
-  const struct block *block;
+  const struct block *frame_block;
   int values_printed = 0;
 
   /* We have been told to display the contents of F77 COMMON
@@ -695,22 +695,17 @@ info_common_command (const char *comname, int from_tty)
   /* The following is generally ripped off from stack.c's routine
      print_frame_info().  */
 
-  block = get_frame_block (fi, 0);
-  if (block == NULL)
+  frame_block = get_frame_block (fi, 0);
+  if (frame_block == nullptr)
     {
       gdb_printf (_("No symbol table info available.\n"));
       return;
     }
 
-  while (block)
-    {
-      info_common_command_for_block (block, comname, &values_printed);
-      /* After handling the function's top-level block, stop.  Don't
-	 continue to its superblock, the block of per-file symbols.  */
-      if (block->function ())
-	break;
-      block = block->superblock ();
-    }
+  /* After handling the function's top-level block, stop.  Don't
+     continue to its superblock, the block of per-file symbols.  */
+  for (auto block : block::block_and_superblocks_in_fn (frame_block))
+    info_common_command_for_block (block, comname, &values_printed);
 
   if (!values_printed)
     {

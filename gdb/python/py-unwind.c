@@ -647,7 +647,7 @@ pending_framepy_block (PyObject *self, PyObject *args)
   PENDING_FRAMEPY_REQUIRE_VALID (pending_frame);
 
   const frame_info_ptr &frame (*pending_frame->frame_info);
-  const struct block *block = nullptr, *fn_block;
+  const struct block *block = nullptr;
 
   try
     {
