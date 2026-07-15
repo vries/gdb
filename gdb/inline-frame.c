@@ -374,26 +374,20 @@ gather_inline_frames (CORE_ADDR this_pc)
     {
       if (cur_block->function () == nullptr)
 	continue;
+      function_symbols.push_back (cur_block->function ());
 
       /* See comments in inline_frame_this_id about this use
 	 of BLOCK_ENTRY_PC.  */
       if (cur_block->inlined_p ()
 	  && (cur_block->entry_pc () == this_pc
 	      || block_starting_point_at (bv, this_pc, cur_block)))
-	{
-	  function_symbols.push_back (cur_block->function ());
-	  continue;
-	}
+	continue;
 
+      /* CUR_BLOCK is pointing to a either:
+	 - a non-inline function that possibly contains some inline functions, or
+	 - an inline function that doesn't start at THIS_PC.  */
       break;
     }
-
-  /* We should only leave the above loop when CUR_BLOCK is pointing to a
-     non-inline function that possibly contains some inline functions, or
-     CUR_BLOCK should point to an inline function that doesn't start at
-     THIS_PC.  */
-  gdb_assert (cur_block->function () != nullptr);
-  function_symbols.push_back (cur_block->function ());
 
   return function_symbols;
 }
