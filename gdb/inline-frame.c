@@ -360,6 +360,15 @@ gather_inline_frames (CORE_ADDR this_pc)
   if (bv == nullptr)
     return {};
 
+  /* If we have a code region for which we have no function blocks,
+     possibly due to bad debug, or possibly just when some debug
+     information has been stripped, then we can end up in a situation where
+     there are global and static blocks for an address, but no function
+     blocks.  In this case the early return above will not trigger as we
+     will find the static block for THIS_PC.  */
+  if (cur_block->is_static_block ())
+    return {};
+
   std::vector<const symbol *> function_symbols;
   while (cur_block != nullptr)
     {
@@ -379,27 +388,12 @@ gather_inline_frames (CORE_ADDR this_pc)
       cur_block = cur_block->superblock ();
     }
 
-  /* If we have a code region for which we have no function blocks,
-     possibly due to bad debug, or possibly just when some debug
-     information has been stripped, then we can end up in a situation where
-     there are global and static blocks for an address, but no function
-     blocks.  In this case the early return above will not trigger as we
-     will find the static block for THIS_PC, but in the loop above we will
-     fail to find any function blocks (inline or non-inline) and so
-     CUR_BLOCK will eventually become NULL.  If this happens then
-     FUNCTION_SYMBOLS must be empty (as we found no function blocks).
-
-     Otherwise, if we did find a function block, then we should only leave
-     the above loop when CUR_BLOCK is pointing to a non-inline function
-     that possibly contains some inline functions, or CUR_BLOCK should
-     point to an inline function that doesn't start at THIS_PC.  */
-  if (cur_block != nullptr)
-    {
-      gdb_assert (cur_block->function () != nullptr);
-      function_symbols.push_back (cur_block->function ());
-    }
-  else
-    gdb_assert (function_symbols.empty ());
+  /* We should only leave the above loop when CUR_BLOCK is pointing to a
+     non-inline function that possibly contains some inline functions, or
+     CUR_BLOCK should point to an inline function that doesn't start at
+     THIS_PC.  */
+  gdb_assert (cur_block->function () != nullptr);
+  function_symbols.push_back (cur_block->function ());
 
   return function_symbols;
 }
