@@ -68,7 +68,6 @@ class TypeFlagsPrinter:
         self.val = val
 
     def __str__(self):
-        global TYPE_FLAGS
         if TYPE_FLAGS is None:
             self.init_TYPE_FLAGS()
         if not self.val:
