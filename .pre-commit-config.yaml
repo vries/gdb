@@ -53,26 +53,33 @@ repos:
   #  - gdb/testsuite/*.py
   #
   # Because gdb/gdb-gdb.py.in is not classified as python, we use
-  # 'types_or: [file]' to override the default type for these hooks.
+  # 'types: [file] / types_or: []' to override the default settings for these
+  # hooks.
+  #
+  # To be robust we set both types and types_or for each hook.  Typically a
+  # repo sets only one of these, but that may change with any update.
   #
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 26.5.1
     hooks:
     - id: black
-      types_or: &gdb_python_types [file]
+      types: &types_default [file]
+      types_or: &types_or_default []
       files: &gdb_python_files '^gdb/.*\.py(\.in)?$'
   - repo:  https://github.com/pycqa/flake8
     rev: 7.3.0
     hooks:
     - id: flake8
-      types_or: *gdb_python_types
+      types: *types_default
+      types_or: *types_or_default
       files: *gdb_python_files
       args: [--config, gdb/setup.cfg]
   - repo: https://github.com/pycqa/isort
     rev: 9.0.0b1
     hooks:
     - id: isort
-      types_or: *gdb_python_types
+      types: *types_default
+      types_or: *types_or_default
       files: *gdb_python_files
       # Isort's .pre-commit-hooks.yaml sets stages, overriding default_stages,
       # so this hook needs an explicit setting.
