@@ -94,7 +94,7 @@ class TypeFlagsPrinter:
         TYPE_FLAGS = []
         try:
             iflags = gdb.lookup_type("enum type_instance_flag_value")
-        except:
+        except Exception:
             print("Warning: Cannot find enum type_instance_flag_value type.")
             print("         `struct type' pretty-printer will be degraded")
             return
