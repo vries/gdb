@@ -92,6 +92,11 @@ repos:
     - id: codespell
       args: &codespell_args [--toml, gdb/pyproject.toml]
       files: &gdb_files '^(gdb|gdbserver|gdbsupport)/'
+      # Override the [text] setting in .pre-commit-hooks.yaml, allowing this
+      # hook to see the same files as codespell usage outside pre-commit.
+      # Instead, filter files in gdb/pyproject.toml.
+      types: *types_default
+      types_or: *types_or_default
     - id: codespell
       name: codespell-log
       entry: gdb/contrib/codespell-log.sh
