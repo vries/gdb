@@ -152,8 +152,7 @@ gdbpy_execute_mi_command (PyObject *self, PyObject *args, PyObject *kw)
 
   for (Py_ssize_t i = 0; i < n_args; ++i)
     {
-      /* Note this returns a borrowed reference.  */
-      PyObject *arg = PyTuple_GetItem (args, i);
+      gdbpy_opt_borrowed_ref<> arg = PyTuple_GetItem (args, i);
       if (arg == nullptr)
 	return nullptr;
       gdb::unique_xmalloc_ptr<char> str = python_string_to_host_string (arg);

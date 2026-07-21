@@ -285,10 +285,10 @@ gdbpy_tuple_new (Py_ssize_t len)
 static inline gdbpy_borrowed_ref<>
 gdbpy_tuple_get_item (gdbpy_borrowed_ref<> tuple, Py_ssize_t pos)
 {
-  PyObject *result = PyTuple_GetItem (tuple, pos);
+  gdbpy_opt_borrowed_ref<> result = PyTuple_GetItem (tuple, pos);
   if (result == nullptr)
     throw gdb_python_exception ();
-  return result;
+  return (PyObject *)result;
 }
 
 /* Wrapper for PyTuple_SetItem.  */

@@ -231,7 +231,7 @@ colorpy_init (PyObject *self, PyObject *args, PyObject *kwds)
 	  uint8_t rgb[3];
 	  for (int i = 0; i < 3; ++i)
 	    {
-	      PyObject *item = PyTuple_GetItem (value_obj, i);
+	      gdbpy_borrowed_ref<> item = PyTuple_GetItem (value_obj, i);
 	      if (!PyLong_Check (item))
 		error (_("Item %d of an RGB tuple must be integer."), i);
 	      long item_value = -1;

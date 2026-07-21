@@ -1208,7 +1208,7 @@ valpy_call (PyObject *self, PyObject *args, PyObject *keywords)
       vargs = XALLOCAVEC (struct value *, args_count);
       for (i = 0; i < args_count; i++)
 	{
-	  PyObject *item = PyTuple_GetItem (args, i);
+	  gdbpy_opt_borrowed_ref<> item = PyTuple_GetItem (args, i);
 
 	  if (item == NULL)
 	    return NULL;

@@ -918,8 +918,8 @@ frame_unwind_python::sniff (const frame_info_ptr &this_frame,
 
   if (pyuw_debug)
     {
-      PyObject *pyo_unwinder_name = PyTuple_GetItem (pyo_execute_ret.get (), 1);
-      gdb_assert (pyo_unwinder_name != nullptr);
+      gdbpy_borrowed_ref<> pyo_unwinder_name
+	= PyTuple_GetItem (pyo_execute_ret.get (), 1);
       gdb::unique_xmalloc_ptr<char> name
 	= python_string_to_host_string (pyo_unwinder_name);
 
@@ -935,15 +935,15 @@ frame_unwind_python::sniff (const frame_info_ptr &this_frame,
     }
 
   /* Received UnwindInfo, cache data.  */
-  PyObject *pyo_unwind_info = PyTuple_GetItem (pyo_execute_ret.get (), 0);
-  gdb_assert (pyo_unwind_info != nullptr);
+  gdbpy_borrowed_ref<> pyo_unwind_info
+    = PyTuple_GetItem (pyo_execute_ret.get (), 0);
   if (!PyObject_TypeCheck (pyo_unwind_info, &unwind_info_object_type))
     error (_("an Unwinder should return gdb.UnwindInfo, not %s."),
 	   gdbpy_py_obj_tp_name (pyo_unwind_info).c_str ());
 
   {
     unwind_info_object *unwind_info =
-      (unwind_info_object *) pyo_unwind_info;
+      (unwind_info_object *) (PyObject *)pyo_unwind_info;
     int reg_count = unwind_info->saved_regs->size ();
 
     cached_frame
