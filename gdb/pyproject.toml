@@ -77,7 +77,6 @@ skip = [
 '*.S',
 # TODO:
 # codespell:ignore-begin.  Ignore slite and endianity.
-'gdb/testsuite/config/slite.exp',
 'gdb/testsuite/gdb.ada/pkd_arr_elem/failure.adb',
 'gdb/testsuite/gdb.ada/str_ref_cmp.exp',
 'gdb/testsuite/gdb.arch/amd64-invalid-stack-middle.c',

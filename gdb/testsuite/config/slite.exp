@@ -88,7 +88,8 @@ proc gdb_load { arg } {
 	    }
 	}
 	 timeout {
-	    perror "Couldn't set SLITE target."
+	     # codespell:ignore-next-line slite
+	     perror "Couldn't set SLITE target."
 	    set timeout 10
 	    verbose "Timeout is now $timeout seconds" 2
 	    return -1
