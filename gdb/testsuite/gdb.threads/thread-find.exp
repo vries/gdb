@@ -72,9 +72,10 @@ if {[info exists thread6]} {
 }
 
 # Collect process ids, if any.
-
+# codespell:ignore-next-line
+set re_process {[Pp]rocess}
 gdb_test_multiple "info threads" "collect thread id" {
-    -re ". (${::decimal}) \[^\r\n\]*\[Pp\]rocess (\[0-9a-fA-Fx\]+)\[^\r\n\]* \"threadname_${::decimal}\" \[^\r\n\]*" {
+    -re ". (${::decimal}) \[^\r\n\]*$re_process (\[0-9a-fA-Fx\]+)\[^\r\n\]* \"threadname_${::decimal}\" \[^\r\n\]*" {
 	set thr_num $expect_out(1,string)
 	set process$thr_num $expect_out(2,string)
 	exp_continue
