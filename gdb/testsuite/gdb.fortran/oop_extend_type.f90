@@ -17,7 +17,7 @@
 module testmod
     implicit none
     type :: point
-	real :: coo(3)
+	real :: coordinate(3)
     end type
 
     type, extends(point) :: waypoint
@@ -44,25 +44,25 @@ program testprog
     l = allocated(wp_vla) ! After vla allocation
 
     wp%angle = 100.00
-    wp%coo(:) = 1.00
-    wp%coo(2) = 2.00
+    wp%coordinate(:) = 1.00
+    wp%coordinate(2) = 2.00
 
     fwp%is_fancy = .TRUE.
     fwp%angle = 10.00
-    fwp%coo(:) = 2.00
-    fwp%coo(1) = 1.00
+    fwp%coordinate(:) = 2.00
+    fwp%coordinate(1) = 1.00
 
     wp_vla(1)%angle = 101.00
-    wp_vla(1)%coo(:) = 10.00
-    wp_vla(1)%coo(2) = 12.00
+    wp_vla(1)%coordinate(:) = 10.00
+    wp_vla(1)%coordinate(2) = 12.00
 
     wp_vla(2)%angle = 102.00
-    wp_vla(2)%coo(:) = 20.00
-    wp_vla(2)%coo(2) = 22.00
+    wp_vla(2)%coordinate(:) = 20.00
+    wp_vla(2)%coordinate(2) = 22.00
 
     wp_vla(3)%angle = 103.00
-    wp_vla(3)%coo(:) = 30.00
-    wp_vla(3)%coo(2) = 32.00
+    wp_vla(3)%coordinate(:) = 30.00
+    wp_vla(3)%coordinate(2) = 32.00
 
     print *, wp, wp_vla, fwp ! After value assignment
 

@@ -44,18 +44,18 @@ gdb_breakpoint $line2
 gdb_continue_to_breakpoint "line2" ".*$srcfile:$line2.*"
 
 # test print of wp
-set test "p wp%coo"
+set test "p wp%coordinate"
 gdb_test_multiple "$test" "$test" {
     -re " = \\(1, 2, 1\\)\r\n$gdb_prompt $" {
       pass "$test"
     }
-    -re "There is no member named coo.\r\n$gdb_prompt $" {
+    -re "There is no member named coordinate.\r\n$gdb_prompt $" {
       kfail "gcc/49475" "$test"
     }
 }
-gdb_test "p wp%point%coo" " = \\(1, 2, 1\\)"
-gdb_test "p wp%point" " = \\( coo = \\(1, 2, 1\\) \\)"
-gdb_test "p wp" " = \\( point = \\( coo = \\(1, 2, 1\\) \\), angle = 100 \\)"
+gdb_test "p wp%point%coordinate" " = \\(1, 2, 1\\)"
+gdb_test "p wp%point" " = \\( coordinate = \\(1, 2, 1\\) \\)"
+gdb_test "p wp" " = \\( point = \\( coordinate = \\(1, 2, 1\\) \\), angle = 100 \\)"
 
 gdb_test "whatis wp" "type = Type waypoint"
 set output_pass_wp [multi_line "type = Type, extends\\(point\\) :: waypoint" \
@@ -76,33 +76,33 @@ gdb_test_multiple "$test" "$test" {
       kfail "gcc/49475" "$test"
     }
 }
-set test "ptype wp%coo"
+set test "ptype wp%coordinate"
 gdb_test_multiple "$test" "$test" {
     -re "$real \\(3\\)\r\n$gdb_prompt $" {
       pass "$test"
     }
-    -re "There is no member named coo.\r\n$gdb_prompt $" {
+    -re "There is no member named coordinate.\r\n$gdb_prompt $" {
       kfail "gcc/49475" "$test"
     }
 }
-gdb_test "ptype wp%point%coo" "$real \\(3\\)"
+gdb_test "ptype wp%point%coordinate" "$real \\(3\\)"
 
 # test print of fwp
-set test "p fwp%coo"
+set test "p fwp%coordinate"
 gdb_test_multiple "$test" "$test" {
     -re " = \\(1, 2, 2\\)\r\n$gdb_prompt $" {
       pass "$test"
     }
-    -re "There is no member named coo.\r\n$gdb_prompt $" {
+    -re "There is no member named coordinate.\r\n$gdb_prompt $" {
       kfail "gcc/49475" "$test"
     }
 }
-gdb_test "p fwp%waypoint%point%coo" " = \\(1, 2, 2\\)"
-gdb_test "p fwp%waypoint%point" " = \\( coo = \\(1, 2, 2\\) \\)"
+gdb_test "p fwp%waypoint%point%coordinate" " = \\(1, 2, 2\\)"
+gdb_test "p fwp%waypoint%point" " = \\( coordinate = \\(1, 2, 2\\) \\)"
 gdb_test "p fwp%waypoint" \
-    " = \\( point = \\( coo = \\(1, 2, 2\\) \\), angle = 10 \\)"
+    " = \\( point = \\( coordinate = \\(1, 2, 2\\) \\), angle = 10 \\)"
 gdb_test "p fwp" \
-    " = \\( waypoint = \\( point = \\( coo = \\(1, 2, 2\\) \\), angle = 10 \\), is_fancy = \.TRUE\. \\)"
+    " = \\( waypoint = \\( point = \\( coordinate = \\(1, 2, 2\\) \\), angle = 10 \\), is_fancy = \.TRUE\. \\)"
 
 set test "p fwp%angle"
 gdb_test_multiple "$test" "$test" {
@@ -137,31 +137,31 @@ gdb_test_multiple "$test" "$test" {
     }
 }
 
-set test "ptype fwp%coo"
+set test "ptype fwp%coordinate"
 gdb_test_multiple "$test" "$test" {
     -re "$real \\(3\\)\r\n$gdb_prompt $" {
       pass "$test"
     }
-    -re "There is no member named coo.\r\n$gdb_prompt $" {
+    -re "There is no member named coordinate.\r\n$gdb_prompt $" {
       kfail "gcc/49475" "$test"
     }
 }
-gdb_test "ptype fwp%waypoint%point%coo" "$real \\(3\\)"
+gdb_test "ptype fwp%waypoint%point%coordinate" "$real \\(3\\)"
 
 # test print of wp_vla
-set test "p wp_vla(1)%coo"
+set test "p wp_vla(1)%coordinate"
 gdb_test_multiple "$test" "$test" {
     -re " = \\(10, 12, 10\\)\r\n$gdb_prompt $" {
       pass "$test"
     }
-    -re "There is no member named coo.\r\n$gdb_prompt $" {
+    -re "There is no member named coordinate.\r\n$gdb_prompt $" {
       kfail "gcc/49475" "$test"
     }
 }
 
-gdb_test "p wp_vla(1)%point%coo" " = \\(10, 12, 10\\)"
-gdb_test "p wp_vla(1)%point" " = \\( coo = \\(10, 12, 10\\) \\)"
-gdb_test "p wp_vla(1)" " = \\( point = \\( coo = \\(10, 12, 10\\) \\), angle = 101 \\)"
+gdb_test "p wp_vla(1)%point%coordinate" " = \\(10, 12, 10\\)"
+gdb_test "p wp_vla(1)%point" " = \\( coordinate = \\(10, 12, 10\\) \\)"
+gdb_test "p wp_vla(1)" " = \\( point = \\( coordinate = \\(10, 12, 10\\) \\), angle = 101 \\)"
 
 gdb_test "whatis wp_vla" "type = Type waypoint, allocatable \\(3\\)" \
     "whatis wp_vla after allocation"
@@ -175,14 +175,14 @@ gdb_test_multiple "$test" "$test" {
       kfail "gcc/49475" "$test"
     }
 }
-set test "ptype wp_vla(1)%coo"
+set test "ptype wp_vla(1)%coordinate"
 gdb_test_multiple "$test" "$test" {
     -re "$real \\(3\\)\r\n$gdb_prompt $" {
       pass "$test"
     }
-    -re "There is no member named coo.\r\n$gdb_prompt $" {
+    -re "There is no member named coordinate.\r\n$gdb_prompt $" {
       kfail "gcc/49475" "$test"
     }
 }
 
-gdb_test "ptype wp_vla(1)%point%coo" "$real \\(3\\)"
+gdb_test "ptype wp_vla(1)%point%coordinate" "$real \\(3\\)"
