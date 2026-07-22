@@ -122,7 +122,6 @@ skip = [
 'gdb/testsuite/gdb.fortran/class-allocatable-array.f90',
 'gdb/testsuite/gdb.fortran/oop_extend_type.exp',
 'gdb/testsuite/gdb.fortran/oop_extend_type.f90',
-'gdb/testsuite/gdb.fortran/ptype-on-functions.f90',
 # codespell:ignore-end
 ]
 

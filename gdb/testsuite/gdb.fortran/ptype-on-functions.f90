@@ -32,7 +32,7 @@ contains
   end function get_number
 
   subroutine set_number (this, val)
-    class (Number), intent (inout) :: this
+    class (Number), intent (inout) :: this ! codespell:ignore
     integer :: val
     this%a = val
   end subroutine set_number
