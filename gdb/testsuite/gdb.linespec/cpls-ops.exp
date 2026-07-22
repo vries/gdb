@@ -67,11 +67,14 @@ proc test_operator_new {class_name brackets} {
 	}
     }
 
-    # Complete all prefixes between "operato" and the full prototype.
+    # codespell:ignore-next-line
+    set operator_bs "operato"
+
+    # Complete all prefixes between $operator_bs and the full prototype.
     foreach cmd_prefix {"b" "b -function"} {
 	set location "${class_name}::operator new${brackets}($size_t)"
 	set line "$cmd_prefix $location"
-	set start [index_after "operato" $line]
+	set start [index_after $operator_bs $line]
 	test_complete_prefix_range $line $start
 	check_bp_locations_match_list "$cmd_prefix $location" [list $location]
 
@@ -122,11 +125,11 @@ proc_with_prefix operator-new\[\] {} {
 # if testing operator delete.
 
 proc test_operator_delete {class_name brackets} {
-    # Complete all prefixes between "operato" and the full prototype.
+    # Complete all prefixes between $operator_bs and the full prototype.
     foreach cmd_prefix {"b" "b -function"} {
 	set location "${class_name}::operator delete${brackets}(void*)"
 	set line "$cmd_prefix $location"
-	set start [index_after "operato" $line]
+	set start [index_after $operator_bs $line]
 	test_complete_prefix_range $line $start
 	check_bp_locations_match_list "$cmd_prefix $location" [list $location]
 
@@ -450,7 +453,7 @@ proc_with_prefix ops-valid-unique {} {
 	foreach cmd_prefix {"b" "b -function"} {
 	    with_test_prefix "no-whitespace" {
 		set line "$cmd_prefix $linespec"
-		set start [index_after "::operato" $line]
+		set start [index_after "::$operator_bs" $line]
 		test_complete_prefix_range $line $start
 	    }
 
