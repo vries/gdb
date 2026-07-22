@@ -117,7 +117,6 @@ skip = [
 'gdb/testsuite/gdb.disasm/t06_ari2.exp',
 'gdb/testsuite/gdb.disasm/t11_logs.exp',
 'gdb/testsuite/gdb.dlang/demangle.exp',
-'gdb/testsuite/gdb.dwarf2/dw2-inline-many-frames.c',
 # codespell:ignore-end
 ]
 

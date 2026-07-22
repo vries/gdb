@@ -63,11 +63,11 @@ aaa ()
 NON_INLINE_FUNCTION int
 jjj ()
 {						/* jjj prologue */
-  int ans;
+  int answer;
   asm ("jjj_label: .globl jjj_label");
-  ans = kkk () + 1;				/* jjj return */
+  answer = kkk () + 1;				/* jjj return */
   asm ("jjj_label2: .globl jjj_label2");
-  return ans;
+  return answer;
 }						/* jjj end */
 
 INLINE_FUNCTION int
@@ -87,11 +87,11 @@ ccc ()
 NON_INLINE_FUNCTION int
 fff ()
 {						/* fff prologue */
-  int ans;
+  int answer;
   asm ("fff_label: .globl fff_label");
-  ans = ggg () + 1;				/* fff return */
+  answer = ggg () + 1;				/* fff return */
   asm ("fff_label2: .globl fff_label2");
-  return ans;
+  return answer;
 }						/* fff end */
 
 NON_INLINE_FUNCTION int
@@ -118,41 +118,41 @@ hhh ()
 int
 main ()
 {						/* main prologue */
-  int ans;
+  int answer;
   asm ("main_label: .globl main_label");
   global_var = 0;				/* main set global_var */
   asm ("main_label2: .globl main_label2");
-  ans = aaa () + 1;				/* main call aaa */
+  answer = aaa () + 1;				/* main call aaa */
   asm ("main_label3: .globl main_label3");
-  return ans;
+  return answer;
 }						/* main end */
 
 NON_INLINE_FUNCTION int
 ddd ()
 {						/* ddd prologue */
-  int ans;
+  int answer;
   asm ("ddd_label: .globl ddd_label");
-  ans =  eee () + 1;				/* ddd return */
+  answer =  eee () + 1;				/* ddd return */
   asm ("ddd_label2: .globl ddd_label2");
-  return ans;
+  return answer;
 }						/* ddd end */
 
 INLINE_FUNCTION int
 iii ()
 {						/* iii prologue */
-  int ans;
+  int answer;
   asm ("iii_label: .globl iii_label");
-  ans = jjj () + 1;				/* iii return */
+  answer = jjj () + 1;				/* iii return */
   asm ("iii_label2: .globl iii_label2");
-  return ans;
+  return answer;
 }						/* iii end */
 
 NON_INLINE_FUNCTION int
 eee ()
 {						/* eee prologue */
-  int ans;
+  int answer;
   asm ("eee_label: .globl eee_label");
-  ans = fff () + 1;				/* eee return */
+  answer = fff () + 1;				/* eee return */
   asm ("eee_label2: .globl eee_label2");
-  return ans;
+  return answer;
 }						/* eee end */
