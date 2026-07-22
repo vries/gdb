@@ -128,7 +128,6 @@ skip = [
 'gdb/testsuite/gdb.python/py-format-string.exp',
 'gdb/testsuite/gdb.python/py-unwind-inline.c',
 'gdb/testsuite/gdb.threads/thread-find.exp',
-'gdb/testsuite/gdb.trace/unavailable-dwarf-piece.c',
 # codespell:ignore-end
 ]
 

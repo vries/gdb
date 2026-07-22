@@ -74,15 +74,15 @@ main (void)
 {
   struct s v = { 0, 1, 2 };
   struct t w = { 5, 0, 1, 0, 1, 0, 1, 0, 1, 7 };
-  int ans;
+  int answer;
 
-  ans = foo (v, v, v);
-
-  end ();
-
-  ans = bar (w, w, w);
+  answer = foo (v, v, v);
 
   end ();
 
-  return ans;
+  answer = bar (w, w, w);
+
+  end ();
+
+  return answer;
 }
