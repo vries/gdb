@@ -133,7 +133,6 @@ skip = [
 'gdb/testsuite/lib/gdb.exp',
 'gdb/testsuite/lib/gdb-utils.exp',
 'gdb/testsuite/lib/pdtrace.in',
-'gdb/testsuite/lib/rust-support.exp'
 # codespell:ignore-end
 ]
 
