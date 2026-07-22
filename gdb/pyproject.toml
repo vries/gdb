@@ -131,7 +131,6 @@ skip = [
 'gdb/testsuite/gdb.threads/thread-find.exp',
 'gdb/testsuite/gdb.trace/unavailable-dwarf-piece.c',
 'gdb/testsuite/lib/gdb.exp',
-'gdb/testsuite/lib/gdb-utils.exp',
 # codespell:ignore-end
 ]
 

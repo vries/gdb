@@ -184,7 +184,9 @@ proc version_compare { l1 op l2 } {
 proc lock_file_acquire {lockfile} {
     verbose -log "acquiring lock file: $::subdir/${::gdb_test_file_name}.exp"
     while {true} {
+	# codespell:ignore-begin
 	if {![catch {open $lockfile {WRONLY CREAT EXCL}} rc]} {
+	# codespell:ignore-end
 	    set msg "locked by $::subdir/${::gdb_test_file_name}.exp"
 	    verbose -log "lock file: $msg"
 	    # For debugging, put info in the lockfile about who owns
