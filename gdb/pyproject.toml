@@ -119,7 +119,6 @@ skip = [
 'gdb/testsuite/gdb.dlang/demangle.exp',
 'gdb/testsuite/gdb.dwarf2/dw2-inline-many-frames.c',
 'gdb/testsuite/gdb.dwarf2/dw2-inline-stepping.c',
-'gdb/testsuite/gdb.fortran/class-allocatable-array.f90',
 # codespell:ignore-end
 ]
 

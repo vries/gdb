@@ -24,7 +24,7 @@ module test_module
 contains
 
   subroutine test_proc (this)
-    class(test_type), intent (inout) :: this
+    class(test_type), intent (inout) :: this ! codespell:ignore
     allocate (this%b (3, 2))
     call fill_array_2d (this%b)
     print *, ""		! Break Here
