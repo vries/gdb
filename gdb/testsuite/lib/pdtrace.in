@@ -926,9 +926,9 @@ f_gen_header_file()
             u_name=$(printf %s "$name" | $TR a-z A-Z | $TR -s _)
 
             # Generate an arg1,arg2,...,argN line for the probe.
-            args=""; nargs=0; aline=$(printf %s "$line" | $SED -e 's/.*(\(.*\)).*/\1/')
+            args=""; nargs=0; args_line=$(printf %s "$line" | $SED -e 's/.*(\(.*\)).*/\1/')
             set -f; IFS=,
-            for arg in $aline; do
+            for arg in $args_line; do
                 args="${args}arg${nargs},"
                 nargs=$((nargs + 1))
             done
