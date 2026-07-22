@@ -46,13 +46,13 @@ foo (int arg)
 int
 main (void)
 {
-  int ans;
+  int answer;
 
   ++global_var;
   ++global_var;
-  ans = foo (42);
+  answer = foo (42);
   ++global_var;
   ++global_var;
-  ans += global_var;
-  return ans;		/* Final breakpoint.  */
+  answer += global_var;
+  return answer;		/* Final breakpoint.  */
 }
