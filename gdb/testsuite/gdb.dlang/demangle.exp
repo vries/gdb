@@ -58,8 +58,10 @@ proc test_d_demangling {} {
     test_demangling "_D8demangle4testFOaZv" "demangle.test(shared(char))"
     test_demangling "_D8demangle4testFxaZv" "demangle.test(const(char))"
     test_demangling "_D8demangle4testFyaZv" "demangle.test(immutable(char))"
+    # codespell:ignore-next-line inout
     test_demangling "_D8demangle4testFNgaZv" "demangle.test(inout(char))"
     test_demangling "_D8demangle4testFOxaZv" "demangle.test(shared(const(char)))"
+    # codespell:ignore-next-line inout
     test_demangling "_D8demangle4testFONgaZv" "demangle.test(shared(inout(char)))"
     test_demangling "_D8demangle4testFAaZv" "demangle.test(char\[\])"
     test_demangling "_D8demangle4testFAAaZv" "demangle.test(char\[\]\[\])"
@@ -177,6 +179,7 @@ proc test_d_demangling {} {
     test_demangling "_D8demangle3fnAFZ3fnBMFZv" "demangle.fnA().fnB()"
     test_demangling "_D8demangle4mainFZ1S3fnCMFZv" "demangle.main().S.fnC()"
     test_demangling "_D8demangle4mainFZ1S3fnDMFZv" "demangle.main().S.fnD()"
+    # codespell:ignore-next-line inout
     test_demangling "_D8demangle2fnFNgiZNgi" "demangle.fn(inout(int))"
     test_demangling "_D8demangle4mainFZ5localMFZi" "demangle.main().local()"
     test_demangling "_D3std5ascii9uppercaseyAa" "std.ascii.uppercase"
