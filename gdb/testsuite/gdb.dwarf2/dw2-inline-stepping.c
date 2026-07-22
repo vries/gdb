@@ -35,11 +35,11 @@ foo ()
 int
 main ()
 {						/* main prologue */
-  int ans;
+  int answer;
   asm ("main_label: .globl main_label");
   global_var = 0;				/* main set global_var */
   asm ("main_label2: .globl main_label2");
-  ans = foo ();					/* main call foo */
+  answer = foo ();				/* main call foo */
   asm ("main_label3: .globl main_label3");
-  return ans;
+  return answer;
 }						/* main end */

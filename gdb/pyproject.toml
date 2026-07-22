@@ -118,7 +118,6 @@ skip = [
 'gdb/testsuite/gdb.disasm/t11_logs.exp',
 'gdb/testsuite/gdb.dlang/demangle.exp',
 'gdb/testsuite/gdb.dwarf2/dw2-inline-many-frames.c',
-'gdb/testsuite/gdb.dwarf2/dw2-inline-stepping.c',
 # codespell:ignore-end
 ]
 
