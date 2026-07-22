@@ -125,7 +125,6 @@ skip = [
 'gdb/testsuite/gdb.fortran/ptype-on-functions.f90',
 'gdb/testsuite/gdb.linespec/cpls-ops.exp',
 'gdb/testsuite/gdb.python/py-finish-breakpoint-inline.c',
-'gdb/testsuite/gdb.python/py-format-string.exp',
 # codespell:ignore-end
 ]
 

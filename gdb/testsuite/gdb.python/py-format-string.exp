@@ -742,12 +742,14 @@ proc test_max_string_one { setting unlimited } {
     check_format_string "another_point" $opts
     check_format_string "a_struct_with_union" $opts
     check_format_string "an_enum" $opts
+    # codespell:ignore-begin
     check_format_string "a_string" $opts \
       "${default_pointer_regexp} \"hel\"..."
     check_format_string "a_binary_string" $opts \
       "${default_pointer_regexp} \"hel\"..."
     check_format_string "a_binary_string_array" $opts \
       "\"hel\"..."
+    # codespell:ignore-end
     check_format_string "a_big_string" $opts \
       [get_cut_big_string 3]
     if { $setting == "elements"} {
