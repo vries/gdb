@@ -126,7 +126,6 @@ skip = [
 'gdb/testsuite/gdb.linespec/cpls-ops.exp',
 'gdb/testsuite/gdb.python/py-finish-breakpoint-inline.c',
 'gdb/testsuite/gdb.python/py-format-string.exp',
-'gdb/testsuite/gdb.python/py-unwind-inline.c',
 # codespell:ignore-end
 ]
 

@@ -30,8 +30,8 @@ foo ()
 int
 main ()
 {
-  int ans;
+  int answer;
   global_var = 0;
-  ans = foo ();
-  return ans;
+  answer = foo ();
+  return answer;
 }
