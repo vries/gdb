@@ -905,6 +905,8 @@ check_regset (int tid, int regset_id, int regsetsize)
     return false;
 }
 
+static void fetch_fp_regs (struct regcache *regcache, int tid);
+
 static void
 fetch_register (struct regcache *regcache, int tid, int regno)
 {
@@ -1062,6 +1064,14 @@ fetch_register (struct regcache *regcache, int tid, int regno)
       fetch_regset (regcache, tid, NT_PPC_TM_CTAR,
 		    PPC_LINUX_SIZEOF_CTARREGSET,
 		    &ppc32_linux_ctarregset);
+      return;
+    }
+  else if ((tdep->ppc_fp0_regnum >= 0
+	    && regno >= tdep->ppc_fp0_regnum
+	    && regno < tdep->ppc_fp0_regnum + ppc_num_fprs)
+	   || regno == PPC_FPSCR_REGNUM)
+    {
+      fetch_fp_regs (regcache, tid);
       return;
     }
 
@@ -1470,6 +1480,8 @@ store_spe_register (const struct regcache *regcache, int tid, int regno)
   set_spe_registers (tid, &evrregs);
 }
 
+static void store_fp_regs (const struct regcache *regcache, int tid, int regno);
+
 static void
 store_register (const struct regcache *regcache, int tid, int regno)
 {
@@ -1615,6 +1627,14 @@ store_register (const struct regcache *regcache, int tid, int regno)
       store_regset (regcache, tid, regno, NT_PPC_TM_CTAR,
 		    PPC_LINUX_SIZEOF_CTARREGSET,
 		    &ppc32_linux_ctarregset);
+      return;
+    }
+  else if ((tdep->ppc_fp0_regnum >= 0
+	    && regno >= tdep->ppc_fp0_regnum
+	    && regno < tdep->ppc_fp0_regnum + ppc_num_fprs)
+	   || regno == PPC_FPSCR_REGNUM)
+    {
+      store_fp_regs (regcache, tid, regno);
       return;
     }
 
