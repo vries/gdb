@@ -1387,4 +1387,9 @@ py_notimplemented ()
 #undef Py_RETURN_FALSE
 #undef Py_RETURN_NOTIMPLEMENTED
 
+/* Return true if import readline was successfully disabled during
+   initialization.  */
+
+extern bool gdbpy_import_readline_disabled ();
+
 #endif /* GDB_PYTHON_PYTHON_INTERNAL_H */

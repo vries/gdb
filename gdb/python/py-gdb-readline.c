@@ -116,8 +116,27 @@ sys.meta_path.insert(2, GdbRemoveReadlineFinder())\n\
 ";
   if (eval_python_command (code, Py_file_input) == 0)
     PyOS_ReadlineFunctionPointer = gdbpy_readline_wrapper;
+  else
+    {
+      if (PyErr_Occurred ())
+	{
+	  PyErr_Print ();
+	  PyErr_Clear ();
+	}
+
+      warning (_("Disabling import readline failed, python-interactive"
+		 " command disabled"));
+    }
 
   return 0;
+}
+
+/* See python-internal.h.  */
+
+bool
+gdbpy_import_readline_disabled ()
+{
+  return PyOS_ReadlineFunctionPointer == gdbpy_readline_wrapper;
 }
 
 GDBPY_INITIALIZE_FILE (gdbpy_initialize_gdb_readline);
