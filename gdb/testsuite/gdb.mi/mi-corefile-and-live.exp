@@ -39,8 +39,8 @@ if {$corefile == ""} {
 
 # Start GDB in non-stop and schedule-multiple mode.
 save_vars { GDBFLAGS } {
-    append GDBFLAGS " -ex \"set non-stop on\""
-    append GDBFLAGS " -ex \"set schedule-multiple on\""
+    append GDBFLAGS { -ex "set non-stop on"}
+    append GDBFLAGS { -ex "set schedule-multiple on"}
     mi_clean_restart $::testfile
 }
 
@@ -56,42 +56,46 @@ mi_create_breakpoint "-g i1 foo" \
 
 # Setup inferior 2, this will load the core file.
 mi_gdb_test "-add-inferior" \
-    [multi_line "=thread-group-added,id=\"i2\"" \
-	 "~\"\\\[New inferior 2\\\]\\\\n\"" \
-	 "\~\"Added inferior 2\[^\r\n\]*\\\\n\"" \
-	 "\\^done,inferior=\"\[^\"\]+\"(?:,connection={.*})?" ] \
+    [quotemeta \
+	 [multi_line \
+	      {=thread-group-added,id="i2"} \
+	      {~"[New inferior 2]\n"} \
+	      {~"Added inferior 2@/[^\r\n]*/\n"} \
+	      {^done,inferior="@/[^"]+/"@/(?:,connection={.*})?/}]] \
     "add inferior 2"
 
 # Set the executable for inferior 2.
 mi_gdb_test "-file-exec-and-symbols --thread-group i2 $::binfile" \
-    "\\^done" \
+    [string_to_regexp "^done"] \
     "set executable of inferior 2"
 
 # Load the core file into inferior 2.
 mi_gdb_test \
     "-target-select --thread-group i2 core $::corefile" \
-    [multi_line \
-	 "=thread-group-started,id=\"i2\",.*" \
-	 "=thread-created,id=\"2\",group-id=\"i2\"" \
-	 ".*\\^connected,frame=.*"] \
+    [quotemeta \
+	 [multi_line \
+	      {=thread-group-started,id="i2",@...} \
+	      {=thread-created,id="2",group-id="i2"} \
+	      {@...^connected,frame=@...}]] \
     "load core file in inferior 2"
 
 # Check the core file thread is initially shown as stopped.
-mi_gdb_test "-thread-info 2" ".*,state=\"stopped\".*" \
+mi_gdb_test "-thread-info 2" {.*,state="stopped".*} \
     "core file thread is initially stopped"
 
 # Resume "all" threads.  As the core target doesn't support execution
 # this should not try to set the core target threads running.
 mi_gdb_test "-exec-continue --all" \
-    [multi_line \
-	 "\\^running" \
-	 "\\*running,thread-id=\"1\""] \
+    [string_to_regexp \
+	 [multi_line \
+	      "^running" \
+	      {*running,thread-id="1"}]] \
     "resume all"
 
 # Wait for the non-core target thread to stop.
 mi_expect_stop "breakpoint-hit" \
-    "foo" ".*" ".*" ".*" {"" "disp=\"keep\""} "w1,i2 stop"
+    "foo" ".*" ".*" ".*" {"" {disp="keep"}} "w1,i2 stop"
 
 # Check that the core target thread is still showing as stopped.
-mi_gdb_test "-thread-info 2" ".*,state=\"stopped\".*" \
+mi_gdb_test "-thread-info 2" {.*,state="stopped".*} \
     "core file thread is still stopped"
