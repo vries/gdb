@@ -62,6 +62,11 @@ struct value_object : public PyObject
   PyObject *address;
   PyObject *dynamic_type;
   PyObject *content_bytes;
+
+  /* Called by the Python interpreter to perform an inferior function
+     call on the value.  */
+  gdbpy_ref<> valpy_call (gdbpy_borrowed_ref<> args,
+			  gdbpy_opt_borrowed_ref<> keywords);
 };
 
 static_assert (gdb::is_python_allocatable_v<value_object>);
@@ -1164,43 +1169,31 @@ valpy_setitem (PyObject *self, PyObject *key, PyObject *value)
 }
 
 /* Called by the Python interpreter to perform an inferior function
-   call on the value.  Returns NULL on error, with a python exception set.  */
-static PyObject *
-valpy_call (PyObject *self, PyObject *args, PyObject *keywords)
+   call on the value.  */
+gdbpy_ref<>
+value_object::valpy_call (gdbpy_borrowed_ref<> args,
+			  gdbpy_opt_borrowed_ref<> keywords ATTRIBUTE_UNUSED)
 {
   Py_ssize_t args_count;
-  struct value *function = ((value_object *) self)->value;
   struct value **vargs = NULL;
   struct type *ftype = NULL;
   gdbpy_ref<> result;
 
-  try
-    {
-      ftype = check_typedef (function->type ());
-    }
-  catch (const gdb_exception &except)
-    {
-      return gdbpy_handle_gdb_exception (nullptr, except);
-    }
+  ftype = check_typedef (value->type ());
 
   if (ftype->code () != TYPE_CODE_FUNC && ftype->code () != TYPE_CODE_METHOD
       && ftype->code () != TYPE_CODE_INTERNAL_FUNCTION)
-    {
-      PyErr_SetString (PyExc_RuntimeError,
-		       _("Value is not callable (not TYPE_CODE_FUNC"
-			 " or TYPE_CODE_METHOD"
-			 " or TYPE_CODE_INTERNAL_FUNCTION)."));
-      return NULL;
-    }
+    gdbpy_err_set_string
+      (PyExc_RuntimeError,
+       _("Value is not callable (not TYPE_CODE_FUNC or TYPE_CODE_METHOD"
+	 " or TYPE_CODE_INTERNAL_FUNCTION)."));
 
-  if (! PyTuple_Check (args))
-    {
-      PyErr_SetString (PyExc_TypeError,
-		       _("Inferior arguments must be provided in a tuple."));
-      return NULL;
-    }
+  if (! gdbpy_tuple_check (args))
+    gdbpy_err_set_string
+      (PyExc_TypeError,
+       _("Inferior arguments must be provided in a tuple."));
 
-  args_count = PyTuple_Size (args);
+  args_count = gdbpy_tuple_size (args);
   if (args_count > 0)
     {
       int i;
@@ -1208,39 +1201,29 @@ valpy_call (PyObject *self, PyObject *args, PyObject *keywords)
       vargs = XALLOCAVEC (struct value *, args_count);
       for (i = 0; i < args_count; i++)
 	{
-	  PyObject *item = PyTuple_GetItem (args, i);
-
-	  if (item == NULL)
-	    return NULL;
-
-	  vargs[i] = convert_value_from_python (item);
-	  if (vargs[i] == NULL)
-	    return NULL;
+	  gdbpy_borrowed_ref<> item = gdbpy_tuple_get_item (args, i);
+	  vargs[i] = gdbpy_require_nonnull (convert_value_from_python (item));
 	}
     }
 
-  try
-    {
-      scoped_value_mark free_values;
+  {
+    scoped_value_mark free_values;
 
-      value *return_value;
-      if (ftype->code () == TYPE_CODE_INTERNAL_FUNCTION)
-	return_value = call_internal_function (gdbpy_enter::get_gdbarch (),
-					       current_language,
-					       function, args_count, vargs,
-					       EVAL_NORMAL);
-      else
-	return_value
-	  = call_function_by_hand (function, NULL,
-				   gdb::make_array_view (vargs, args_count));
-      result = value_to_value_object (return_value);
-    }
-  catch (const gdb_exception &except)
-    {
-      return gdbpy_handle_gdb_exception (nullptr, except);
-    }
+    struct value *return_value;
+    if (ftype->code () == TYPE_CODE_INTERNAL_FUNCTION)
+      return_value = call_internal_function (gdbpy_enter::get_gdbarch (),
+					     current_language,
+					     value, args_count, vargs,
+					     EVAL_NORMAL);
+    else
+      return_value
+	= call_function_by_hand (value, NULL,
+				 gdb::make_array_view (vargs, args_count));
 
-  return result.release ();
+    result = value_to_value_object (return_value);
+  }
+
+  return result;
 }
 
 /* Called by the Python interpreter to obtain string representation
@@ -2376,7 +2359,7 @@ PyTypeObject value_object_type = {
   0,				  /*tp_as_sequence*/
   &value_object_as_mapping,	  /*tp_as_mapping*/
   valpy_hash,		          /*tp_hash*/
-  valpy_call,	                  /*tp_call*/
+  safety_details::varargs_wrapper<value_object, &value_object::valpy_call>, /*tp_call*/
   valpy_str,			  /*tp_str*/
   0,				  /*tp_getattro*/
   0,				  /*tp_setattro*/

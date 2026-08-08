@@ -358,4 +358,22 @@ gdbpy_sequence_concat (gdbpy_borrowed_ref<> first, gdbpy_borrowed_ref<> second)
   return result;
 }
 
+/* Wrapper for PyTuple_Check.  */
+static inline bool
+gdbpy_tuple_check (gdbpy_borrowed_ref<> p)
+{
+  /* Always succeeds.  */
+  return PyTuple_Check (p);
+}
+
+/* Throw gdb_python_exception if VAL is nullptr.  */
+template<typename T>
+T
+gdbpy_require_nonnull (T val)
+{
+  if (val == nullptr)
+    throw gdb_python_exception ();
+  return val;
+}
+
 #endif /* GDB_PYTHON_PY_WRAPPERS_H */
