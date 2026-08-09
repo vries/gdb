@@ -299,6 +299,33 @@ varargs_method (const char *name, const char *doc)
   };
 }
 
+/* Normally gdb requires that if a method accepts multiple arguments,
+   then it should also accept keywords.  However, there are some
+   exceptions to this rule.  These exceptions should use this wrapper.
+   This should be used sparingly.
+
+   A typical exception is something that takes an optional argument.
+   So, it may call PyArg_ParseTuple with "|s" or the like.
+
+   The underlying method should accept a single gdbpy_borrowed_ref
+   argument, which holds the arguments.  */
+template<class C, auto M>
+constexpr PyMethodDef
+varargs_no_keywords_method (std::string_view name, std::string_view doc)
+{
+  using namespace safety_details;
+  return {
+    name.data (),
+    [] (PyObject *self, PyObject *args) -> PyObject *
+    {
+      return wrapped_method (M, static_cast<C *> (self),
+			     gdbpy_borrowed_ref<> (args));
+    },
+    METH_VARARGS,
+    doc.data (),
+  };
+}
+
 /* A function that wraps a "repr" or "str" method.  */
 template<typename C, auto M>
 PyObject *
