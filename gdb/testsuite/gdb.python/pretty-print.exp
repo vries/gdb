@@ -1,0 +1,41 @@
+# Copyright (C) 2022-2026 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# This file is part of the GDB testsuite.  It tests a pretty printer that
+# calls an inferior function by hand, triggering a Use-after-Free bug
+# (PR gdb/28856).
+
+load_lib gdb-python.exp
+
+require allow_python_tests
+
+standard_testfile
+
+if { [prepare_for_testing "failed to prepare" $testfile $srcfile] } {
+    untested "failed to compile"
+    return
+}
+
+set line_nr [gdb_get_line_number "stop here"]
+
+if {![runto $srcfile:$line_nr]} {
+    untested "couldn't run to breakpoint"
+    return
+}
+
+gdb_test_no_output "source $srcdir/$subdir/pretty-print.py" \
+    "load script"
+
+gdb_test {interpreter-exec mi4 "-stack-list-arguments 2"}
