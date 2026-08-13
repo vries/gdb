@@ -70,7 +70,7 @@ repos:
         files: *gdb_python_files
         args: [--config, gdb/setup.cfg]
   - repo: https://github.com/pycqa/isort
-    rev: 9.0.0b1
+    rev: 8.0.1
     hooks:
       - id: isort
         types_or: *gdb_python_types
@@ -147,6 +147,13 @@ repos:
         language: unsupported_script
         entry: gdb/contrib/check-file-mode.sh
         files: *gdb_files
+      - id: &id5 pre-commit-config-check
+        name: *id5
+        language: python
+        entry: gdb/contrib/pre-commit.py
+        args: [--config-check]
+        additional_dependencies: ["pyyaml"]
+        files: '^\.pre-commit-config.yaml$'
 
 # Local Variables:
 # indent-tabs-mode: nil
