@@ -189,26 +189,57 @@ svr4_solib_ops::read_lm_info (CORE_ADDR lm_addr, CORE_ADDR debug_base) const
   gdb::byte_vector lm (lmo->link_map_size);
 
   if (target_read_memory (lm_addr, lm.data (), lmo->link_map_size) != 0)
-    warning (_("Error reading shared library list entry at %s"),
-	     paddress (current_inferior ()->arch (), lm_addr));
-  else
     {
-      type *ptr_type
-	= builtin_type (current_inferior ()->arch ())->builtin_data_ptr;
-
-      lm_info = std::make_unique<lm_info_svr4> (debug_base);
-      lm_info->lm_addr = lm_addr;
-
-      lm_info->l_addr_inferior = extract_typed_address (&lm[lmo->l_addr_offset],
-							ptr_type);
-      lm_info->l_ld = extract_typed_address (&lm[lmo->l_ld_offset], ptr_type);
-      lm_info->l_next = extract_typed_address (&lm[lmo->l_next_offset],
-					       ptr_type);
-      lm_info->l_prev = extract_typed_address (&lm[lmo->l_prev_offset],
-					       ptr_type);
-      lm_info->l_name = extract_typed_address (&lm[lmo->l_name_offset],
-					       ptr_type);
+      warning (_("Error reading shared library list entry at %s"),
+	       paddress (current_inferior ()->arch (), lm_addr));
+      return lm_info;
     }
+
+  type *ptr_type
+    = builtin_type (current_inferior ()->arch ())->builtin_data_ptr;
+
+  lm_info = std::make_unique<lm_info_svr4> (debug_base);
+  lm_info->lm_addr = lm_addr;
+
+  lm_info->l_addr_inferior
+    = extract_typed_address (&lm[lmo->l_addr_offset], ptr_type);
+  lm_info->l_ld = extract_typed_address (&lm[lmo->l_ld_offset], ptr_type);
+  lm_info->l_next = extract_typed_address (&lm[lmo->l_next_offset], ptr_type);
+  lm_info->l_prev = extract_typed_address (&lm[lmo->l_prev_offset], ptr_type);
+  lm_info->l_name = extract_typed_address (&lm[lmo->l_name_offset], ptr_type);
+
+  if (lmo->l_real_offset == -1)
+    return lm_info;
+  CORE_ADDR l_real = extract_typed_address (&lm[lmo->l_real_offset], ptr_type);
+
+  if (l_real == lm_addr)
+    return lm_info;
+
+  /* We have l_real != lm_addr, so l_real points to the link map of ld.so.  */
+
+  if (!(lm_info->l_addr_inferior == 0 && lm_info->l_ld == 0))
+    return lm_info;
+
+  /* We have l_addr_inferior == 0 and l_ld == 0.  This can happen with a glibc
+     that:
+     - has commit a93d9e03a3 ("Extend struct r_debug to support multiple
+       namespaces [BZ #15971]"), but
+     - misses commit 88361b408b ("elf: Copy l_addr/l_ld when adding ld.so to a
+       new namespace").
+     This seems to be the case at least for the alma linux 9.8 BaseOs version,
+     which uses glibc v2.34 and backports only the first commit.
+     Fix/workaround this here by replicating the copy of ld_addr/l_ld here.  */
+
+  if (target_read_memory (l_real, lm.data (), lmo->link_map_size) != 0)
+    {
+      warning (_("Error reading shared library list entry at %s"),
+	       paddress (current_inferior ()->arch (), l_real));
+      return lm_info;
+    }
+
+  lm_info->l_addr_inferior = extract_typed_address (&lm[lmo->l_addr_offset],
+						    ptr_type);
+  lm_info->l_ld = extract_typed_address (&lm[lmo->l_ld_offset], ptr_type);
 
   return lm_info;
 }
@@ -3537,6 +3568,7 @@ ilp32_svr4_solib_ops::fetch_link_map_offsets () const
       lmo.l_ld_offset = 8;
       lmo.l_next_offset = 12;
       lmo.l_prev_offset = 16;
+      lmo.l_real_offset = -1;
     }
 
   return lmp;
@@ -3586,6 +3618,7 @@ lp64_svr4_solib_ops::fetch_link_map_offsets () const
       lmo.l_ld_offset = 16;
       lmo.l_next_offset = 24;
       lmo.l_prev_offset = 32;
+      lmo.l_real_offset = -1;
     }
 
   return lmp;

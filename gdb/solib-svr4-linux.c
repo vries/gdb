@@ -53,6 +53,7 @@ linux_ilp32_svr4_solib_ops::fetch_link_map_offsets () const
       lmo.l_ld_offset = 8;
       lmo.l_next_offset = 12;
       lmo.l_prev_offset = 16;
+      lmo.l_real_offset = -1;
     }
 
   return lmp;
@@ -85,13 +86,14 @@ linux_lp64_svr4_solib_ops::fetch_link_map_offsets () const
       lmo.r_ldsomap_offset = -1;
       lmo.r_next_offset = 40;
 
-      /* Everything we need is in the first 40 bytes.  */
-      lmo.link_map_size = 40;
+      /* Everything we need is in the first 48 bytes.  */
+      lmo.link_map_size = 48;
       lmo.l_addr_offset = 0;
       lmo.l_name_offset = 8;
       lmo.l_ld_offset = 16;
       lmo.l_next_offset = 24;
       lmo.l_prev_offset = 32;
+      lmo.l_real_offset = 40;
     }
 
   return lmp;

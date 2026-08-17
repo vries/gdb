@@ -571,6 +571,7 @@ mips_fbsd_lp64_solib_ops::fetch_link_map_offsets () const
       lmo.l_ld_offset = 24;
       lmo.l_next_offset = 32;
       lmo.l_prev_offset = 40;
+      lmo.l_real_offset = -1;
     }
 
   return lmp;

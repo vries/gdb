@@ -207,6 +207,10 @@ struct link_map_offsets
 
     /* Offset to l_name field in struct link_map.  */
     int l_name_offset;
+
+    /* Offset to l_real field in struct link_map.  Available since glibc
+       version v2.3.4.  */
+    int l_real_offset;
   };
 
 /* Set the gdbarch methods for SVR4 systems.  */

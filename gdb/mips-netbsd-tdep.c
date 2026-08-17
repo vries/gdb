@@ -333,6 +333,7 @@ mips_nbsd_ilp32_svr4_solib_ops::fetch_link_map_offsets () const
       lmo.l_ld_offset = 12;
       lmo.l_next_offset = 16;
       lmo.l_prev_offset = 20;
+      lmo.l_real_offset = -1;
     }
 
   return lmp;
