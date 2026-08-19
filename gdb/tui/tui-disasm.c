@@ -112,6 +112,15 @@ tui_disassemble (struct gdbarch *gdbarch,
     {
       tui_asm_line tal;
 
+      /* Don't disassemble:
+	 - non-code sections (not appropriate for disassembly window), and
+	 - section holes (otherwise we can get stuck, unable to scroll back to
+	   the section before the section hole).  */
+      struct obj_section *section = find_pc_section (pc);
+      if (section == nullptr
+	  || (bfd_section_flags (section->the_bfd_section) & SEC_CODE) == 0)
+	return pc;
+
       /* Save the instruction address.  */
       tal.addr = pc;
 
