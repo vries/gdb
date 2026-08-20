@@ -148,22 +148,15 @@ proc load_lib { file } {
        set known_globals($varname) 1
     }
 
-    set code [catch {saved_load_lib $file} result]
-
-    foreach varname [info globals] {
-       if { ![info exists known_globals($varname)] } {
-	   gdb_persistent_global_no_decl $varname
-       }
+    try {
+	return [saved_load_lib $file]
+    } finally {
+	foreach varname [info globals] {
+	    if { ![info exists known_globals($varname)] } {
+		gdb_persistent_global_no_decl $varname
+	    }
+	}
     }
-
-    if {$code == 1} {
-	global errorInfo errorCode
-	return -code error -errorinfo $errorInfo -errorcode $errorCode $result
-    } elseif {$code > 1} {
-	return -code $code $result
-    }
-
-    return $result
 }
 
 # Tcl 9.0 changed the default channel encoding profile to "strict".
@@ -3294,15 +3287,12 @@ proc with_test_prefix { prefix body } {
 
   set saved $pf_prefix
   append pf_prefix " " $prefix ":"
-  set code [catch {uplevel 1 $body} result]
-  set pf_prefix $saved
 
-  if {$code == 1} {
-      global errorInfo errorCode
-      return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-  } else {
-      return -code $code $result
-  }
+    try {
+	return [uplevel 1 $body]
+    } finally {
+	set pf_prefix $saved
+    }
 }
 
 # Wrapper for foreach that calls with_test_prefix on each iteration,
@@ -3312,16 +3302,7 @@ proc foreach_with_prefix {var list body} {
     upvar 1 $var myvar
     foreach myvar $list {
 	with_test_prefix "$var=$myvar" {
-	    set code [catch {uplevel 1 $body} result]
-	}
-
-	if {$code == 1} {
-	    global errorInfo errorCode
-	    return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-	} elseif {$code == 3} {
-	    break
-	} elseif {$code == 2} {
-	    return -code $code $result
+	    uplevel 1 $body
 	}
     }
 }
