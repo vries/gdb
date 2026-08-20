@@ -56,7 +56,7 @@ proc Term::_log_cur { what body } {
     set orig_cur_row $_cur_row
     set orig_cur_col $_cur_col
 
-    set code [catch {uplevel $body} result]
+    set code [catch {uplevel $body} result opts]
 
     _log "$what, cursor: ($orig_cur_row, $orig_cur_col) -> ($_cur_row, $_cur_col)"
 
@@ -64,7 +64,7 @@ proc Term::_log_cur { what body } {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 

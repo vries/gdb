@@ -235,7 +235,7 @@ proc with_lock { lock_file body } {
 	set lock_rc [lock_file_acquire $lock_file]
     }
 
-    set code [catch {uplevel 1 $body} result]
+    set code [catch {uplevel 1 $body} result opts]
 
     if {[info exists ::GDB_PARALLEL]} {
 	lock_file_release $lock_rc
@@ -245,7 +245,7 @@ proc with_lock { lock_file body } {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 

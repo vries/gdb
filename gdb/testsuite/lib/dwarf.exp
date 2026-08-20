@@ -324,7 +324,7 @@ proc shared_gdb_end_use {} {
 
 proc with_shared_gdb { body } {
     shared_gdb_enable
-    set code [catch { uplevel 1 $body } result]
+    set code [catch { uplevel 1 $body } result opts]
     shared_gdb_disable
 
     # Return as appropriate.
@@ -332,7 +332,7 @@ proc with_shared_gdb { body } {
 	global errorInfo errorCode
 	return -code error -errorinfo $errorInfo -errorcode $errorCode $result
     } elseif { $code > 1 } {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 
     return $result

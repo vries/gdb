@@ -148,7 +148,7 @@ proc load_lib { file } {
        set known_globals($varname) 1
     }
 
-    set code [catch {saved_load_lib $file} result]
+    set code [catch {saved_load_lib $file} result opts]
 
     foreach varname [info globals] {
        if { ![info exists known_globals($varname)] } {
@@ -160,7 +160,7 @@ proc load_lib { file } {
 	global errorInfo errorCode
 	return -code error -errorinfo $errorInfo -errorcode $errorCode $result
     } elseif {$code > 1} {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 
     return $result
@@ -1582,7 +1582,7 @@ proc gdb_test_multiple { command message args } {
     set gdb_test_name "$message"
 
     set result 0
-    set code [catch {gdb_expect $code} string]
+    set code [catch {gdb_expect $code} string opts]
 
     # Clean up the gdb_test_name variable.  If we had a
     # previous value then restore it, otherwise, delete the variable
@@ -1597,7 +1597,7 @@ proc gdb_test_multiple { command message args } {
 	global errorInfo errorCode
 	return -code error -errorinfo $errorInfo -errorcode $errorCode $string
     } elseif {$code > 1} {
-	return -code $code $string
+	return -options [dict incr opts -level] $string
     }
     return $result
 }
@@ -3294,14 +3294,14 @@ proc with_test_prefix { prefix body } {
 
   set saved $pf_prefix
   append pf_prefix " " $prefix ":"
-  set code [catch {uplevel 1 $body} result]
+  set code [catch {uplevel 1 $body} result opts]
   set pf_prefix $saved
 
   if {$code == 1} {
       global errorInfo errorCode
       return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
   } else {
-      return -code $code $result
+      return -options [dict incr opts -level] $result
   }
 }
 
@@ -3312,7 +3312,7 @@ proc foreach_with_prefix {var list body} {
     upvar 1 $var myvar
     foreach myvar $list {
 	with_test_prefix "$var=$myvar" {
-	    set code [catch {uplevel 1 $body} result]
+	    set code [catch {uplevel 1 $body} result opts]
 	}
 
 	if {$code == 1} {
@@ -3321,7 +3321,7 @@ proc foreach_with_prefix {var list body} {
 	} elseif {$code == 3} {
 	    break
 	} elseif {$code == 2} {
-	    return -code $code $result
+	    return -options [dict incr opts -level] $result
 	}
     }
 }
@@ -3404,7 +3404,7 @@ proc save_vars { vars body } {
 	}
     }
 
-    set code [catch {uplevel 1 $body} result]
+    set code [catch {uplevel 1 $body} result opts]
 
     foreach {var value} [array get saved_scalars] {
 	uplevel 1 [list set $var $value]
@@ -3423,7 +3423,7 @@ proc save_vars { vars body } {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 
@@ -3455,7 +3455,7 @@ proc save_target_board_info { vars body } {
 	}
     }
 
-    set code [catch {uplevel 1 $body} result]
+    set code [catch {uplevel 1 $body} result opts]
 
     foreach {var value} [array get saved_target_board_info] {
 	unset_board_info $var
@@ -3470,7 +3470,7 @@ proc save_target_board_info { vars body } {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 
@@ -3486,7 +3486,7 @@ proc with_cwd { dir body } {
     verbose -log "Switching to directory $dir (saved CWD: $saved_dir)."
     cd $dir
 
-    set code [catch {uplevel 1 $body} result]
+    set code [catch {uplevel 1 $body} result opts]
 
     verbose -log "Switching back to $saved_dir."
     cd $saved_dir
@@ -3495,7 +3495,7 @@ proc with_cwd { dir body } {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 
@@ -3570,7 +3570,7 @@ proc with_gdb_cwd { dir body } {
 	return
     }
 
-    set code [catch {uplevel 1 $body} result]
+    set code [catch {uplevel 1 $body} result opts]
 
     verbose -log "Switching back to $saved_dir."
     if {![gdb_cd $saved_dir]} {
@@ -3605,7 +3605,7 @@ proc with_gdb_cwd { dir body } {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 
@@ -3646,7 +3646,7 @@ proc with_gdb_prompt { prompt body } {
     set gdb_prompt $prompt
     gdb_test_no_output "set prompt $prompt " ""
 
-    set code [catch {uplevel 1 $body} result]
+    set code [catch {uplevel 1 $body} result opts]
 
     verbose -log "Restoring gdb prompt to \"$saved \"."
     set gdb_prompt $saved
@@ -3656,7 +3656,7 @@ proc with_gdb_prompt { prompt body } {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 
@@ -3681,7 +3681,7 @@ proc with_target_charset { target_charset body } {
 
     gdb_test_no_output -nopass "set target-charset $target_charset"
 
-    set code [catch {uplevel 1 $body} result]
+    set code [catch {uplevel 1 $body} result opts]
 
     gdb_test_no_output -nopass "set target-charset $saved"
 
@@ -3689,7 +3689,7 @@ proc with_target_charset { target_charset body } {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 
@@ -3711,7 +3711,7 @@ proc with_max_value_size { size body } {
 
     gdb_test_no_output -nopass "set max-value-size $size"
 
-    set code [catch {uplevel 1 $body} result]
+    set code [catch {uplevel 1 $body} result opts]
 
     gdb_test_no_output -nopass "set max-value-size $saved"
 
@@ -3719,7 +3719,7 @@ proc with_max_value_size { size body } {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 
@@ -3757,7 +3757,7 @@ proc with_spawn_id { spawn_id body } {
 
     switch_gdb_spawn_id $spawn_id
 
-    set code [catch {uplevel 1 $body} result]
+    set code [catch {uplevel 1 $body} result opts]
 
     if {[info exists saved_spawn_id]} {
 	switch_gdb_spawn_id $saved_spawn_id
@@ -3769,7 +3769,7 @@ proc with_spawn_id { spawn_id body } {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 
@@ -3824,14 +3824,14 @@ proc with_timeout_factor { factor body } {
     set savedtimeout $timeout
 
     set timeout [expr {[get_largest_timeout] * $factor}]
-    set code [catch {uplevel 1 $body} result]
+    set code [catch {uplevel 1 $body} result opts]
 
     set timeout $savedtimeout
     if {$code == 1} {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 
@@ -7546,14 +7546,14 @@ proc gdb_expect { args } {
     }
 
     set code [catch \
-	{uplevel remote_expect host $tmt $expcode} string]
+	{uplevel remote_expect host $tmt $expcode} string opts]
 
     if {$code == 1} {
 	global errorInfo errorCode
 
 	return -code error -errorinfo $errorInfo -errorcode $errorCode $string
     } else {
-	return -code $code $string
+	return -options [dict incr opts -level] $string
     }
 }
 
@@ -8245,7 +8245,7 @@ proc with_set { var val body } {
 	}
     }
 
-    set code [catch {uplevel 1 $body} result]
+    set code [catch {uplevel 1 $body} result opts]
 
     # Restore saved setting.
     if { $save != "" } {
@@ -8261,7 +8261,7 @@ proc with_set { var val body } {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 
@@ -8667,7 +8667,7 @@ proc standard_temp_file {basename} {
 
 proc tentative_rename { a b } {
     global errorInfo errorCode
-    set code [catch {file rename -- $a $b} result]
+    set code [catch {file rename -- $a $b} result opts]
     if { $code == 1 && [lindex $errorCode 0] == "POSIX" \
 	     && [lindex $errorCode 1] == "EEXIST" } {
 	file delete $a
@@ -8676,7 +8676,7 @@ proc tentative_rename { a b } {
     if {$code == 1} {
 	return -code error -errorinfo $errorInfo -errorcode $errorCode $result
     } elseif {$code > 1} {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
     return 1
 }
@@ -11298,7 +11298,7 @@ proc with_override { name override body } {
     proc $name $new_args $new_body
 
     # Execute body.
-    set code [catch {uplevel 1 $body} result]
+    set code [catch {uplevel 1 $body} result opts]
 
     # Restore old proc if it existed on entry, else delete it.
     if { $existed } {
@@ -11313,7 +11313,7 @@ proc with_override { name override body } {
 	global errorInfo errorCode
 	return -code error -errorinfo $errorInfo -errorcode $errorCode $result
     } elseif { $code > 1 } {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 
     return $result
@@ -11332,14 +11332,14 @@ proc with_ansi_styling_terminal { body } {
 	unset -nocomplain ::env(NO_COLOR)
 	unset -nocomplain ::env(COLORTERM)
 
-	set code [catch {uplevel 1 $body} result]
+	set code [catch {uplevel 1 $body} result opts]
     }
 
     if {$code == 1} {
 	global errorInfo errorCode
 	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
     } else {
-	return -code $code $result
+	return -options [dict incr opts -level] $result
     }
 }
 
