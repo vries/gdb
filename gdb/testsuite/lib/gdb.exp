@@ -3290,19 +3290,23 @@ gdb_caching_proc allow_tui_tests {} {
 # Returns the result of BODY.
 #
 proc with_test_prefix { prefix body } {
-  global pf_prefix
+    global pf_prefix
 
-  set saved $pf_prefix
-  append pf_prefix " " $prefix ":"
-  set code [catch {uplevel 1 $body} result]
-  set pf_prefix $saved
-
-  if {$code == 1} {
-      global errorInfo errorCode
-      return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-  } else {
-      return -code $code $result
-  }
+    set saved $pf_prefix
+    append pf_prefix " " $prefix ":"
+    try {
+	uplevel 1 $body
+    } on ok {result} {
+	return $result
+    } on return {result} {
+	return -code return $result
+    } on break {} {
+	return -code break
+    } on continue {} {
+	return -code continue
+    } finally {
+	set pf_prefix $saved
+    }
 }
 
 # Wrapper for foreach that calls with_test_prefix on each iteration,
@@ -3310,19 +3314,14 @@ proc with_test_prefix { prefix body } {
 
 proc foreach_with_prefix {var list body} {
     upvar 1 $var myvar
-    foreach myvar $list {
-	with_test_prefix "$var=$myvar" {
-	    set code [catch {uplevel 1 $body} result]
+    try {
+	foreach myvar $list {
+	    with_test_prefix "$var=$myvar" {
+		uplevel 1 $body
+	    }
 	}
-
-	if {$code == 1} {
-	    global errorInfo errorCode
-	    return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-	} elseif {$code == 3} {
-	    break
-	} elseif {$code == 2} {
-	    return -code $code $result
-	}
+    } on return {result} {
+	return -code return $result
     }
 }
 
