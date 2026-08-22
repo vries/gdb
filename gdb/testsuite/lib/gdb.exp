@@ -1522,6 +1522,8 @@ proc gdb_test_multiple { command message args } {
 	    if { $message != "" } {
 		fail "$message"
 	    }
+	    # This does not return from gdb_test_multiple, but from the proc
+	    # above it.
 	    return -1
 	}
     }
@@ -1542,6 +1544,8 @@ proc gdb_test_multiple { command message args } {
 	    if { $message != "" } {
 		fail "$message"
 	    }
+	    # This does not return from gdb_test_multiple, but from the proc
+	    # above it.
 	    return -1
 	}
 	full_buffer {
@@ -12416,6 +12420,9 @@ proc unprintable_to_octal { input_string } {
 
     return $result
 }
+
+# Ignore args and don't do anything.  Can be used with proc with_override.
+proc nop {args} {}
 
 require {tcl_version_at_least 8 6 2}
 
