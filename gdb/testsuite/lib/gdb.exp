@@ -3294,15 +3294,10 @@ proc with_test_prefix { prefix body } {
 
     set saved $pf_prefix
     append pf_prefix " " $prefix ":"
-    set code [catch {uplevel 1 $body} result]
+    catch {uplevel 1 $body} result opts
     set pf_prefix $saved
 
-    if {$code == 1} {
-	global errorInfo errorCode
-	return -code $code -errorinfo $errorInfo -errorcode $errorCode $result
-    } else {
-	return -code $code $result
-    }
+    return -options [dict incr opts -level 1] $result
 }
 
 # Wrapper for foreach that calls with_test_prefix on each iteration,

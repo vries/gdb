@@ -1,0 +1,45 @@
+# Copyright 2026 Free Software Foundation, Inc.
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Testsuite self-tests for with_test_prefix.
+
+proc bar {variant} {
+    if {$variant == 0} {
+	verbose -log "Returning in bar (ok)"
+	return -level 2 1
+    } else {
+	with_test_prefix dummy {
+	    verbose -log "Returning in bar (ok)"
+	    return -level 2 1
+	}
+    }
+}
+
+proc foo {variant} {
+    set res [bar $variant]
+    verbose -log "returning in foo (not ok)"
+    return 2
+}
+
+# Note: don't use with_test_prefix (directly or indirectly) to make sure that
+# this test is run even if with_test_prefix is broken.
+foreach variant {0 1} {
+    set msg "$variant: return -level 2"
+    try {
+	set res 0
+	set res [foo $variant]
+    } finally {
+	gdb_assert {$res == 1} $msg
+    }
+}
