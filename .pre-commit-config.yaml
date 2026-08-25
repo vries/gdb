@@ -109,6 +109,19 @@ repos:
       - id: yamllint
         files: '^\.pre-commit-config.yaml$'
 
+  # Out-of-the-box hooks.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      # This just checks for well-formedness.  For better xml checking, see
+      # xmllint (disabled by default) below.
+      - id: &id5 check-xml
+        name: *id5
+        files: &gdb_xml_files '^(gdb|gdbserver|gdbsupport)/.*\.(xml|xsl|svg)$'
+        # Exclude:
+        # - gdb.xml/tdesc-bogus.xml (malformed)
+        exclude: ^gdb/testsuite/gdb.xml/tdesc-bogus.xml$
+
   # Local hooks.
   - repo: local
     hooks:
@@ -146,6 +159,20 @@ repos:
         language: unsupported_script
         entry: gdb/contrib/check-file-mode.sh
         files: *gdb_files
+      - id: &id6 xmllint
+        name: *id6
+        # The xmllint.sh script calls xmllint.  Users need to install xmllint
+        # and its dependencies.  It's not clear what the supported versions
+        # are, but this has been tested with libxml version 21308.
+        language: unsupported_script
+        entry: gdb/contrib/xmllint.sh
+        files: *gdb_xml_files
+        # Disabled by default, because pre-commit doesn't install xmllint for
+        # you.  To use this hook, do:
+        #   $ pre-commit run --hook-stage manual xmllint --files ...
+        #   $ pre-commit run --hook-stage manual xmllint --all-files
+        # or similar.
+        stages: [manual]
 
 # Local Variables:
 # indent-tabs-mode: nil
