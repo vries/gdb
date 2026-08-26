@@ -4,9 +4,9 @@
      are permitted in any medium without royalty provided the copyright
      notice and this notice are preserved.  -->
 
-<!-- The root element of a syscall info is <syscalls-info>.  -->
+<!-- The root element of a syscall info is <syscalls_info>.  -->
 
-<!ELEMENT syscalls-info		(syscall*)>
+<!ELEMENT syscalls_info		(syscall*)>
 
 <!ELEMENT syscall		EMPTY>
 <!ATTLIST syscall
