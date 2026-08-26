@@ -1,1 +1,1 @@
-<xi:include href="nonexistent.xml"/>
+<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="nonexistent.xml"/>

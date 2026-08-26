@@ -6,7 +6,7 @@
      notice and this notice are preserved.  -->
 
 <!DOCTYPE target SYSTEM "gdb-target.dtd">
-<target>
+<target xmlns:xi="http://www.w3.org/2001/XInclude">
   <feature name="org.gnu.gdb.rx.core">
     <reg name="r0" bitsize="32" type="data_ptr"/>
     <reg name="r1" bitsize="32" type="uint32"/>

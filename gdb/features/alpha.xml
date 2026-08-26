@@ -6,6 +6,6 @@
      notice and this notice are preserved.  -->
 
 <!DOCTYPE feature SYSTEM "gdb-target.dtd">
-<target version="1.0">
+<target version="1.0" xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="alpha-core.xml"/>
 </target>

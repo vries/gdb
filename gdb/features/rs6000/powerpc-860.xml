@@ -8,7 +8,7 @@
 <!-- PowerPC 860 or 850.  -->
 
 <!DOCTYPE target SYSTEM "gdb-target.dtd">
-<target>
+<target xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="power-core.xml"/>
   <xi:include href="power-fpu.xml"/>
   <xi:include href="power-oea.xml"/>

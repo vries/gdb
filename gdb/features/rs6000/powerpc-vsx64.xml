@@ -9,7 +9,7 @@
      view of the PowerPC.  Includes AltiVec and VSX vector registers.   -->
 
 <!DOCTYPE target SYSTEM "gdb-target.dtd">
-<target>
+<target xmlns:xi="http://www.w3.org/2001/XInclude">
   <architecture>powerpc:common64</architecture>
   <xi:include href="power64-core.xml"/>
   <xi:include href="power-fpu.xml"/>
