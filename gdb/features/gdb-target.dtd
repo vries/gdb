@@ -9,10 +9,10 @@
 <!-- The osabi and compatible elements were added post GDB 6.8.  The version
      wasn't bumped, since older GDBs silently ignore unknown elements.  -->
 
-<!ELEMENT target	(architecture?, osabi?, compatible*, feature*)>
+<!ELEMENT target	(architecture?, osabi?, compatible*, xi:include*, feature*)>
 <!ATTLIST target
-	version		CDATA	#FIXED "1.0">
-
+	version		CDATA	#FIXED "1.0"
+	xmlns:xi	CDATA   #FIXED "http://www.w3.org/2001/XInclude">
 <!ELEMENT architecture	(#PCDATA)>
 
 <!ELEMENT osabi	(#PCDATA)>
