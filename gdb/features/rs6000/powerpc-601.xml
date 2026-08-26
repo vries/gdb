@@ -9,7 +9,7 @@
      user-level SPR's.  -->
 
 <!DOCTYPE target SYSTEM "gdb-target.dtd">
-<target>
+<target xmlns:xi="http://www.w3.org/2001/XInclude">
   <!-- This description is slightly different from the standard
        org.gnu.gdb.power.core, to accommodate mq.  -->
   <feature name="org.gnu.gdb.power.core">

@@ -6,7 +6,7 @@
      notice and this notice are preserved.  -->
 
 <!DOCTYPE target SYSTEM "gdb-target.dtd">
-<target>
+<target xmlns:xi="http://www.w3.org/2001/XInclude">
   <architecture>z80</architecture>
   <xi:include href="z80-cpu.xml"/>
 </target>

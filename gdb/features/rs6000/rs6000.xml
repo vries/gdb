@@ -9,7 +9,7 @@
      user-level SPR's.  -->
 
 <!DOCTYPE target SYSTEM "gdb-target.dtd">
-<target>
+<target xmlns:xi="http://www.w3.org/2001/XInclude">
   <architecture>rs6000:6000</architecture>
 
   <!-- This description is slightly different from the standard

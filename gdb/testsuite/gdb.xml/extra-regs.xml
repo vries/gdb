@@ -1,4 +1,4 @@
-<target>
+<target xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="core-regs.xml"/>
   <feature name="extra">
     <vector id="v4int8" type="int8" count="4"/>

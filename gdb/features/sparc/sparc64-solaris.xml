@@ -6,7 +6,7 @@
      notice and this notice are preserved.  -->
 
 <!DOCTYPE target SYSTEM "gdb-target.dtd">
-<target>
+<target xmlns:xi="http://www.w3.org/2001/XInclude">
   <architecture>sparc:v9</architecture>
   <osabi>Solaris</osabi>
   <xi:include href="sparc64-cpu.xml"/>

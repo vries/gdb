@@ -6,7 +6,7 @@
      notice and this notice are preserved.  -->
 
 <!DOCTYPE target SYSTEM "gdb-target.dtd">
-<target>
+<target xmlns:xi="http://www.w3.org/2001/XInclude">
   <architecture>or1k</architecture>
   <xi:include href="or1k-core.xml"/>
 </target>
