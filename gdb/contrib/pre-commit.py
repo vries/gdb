@@ -49,7 +49,11 @@ def config_check_repo(repo):
 
     # Check version number.  Don't allow pre-releases like 9.0.0b1.
     # We currently only need to support x.y.z, but that could change.
-    if not re.fullmatch(r"\d+[.]\d+[.]\d+", rev):
+    re_rev = r"\d+[.]\d+[.]\d+"
+    if name == "https://github.com/scop/pre-commit-shfmt.git":
+        re_rev += r"-\d+"
+
+    if not re.fullmatch(re_rev, rev):
         print("Revision %s for repo %s not allowed." % (rev, name))
         return False
 

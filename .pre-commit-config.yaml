@@ -114,6 +114,18 @@ repos:
         # Enable strict mode to make sure we see and fix warnings.
         args: [--strict]
 
+  # Shell script hooks.
+  - repo: https://github.com/scop/pre-commit-shfmt.git
+    rev: v3.13.1-1
+    hooks:
+      - id: shfmt-src
+        alias: shfmt
+        entry: gdb/contrib/shfmt.sh
+        files: *gdb_files
+        args: []
+        # Disabled.
+        stages: [manual]
+
   # Local hooks.
   - repo: local
     hooks:
