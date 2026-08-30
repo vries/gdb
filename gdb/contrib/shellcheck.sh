@@ -45,7 +45,6 @@ for f in "$@"; do
 	    | gdb/config/djgpp/djconfig.sh \
 	    | gdb/contrib/cc-with-tweaks.sh \
 	    | gdb/contrib/gdb-add-index.sh \
-	    | gdb/gdb_buildall.sh \
 	    | gdb/gdb_mbuild.sh \
 	    | gdb/testsuite/lib/pdtrace.in)
 	    # Skip unclean files.
