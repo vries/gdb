@@ -50,6 +50,7 @@ with_indent()
 	--space-redirects \
 	--case-indent \
 	--binary-next-line \
+	--simplify \
 	--write \
 	"$@"
 }
