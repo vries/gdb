@@ -53,16 +53,12 @@
 myname=cc-with-tweaks.sh
 mydir=$(dirname "$0")
 
-if [ -z "$GDB" ]
-then
-    if [ -f ./gdb ]
-    then
+if [ -z "$GDB" ]; then
+    if [ -f ./gdb ]; then
 	GDB="./gdb -data-directory data-directory"
-    elif [ -f ../gdb ]
-    then
+    elif [ -f ../gdb ]; then
 	GDB="../gdb -data-directory ../data-directory"
-    elif [ -f ../../gdb ]
-    then
+    elif [ -f ../../gdb ]; then
 	GDB="../../gdb -data-directory ../../data-directory"
     else
 	echo "$myname: unable to find usable gdb" >&2
@@ -100,10 +96,16 @@ while [ $# -gt 0 ]; do
 	-Z) want_objcopy_compress=true ;;
 	-z) want_dwz=true ;;
 	-i) want_index=true ;;
-	-n) want_index=true; index_options=-dwarf-5;;
+	-n)
+	    want_index=true
+	    index_options=-dwarf-5
+	    ;;
 	-c) want_index_cache=true ;;
 	-m) want_multi=true ;;
-	-5) want_multi=true; dwz_5flag=-5 ;;
+	-5)
+	    want_multi=true
+	    dwz_5flag=-5
+	    ;;
 	-p) want_dwp=true ;;
 	-l) want_gnu_debuglink=true ;;
 	*) break ;;
@@ -111,12 +113,9 @@ while [ $# -gt 0 ]; do
     shift
 done
 
-if [ "$want_index" = true ]
-then
-    if [ -z "$GDB_ADD_INDEX" ]
-    then
-	if [ -f "$mydir/gdb-add-index.sh" ]
-	then
+if [ "$want_index" = true ]; then
+    if [ -z "$GDB_ADD_INDEX" ]; then
+	if [ -f "$mydir/gdb-add-index.sh" ]; then
 	    GDB_ADD_INDEX="$mydir/gdb-add-index.sh"
 	else
 	    echo "$myname: unable to find usable contrib/gdb-add-index.sh" >&2
@@ -125,10 +124,8 @@ then
     fi
 fi
 
-for arg in "$@"
-do
-    if [ "$next_is_output_file" = "yes" ]
-    then
+for arg in "$@"; do
+    if [ "$next_is_output_file" = "yes" ]; then
 	output_file="$arg"
 	next_is_output_file=no
 	continue
@@ -146,14 +143,12 @@ do
     esac
 done
 
-if [ "$next_is_output_file" = "yes" ]
-then
+if [ "$next_is_output_file" = "yes" ]; then
     echo "$myname: Unable to find output file" >&2
     exit 1
 fi
 
-if [ "$have_link" = "no" ]
-then
+if [ "$have_link" = "no" ]; then
     "$@"
     exit $?
 fi
@@ -164,13 +159,12 @@ output_dir="${output_file%/*}"
 "$@"
 rc=$?
 [ $rc != 0 ] && exit $rc
-if [ ! -f "$output_file" ]
-then
+if [ ! -f "$output_file" ]; then
     echo "$myname: Internal error: $output_file missing." >&2
     exit 1
 fi
 
-get_tmpdir ()
+get_tmpdir()
 {
     subdir="$1"
     if [ "$subdir" = "" ]; then
@@ -217,9 +211,9 @@ fi
 
 if [ "$want_index_cache" = true ]; then
     $GDB -q -batch \
-	 -ex "set index-cache directory $INDEX_CACHE_DIR" \
-	 -ex "set index-cache enabled on" \
-	 -ex "file $output_file"
+	-ex "set index-cache directory $INDEX_CACHE_DIR" \
+	-ex "set index-cache enabled on" \
+	-ex "file $output_file"
     rc=$?
     [ $rc != 0 ] && exit $rc
 fi
@@ -233,8 +227,10 @@ if [ "$want_dwz" = true ] || [ "$want_multi" = true ]; then
     dwz_version_major=${dwz_version//\.*/}
     dwz_version_minor=${dwz_version//*\./}
     if [ "$dwz_version_major" -lt "$dwz_version_major_required" ] \
-	   || { [ "$dwz_version_major" -eq "$dwz_version_major_required" ] \
-		    && [ "$dwz_version_minor" -lt "$dwz_version_minor_required" ]; }; then
+	|| {
+	    [ "$dwz_version_major" -eq "$dwz_version_major_required" ] \
+		&& [ "$dwz_version_minor" -lt "$dwz_version_minor_required" ]
+	}; then
 	detected="$dwz_version_major.$dwz_version_minor"
 	required="$dwz_version_major_required.$dwz_version_minor_required"
 	echo "$myname: dwz version $detected detected, version $required or higher required"
@@ -284,14 +280,14 @@ fi
 
 if [ "$want_dwp" = true ]; then
     mapfile -t dwo_files \
-	    < \
-	    <($READELF -wi "${output_file}" \
-		  | grep _dwo_name \
-		  | sed -e 's/^.*: //' \
-		  | sort \
-		  | uniq)
+	< \
+	<($READELF -wi "${output_file}" \
+	    | grep _dwo_name \
+	    | sed -e 's/^.*: //' \
+	    | sort \
+	    | uniq)
     rc=0
-    if  [ ${#dwo_files[@]} -ne 0 ]; then
+    if [ ${#dwo_files[@]} -ne 0 ]; then
 	$DWP -o "${output_file}.dwp" "${dwo_files[@]}" > /dev/null
 	rc=$?
 	[ $rc != 0 ] && exit $rc
@@ -311,11 +307,11 @@ if [ "$want_gnu_debuglink" = true ]; then
 
     # Create stripped and debug versions of output_file.
     strip "${STRIP_ARGS_STRIP_DEBUG[@]}" "${output_file}" \
-	  -o "${stripped_file}"
+	-o "${stripped_file}"
     rc=$?
     [ $rc != 0 ] && exit $rc
     strip "${STRIP_ARGS_KEEP_DEBUG[@]}" "${output_file}" \
-	  -o "${debug_file}"
+	-o "${debug_file}"
     rc=$?
     [ $rc != 0 ] && exit $rc
 
@@ -329,7 +325,7 @@ if [ "$want_gnu_debuglink" = true ]; then
 	# Overwrite output_file with stripped version containing
 	# .gnu_debuglink to debug_file.
 	$OBJCOPY --add-gnu-debuglink="$link" "${stripped_file}" \
-		 "${output_file}"
+	    "${output_file}"
     )
     rc=$?
     [ $rc != 0 ] && exit $rc

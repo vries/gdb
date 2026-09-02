@@ -28,14 +28,14 @@
 # rather than syscalls.master as syscall.h is easier to parse.
 
 if [ $# -ne 1 ]; then
-   echo "Error: Path to syscall.h missing. Aborting."
-   echo "Usage: update-freebsd.sh <path-to-syscall.h>"
-   exit 1
+    echo "Error: Path to syscall.h missing. Aborting."
+    echo "Usage: update-freebsd.sh <path-to-syscall.h>"
+    exit 1
 fi
 
 year=$(date +%Y)
 
-cat > freebsd.xml.tmp <<EOF
+cat > freebsd.xml.tmp << EOF
 <?xml version="1.0"?> <!-- THIS FILE IS GENERATED -*- buffer-read-only: t -*-  -->
 <!-- vi:set ro: -->
 <!-- Copyright (C) 2009-$year Free Software Foundation, Inc.
@@ -63,7 +63,7 @@ awk '
     sub(/^SYS_/,"",$2);
     printf "  <syscall name=\"%s\" number=\"%s\"", $2, $3
     if (sub(/^freebsd[0-9]*_/,"",$2) != 0)
-        printf " alias=\"%s\"", $2
+	printf " alias=\"%s\"", $2
     printf "/>\n"
 }
 /\/\* [0-9]* is obsolete [a-z_]* \*\// {
@@ -73,7 +73,7 @@ awk '
     printf "  <syscall name=\"%s_%s\" number=\"%s\" alias=\"%s\"/>\n", $4, $5, $2, $5
 }' "$1" >> freebsd.xml.tmp
 
-cat >> freebsd.xml.tmp <<EOF
+cat >> freebsd.xml.tmp << EOF
 </syscalls_info>
 EOF
 

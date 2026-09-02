@@ -20,14 +20,14 @@ set -o pipefail
 no_exec_files=()
 for f in "$@"; do
     case $f in
-	*/*.py \
-	    | */*.sh \
-	    | */configure \
-	    | gdb/gstack-1.in \
-	    | gdb/gcore-1.in \
-	    | gdb/po/gdbtext \
-	    | gdb/make-init-c \
-	    | gdb/testsuite/lib/notty-wrap )
+	*/*.py | \
+	    */*.sh | \
+	    */configure | \
+	    gdb/gstack-1.in | \
+	    gdb/gcore-1.in | \
+	    gdb/po/gdbtext | \
+	    gdb/make-init-c | \
+	    gdb/testsuite/lib/notty-wrap)
 	    continue
 	    ;;
 	*)

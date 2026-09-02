@@ -56,7 +56,7 @@ while [ $# -gt 0 ]; do
 	    c=true
 	    shift
 	    ;;
-	--freq|-f)
+	--freq | -f)
 	    minfreq=$2
 	    maxfreq=$2
 	    shift 2
@@ -76,7 +76,7 @@ while [ $# -gt 0 ]; do
 	    shift 2
 	    ;;
 	*)
-	    break;
+	    break
 	    ;;
     esac
 done
@@ -89,7 +89,7 @@ fi
 awkfile=$(mktemp)
 trap 'rm -f "$awkfile"' EXIT
 
-cat > "$awkfile" <<EOF
+cat > "$awkfile" << EOF
 BEGIN {
     in_comment=0
 }
@@ -128,17 +128,17 @@ else
     cat "$@"
 fi \
     | sed \
-	  -e 's/[!"?;:%^$~#{}`&=@,. \t\/_()|<>\+\*-]/\n/g' \
-	  -e 's/\[/\n/g' \
-	  -e 's/\]/\n/g' \
-	  -e "s/'/\n/g" \
-	  -e 's/[0-9][0-9]*/\n/g' \
-	  -e 's/[ \t]*//g' \
+	-e 's/[!"?;:%^$~#{}`&=@,. \t\/_()|<>\+\*-]/\n/g' \
+	-e 's/\[/\n/g' \
+	-e 's/\]/\n/g' \
+	-e "s/'/\n/g" \
+	-e 's/[0-9][0-9]*/\n/g' \
+	-e 's/[ \t]*//g' \
     | tr '[:upper:]' '[:lower:]' \
     | sort \
     | uniq -c \
     | awk "{ if (($minfreq == 0 || $minfreq <= \$1) \
-                 && ($maxfreq == 0 || \$1 <= $maxfreq)) { print \$0; } }" \
+		 && ($maxfreq == 0 || \$1 <= $maxfreq)) { print \$0; } }" \
     | awk '{ print length($0) " " $0; }' \
     | sort -n -r \
     | cut -d ' ' -f 2-

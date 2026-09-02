@@ -22,7 +22,7 @@
 
 pwd=$(pwd -P)
 
-parse_args ()
+parse_args()
 {
     if [ $# -lt 1 ]; then
 	echo "dir argument needed"
@@ -38,7 +38,7 @@ parse_args ()
     fi
 }
 
-gen_from_kernel_headers ()
+gen_from_kernel_headers()
 {
     local f
     f="$1"
@@ -83,7 +83,7 @@ gen_from_kernel_headers ()
     rm -Rf "$tmpdir"
 }
 
-pre ()
+pre()
 {
     local f
     f="$1"
@@ -108,7 +108,7 @@ pre ()
     local year
     year=$(date +%Y)
 
-    cat <<EOF
+    cat << EOF
 <?xml version="1.0"?>
 <!-- Copyright (C) $start_date-$year Free Software Foundation, Inc.
 
@@ -130,13 +130,12 @@ EOF
     echo '<syscalls_info>'
 }
 
-
-post ()
+post()
 {
     echo '</syscalls_info>'
 }
 
-one ()
+one()
 {
     local f
     f="$1"
@@ -157,21 +156,21 @@ one ()
     # Print out num, abi, name.
     grep -v "^#" "$d/$f" \
 	| awk '{print $1, $2, $3}' \
-	      > "$tmp"
+	    > "$tmp"
 
     local decimal
     decimal="[0-9][0-9]*"
     # Print out num, "removed", name.
     grep -E "^# $decimal was sys_*" "$d/$f" \
 	| awk '{print $2, "removed", gensub("^sys_", "", 1, $4)}' \
-	      >> "$tmp"
+	    >> "$tmp"
 
     case $h in
 	arch/arm/include/uapi/asm/unistd.h)
 	    grep '#define __ARM_NR_[a-z].*__ARM_NR_BASE\+' "$d/$h" \
 		| sed 's/#define //;s/__ARM_NR_BASE+//;s/[()]//g;s/__ARM_NR_/ARM_/' \
 		| awk '{print $2 + 0x0f0000, "private", $1}' \
-		      >> "$tmp"
+		    >> "$tmp"
 	    ;;
     esac
 
@@ -228,7 +227,7 @@ one ()
     local n
     n=$i
 
-    for ((i = 0 ; i < n ; i++)); do
+    for ((i = 0; i < n; i++)); do
 	_name=${names[$i]}
 	_abi=${abis[$i]}
 	_num=$((${nums[$i]} + offset))
@@ -249,7 +248,7 @@ one ()
     post
 }
 
-regen ()
+regen()
 {
     local f
     f="$1"
@@ -352,7 +351,7 @@ regen ()
     one "$t" "$abi" "$start_date" "$offset" "$h" > "$f"
 }
 
-main ()
+main()
 {
     shopt -s extglob
 

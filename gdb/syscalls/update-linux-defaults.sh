@@ -33,11 +33,11 @@ if [ ! -d "$d" ]; then
     exit 1
 fi
 
-pre ()
+pre()
 {
     year=$(date +%Y)
 
-    cat <<EOF
+    cat << EOF
 <?xml version="1.0"?>
 <!-- Copyright (C) 2009-$year Free Software Foundation, Inc.
 
@@ -51,33 +51,32 @@ EOF
     echo '<syscalls_defaults>'
 }
 
-
-post ()
+post()
 {
     echo '</syscalls_defaults>'
 }
 
-generate ()
+generate()
 {
     pre
 
     grep -rn -E "T[A-Z][,|]" "$d/src/linux/" \
 	| sed -e 's/\(T[A-Z][,|].*\)/\x03&/' -e 's/.*\x03//' \
-	      -e 's/,[ \t]*SEN[ \t]*(/, SEN(/g' \
+	    -e 's/,[ \t]*SEN[ \t]*(/, SEN(/g' \
 	| grep ", SEN(" \
 	| sed -e 's/\(.*\"\).*/\1/g' \
-	      -e 's/#64\"/\"/g' \
+	    -e 's/#64\"/\"/g' \
 	| awk '{print $3 " " $1}' \
 	| sort -u \
 	| sed -e 's/|/,/g' \
-	      -e 's/TD,/descriptor,/g' \
-	      -e 's/TF,/file,/g' \
-	      -e 's/TI,/ipc,/g' \
-	      -e 's/TM,/memory,/g' \
-	      -e 's/TN,/network,/g' \
-	      -e 's/TP,/process,/g' \
-	      -e 's/TS,/signal,/g' \
-	      -e 's/[A-Z]\+,//g' \
+	    -e 's/TD,/descriptor,/g' \
+	    -e 's/TF,/file,/g' \
+	    -e 's/TI,/ipc,/g' \
+	    -e 's/TM,/memory,/g' \
+	    -e 's/TN,/network,/g' \
+	    -e 's/TP,/process,/g' \
+	    -e 's/TS,/signal,/g' \
+	    -e 's/[A-Z]\+,//g' \
 	| grep -v '" $' \
 	| sed 's/,$//g' \
 	| awk "{printf \"  <syscall name=%s groups=\\\"%s\\\"/>\n\", \$1, \$2}"

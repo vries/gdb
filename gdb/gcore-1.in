@@ -36,7 +36,8 @@ data_directory=
 # The GDB binary to run.
 gdb_binary=
 
-print_usage() {
+print_usage()
+{
     prefix="Usage: $0"
     padding=$(printf '%*s' ${#prefix})
 
@@ -45,11 +46,13 @@ print_usage() {
     echo "$padding pid1 [pid2...pidN]"
 }
 
-print_try_help() {
+print_try_help()
+{
     echo "Try '$0 --help' for more information."
 }
 
-print_help() {
+print_help()
+{
     print_usage
     echo
     echo "Create a core file of a running program using GDB."
@@ -65,7 +68,8 @@ print_help() {
     echo "                       to GDB."
 }
 
-print_version() {
+print_version()
+{
     echo "GNU gcore (${PKGVERSION}) ${VERSION}"
 }
 
@@ -77,23 +81,23 @@ while getopts vhao:g:d:-: OPT; do
     fi
 
     case "$OPT" in
-        a)
-            case "$(uname -s)" in
-                Linux)
-                    use_coredump_filter="off"
-                    dump_excluded_mappings="on"
-                    ;;
-            esac
-            ;;
-        o)
-            prefix=$OPTARG
-            ;;
-        g)
-            gdb_binary="$OPTARG"
-            ;;
-        d)
-            data_directory="$OPTARG"
-            ;;
+	a)
+	    case "$(uname -s)" in
+		Linux)
+		    use_coredump_filter="off"
+		    dump_excluded_mappings="on"
+		    ;;
+	    esac
+	    ;;
+	o)
+	    prefix=$OPTARG
+	    ;;
+	g)
+	    gdb_binary="$OPTARG"
+	    ;;
+	d)
+	    data_directory="$OPTARG"
+	    ;;
 	h | help)
 	    print_help
 	    exit 0
@@ -107,21 +111,20 @@ while getopts vhao:g:d:-: OPT; do
 	    print_try_help 1>&2
 	    exit 2
 	    ;;
-        *)
+	*)
 	    # Unknown single character options are handled by the \?
 	    # case above.  This is formatted to match the error
 	    # getopts gives for an unknown single character option.
 	    echo "$0: illegal option -- $OPT" 1>&2
 	    print_try_help 1>&2
 	    exit 2
-            ;;
+	    ;;
     esac
 done
 
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
-if [ "$#" -eq "0" ]
-then
+if [ "$#" -eq "0" ]; then
     print_usage 1>&2
     exit 1
 fi
@@ -130,31 +133,31 @@ fi
 # called.
 binary_path=$(dirname "$0")
 
-if test "$binary_path" = . ; then
-  # We got "." back as a path.  This means the user executed
-  # the gcore script locally (i.e. ./gcore) or called the
-  # script via a shell interpreter (i.e. sh gcore).
-  binary_basename=$(basename "$0")
+if test "$binary_path" = .; then
+    # We got "." back as a path.  This means the user executed
+    # the gcore script locally (i.e. ./gcore) or called the
+    # script via a shell interpreter (i.e. sh gcore).
+    binary_basename=$(basename "$0")
 
-  # If the gcore script was called like "sh gcore" and the script
-  # lives in the current directory, "which" will not give us "gcore".
-  # So first we check if the script is in the current directory
-  # before using the output of "which".
-  if test -f "$binary_basename" ; then
-    # We have a local gcore script in ".".  This covers the case of
-    # doing "./gcore" or "sh gcore".
-    binary_path="."
-  else
-    # The gcore script was not found in ".", which means the script
-    # was called from somewhere else in $PATH by "sh gcore".
-    # Extract the correct path now.
-    binary_path_from_env=$(which "$0")
-    binary_path=$(dirname "$binary_path_from_env")
-  fi
+    # If the gcore script was called like "sh gcore" and the script
+    # lives in the current directory, "which" will not give us "gcore".
+    # So first we check if the script is in the current directory
+    # before using the output of "which".
+    if test -f "$binary_basename"; then
+	# We have a local gcore script in ".".  This covers the case of
+	# doing "./gcore" or "sh gcore".
+	binary_path="."
+    else
+	# The gcore script was not found in ".", which means the script
+	# was called from somewhere else in $PATH by "sh gcore".
+	# Extract the correct path now.
+	binary_path_from_env=$(which "$0")
+	binary_path=$(dirname "$binary_path_from_env")
+    fi
 fi
 
 if [ -z "$gdb_binary" ]; then
-   gdb_binary="$binary_path/@GDB_TRANSFORM_NAME@"
+    gdb_binary="$binary_path/@GDB_TRANSFORM_NAME@"
 fi
 
 gdb_binary_basename=$(basename "$gdb_binary")
@@ -162,34 +165,32 @@ gdb_binary_basename=$(basename "$gdb_binary")
 # Check if the GDB binary is in the expected path.  If not, just
 # quit with a message.
 if [ ! -f "$gdb_binary" ]; then
-  echo "gcore: GDB binary ($gdb_binary) not found"
-  exit 1
+    echo "gcore: GDB binary ($gdb_binary) not found"
+    exit 1
 fi
 
 # Initialise return code.
 rc=0
 
 # Loop through pids
-for pid in "$@"
-do
-	# `</dev/null' to avoid touching interactive terminal if it is
-	# available but not accessible as GDB would get stopped on SIGTTIN.
-	"$gdb_binary" </dev/null \
-            ${data_directory:+--data-directory "$data_directory"} \
-	    --nx --batch --readnever -iex 'set debuginfod enabled off' \
-	    -ex "set pagination off" -ex "set height 0" -ex "set width 0" \
-            ${use_coredump_filter:+-ex "set use-coredump-filter ${use_coredump_filter}"} \
-	    ${dump_excluded_mappings:+-ex "set dump-excluded-mappings ${dump_excluded_mappings}"} \
-	    -ex "attach $pid" -ex "gcore $prefix.$pid" -ex detach -ex quit
+for pid in "$@"; do
+    # `</dev/null' to avoid touching interactive terminal if it is
+    # available but not accessible as GDB would get stopped on SIGTTIN.
+    "$gdb_binary" < /dev/null \
+	${data_directory:+--data-directory "$data_directory"} \
+	--nx --batch --readnever -iex 'set debuginfod enabled off' \
+	-ex "set pagination off" -ex "set height 0" -ex "set width 0" \
+	${use_coredump_filter:+-ex "set use-coredump-filter ${use_coredump_filter}"} \
+	${dump_excluded_mappings:+-ex "set dump-excluded-mappings ${dump_excluded_mappings}"} \
+	-ex "attach $pid" -ex "gcore $prefix.$pid" -ex detach -ex quit
 
-	if [ -r "$prefix.$pid" ] ; then
-	    rc=0
-	else
-	    echo "$gdb_binary_basename: failed to create $prefix.$pid"
-	    rc=1
-	    break
-	fi
-
+    if [ -r "$prefix.$pid" ]; then
+	rc=0
+    else
+	echo "$gdb_binary_basename: failed to create $prefix.$pid"
+	rc=1
+	break
+    fi
 
 done
 

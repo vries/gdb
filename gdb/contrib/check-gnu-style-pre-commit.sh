@@ -16,7 +16,10 @@
 
 set -e
 
-scriptdir=$(cd "$(dirname "$0")" || exit 1; pwd -P)
+scriptdir=$(
+    cd "$(dirname "$0")" || exit 1
+    pwd -P
+)
 
 tmp=""
 

@@ -90,7 +90,7 @@ virtual_boards=(
 )
 
 # Get RUNTESTFLAGS needed for specific boards.
-rtf_for_board ()
+rtf_for_board()
 {
     local b
     b="$1"
@@ -128,7 +128,7 @@ rtf_for_board ()
 		)
 	    fi
 	    ;;
-	local-remote-host|local-remote-host-notty)
+	local-remote-host | local-remote-host-notty)
 	    if [ "$host_user" != "" ]; then
 		rtf=(
 		    "${rtf[@]}"
@@ -147,7 +147,7 @@ rtf_for_board ()
 }
 
 # Get make target needed for specific boards.
-maketarget_for_board ()
+maketarget_for_board()
 {
     local b
     b="$1"
@@ -166,7 +166,7 @@ maketarget_for_board ()
 }
 
 # Summarize make check output.
-summary ()
+summary()
 {
     if $verbose; then
 	cat
@@ -179,7 +179,7 @@ summary ()
 }
 
 # Run make check, and possibly save test results.
-do_tests ()
+do_tests()
 {
     if $debug; then
 	echo "RTF: ${rtf[*]}"
@@ -191,8 +191,8 @@ do_tests ()
 
     # Run make check.
     make $maketarget \
-	 RUNTESTFLAGS="${rtf[*]}" TESTS="${tests[*]}" \
-	 2>&1 \
+	RUNTESTFLAGS="${rtf[*]}" TESTS="${tests[*]}" \
+	2>&1 \
 	| summary
 
     # Save test results.
@@ -216,7 +216,7 @@ do_tests ()
 
 	# Record the 'make check' command to enable easy re-running.
 	make_check_script="$dir/make-check.sh"
-	cat <<-EOF > "$make_check_script"
+	cat <<- EOF > "$make_check_script"
 	#!/bin/sh
 
 	cd "$PWD" && \\
@@ -228,7 +228,7 @@ do_tests ()
 
 # Set default values for global vars and modify according to command line
 # arguments.
-parse_args ()
+parse_args()
 {
     # Default values.
     debug=false
@@ -277,7 +277,7 @@ parse_args ()
 }
 
 # Cleanup function, scheduled to run on exit.
-cleanup ()
+cleanup()
 {
     if [ "$tmpdir" != "" ]; then
 	if $keep_tmp; then
@@ -289,7 +289,7 @@ cleanup ()
 }
 
 # Top-level function, called with command line arguments of the script.
-main ()
+main()
 {
     # Parse command line arguments.
     parse_args "$@"

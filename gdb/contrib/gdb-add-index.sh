@@ -27,16 +27,19 @@ VERSION="@VERSION@"
 
 myname="${0##*/}"
 
-print_usage() {
+print_usage()
+{
     prefix="Usage: $myname"
     echo "$prefix [-h|--help] [-v|--version] [--dwarf-5] FILENAME"
 }
 
-print_try_help() {
+print_try_help()
+{
     echo "Try '$myname --help' for more information."
 }
 
-print_help() {
+print_help()
+{
     print_usage
     echo
     echo "Add a .gdb_index section to FILENAME to facilitate faster debug"
@@ -48,7 +51,8 @@ print_help() {
     echo "                       instead of .gdb_index."
 }
 
-print_version() {
+print_version()
+{
     echo "GNU gdb-add-index (${PKGVERSION}) ${VERSION}"
 }
 
@@ -56,33 +60,33 @@ dwarf5=""
 
 # Parse options.
 until
-opt=$1
-case ${opt} in
-    --dwarf-5 | -dwarf-5)
-	dwarf5="-dwarf-5"
-	;;
+    opt=$1
+    case ${opt} in
+	--dwarf-5 | -dwarf-5)
+	    dwarf5="-dwarf-5"
+	    ;;
 
-    --help | -help | -h)
-	print_help
-	exit 0
-	;;
+	--help | -help | -h)
+	    print_help
+	    exit 0
+	    ;;
 
-    --version | -version | -v)
-	print_version
-	exit 0
-	;;
+	--version | -version | -v)
+	    print_version
+	    exit 0
+	    ;;
 
-    -?*)
-	print_try_help 1>&2
-	exit 2
-	;;
+	-?*)
+	    print_try_help 1>&2
+	    exit 2
+	    ;;
 
-    *)
-	# No arguments remaining.
-	;;
-esac
-# Break from loop if the first character of OPT is not '-'.
-[ "x$(printf %.1s "$opt")" != "x-" ]
+	*)
+	    # No arguments remaining.
+	    ;;
+    esac
+    # Break from loop if the first character of OPT is not '-'.
+    [ "x$(printf %.1s "$opt")" != "x-" ]
 do
     shift
 done
@@ -95,7 +99,7 @@ fi
 file="$1"
 
 if test -L "$file"; then
-    if ! command -v readlink >/dev/null 2>&1; then
+    if ! command -v readlink > /dev/null 2>&1; then
 	echo "$myname: 'readlink' missing.  Failed to follow symlink $1." 1>&2
 	exit 1
     fi
@@ -133,9 +137,9 @@ test "$dir" = "$file" && dir="."
 dwz_file=""
 if $READELF -S "$file" | grep -q " \.gnu_debugaltlink "; then
     dwz_file=$($READELF --string-dump=.gnu_debugaltlink "$file" \
-		   | grep -A1  "'\.gnu_debugaltlink':" \
-		   | tail -n +2 \
-		   | sed 's/.*]//')
+	| grep -A1 "'\.gnu_debugaltlink':" \
+	| tail -n +2 \
+	| sed 's/.*]//')
     dwz_file=$(echo $dwz_file)
     if $READELF -S "$dwz_file" | grep -E -q " \.(gdb_index|debug_names) "; then
 	# Already has an index, skip it.
@@ -143,7 +147,7 @@ if $READELF -S "$file" | grep -q " \.gnu_debugaltlink "; then
     fi
 fi
 
-set_files ()
+set_files()
 {
     fpath="$1"
 
@@ -183,7 +187,7 @@ $GDB --batch -nx -iex 'set auto-load no' \
 # already stripped binary, it's a no-op.
 status=0
 
-handle_file ()
+handle_file()
 {
     fpath="$1"
 
@@ -202,35 +206,35 @@ handle_file ()
 	fi
 	if test -s "$debugstr"; then
 	    if ! $OBJCOPY --dump-section .debug_str="$debugstrmerge" "$fpath" \
-		 /dev/null 2> "$debugstrerr"; then
+		/dev/null 2> "$debugstrerr"; then
 		cat >&2 "$debugstrerr"
 		exit 1
 	    fi
-	    cat "$debugstr" >>"$debugstrmerge"
+	    cat "$debugstr" >> "$debugstrmerge"
 	    if grep -q "can't dump section '.debug_str' - it does not exist" \
-		    "$debugstrerr"; then
+		"$debugstrerr"; then
 		$OBJCOPY --add-section $section="$index" \
-			 --set-section-flags $section=readonly \
-			 --add-section .debug_str="$debugstrmerge" \
-		         --set-section-flags .debug_str=readonly \
-			 "$fpath" "$fpath"
+		    --set-section-flags $section=readonly \
+		    --add-section .debug_str="$debugstrmerge" \
+		    --set-section-flags .debug_str=readonly \
+		    "$fpath" "$fpath"
 	    else
 		$OBJCOPY --add-section $section="$index" \
-			 --set-section-flags $section=readonly \
-			 --update-section .debug_str="$debugstrmerge" \
-			 "$fpath" "$fpath"
+		    --set-section-flags $section=readonly \
+		    --update-section .debug_str="$debugstrmerge" \
+		    "$fpath" "$fpath"
 	    fi
 	else
 	    $OBJCOPY --add-section $section="$index" \
-		     --set-section-flags $section=readonly \
-		     "$fpath" "$fpath"
+		--set-section-flags $section=readonly \
+		"$fpath" "$fpath"
 	fi
 
 	status=$?
     else
 	echo "$myname: No index was created for $fpath" 1>&2
 	echo "$myname: [Was there no debuginfo? Was there already an index?]" \
-	     1>&2
+	    1>&2
     fi
 }
 

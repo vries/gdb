@@ -123,8 +123,6 @@ repos:
         entry: gdb/contrib/shfmt.sh
         files: *gdb_files
         args: []
-        # Disabled.
-        stages: [manual]
 
   # Local hooks.
   - repo: local

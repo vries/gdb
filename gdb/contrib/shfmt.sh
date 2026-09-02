@@ -22,10 +22,10 @@ for f in "$@"; do
 	    # Mixed 2/4 indentation.
 	    continue
 	    ;;
-	gdb/config/djgpp/djconfig.sh \
-	    | gdb/contrib/expect-read1.sh \
-	    | gdb/features/feature_to_c.sh \
-	    | gdb/gdb_buildall.sh )
+	gdb/config/djgpp/djconfig.sh | \
+	    gdb/contrib/expect-read1.sh | \
+	    gdb/features/feature_to_c.sh | \
+	    gdb/gdb_buildall.sh)
 	    f2=("${f2[@]}" "$f")
 	    ;;
 	*)

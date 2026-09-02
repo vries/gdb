@@ -21,4 +21,4 @@
 # Wrap any passed-in program and args in a pipe, so that the program
 # is started without a terminal.
 
-exec "$@" </dev/null 2>&1 | cat
+exec "$@" < /dev/null 2>&1 | cat

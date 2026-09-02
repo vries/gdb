@@ -41,9 +41,9 @@ for f in "$@"; do
 	    # Skip generated files.
 	    continue
 	    ;;
-	gdb/contrib/gdb-add-index.sh \
-	    | gdb/gdb_buildall.sh \
-	    | gdb/gdb_mbuild.sh )
+	gdb/contrib/gdb-add-index.sh | \
+	    gdb/gdb_buildall.sh | \
+	    gdb/gdb_mbuild.sh)
 	    # Skip unclean files.
 	    continue
 	    ;;

@@ -40,15 +40,18 @@ if [ ! -x "$AWK" ]; then
     exit 2
 fi
 
-function print_usage() {
+function print_usage()
+{
     echo "Usage: $0 [-h|--help] [-v|--version] PID"
 }
 
-function print_try_help() {
+function print_try_help()
+{
     echo "Try '$0 --help' for more information."
 }
 
-function print_help() {
+function print_help()
+{
     print_usage
     echo "Print a stack trace of a running program"
     echo
@@ -56,7 +59,8 @@ function print_help() {
     echo "  -v, --version      Print version information then exit."
 }
 
-function print_version() {
+function print_version()
+{
     echo "GNU gstack (${PKGVERSION}) ${VERSION}"
 }
 
@@ -80,7 +84,8 @@ while getopts hv-: OPT; do
 	\?)
 	    # getopts has already output an error message.
 	    print_try_help 1>&2
-	    exit 2 ;;
+	    exit 2
+	    ;;
 	*)
 	    echo "$0: unrecognized option '--$OPT'" 1>&2
 	    print_try_help 1>&2
@@ -88,7 +93,7 @@ while getopts hv-: OPT; do
 	    ;;
     esac
 done
-shift $((OPTIND-1))
+shift $((OPTIND - 1))
 
 # The sole remaining argument should be the PID of the process
 # whose backtrace is desired.
@@ -99,7 +104,8 @@ fi
 
 PID=$1
 
-awk_script=$(cat << EOF
+awk_script=$(
+    cat << EOF
 BEGIN {
   first=1
   attach_okay=0
@@ -129,11 +135,11 @@ if (attach_okay == 0)
   exit 2
 }
 EOF
-	  )
+)
 
 # Run GDB and remove some unwanted noise.
 # shellcheck disable=SC2086
-"$GDB" --quiet -nx $GDBARGS <<EOF |
+"$GDB" --quiet -nx $GDBARGS << EOF | $AWK -- "$awk_script"
 set width 0
 set height 0
 set pagination no
@@ -145,4 +151,3 @@ thread apply all bt
 end
 attach-bt $PID
 EOF
-$AWK -- "$awk_script"
