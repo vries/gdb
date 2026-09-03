@@ -100,7 +100,7 @@ repos:
     hooks:
       - id: tclint
         args: [--trust-plugins]
-        files: '^gdb/testsuite/.*\.(exp|tcl)$'
+        files: &gdb_exp_tcl_files '^gdb/testsuite/.*\.(exp|tcl)$'
 
   # Yaml hooks.
   - repo: https://github.com/adrienverge/yamllint.git
@@ -169,6 +169,13 @@ repos:
         args: [--config-check]
         additional_dependencies: ["pyyaml"]
         files: *pre_commit_config_file
+      - id: &id7 indent-exp
+        name: *id7
+        language: unsupported_script
+        entry: gdb/contrib/emacs-indent.sh
+        args: [tcl-mode]
+        files: *gdb_exp_tcl_files
+        stages: [manual]
 
 # Local Variables:
 # indent-tabs-mode: nil
