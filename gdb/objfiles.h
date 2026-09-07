@@ -954,7 +954,9 @@ extern void objfile_purge_solibs (program_space *pspace);
 /* Functions for dealing with the minimal symbol table, really a misc
    address<->symbol mapping for things we don't have debug symbols for.  */
 
-extern struct obj_section *find_pc_section (CORE_ADDR pc);
+extern struct obj_section *find_pc_section (CORE_ADDR pc,
+					    struct obj_section **prev = nullptr,
+					    struct obj_section **next = nullptr);
 
 /* Return true if PC is in a section called NAME.  */
 extern bool pc_in_section (CORE_ADDR, const char *);

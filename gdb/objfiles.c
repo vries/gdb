@@ -915,10 +915,16 @@ update_section_map (struct program_space *pspace,
 /* Returns a section whose range includes PC or NULL if none found.   */
 
 struct obj_section *
-find_pc_section (CORE_ADDR pc)
+find_pc_section (CORE_ADDR pc, struct obj_section **prev,
+		 struct obj_section **next)
 {
   struct objfile_pspace_info *pspace_info;
   struct obj_section *s;
+
+  if (prev != nullptr)
+    *prev = nullptr;
+  if (next != nullptr)
+    *next = nullptr;
 
   /* Check for mapped overlay section first.  */
   s = find_pc_mapped_section (pc);
@@ -959,6 +965,24 @@ find_pc_section (CORE_ADDR pc)
   if (it != data.cend ()
       && (*it)->addr () <= pc && pc < (*it)->endaddr ())
     return *it;
+
+  if (it == data.cbegin ())
+    {
+      if (next != nullptr)
+	*next = *it;
+    }
+  else if (it == data.cend ())
+    {
+      if (prev != nullptr)
+	*prev = *(it-1);
+    }
+  else
+    {
+      if (prev != nullptr)
+	*prev = *(it-1);
+      if (next != nullptr)
+	*next = *it;
+    }
 
   return NULL;
 }
