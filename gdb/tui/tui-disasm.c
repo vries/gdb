@@ -177,9 +177,22 @@ tui_find_backward_disassembly_start_address (CORE_ADDR addr)
   else if (msym_prev.minsym != nullptr)
     return msym_prev.value_address ();
 
-  /* Find the section that ADDR is in, and look for the start of the
-     section.  */
-  struct obj_section *section = find_pc_section (addr);
+  /* Find the first section with start address before ADDR, and use its start
+     address.  The found section may be the one containing ADDR, or the one
+     before it.  */
+  struct obj_section *section;
+  for (int offset = 0; offset <= 1; ++offset)
+    {
+      section = find_pc_section (addr - offset);
+      if (offset == 0 && section != nullptr && section->addr () == addr)
+	{
+	  /* If ADDR is the start of its section, use ADDR - 1.  */
+	  continue;
+	}
+
+      break;
+    }
+
   if (section != NULL)
     return section->addr ();
 
