@@ -912,28 +912,13 @@ update_section_map (struct program_space *pspace,
   *pmap_size = map_size;
 }
 
-/* Bsearch comparison function.  */
-
-static int
-bsearch_cmp (const void *key, const void *elt)
-{
-  const CORE_ADDR pc = *(CORE_ADDR *) key;
-  const struct obj_section *section = *(const struct obj_section **) elt;
-
-  if (pc < section->addr ())
-    return -1;
-  if (pc < section->endaddr ())
-    return 0;
-  return 1;
-}
-
 /* Returns a section whose range includes PC or NULL if none found.   */
 
 struct obj_section *
 find_pc_section (CORE_ADDR pc)
 {
   struct objfile_pspace_info *pspace_info;
-  struct obj_section *s, **sp;
+  struct obj_section *s;
 
   /* Check for mapped overlay section first.  */
   s = find_pc_mapped_section (pc);
@@ -963,13 +948,18 @@ find_pc_section (CORE_ADDR pc)
       return NULL;
     }
 
-  sp = (struct obj_section **) bsearch (&pc,
-					pspace_info->sections,
-					pspace_info->num_sections,
-					sizeof (*pspace_info->sections),
-					bsearch_cmp);
-  if (sp != NULL)
-    return *sp;
+  auto data
+    = gdb::make_array_view (pspace_info->sections, pspace_info->num_sections);
+  auto cmp
+    = [](obj_section *sect, CORE_ADDR pc_) -> bool
+      {
+	return sect->endaddr () <= pc_;
+      };
+  auto it = std::lower_bound (data.cbegin (), data.cend (), pc, cmp);
+  if (it != data.cend ()
+      && (*it)->addr () <= pc && pc < (*it)->endaddr ())
+    return *it;
+
   return NULL;
 }
 
