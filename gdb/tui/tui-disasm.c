@@ -112,22 +112,43 @@ tui_disassemble (struct gdbarch *gdbarch,
     {
       tui_asm_line tal;
 
-      /* Save the instruction address.  */
-      tal.addr = pc;
+      bool retry;
+      do
+	{
+	  retry = false;
 
-      try
-	{
-	  pc += gdb_print_insn (gdbarch, pc, stream, NULL);
+	  /* Save the instruction address.  */
+	  tal.addr = pc;
+
+	  try
+	    {
+	      pc += gdb_print_insn (gdbarch, pc, stream, NULL);
+	    }
+	  catch (const gdb_exception_error &except)
+	    {
+	      /* If PC points to an invalid address then we'll catch a
+		 MEMORY_ERROR here, this should stop the disassembly, but
+		 otherwise is fine.  */
+	      if (except.error != MEMORY_ERROR)
+		throw;
+
+	      struct obj_section *next;
+	      struct obj_section *section
+		= find_pc_section (pc, nullptr, &next);
+	      if (section == nullptr
+		  && next != nullptr
+		  && ((bfd_section_flags (next->the_bfd_section) & SEC_ALLOC)
+		      != 0))
+		{
+		  /* Skip over section hole.  */
+		  pc = next->addr ();
+		  retry = true;
+		}
+	      else
+		return pc;
+	    }
 	}
-      catch (const gdb_exception_error &except)
-	{
-	  /* If PC points to an invalid address then we'll catch a
-	     MEMORY_ERROR here, this should stop the disassembly, but
-	     otherwise is fine.  */
-	  if (except.error != MEMORY_ERROR)
-	    throw;
-	  return pc;
-	}
+      while (retry);
 
       /* If that's all we need, continue.  */
       if (addr_size == nullptr)
@@ -563,7 +584,7 @@ run_tests ()
 
       /* Check that tui_find_disassembly_address robustly handles the case of
 	 being passed a PC for which gdb_print_insn throws a MEMORY_ERROR.  */
-      SELF_CHECK (tui_find_disassembly_address (gdbarch, 0, 1) == 0);
+      tui_find_disassembly_address (gdbarch, 0, 1);
       SELF_CHECK (tui_find_disassembly_address (gdbarch, 0, -1) == 0);
     }
 }
