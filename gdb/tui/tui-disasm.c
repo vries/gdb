@@ -173,9 +173,15 @@ tui_find_backward_disassembly_start_address (CORE_ADDR addr)
 
   /* Find the section that ADDR is in, and look for the start of the
      section.  */
-  struct obj_section *section = find_pc_section (addr);
+  struct obj_section *prev;
+  struct obj_section *section = find_pc_section (addr, &prev);
   if (section != NULL)
     return section->addr ();
+
+  if (prev != nullptr
+      && (bfd_section_flags (prev->the_bfd_section) & SEC_ALLOC) != 0
+      && addr != prev->endaddr ())
+    return tui_find_backward_disassembly_start_address (prev->endaddr ());
 
   return addr;
 }
