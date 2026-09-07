@@ -912,13 +912,21 @@ update_section_map (struct program_space *pspace,
   *pmap_size = map_size;
 }
 
-/* Returns a section whose range includes PC or NULL if none found.   */
+/* Returns a section whose range includes PC or nullptr if none found.
+   On returning nullptr, set PREV_PTR and NEXT_PTR to point to the sections
+   before and after PC, if any.  */
 
 struct obj_section *
-find_pc_section (CORE_ADDR pc)
+find_pc_section (CORE_ADDR pc, struct obj_section **prev_ptr,
+		 struct obj_section **next_ptr)
 {
   struct objfile_pspace_info *pspace_info;
   struct obj_section *s;
+
+  if (prev_ptr != nullptr)
+    *prev_ptr = nullptr;
+  if (next_ptr != nullptr)
+    *next_ptr = nullptr;
 
   /* Check for mapped overlay section first.  */
   s = find_pc_mapped_section (pc);
@@ -963,6 +971,26 @@ find_pc_section (CORE_ADDR pc)
   if (it != data.cend ()
       && (*it)->addr () <= pc && pc < (*it)->endaddr ())
     return *it;
+
+  struct obj_section *prev = nullptr, *next = nullptr;
+  auto prev_it = (it == data.cbegin ()
+		  ? data.cend ()
+		  : it - 1);
+  if (prev_it != data.cend ())
+    {
+      prev = *prev_it;
+      gdb_assert (prev->endaddr () <= pc);
+    }
+  if (it != data.cend ())
+    {
+      next = *it;
+      gdb_assert (pc < next->addr ());
+    }
+
+  if (prev_ptr != nullptr)
+    *prev_ptr = prev;
+  if (next_ptr != nullptr)
+    *next_ptr = next;
 
   return NULL;
 }
