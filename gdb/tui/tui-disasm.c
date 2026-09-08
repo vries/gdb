@@ -201,10 +201,10 @@ tui_find_backward_disassembly_start_address (CORE_ADDR addr)
   /* Find the first section with start address before ADDR, and use its start
      address.  The found section may be the one containing ADDR, or the one
      before it.  */
-  struct obj_section *section;
+  struct obj_section *section, *prev;
   for (int offset = 0; offset <= 1; ++offset)
     {
-      section = find_pc_section (addr - offset);
+      section = find_pc_section (addr - offset, &prev);
       if (offset == 0 && section != nullptr && section->addr () == addr)
 	{
 	  /* If ADDR is the start of its section, use ADDR - 1.  */
@@ -216,6 +216,20 @@ tui_find_backward_disassembly_start_address (CORE_ADDR addr)
 
   if (section != NULL)
     return section->addr ();
+
+  if (prev != nullptr
+      && (bfd_section_flags (prev->the_bfd_section) & SEC_ALLOC) != 0)
+    {
+      /* Skip over section hole and use previous section.  */
+
+      /* If not causing infinite recursion, self-recurse to possibly use
+	 minimal symbols in the previous section.  */
+      if (prev->endaddr () < addr)
+	return tui_find_backward_disassembly_start_address (prev->endaddr ());
+
+      /* Fallback: simply use start of previous section.  */
+      return prev->addr ();
+    }
 
   return addr;
 }
@@ -282,6 +296,12 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
 	  /* Find an address from which we can start disassembling.  */
 	  prev_low = new_low;
 	  new_low = tui_find_backward_disassembly_start_address (new_low);
+	  if (new_low == prev_low)
+	    {
+	      /* No backward progress made, bail out.  */
+	      next_addr = new_low;
+	      break;
+	    }
 
 	  /* Disassemble forward.  */
 	  next_addr = tui_disassemble (gdbarch, asm_lines, new_low, max_lines);
@@ -320,6 +340,13 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
       /* The following walk forward assumes that ASM_LINES contains exactly
 	 MAX_LINES entries.  */
       gdb_assert (asm_lines.size () == max_lines);
+
+      if (next_addr > pc)
+	{
+	  /* We're about to scan forward starting at next_addr to reach pc.
+	     No need to do that if next_addr is already past pc.  */
+	  return new_low;
+	}
 
       /* Scan forward disassembling one instruction at a time until
 	 the last visible instruction of the window matches the pc.

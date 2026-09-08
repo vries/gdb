@@ -30,6 +30,31 @@ if { [build_executable "failed to prepare" $testfile $srcfile $opts] == -1 } {
     return
 }
 
+# This test-case relies on not being able to scroll to before _start.  That
+# used to be the case because there's a section hole in between
+# .note.gnu.build-id and .text:
+#
+# [Nr] Name               Type      Address  Off    Size   ES Flg Lk Inf Al
+# [ 0]                    NULL      00000000 000000 000000 00      0   0  0
+# [ 1] .note.gnu.property NOTE      00400190 000190 000030 00   A  0   0  8
+# [ 2] .note.gnu.build-id NOTE      004001c0 0001c0 000024 00   A  0   0  4
+# [ 3] .text              PROGBITS  00401000 001000 000005 00  AX  0   0  1
+#
+# Now that section holes no longer stop scrolling, strip the notes to get:
+#
+# [Nr] Name               Type      Address  Off    Size   ES Flg Lk Inf Al
+# [ 0]                    NULL      00000000 000000 000000 00      0   0  0
+# [ 1] .text              PROGBITS  00401000 001000 000005 00  AX  0   0  1
+
+set objcopy_program [gdb_find_objcopy]
+set res \
+    [remote_exec host \
+	 "$objcopy_program --remove-section=.note.* $binfile"]
+if {[lindex $res 0] != 0} {
+    unsupported "Couldn't strip notes"
+    return
+}
+
 Term::clean_restart 24 80 $testfile
 if {![Term::prepare_for_tui]} {
     unsupported "TUI not supported"
