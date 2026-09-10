@@ -128,35 +128,24 @@ gdb_mpz::export_bits (gdb::array_view<gdb_byte> buf, int endian, bool unsigned_p
 	       hi.str ().c_str ());
     }
 
-  const gdb_mpz *exported_val = this;
-  gdb_mpz un_signed;
+  gdb_mpz exported_val = *this;
   if (sign < 0)
     {
       /* mpz_export does not handle signed values, so create a positive
 	 value whose bit representation as an unsigned of the same length
 	 would be the same as our negative value.  */
       gdb_mpz neg_offset = gdb_mpz::pow (2, buf.size () * HOST_CHAR_BIT);
-      un_signed = *exported_val + neg_offset;
-      exported_val = &un_signed;
+      exported_val += neg_offset;
     }
 
   /* If the value is too large, truncate it.  */
   if (!safe
-      && mpz_sizeinbase (exported_val->m_val, 2) > buf.size () * HOST_CHAR_BIT)
-    {
-      /* If we don't already have a copy, make it now.  */
-      if (exported_val != &un_signed)
-	{
-	  un_signed = *exported_val;
-	  exported_val = &un_signed;
-	}
+      && mpz_sizeinbase (exported_val.m_val, 2) > buf.size () * HOST_CHAR_BIT)
+    exported_val.mask (buf.size () * HOST_CHAR_BIT);
 
-      un_signed.mask (buf.size () * HOST_CHAR_BIT);
-    }
-
-  /* It's possible that one of the above results in zero, which has to
-     be handled specially.  */
-  if (exported_val->sgn () == 0)
+  /* It's possible that the above results in zero, which has to be
+     handled specially.  */
+  if (exported_val.sgn () == 0)
     {
       memset (buf.data (), 0, buf.size ());
       return;
@@ -174,8 +163,9 @@ gdb_mpz::export_bits (gdb::array_view<gdb_byte> buf, int endian, bool unsigned_p
 
   size_t word_countp;
   gdb::unique_xmalloc_ptr<void> exported
-    (mpz_export (NULL, &word_countp, -1 /* order */, buf.size () /* size */,
-		 endian, 0 /* nails */, exported_val->m_val));
+    (mpz_export (nullptr, &word_countp, -1 /* order */,
+		 buf.size () /* size */, endian, 0 /* nails */,
+		 exported_val.m_val));
 
   gdb_assert (word_countp == 1);
 
