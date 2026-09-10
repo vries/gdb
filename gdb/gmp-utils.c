@@ -128,22 +128,22 @@ gdb_mpz::export_bits (gdb::array_view<gdb_byte> buf, int endian, bool unsigned_p
 	       hi.str ().c_str ());
     }
 
-  gdb_mpz exported_val = *this;
-  exported_val.mask (buf.size () * HOST_CHAR_BIT);
+  gdb_mpz masked = *this;
+  masked.mask (buf.size () * HOST_CHAR_BIT);
 
-  if (sign < 0 && exported_val.sgn () != 0)
+  if (sign < 0 && masked.sgn () != 0)
     {
       /* mpz_export does not handle signed values, so create a positive
 	 value whose bit representation as an unsigned of the same length
 	 would be the same as our negative value.  However, if masking
 	 left us with 0, we don't need to do anything else.  */
       gdb_mpz neg_offset = gdb_mpz::pow (2, buf.size () * HOST_CHAR_BIT);
-      exported_val += neg_offset;
+      masked += neg_offset;
     }
 
   /* It's possible that the above results in zero, which has to be
      handled specially.  */
-  if (exported_val.sgn () == 0)
+  if (masked.sgn () == 0)
     {
       memset (buf.data (), 0, buf.size ());
       return;
@@ -163,7 +163,7 @@ gdb_mpz::export_bits (gdb::array_view<gdb_byte> buf, int endian, bool unsigned_p
   gdb::unique_xmalloc_ptr<void> exported
     (mpz_export (nullptr, &word_countp, -1 /* order */,
 		 buf.size () /* size */, endian, 0 /* nails */,
-		 exported_val.m_val));
+		 masked.m_val));
 
   gdb_assert (word_countp == 1);
 
