@@ -80,6 +80,35 @@ void
 gdb_mpz::export_bits (gdb::array_view<gdb_byte> buf, int endian, bool unsigned_p,
 		      bool safe) const
 {
+  auto export_unsigned_val = [&] (gdb_mpz &val)
+  {
+    if (val.sgn () == 0)
+      {
+	memset (buf.data (), 0, buf.size ());
+	return;
+      }
+
+    /* Do the export into a buffer allocated by GMP itself; that way,
+       we can detect cases where BUF is not large enough to export
+       our value, and thus avoid a buffer overflow.  Normally, this should
+       never happen, since we verified earlier that the buffer is large
+       enough to accommodate our value, but doing this allows us to be
+       extra safe with the export.
+
+       After verification that the export behaved as expected, we will
+       copy the data over to BUF.  */
+
+    size_t word_countp;
+    gdb::unique_xmalloc_ptr<void> exported
+      (mpz_export (nullptr, &word_countp, -1 /* order */,
+		   buf.size () /* size */, endian, 0 /* nails */,
+		   val.m_val));
+
+    gdb_assert (word_countp == 1);
+
+    memcpy (buf.data (), exported.get (), buf.size ());
+  };
+
   int sign = mpz_sgn (m_val);
   if (sign == 0)
     {
@@ -89,7 +118,7 @@ gdb_mpz::export_bits (gdb::array_view<gdb_byte> buf, int endian, bool unsigned_p
 	 BUF ourselves, if it is non-empty.  In some languages, a
 	 zero-bit type can exist and this is also fine.  */
       if (buf.size () > 0)
-	memset (buf.data (), 0, buf.size ());
+	export_unsigned_val (m_val);
       return;
     }
 
@@ -130,44 +159,22 @@ gdb_mpz::export_bits (gdb::array_view<gdb_byte> buf, int endian, bool unsigned_p
 
   gdb_mpz masked = *this;
   masked.mask (buf.size () * HOST_CHAR_BIT);
+  if (masked.sgn () == 0)
+    {
+      export_unsigned_val (masked);
+      return;
+    }
 
-  if (sign < 0 && masked.sgn () != 0)
+  if (sign < 0)
     {
       /* mpz_export does not handle signed values, so create a positive
 	 value whose bit representation as an unsigned of the same length
-	 would be the same as our negative value.  However, if masking
-	 left us with 0, we don't need to do anything else.  */
+	 would be the same as our negative value.  */
       gdb_mpz neg_offset = gdb_mpz::pow (2, buf.size () * HOST_CHAR_BIT);
       masked += neg_offset;
     }
 
-  /* It's possible that the above results in zero, which has to be
-     handled specially.  */
-  if (masked.sgn () == 0)
-    {
-      memset (buf.data (), 0, buf.size ());
-      return;
-    }
-
-  /* Do the export into a buffer allocated by GMP itself; that way,
-     we can detect cases where BUF is not large enough to export
-     our value, and thus avoid a buffer overflow.  Normally, this should
-     never happen, since we verified earlier that the buffer is large
-     enough to accommodate our value, but doing this allows us to be
-     extra safe with the export.
-
-     After verification that the export behaved as expected, we will
-     copy the data over to BUF.  */
-
-  size_t word_countp;
-  gdb::unique_xmalloc_ptr<void> exported
-    (mpz_export (nullptr, &word_countp, -1 /* order */,
-		 buf.size () /* size */, endian, 0 /* nails */,
-		 masked.m_val));
-
-  gdb_assert (word_countp == 1);
-
-  memcpy (buf.data (), exported.get (), buf.size ());
+  export_unsigned_val (masked);
 }
 
 /* See gmp-utils.h.  */
