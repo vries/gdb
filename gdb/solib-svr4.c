@@ -1333,6 +1333,29 @@ svr4_solib_ops::read_so_list (svr4_info *info, CORE_ADDR lm, CORE_ADDR prev_lm,
       if (*name == '\0' || match_main (name.get ()))
 	continue;
 
+      gdb_byte dummy;
+      if (li->l_addr_inferior == 0 && li->l_ld == 0
+	  && target_read_memory (0, &dummy, 1) != 0)
+	{
+	  /* We have l_addr_inferior == 0 and l_ld == 0 (corresponding to link
+	     map entries l_addr and l_ld).  This can happen with a glibc that:
+	     - has commit a93d9e03a3 ("Extend struct r_debug to support
+	       multiple namespaces [BZ #15971]"), but
+	     - misses commit 88361b408b ("elf: Copy l_addr/l_ld when adding
+	       ld.so to a new namespace").
+	     This seems to be the case at least for the alma linux 9.8 BaseOS
+	     version, which uses glibc v2.34 and backports only the first
+	     commit ( https://bugs.almalinux.org/view.php?id=667 ).
+	     Detect this here and bail out.  Otherwise, we'll present
+	     the user with incorrect info for "info shared".
+
+	     The target_read_memory is there to detect the improbable
+	     situation that address 0 is both mapped, and the address of the
+	     dynamic section.  */
+	  warning (_("Corrupted shared library entry: zero l_addr and l_ld"));
+	  return 0;
+	}
+
       sos.emplace_back (name.get (), std::move (li));
     }
 

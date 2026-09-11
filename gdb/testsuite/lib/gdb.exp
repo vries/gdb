@@ -3201,6 +3201,9 @@ gdb_caching_proc allow_dlmopen_tests {} {
 	return 0
     }
     gdb_expect {
+	-re "warning: Corrupted.*$gdb_prompt $" {
+	    set allow_dlmopen_tests 0
+	}
 	-re "$inferior_exited_re normally.*${gdb_prompt} $" {
 	    set allow_dlmopen_tests 1
 	}
