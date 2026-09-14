@@ -34,6 +34,7 @@
 #include "cli/cli-style.h"
 #include "objfiles.h"
 #include "inferior.h"
+#include "addrmap.h"
 
 /* Disassemble functions.
    FIXME: We should get rid of all the duplicate code in gdb that does
@@ -524,7 +525,7 @@ dump_insns (struct gdbarch *gdbarch,
 
    N.B. This view is deprecated.  */
 
-static void
+static int
 do_mixed_source_and_assembly_deprecated
   (struct gdbarch *gdbarch, struct ui_out *uiout,
    struct symtab *symtab,
@@ -669,6 +670,8 @@ do_mixed_source_and_assembly_deprecated
       if (how_many >= 0 && num_displayed >= how_many)
 	break;
     }
+
+  return num_displayed;
 }
 
 /* The idea here is to present a source-O-centric view of a
@@ -676,7 +679,7 @@ do_mixed_source_and_assembly_deprecated
    in source order, with (possibly) out of order assembly
    immediately following.  */
 
-static void
+static int
 do_mixed_source_and_assembly (struct gdbarch *gdbarch,
 			      struct ui_out *uiout,
 			      struct symtab *main_symtab,
@@ -906,16 +909,18 @@ do_mixed_source_and_assembly (struct gdbarch *gdbarch,
       last_symtab = sal.symtab;
       last_line = sal.line;
     }
+
+  return num_displayed;
 }
 
-static void
+static int
 do_assembly_only (struct gdbarch *gdbarch, struct ui_out *uiout,
 		  CORE_ADDR low, CORE_ADDR high,
 		  int how_many, gdb_disassembly_flags flags)
 {
   ui_out_emit_list list_emitter (uiout, "asm_insns");
 
-  dump_insns (gdbarch, uiout, low, high, how_many, flags, NULL);
+  return dump_insns (gdbarch, uiout, low, high, how_many, flags, NULL);
 }
 
 /* Combine implicit and user disassembler options and return them
@@ -1141,10 +1146,12 @@ gdb_disassembler::print_insn (CORE_ADDR memaddr,
   return length;
 }
 
-void
-gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
-		 gdb_disassembly_flags flags, int how_many,
-		 CORE_ADDR low, CORE_ADDR high)
+/* Helper function for gdb_disassembly.  */
+
+static int
+gdb_disassembly_1 (struct gdbarch *gdbarch, struct ui_out *uiout,
+		   gdb_disassembly_flags flags, int how_many,
+		   CORE_ADDR low, CORE_ADDR high)
 {
   struct symtab *symtab;
   int nlines = -1;
@@ -1155,19 +1162,58 @@ gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
   if (symtab != NULL && symtab->linetable () != NULL)
     nlines = symtab->linetable ()->nitems;
 
+  int num_displayed = 0;
   if (!(flags & (DISASSEMBLY_SOURCE_DEPRECATED | DISASSEMBLY_SOURCE))
       || nlines <= 0)
-    do_assembly_only (gdbarch, uiout, low, high, how_many, flags);
+    num_displayed
+      = do_assembly_only (gdbarch, uiout, low, high, how_many, flags);
 
   else if (flags & DISASSEMBLY_SOURCE)
-    do_mixed_source_and_assembly (gdbarch, uiout, symtab, low, high,
-				  how_many, flags);
+    num_displayed
+      = do_mixed_source_and_assembly (gdbarch, uiout, symtab, low, high,
+				      how_many, flags);
 
   else if (flags & DISASSEMBLY_SOURCE_DEPRECATED)
-    do_mixed_source_and_assembly_deprecated (gdbarch, uiout, symtab,
-					     low, high, how_many, flags);
+    num_displayed
+      = do_mixed_source_and_assembly_deprecated (gdbarch, uiout, symtab,
+						 low, high, how_many, flags);
 
   gdb_flush (gdb_stdout);
+  return num_displayed;
+}
+
+void
+gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
+		 gdb_disassembly_flags flags, int how_many,
+		 CORE_ADDR low, CORE_ADDR high)
+{
+  std::unique_ptr<addrmap_mutable> map = section_addrmap ();
+  bool update_how_many = how_many != -1;
+
+  while (low < high)
+    {
+      CORE_ADDR tmp_high = high;
+
+      CORE_ADDR range_high;
+      map->find (low, nullptr, &range_high);
+
+      /* Don't disassemble past a section change.  */
+      if (range_high != (CORE_ADDR)-1)
+	tmp_high = std::min (tmp_high, range_high + 1);
+
+      int res
+	= gdb_disassembly_1 (gdbarch, uiout, flags, how_many, low,
+			     tmp_high);
+
+      if (update_how_many)
+	{
+	  how_many -= res;
+	  if (how_many <= 0)
+	    break;
+	}
+
+      low = tmp_high;
+    }
 }
 
 /* Print the instruction at address MEMADDR in debugged memory,
