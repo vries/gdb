@@ -26,8 +26,8 @@
 # Example usage:
 #
 # bash$ cd $objdir/gdb/testsuite
-# bash$ runtest \
-#   CC_FOR_TARGET="/bin/bash $srcdir/gdb/contrib/cc-with-tweaks.sh ARGS gcc" \
+# bash$ runtest \#
+#   CC_FOR_TARGET="/bin/bash $srcdir/gdb/contrib/cc-with-tweaks.sh ARGS gcc" \#
 #   CXX_FOR_TARGET="/bin/bash $srcdir/gdb/contrib/cc-with-tweaks.sh ARGS g++"
 #
 # For documentation on Fission and dwp files:

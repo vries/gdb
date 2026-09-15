@@ -32,9 +32,9 @@
 # Recommended usage example:
 #
 # bash$ cd $objdir/gdb/testsuite
-# bash$ $srcdir/testsuite/gdb/make-check-all.sh \
-#           --host-user remote-host \
-#           --target-user remote-target \
+# bash$ $srcdir/testsuite/gdb/make-check-all.sh \#
+#           --host-user remote-host \#
+#           --target-user remote-target \#
 #           gdb.base/advance.exp
 
 set -e

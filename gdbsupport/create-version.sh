@@ -19,7 +19,7 @@
 
 # Create version.c from version.in.
 # Usage:
-#    create-version.sh PATH-TO-GDB-SRCDIR HOST_ALIAS \
+#    create-version.sh PATH-TO-GDB-SRCDIR HOST_ALIAS \#
 #        TARGET_ALIAS OUTPUT-FILE-NAME
 
 srcdir="$1"
