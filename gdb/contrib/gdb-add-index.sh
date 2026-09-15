@@ -82,7 +82,7 @@ case ${opt} in
 	;;
 esac
 # Break from loop if the first character of OPT is not '-'.
-[ "x$(printf %.1s "$opt")" != "x-" ]
+[ "$(printf %.1s "$opt")" != "-" ]
 do
     shift
 done
@@ -93,6 +93,7 @@ if test $# != 1; then
 fi
 
 file="$1"
+set --
 
 if test -L "$file"; then
     if ! command -v readlink >/dev/null 2>&1; then
@@ -135,8 +136,7 @@ if $READELF -S "$file" | grep -q " \.gnu_debugaltlink "; then
     dwz_file=$($READELF --string-dump=.gnu_debugaltlink "$file" \
 		   | grep -A1  "'\.gnu_debugaltlink':" \
 		   | tail -n +2 \
-		   | sed 's/.*]//')
-    dwz_file=$(echo $dwz_file)
+		   | sed 's/.*] *//')
     if $READELF -S "$dwz_file" | grep -E -q " \.(gdb_index|debug_names) "; then
 	# Already has an index, skip it.
 	dwz_file=""
@@ -154,19 +154,24 @@ set_files ()
     debugstrerr="${fpath}.debug_str.err"
 }
 
-tmp_files=
 for f in "$file" "$dwz_file"; do
     if [ "$f" = "" ]; then
 	continue
     fi
     set_files "$f"
-    tmp_files="$tmp_files $index4 $index5 $debugstr $debugstrmerge $debugstrerr"
+    set -- \
+	"$@" \
+	"$index4" \
+	"$index5" \
+	"$debugstr" \
+	"$debugstrmerge" \
+	"$debugstrerr"
 done
 
-rm -f $tmp_files
+rm -f "$@"
 
 # Ensure intermediate index file is removed when we exit.
-trap "rm -f $tmp_files" 0
+trap 'rm -f "$@"' 0
 
 $GDB --batch -nx -iex 'set auto-load no' \
     -iex 'set debuginfod enabled off' \
