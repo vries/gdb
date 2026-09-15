@@ -180,6 +180,14 @@ repos:
         files: *gdb_files
         exclude: *testsuite_files
         require_serial: true
+      - id: &id8 indent-shell
+        name: *id8
+        language: unsupported_script
+        entry: gdb/contrib/emacs-indent.sh
+        args: [sh-mode]
+        types: [shell]
+        files: *gdb_files
+        stages: [manual]
 
 # Local Variables:
 # indent-tabs-mode: nil
