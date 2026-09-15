@@ -56,33 +56,33 @@ dwarf5=""
 
 # Parse options.
 until
-opt=$1
-case ${opt} in
-    --dwarf-5 | -dwarf-5)
-	dwarf5="-dwarf-5"
-	;;
+    opt=$1
+    case ${opt} in
+	--dwarf-5 | -dwarf-5)
+	    dwarf5="-dwarf-5"
+	    ;;
 
-    --help | -help | -h)
-	print_help
-	exit 0
-	;;
+	--help | -help | -h)
+	    print_help
+	    exit 0
+	    ;;
 
-    --version | -version | -v)
-	print_version
-	exit 0
-	;;
+	--version | -version | -v)
+	    print_version
+	    exit 0
+	    ;;
 
-    -?*)
-	print_try_help 1>&2
-	exit 2
-	;;
+	-?*)
+	    print_try_help 1>&2
+	    exit 2
+	    ;;
 
-    *)
-	# No arguments remaining.
-	;;
-esac
-# Break from loop if the first character of OPT is not '-'.
-[ "x$(printf %.1s "$opt")" != "x-" ]
+	*)
+	    # No arguments remaining.
+	    ;;
+    esac
+    # Break from loop if the first character of OPT is not '-'.
+    [ "x$(printf %.1s "$opt")" != "x-" ]
 do
     shift
 done
@@ -169,8 +169,8 @@ rm -f $tmp_files
 trap "rm -f $tmp_files" 0
 
 $GDB --batch -nx -iex 'set auto-load no' \
-    -iex 'set debuginfod enabled off' \
-    -ex "file '$file'" -ex "save gdb-index $dwarf5 '$dir'" || {
+     -iex 'set debuginfod enabled off' \
+     -ex "file '$file'" -ex "save gdb-index $dwarf5 '$dir'" || {
     # Just in case.
     status=$?
     echo "$myname: gdb error generating index for $file" 1>&2

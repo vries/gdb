@@ -63,42 +63,42 @@ keep=false
 while test $# -gt 0
 do
     case "$1" in
-    -j )
-	# Number of parallel make jobs.
-	shift
-	test $# -ge 1 || usage
-	makejobs="$1"
-	;;
-    -b | -c )
-	# Number of builds to fire off in parallel.
-	shift
-	test $# -ge 1 || usage
-	# shellcheck disable=SC2034 # Not yet implemented.
-	maxbuilds=$1
-	;;
-    -k )
-	# Should we soldier on after the first build fails?
-	keepgoing=-k
-	;;
-    --keep )
-	keep=true
-	;;
-    -e )
-	# A regular expression for selecting targets
-	shift
-	test $# -ge 1 || usage
-	targexp=("${targexp[@]}" "-e" "${1}")
-	;;
-    -f )
-	# Force a rebuild
-	force=true ;
-	;;
-    -v )
-	# Be more, and more, and more, verbose
-	verbose=$((verbose + 1))
-	;;
-    -* ) usage ;;
-    *) break ;;
+	-j )
+	    # Number of parallel make jobs.
+	    shift
+	    test $# -ge 1 || usage
+	    makejobs="$1"
+	    ;;
+	-b | -c )
+	    # Number of builds to fire off in parallel.
+	    shift
+	    test $# -ge 1 || usage
+	    # shellcheck disable=SC2034 # Not yet implemented.
+	    maxbuilds=$1
+	    ;;
+	-k )
+	    # Should we soldier on after the first build fails?
+	    keepgoing=-k
+	    ;;
+	--keep )
+	    keep=true
+	    ;;
+	-e )
+	    # A regular expression for selecting targets
+	    shift
+	    test $# -ge 1 || usage
+	    targexp=("${targexp[@]}" "-e" "${1}")
+	    ;;
+	-f )
+	    # Force a rebuild
+	    force=true ;
+	    ;;
+	-v )
+	    # Be more, and more, and more, verbose
+	    verbose=$((verbose + 1))
+	    ;;
+	-* ) usage ;;
+	*) break ;;
     esac
     shift
 done
@@ -153,11 +153,11 @@ b loop
 :end
 p
 ' | if test ${#targexp[@]} -eq 0
-then
-    grep -v -e broken -e OBSOLETE
-else
-    grep "${targexp[@]}"
-fi)
+	  then
+	      grep -v -e broken -e OBSOLETE
+	  else
+	      grep "${targexp[@]}"
+	  fi)
 
 
 # Usage: fail <message> <test-that-should-succeed>.  Should the build
@@ -255,9 +255,9 @@ do
 	# The config options
 	__target="--target=${target}"
 	__enable_gdb_build_warnings=$(test -z "${gdbopts}" \
-	    || echo "--enable-gdb-build-warnings=${gdbopts}")
+					  || echo "--enable-gdb-build-warnings=${gdbopts}")
 	__enable_sim_build_warnings=$(test -z "${simopts}" \
-	    || echo "--enable-sim-build-warnings=${simopts}")
+					  || echo "--enable-sim-build-warnings=${simopts}")
 	__configure="${srcdir}/configure \
 	    ${__target} \
 	    ${__enable_gdb_build_warnings} \
@@ -304,8 +304,8 @@ EOF
     # Rules to replace <0xNNNN> with the corresponding function's
     # name.
     sed -n -e '/<0x0*>/d' -e 's/^.*<0x\([0-9a-f]*\)>.*$/0x\1/p' Gdb.log \
-    | sort -u \
-    | while read -r addr
+	| sort -u \
+	| while read -r addr
     do
 	func="$(addr2line -f -e ./gdb/gdb -s "${addr}" | sed -n -e 1p)"
 	test ${verbose} -gt 0 && echo "${addr} ${func}" 1>&2

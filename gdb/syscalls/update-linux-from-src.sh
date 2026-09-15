@@ -74,9 +74,9 @@ gen_from_kernel_headers ()
 	    2>&1
 
 	"$pwd"/update-linux.sh \
-	    "$pwd"/"$f" \
-	    -nostdinc \
-	    -isystem "$include"
+	      "$pwd"/"$f" \
+	      -nostdinc \
+	      -isystem "$include"
     )
 
     trap '' EXIT

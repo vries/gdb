@@ -59,16 +59,16 @@ clean=false
 while test $# -gt 0
 do
   case "$1" in
-  -j )
+    -j )
       # Number of parallel make jobs.
       shift
       test $# -ge 1 || usage
       makejobs="$1"
       ;;
-      --clean )
-	# Shall the build directory be deleted after processing?
-	clean=true
-	;;
+    --clean )
+      # Shall the build directory be deleted after processing?
+      clean=true
+      ;;
     -e )
       # A regular expression for selecting targets
       shift
@@ -110,8 +110,8 @@ ulimit -c 0
 maintainers=${srcdir}/gdb/MAINTAINERS
 if [ ! -r "${maintainers}" ]
 then
-    echo "Maintainers file ${maintainers} not found"
-    exit 1
+  echo "Maintainers file ${maintainers} not found"
+  exit 1
 fi
 
 
@@ -159,9 +159,9 @@ then
   # The config options.
   __build="--enable-targets=all"
   __enable_gdb_build_warnings=$(test -z "${gdbopts}" \
-    || echo "--enable-gdb-build-warnings=${gdbopts}")
+				  || echo "--enable-gdb-build-warnings=${gdbopts}")
   __enable_sim_build_warnings=$(test -z "${simopts}" \
-    || echo "--enable-sim-build-warnings=${simopts}")
+				  || echo "--enable-sim-build-warnings=${simopts}")
   __configure="${srcdir}/configure \
     ${__build} ${bfd_flag}\
     ${__enable_gdb_build_warnings} \
@@ -248,8 +248,8 @@ EOF
   rm -f mbuild.sed
   # Rules to replace <0xNNNN> with the corresponding function's name.
   sed -n -e '/<0x0*>/d' -e 's/^.*<0x\([0-9a-f]*\)>.*$/0x\1/p' "$log_file" \
-  | sort -u \
-  | while read -r addr
+    | sort -u \
+    | while read -r addr
   do
     func="$(addr2line -f -e ./$gdb_bin -s "${addr}" | sed -n -e 1p)"
     echo "s/<${addr}>/<${func}>/g"

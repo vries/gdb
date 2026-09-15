@@ -69,11 +69,11 @@ EOF
 
     echo '<syscalls_info>'
 
-# There are __NR_ and __NR3264_ prefixed syscall numbers, handle them
-# automatically in this script. Here are the examples of the two types:
-#
-# #define __NR_io_setup 0
-# #define __NR3264_fcntl 25
+    # There are __NR_ and __NR3264_ prefixed syscall numbers, handle them
+    # automatically in this script. Here are the examples of the two types:
+    #
+    # #define __NR_io_setup 0
+    # #define __NR3264_fcntl 25
 
     echo '#include <asm/unistd.h>' \
 	| gcc -E - -dD "$@" \
@@ -82,7 +82,7 @@ EOF
 	line=$(echo "$line" | awk '$2 ~ "__NR" && $3 !~ "__NR3264_" {
 	     sub("^#define __NR(3264)?_", ""); print | "sort -k2 -n"}')
 	if [ -z "$line" ]; then
-		continue
+	    continue
 	fi
 	name=$(echo "$line" | awk '{print $1}')
 	nr=$(echo "$line" | awk '{print $2}')

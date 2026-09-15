@@ -50,9 +50,9 @@ fi
 # Make sure they don't have some file names mangled by untarring.
 printf "Checking the unpacked distribution..."
 if ! test -f "${srcdir}/bfd/ChangeLog.0203"      || \
-     ! test -f "${srcdir}/gdb/ChangeLog.002"       || \
-     ! test -f "${srcdir}/opcodes/ChangeLog.0203"  || \
-     ! test -f "${srcdir}/readline/config.h-in"; then
+    ! test -f "${srcdir}/gdb/ChangeLog.002"       || \
+    ! test -f "${srcdir}/opcodes/ChangeLog.0203"  || \
+    ! test -f "${srcdir}/readline/config.h-in"; then
   if ! test -f "${srcdir}/bfd/ChangeLog.0203"; then
     notfound="${srcdir}/bfd/ChangeLog.0203"
   else
@@ -178,8 +178,8 @@ fi
 echo "Running the configure script..."
 # shellcheck disable=SC2016 # $DJDIR is not expanded here.
 "$srcdir/configure" --srcdir="$srcdir" --prefix='${DJDIR}' \
-  --disable-shared --disable-nls --verbose --enable-build-warnings=\
--Wimplicit,-Wcomment,-Wformat,-Wparentheses,-Wpointer-arith,-Wuninitialized "$@"
+		    --disable-shared --disable-nls --verbose --enable-build-warnings=\
+		    -Wimplicit,-Wcomment,-Wformat,-Wparentheses,-Wpointer-arith,-Wuninitialized "$@"
 
 if test -f "${srcdir}/install-" ; then
   mv "${srcdir}/install-" "${srcdir}/install-.sh"
