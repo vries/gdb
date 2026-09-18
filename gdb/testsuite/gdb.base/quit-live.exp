@@ -152,6 +152,7 @@ proc quit_with_live_inferior {appear_how extra_inferior quit_how} {
 		gdb_test_multiple "" $test {
 		    eof {
 			pass $test
+			unset gdb_spawn_id
 		    }
 		}
 	    }
@@ -175,7 +176,14 @@ foreach_with_prefix appear_how {"run" "attach" "attach-nofile"} {
     }
 
     foreach_with_prefix extra_inferior {0 1} {
-	foreach_with_prefix quit_how {"quit" "sigterm" "sighup"} {
+	set qhs {}
+	lappend qhs "quit"
+	if {![isremote host]} {
+	    # For remote host, gdb_pid holds the pid of the ssh session, so
+	    # we'd end up sending signals to ssh instead of gdb.
+	    lappend qhs "sigterm" "sighup"
+	}
+	foreach_with_prefix quit_how $qhs {
 	    quit_with_live_inferior $appear_how $extra_inferior $quit_how
 	}
     }
