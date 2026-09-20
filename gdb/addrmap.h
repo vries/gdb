@@ -45,12 +45,18 @@ using addrmap_foreach_const_fn
 /* The base class for addrmaps.  */
 struct addrmap
 {
-  /* Return the object associated with ADDR in MAP.  */
+  /* Return the object associated with ADDR in MAP.  If LOW and HIGH are
+     non-nullptr, use them to return the range associated with ADDR.  */
+  const void *find (CORE_ADDR addr, CORE_ADDR *low,
+		    CORE_ADDR *high) const
+  { return this->do_find (addr, low, high); }
   const void *find (CORE_ADDR addr) const
-  { return this->do_find (addr); }
+  { return this->do_find (addr, nullptr, nullptr); }
 
+  void *find (CORE_ADDR addr, CORE_ADDR *low, CORE_ADDR *high)
+  { return this->do_find (addr, low, high); }
   void *find (CORE_ADDR addr)
-  { return this->do_find (addr); }
+  { return this->do_find (addr, nullptr, nullptr); }
 
   /* Call FN for every address in MAP, following an in-order traversal.
      If FN ever returns a non-zero value, the iteration ceases
@@ -68,7 +74,8 @@ protected:
 
 private:
   /* Worker for find, implemented by sub-classes.  */
-  virtual void *do_find (CORE_ADDR addr) const = 0;
+  virtual void *do_find (CORE_ADDR addr, CORE_ADDR *low,
+			 CORE_ADDR *high) const = 0;
 
   /* Worker for foreach, implemented by sub-classes.  */
   virtual int do_foreach (addrmap_foreach_fn fn) const = 0;
@@ -94,7 +101,8 @@ public:
   void relocate (CORE_ADDR offset);
 
 private:
-  void *do_find (CORE_ADDR addr) const override;
+  void *do_find (CORE_ADDR addr, CORE_ADDR *low,
+		 CORE_ADDR *high) const override;
   int do_foreach (addrmap_foreach_fn fn) const override;
 
   /* A transition: a point in an address map where the value changes.
@@ -193,7 +201,8 @@ public:
   void clear ();
 
 private:
-  void *do_find (CORE_ADDR addr) const override;
+  void *do_find (CORE_ADDR addr, CORE_ADDR *low,
+		 CORE_ADDR *high) const override;
   int do_foreach (addrmap_foreach_fn fn) const override;
 
   /* A splay tree, with a node for each transition; there is a
@@ -220,7 +229,7 @@ private:
   void force_transition (CORE_ADDR addr);
   splay_tree_node splay_tree_lookup (CORE_ADDR addr) const;
   splay_tree_node splay_tree_predecessor (CORE_ADDR addr) const;
-  splay_tree_node splay_tree_successor (CORE_ADDR addr);
+  splay_tree_node splay_tree_successor (CORE_ADDR addr) const;
   void splay_tree_remove (CORE_ADDR addr);
   void splay_tree_insert (CORE_ADDR key, void *value);
 };

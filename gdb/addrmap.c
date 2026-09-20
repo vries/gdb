@@ -31,7 +31,7 @@ static_assert (sizeof (splay_tree_value) >= sizeof (void *));
 /* Fixed address maps.  */
 
 void *
-addrmap_fixed::do_find (CORE_ADDR addr) const
+addrmap_fixed::do_find (CORE_ADDR addr, CORE_ADDR *low, CORE_ADDR *high) const
 {
   const struct addrmap_transition *bottom = &transitions[0];
   const struct addrmap_transition *top = &transitions[num_transitions - 1];
@@ -58,6 +58,12 @@ addrmap_fixed::do_find (CORE_ADDR addr) const
 	top = mid - 1;
     }
 
+  if (low != nullptr)
+    *low = bottom->addr;
+  if (high != nullptr)
+    *high = (bottom == &transitions[num_transitions - 1]
+	     ? (CORE_ADDR)-1
+	     : (bottom + 1)->addr - 1);
   return bottom->value;
 }
 
@@ -119,7 +125,7 @@ addrmap_mutable::splay_tree_predecessor (CORE_ADDR addr) const
 
 
 splay_tree_node
-addrmap_mutable::splay_tree_successor (CORE_ADDR addr)
+addrmap_mutable::splay_tree_successor (CORE_ADDR addr) const
 {
   return ::splay_tree_successor (tree, (splay_tree_key) &addr);
 }
@@ -266,25 +272,54 @@ addrmap_mutable::set_empty (CORE_ADDR start, CORE_ADDR end_inclusive,
 
 
 void *
-addrmap_mutable::do_find (CORE_ADDR addr) const
+addrmap_mutable::do_find (CORE_ADDR addr, CORE_ADDR *low, CORE_ADDR *high) const
 {
   if (tree == nullptr)
-    return nullptr;
+    {
+      if (low)
+	*low = 0;
+      if (high)
+	*high = (CORE_ADDR)-1;
+      return nullptr;
+    }
+
+  auto return_value = [this, &low, &high] (splay_tree_node &n)
+  {
+    if (low)
+      *low = addrmap_node_key (n);
+    if (high)
+      {
+	splay_tree_node succ = splay_tree_successor (addrmap_node_key (n));
+	if (succ != nullptr)
+	  *high = addrmap_node_key (succ) - 1;
+	else
+	  *high = (CORE_ADDR)-1;
+      }
+    return addrmap_node_value (n);
+  };
 
   splay_tree_node n = splay_tree_lookup (addr);
   if (n != nullptr)
     {
       gdb_assert (addrmap_node_key (n) == addr);
-      return addrmap_node_value (n);
+      return return_value (n);
     }
 
   n = splay_tree_predecessor (addr);
   if (n != nullptr)
     {
       gdb_assert (addrmap_node_key (n) < addr);
-      return addrmap_node_value (n);
+      return return_value (n);
     }
 
+  if (low != nullptr)
+    *low = 0;
+  if (high != nullptr)
+    {
+      splay_tree_node succ = splay_tree_successor (addr);
+      gdb_assert (succ != nullptr);
+      *high = addrmap_node_key (succ) - 1;
+    }
   return nullptr;
 }
 
@@ -436,9 +471,21 @@ test_addrmap ()
   /* Create mutable addrmap.  */
   auto_obstack temp_obstack;
   addrmap_mutable map;
+  addrmap_fixed *map2;
 
   /* Check initial state.  */
   check_addrmap_find (map, array, 0, 19, nullptr);
+
+  CORE_ADDR low, high;
+  {
+    map2 = new (&temp_obstack) addrmap_fixed (&temp_obstack, &map);
+    for (addrmap *m : {(addrmap *)&map, (addrmap *)map2})
+      {
+	SELF_CHECK (m->find (core_addr (&array[0]), &low, &high) == nullptr);
+	SELF_CHECK (low == 0 && high == (CORE_ADDR)-1);
+      }
+    delete map2;
+  }
 
   /* Insert address range into mutable addrmap.  */
   bool full_range_p
@@ -449,8 +496,7 @@ test_addrmap ()
   check_addrmap_find (map, array, 13, 19, nullptr);
 
   /* Create corresponding fixed addrmap.  */
-  addrmap_fixed *map2
-    = new (&temp_obstack) addrmap_fixed (&temp_obstack, &map);
+  map2 = new (&temp_obstack) addrmap_fixed (&temp_obstack, &map);
   SELF_CHECK (map2 != nullptr);
   check_addrmap_find (*map2, array, 0, 9, nullptr);
   check_addrmap_find (*map2, array, 10, 12, val1);
@@ -471,6 +517,22 @@ test_addrmap ()
     };
   SELF_CHECK (map.foreach (callback) == 0);
   SELF_CHECK (map2->foreach (callback) == 0);
+
+  for (addrmap *m : {(addrmap *)&map, (addrmap *)map2})
+    {
+      SELF_CHECK (m->find (core_addr (&array[0]), &low, &high) == nullptr);
+      SELF_CHECK (low == 0 && high == core_addr (&array[9]));
+
+      for (int i = 10; i <= 12; i++)
+	{
+	  m->find (core_addr (&array[i]), &low, &high);
+	  SELF_CHECK (low == core_addr (&array[10])
+		      && high == core_addr (&array[12]));
+	}
+
+      SELF_CHECK (m->find (core_addr (&array[19]), &low, &high) == nullptr);
+      SELF_CHECK (low == core_addr (&array[13]) && high == (CORE_ADDR)-1);
+    }
 
   /* Relocate fixed addrmap.  */
   map2->relocate (1);
