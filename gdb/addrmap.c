@@ -359,7 +359,7 @@ addrmap_mutable::clear ()
 /* See addrmap.h.  */
 
 void
-addrmap_dump (struct addrmap *map, struct ui_file *outfile, void *payload,
+addrmap_dump (addrmap *map, struct ui_file *outfile, void *payload,
 	      gdb::function_view<void (struct ui_file *outfile,
 				       CORE_ADDR start_addr,
 				       const void *value)> annotate_value)

@@ -36,20 +36,21 @@
    can't be edited.  */
 
 /* The base class for addrmaps.  */
-struct addrmap
+template <typename T>
+struct addrmap_template
 {
   /* The type of a function used to iterate over the map.
      OBJ is NULL for unmapped regions.  */
   using foreach_fn
-  = gdb::function_view<int (CORE_ADDR start_addr, void *obj)>;
+  = gdb::function_view<int (CORE_ADDR start_addr, T *obj)>;
   using foreach_const_fn
-  = gdb::function_view<int (CORE_ADDR start_addr, const void *obj)>;
+  = gdb::function_view<int (CORE_ADDR start_addr, const T *obj)>;
 
   /* Return the object associated with ADDR in MAP.  */
-  const void *find (CORE_ADDR addr) const
+  const T *find (CORE_ADDR addr) const
   { return this->do_find (addr); }
 
-  void *find (CORE_ADDR addr)
+  T *find (CORE_ADDR addr)
   { return this->do_find (addr); }
 
   /* Call FN for every address in MAP, following an in-order traversal.
@@ -64,15 +65,17 @@ struct addrmap
 
 
 protected:
-  ~addrmap () = default;
+  ~addrmap_template () = default;
 
 private:
   /* Worker for find, implemented by sub-classes.  */
-  virtual void *do_find (CORE_ADDR addr) const = 0;
+  virtual T *do_find (CORE_ADDR addr) const = 0;
 
   /* Worker for foreach, implemented by sub-classes.  */
   virtual int do_foreach (foreach_fn fn) const = 0;
 };
+
+using addrmap = addrmap_template<void>;
 
 struct addrmap_mutable;
 
@@ -231,7 +234,7 @@ private:
    map is dumped.)  If ANNOTATE_VALUE is non-nullptr, call it for each
    value.  */
 
-void addrmap_dump (struct addrmap *map, struct ui_file *outfile,
+void addrmap_dump (addrmap *map, struct ui_file *outfile,
 		   void *payload,
 		   gdb::function_view<void (struct ui_file *outfile,
 					    CORE_ADDR start_addr,
