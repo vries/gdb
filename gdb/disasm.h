@@ -26,6 +26,7 @@
 struct gdbarch;
 struct ui_out;
 struct ui_file;
+struct addrmap_mutable;
 
 /* A wrapper around a disassemble_info and a gdbarch.  This is the core
    set of data that all disassembler sub-classes will need.  This class
@@ -322,6 +323,19 @@ struct disasm_insn
   /* True if the instruction was executed speculatively.  */
   unsigned int is_speculative:1;
 };
+
+
+/* For an attempt to disassemble PC in section S (which may be nullptr) and
+   range [RANGE_LOW, RANGE_HIGH], skip over S if needed.
+   If so, return an updated PC and [RANGE_LOW, RANGE_HIGH].
+   If DIRECTION == 1 disassemble forward, if DIRECTION == -1, disassemble
+   backward.  */
+
+extern CORE_ADDR disassemble_skip_sections (addrmap_mutable *map, CORE_ADDR pc,
+					    struct obj_section *s,
+					    CORE_ADDR *range_low,
+					    CORE_ADDR *range_high,
+					    int direction = 1);
 
 extern void gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
 			     gdb_disassembly_flags flags, int how_many,
