@@ -927,25 +927,18 @@ bsearch_cmp (const void *key, const void *elt)
   return 1;
 }
 
-/* Returns a section whose range includes PC or NULL if none found.  */
+/* Update the section map for PSPACE.  */
 
-struct obj_section *
-find_pc_section (CORE_ADDR pc)
+static void
+update_section_map (struct program_space *pspace)
 {
-  struct objfile_pspace_info *pspace_info;
-  struct obj_section *s, **sp;
+  struct objfile_pspace_info *pspace_info = get_objfile_pspace_data (pspace);
 
-  /* Check for mapped overlay section first.  */
-  s = find_pc_mapped_section (pc);
-  if (s)
-    return s;
-
-  pspace_info = get_objfile_pspace_data (current_program_space);
   if (pspace_info->section_map_dirty
       || (pspace_info->new_objfiles_available
 	  && !pspace_info->inhibit_updates))
     {
-      update_section_map (current_program_space,
+      update_section_map (pspace,
 			  &pspace_info->sections,
 			  &pspace_info->num_sections);
 
@@ -954,6 +947,24 @@ find_pc_section (CORE_ADDR pc)
       pspace_info->new_objfiles_available = 0;
       pspace_info->section_map_dirty = 0;
     }
+}
+
+/* Returns a section whose range includes PC or NULL if none found.  */
+
+struct obj_section *
+find_pc_section (CORE_ADDR pc)
+{
+  struct obj_section *s, **sp;
+
+  /* Check for mapped overlay section first.  */
+  s = find_pc_mapped_section (pc);
+  if (s)
+    return s;
+
+  update_section_map (current_program_space);
+
+  struct objfile_pspace_info *pspace_info
+    = get_objfile_pspace_data (current_program_space);
 
   /* The C standard (ISO/IEC 9899:TC2) requires the BASE argument to
      bsearch be non-NULL.  */
