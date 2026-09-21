@@ -35,16 +35,16 @@
    A fixed address map, once constructed (from a mutable address map),
    can't be edited.  */
 
-/* The type of a function used to iterate over the map.
-   OBJ is NULL for unmapped regions.  */
-using addrmap_foreach_fn
-  = gdb::function_view<int (CORE_ADDR start_addr, void *obj)>;
-using addrmap_foreach_const_fn
-  = gdb::function_view<int (CORE_ADDR start_addr, const void *obj)>;
-
 /* The base class for addrmaps.  */
 struct addrmap
 {
+  /* The type of a function used to iterate over the map.
+     OBJ is NULL for unmapped regions.  */
+  using foreach_fn
+  = gdb::function_view<int (CORE_ADDR start_addr, void *obj)>;
+  using foreach_const_fn
+  = gdb::function_view<int (CORE_ADDR start_addr, const void *obj)>;
+
   /* Return the object associated with ADDR in MAP.  */
   const void *find (CORE_ADDR addr) const
   { return this->do_find (addr); }
@@ -56,10 +56,10 @@ struct addrmap
      If FN ever returns a non-zero value, the iteration ceases
      immediately, and the value is returned.  Otherwise, this function
      returns 0.  */
-  int foreach (addrmap_foreach_const_fn fn) const
+  int foreach (foreach_const_fn fn) const
   { return this->do_foreach (fn); }
 
-  int foreach (addrmap_foreach_fn fn)
+  int foreach (foreach_fn fn)
   { return this->do_foreach (fn); }
 
 
@@ -71,7 +71,7 @@ private:
   virtual void *do_find (CORE_ADDR addr) const = 0;
 
   /* Worker for foreach, implemented by sub-classes.  */
-  virtual int do_foreach (addrmap_foreach_fn fn) const = 0;
+  virtual int do_foreach (foreach_fn fn) const = 0;
 };
 
 struct addrmap_mutable;
@@ -95,7 +95,7 @@ public:
 
 private:
   void *do_find (CORE_ADDR addr) const override;
-  int do_foreach (addrmap_foreach_fn fn) const override;
+  int do_foreach (foreach_fn fn) const override;
 
   /* A transition: a point in an address map where the value changes.
      The map maps ADDR to VALUE, but if ADDR > 0, it maps ADDR-1 to
@@ -194,7 +194,7 @@ public:
 
 private:
   void *do_find (CORE_ADDR addr) const override;
-  int do_foreach (addrmap_foreach_fn fn) const override;
+  int do_foreach (foreach_fn fn) const override;
 
   /* A splay tree, with a node for each transition; there is a
      transition at address T if T-1 and T map to different objects.
@@ -237,5 +237,6 @@ void addrmap_dump (struct addrmap *map, struct ui_file *outfile,
 					    CORE_ADDR start_addr,
 					    const void *value)>
 		     annotate_value = nullptr);
+
 
 #endif /* GDB_ADDRMAP_H */

@@ -73,7 +73,7 @@ addrmap_fixed::relocate (CORE_ADDR offset)
 
 
 int
-addrmap_fixed::do_foreach (addrmap_foreach_fn fn) const
+addrmap_fixed::do_foreach (foreach_fn fn) const
 {
   size_t i;
 
@@ -330,14 +330,14 @@ addrmap_fixed::addrmap_fixed (struct obstack *obstack,
 static int
 addrmap_mutable_foreach_worker (splay_tree_node node, void *data)
 {
-  addrmap_foreach_fn *fn = (addrmap_foreach_fn *) data;
+  addrmap::foreach_fn *fn = (addrmap::foreach_fn *) data;
 
   return (*fn) (addrmap_node_key (node), addrmap_node_value (node));
 }
 
 
 int
-addrmap_mutable::do_foreach (addrmap_foreach_fn fn) const
+addrmap_mutable::do_foreach (addrmap::foreach_fn fn) const
 {
   if (tree == nullptr)
     return 0;
