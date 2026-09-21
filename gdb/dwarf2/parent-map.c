@@ -24,7 +24,7 @@
 /* Dump MAP as parent_map.  */
 
 static void
-dump_parent_map (dwarf2_per_bfd *per_bfd, const struct addrmap *map)
+dump_parent_map (dwarf2_per_bfd *per_bfd, const addrmap *map)
 {
   auto_obstack temp_storage;
 

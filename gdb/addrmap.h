@@ -80,25 +80,27 @@ using addrmap = addrmap_template<void>;
 struct addrmap_mutable;
 
 /* Fixed address maps.  */
-struct addrmap_fixed final : public addrmap,
-			     public allocate_on_obstack<addrmap_fixed>
+template <typename T>
+struct addrmap_fixed_template final
+  : public addrmap_template<T>,
+    public allocate_on_obstack<addrmap_fixed_template<T>>
 {
 public:
 
-  addrmap_fixed (struct obstack *obstack, const addrmap_mutable *mut);
-  DISABLE_COPY_AND_ASSIGN (addrmap_fixed);
+  addrmap_fixed_template (struct obstack *obstack, const addrmap_mutable *mut);
+  DISABLE_COPY_AND_ASSIGN (addrmap_fixed_template);
 
   /* It's fine to use the default move operators, because this addrmap
      does not own the storage for the elements.  */
-  addrmap_fixed (addrmap_fixed &&other) = default;
-  addrmap_fixed &operator= (addrmap_fixed &&) = default;
+  addrmap_fixed_template (addrmap_fixed_template &&other) = default;
+  addrmap_fixed_template &operator= (addrmap_fixed_template &&) = default;
 
   /* Relocate all the addresses in this map by OFFSET.  */
   void relocate (CORE_ADDR offset);
 
 private:
-  void *do_find (CORE_ADDR addr) const override;
-  int do_foreach (foreach_fn fn) const override;
+  T *do_find (CORE_ADDR addr) const override;
+  int do_foreach (typename addrmap_template<T>::foreach_fn fn) const override;
 
   /* A transition: a point in an address map where the value changes.
      The map maps ADDR to VALUE, but if ADDR > 0, it maps ADDR-1 to
@@ -106,7 +108,7 @@ private:
   struct addrmap_transition
   {
     CORE_ADDR addr;
-    void *value;
+    T *value;
   };
 
   /* The number of transitions in TRANSITIONS.  */
@@ -119,6 +121,8 @@ private:
      an entry for address 0).  */
   struct addrmap_transition *transitions;
 };
+
+using addrmap_fixed = addrmap_fixed_template<void>;
 
 /* Mutable address maps.  */
 

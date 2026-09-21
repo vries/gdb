@@ -30,8 +30,9 @@ static_assert (sizeof (splay_tree_value) >= sizeof (void *));
 
 /* Fixed address maps.  */
 
-void *
-addrmap_fixed::do_find (CORE_ADDR addr) const
+template <typename T>
+T *
+addrmap_fixed_template<T>::do_find (CORE_ADDR addr) const
 {
   const struct addrmap_transition *bottom = &transitions[0];
   const struct addrmap_transition *top = &transitions[num_transitions - 1];
@@ -62,8 +63,9 @@ addrmap_fixed::do_find (CORE_ADDR addr) const
 }
 
 
+template <typename T>
 void
-addrmap_fixed::relocate (CORE_ADDR offset)
+addrmap_fixed_template<T>::relocate (CORE_ADDR offset)
 {
   size_t i;
 
@@ -72,8 +74,9 @@ addrmap_fixed::relocate (CORE_ADDR offset)
 }
 
 
+template <typename T>
 int
-addrmap_fixed::do_foreach (foreach_fn fn) const
+addrmap_fixed_template<T>::do_foreach (typename addrmap_template<T>::foreach_fn fn) const
 {
   size_t i;
 
@@ -289,13 +292,14 @@ addrmap_mutable::do_find (CORE_ADDR addr) const
 }
 
 
-addrmap_fixed::addrmap_fixed (struct obstack *obstack,
-			      const addrmap_mutable *mut)
+template <typename T>
+addrmap_fixed_template<T>::addrmap_fixed_template (struct obstack *obstack,
+						   const addrmap_mutable *mut)
 {
   size_t transition_count = 0;
 
   /* Count the number of transitions in the tree.  */
-  mut->foreach ([&] (CORE_ADDR start, const void *obj)
+  mut->foreach ([&] (CORE_ADDR start, const T *obj)
     {
       ++transition_count;
       return 0;
@@ -313,10 +317,10 @@ addrmap_fixed::addrmap_fixed (struct obstack *obstack,
 
   /* Copy all entries from the splay tree to the array, in order
      of increasing address.  */
-  mut->foreach ([&] (CORE_ADDR start, const void *obj)
+  mut->foreach ([&] (CORE_ADDR start, const T *obj)
     {
       transitions[num_transitions].addr = start;
-      transitions[num_transitions].value = const_cast<void *> (obj);
+      transitions[num_transitions].value = const_cast<T *> (obj);
       ++num_transitions;
       return 0;
     });

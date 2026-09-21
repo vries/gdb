@@ -31,7 +31,9 @@ struct compunit_symtab;
 struct block_namespace_info;
 struct using_direct;
 struct obstack;
-struct addrmap_fixed;
+
+template <typename T> struct addrmap_fixed_template;
+using addrmap_fixed = addrmap_fixed_template<void>;
 
 /* Blocks can occupy non-contiguous address ranges.  When this occurs,
    startaddr and endaddr within struct block (still) specify the lowest
