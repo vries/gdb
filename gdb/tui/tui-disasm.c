@@ -179,8 +179,13 @@ tui_disassemble (struct gdbarch *gdbarch,
 
   while (count > 0)
     {
-      CORE_ADDR range_high;
-      map->find (pc, nullptr, &range_high);
+      CORE_ADDR range_low, range_high;
+      struct obj_section *s
+	= (struct obj_section *)map->find (pc, &range_low, &range_high);
+
+      pc = disassemble_skip_sections (map.get (), pc, s, &range_low,
+				      &range_high);
+
 
       /* Don't disassemble past a section change.  */
       std::optional<CORE_ADDR> high_pc;
@@ -206,7 +211,8 @@ tui_disassemble (struct gdbarch *gdbarch,
    addresses, or the start of a section.  */
 
 static CORE_ADDR
-tui_find_backward_disassembly_start_address (CORE_ADDR addr)
+tui_find_backward_disassembly_start_address (addrmap_mutable *map,
+					     CORE_ADDR addr)
 {
   if (addr == 0)
     {
@@ -214,9 +220,16 @@ tui_find_backward_disassembly_start_address (CORE_ADDR addr)
       return addr;
     }
 
+  CORE_ADDR range_low, range_high;
+  struct obj_section *s
+    = (struct obj_section *)map->find (addr - 1, &range_low, &range_high);
+
+  addr = disassemble_skip_sections (map, addr - 1, s, &range_low,
+				    &range_high, -1);
+
   bound_minimal_symbol msym_prev;
   bound_minimal_symbol msym
-    = lookup_minimal_symbol_by_pc_section (addr - 1, nullptr,
+    = lookup_minimal_symbol_by_pc_section (addr, nullptr,
 					   lookup_msym_prefer::TEXT,
 					   &msym_prev);
   if (msym.minsym != nullptr)
@@ -224,13 +237,7 @@ tui_find_backward_disassembly_start_address (CORE_ADDR addr)
   else if (msym_prev.minsym != nullptr)
     return msym_prev.value_address ();
 
-  /* Find the first section with start address before ADDR, and use its start
-     address.  */
-  struct obj_section *section = find_pc_section (addr - 1);
-  if (section != NULL)
-    return section->addr ();
-
-  return addr;
+  return range_low;
 }
 
 /* Find the disassembly address that corresponds to FROM lines above
@@ -290,16 +297,22 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
 	 different or not.  */
       CORE_ADDR prev_low;
 
+      std::unique_ptr<addrmap_mutable> map = section_addrmap ();
+
       do
 	{
 	  /* Find an address from which we can start disassembling.  */
 	  prev_low = new_low;
-	  new_low = tui_find_backward_disassembly_start_address (new_low);
+	  new_low = tui_find_backward_disassembly_start_address (map.get (),
+								 new_low);
 
 	  /* Disassemble forward.  */
 	  next_addr = tui_disassemble (gdbarch, asm_lines, new_low, max_lines);
 	  if (asm_lines.empty ())
-	    break;
+	    {
+	      new_low = prev_low;
+	      break;
+	    }
 	  last_addr = asm_lines.back ().addr;
 
 	  /* If disassembling from the current value of NEW_LOW reached PC

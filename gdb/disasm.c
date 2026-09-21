@@ -1182,6 +1182,53 @@ gdb_disassembly_1 (struct gdbarch *gdbarch, struct ui_out *uiout,
   return num_displayed;
 }
 
+/* See disasm.h.  */
+
+CORE_ADDR
+disassemble_skip_sections (addrmap_mutable *map, CORE_ADDR pc,
+			   struct obj_section *s, CORE_ADDR *range_low,
+			   CORE_ADDR *range_high, int direction)
+{
+  if (s != nullptr)
+    return pc;
+
+  struct obj_section *prev = nullptr, *next = nullptr;
+  CORE_ADDR prev_low, prev_high;
+  if (*range_low != 0)
+    prev
+      = (struct obj_section *)map->find (*range_low-1, &prev_low, &prev_high);
+  CORE_ADDR next_low, next_high;
+  if (*range_high != (CORE_ADDR)-1)
+    next
+      = (struct obj_section *)map->find (*range_high+1, &next_low, &next_high);
+
+  bool section_hole
+    = prev != nullptr && next != nullptr && prev->objfile == next->objfile;
+  if (!section_hole)
+    return pc;
+
+  if (target_has_registers ())
+    {
+      /* Reading from the section hole doesn't trigger a memory error, so
+	 don't skip it.  */
+      return pc;
+    }
+
+  if (direction == 1)
+    {
+      *range_low = next_low;
+      *range_high = next_high;
+      return next_low;
+    }
+  else if (direction == -1)
+    {
+      *range_low = prev_low;
+      *range_high = prev_high;
+      return prev_high;
+    }
+  gdb_assert_not_reached ();
+}
+
 void
 gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
 		 gdb_disassembly_flags flags, int how_many,
@@ -1194,8 +1241,12 @@ gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
     {
       CORE_ADDR tmp_high = high;
 
-      CORE_ADDR range_high;
-      map->find (low, nullptr, &range_high);
+      CORE_ADDR range_low, range_high;
+      struct obj_section *s
+	= (struct obj_section *)map->find (low, &range_low, &range_high);
+
+      low = disassemble_skip_sections (map.get (), low, s, &range_low,
+				       &range_high);
 
       /* Don't disassemble past a section change.  */
       if (range_high != (CORE_ADDR)-1)
