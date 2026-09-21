@@ -38,6 +38,7 @@
 struct htab;
 struct objfile_data;
 struct partial_symbol;
+struct addrmap_mutable;
 
 /* This structure maintains information on a per-objfile basis about the
    "entry point" of the objfile, and the scope within which the entry point
@@ -955,6 +956,11 @@ extern void objfile_purge_solibs (program_space *pspace);
    address<->symbol mapping for things we don't have debug symbols for.  */
 
 extern struct obj_section *find_pc_section (CORE_ADDR pc);
+
+/* Returns an addrmap mapping addresses to sections, similar to how
+   find_pc_section maps.  */
+
+extern std::unique_ptr<addrmap_mutable> section_addrmap ();
 
 /* Return true if PC is in a section called NAME.  */
 extern bool pc_in_section (CORE_ADDR, const char *);
