@@ -984,6 +984,33 @@ find_pc_section (CORE_ADDR pc)
   return NULL;
 }
 
+/* See objfiles.h.  */
+
+std::unique_ptr<addrmap_mutable>
+section_addrmap ()
+{
+  std::unique_ptr<addrmap_mutable> res (new addrmap_mutable ());
+
+  /* Insert mapped overlay sections first.  */
+  if (overlay_debugging)
+    for (objfile &objfile : current_program_space->objfiles ())
+      for (obj_section &osect : objfile.sections ())
+	if (section_is_mapped (&osect))
+	  res->set_empty (osect.addr (), osect.endaddr () - 1, &osect);
+
+  update_section_map (current_program_space);
+
+  struct objfile_pspace_info *pspace_info
+    = get_objfile_pspace_data (current_program_space);
+
+  for (int i = 0; i < pspace_info->num_sections; ++i)
+    {
+      obj_section *s = pspace_info->sections[i];
+      res->set_empty (s->addr (), s->endaddr () - 1, s);
+    }
+
+  return res;
+}
 
 /* Return non-zero if PC is in a section called NAME.  */
 
