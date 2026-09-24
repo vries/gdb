@@ -2251,15 +2251,16 @@ proc gdb_assert { condition {message ""} } {
 	set message $condition
     }
 
-    set code [catch {uplevel 1 [list expr $condition]} res]
-    if {$code == 1} {
-	# If code is 1 (TCL_ERROR), it means evaluation failed and res contains
-	# an error message.  Print the error message, and set res to 0 since we
-	# want to return a boolean.
-	warning "While evaluating expression in gdb_assert: $res"
+    try {
+	set res [uplevel 1 [list expr $condition]]
+    } on error {error_msg} {
+	# Evaluation failed.  Print the error message, and return 0.
+	warning "While evaluating expression in gdb_assert: $error_msg"
 	unresolved $message
-	set res 0
-    } elseif { !$res } {
+	return 0
+    }
+
+    if { !$res } {
 	fail $message
     } else {
 	pass $message
@@ -2719,7 +2720,10 @@ proc spawn_capture_tty_name { args } {
     # if it doesn't work, we want to be notified of that fact via the
     # normal Tcl error reporting mechanisms.)
     if {[tcl_version_at_least 9 0 0]} {
-	catch {fconfigure $spawn_id -encoding utf-8 -profile replace}
+	try {
+	    fconfigure $spawn_id -encoding utf-8 -profile replace
+	} on error {} {
+	}
     }
     return $result
 }
@@ -6514,8 +6518,10 @@ proc gdb_windows_manifest_obj {} {
     set cmd [list $windres -I [file dirname $rc_src] \
 		 -i $rc_src -o $obj -O coff]
     verbose -log "Executing $cmd"
-    if {[catch {exec {*}$cmd} output]} {
-	verbose -log "gdb_windows_manifest_obj: windres failed: $output"
+    try {
+	exec {*}$cmd
+    } on error {msg} {
+	verbose -log "gdb_windows_manifest_obj: windres failed: $msg"
 	return ""
     }
 
@@ -7543,12 +7549,13 @@ proc send_gdb { string {type standard}} {
 proc send_inferior { string } {
     global inferior_spawn_id
 
-    # tclint-disable-next-line command-args
-    if {[catch "send -i $inferior_spawn_id -- \$string" errorInfo]} {
-	return "$errorInfo"
-    } else {
-	return ""
+    try {
+	send -i $inferior_spawn_id -- $string
+    } on error {msg} {
+	return "$msg"
     }
+
+    return ""
 }
 
 #
@@ -7856,7 +7863,10 @@ proc kill_wait_spawned_process { proc_spawn_id } {
     remote_exec build "kill -9 ${pid}"
 
     verbose -log "closing ${proc_spawn_id}"
-    catch {close -i $proc_spawn_id}
+    try {
+	close -i $proc_spawn_id
+    } on error {} {
+    }
     verbose -log "waiting for ${proc_spawn_id}"
 
     # If somehow GDB ends up still attached to the process here, a
@@ -8765,7 +8775,10 @@ proc standard_testfile {args} {
     if {[info exists gdb_test_file_last_vars]} {
 	foreach varname $gdb_test_file_last_vars {
 	    global $varname
-	    catch {unset $varname}
+	    try {
+		unset $varname
+	    } on error {} {
+	    }
 	}
     }
     # 'executable' is often set by tests.
@@ -9070,9 +9083,7 @@ proc gdb_get_line_number { text { file "" } } {
 	set file "$srcdir/$subdir/$file"
     }
 
-    if {[catch { set fd [open "$file"] } message]} {
-	error "$message"
-    }
+    set fd [open "$file"]
 
     if {[tcl_version_at_least 9 0 0]} {
 	fconfigure $fd -encoding utf-8 -profile replace
@@ -9080,9 +9091,7 @@ proc gdb_get_line_number { text { file "" } } {
 
     set found -1
     for { set line 1 } { 1 } { incr line } {
-	if {[catch { set nchar [gets "$fd" body] } message]} {
-	    error "$message"
-	}
+	set nchar [gets "$fd" body]
 	if {$nchar < 0} {
 	    break
 	}
@@ -9092,9 +9101,7 @@ proc gdb_get_line_number { text { file "" } } {
 	}
     }
 
-    if {[catch { close "$fd" } message]} {
-	error "$message"
-    }
+    close "$fd"
 
     if {$found == -1} {
 	error "undefined tag \"$text\""
@@ -9202,21 +9209,25 @@ proc rerun_to_main {} {
 
 proc exec_has_index_section { executable } {
     set readelf_program [gdb_find_readelf]
-    set res [catch {exec $readelf_program -S $executable \
-			| grep -E "\.gdb_index|\.debug_names" }]
-    if { $res == 0 } {
-	return 1
+    try {
+	exec $readelf_program -S $executable \
+	    | grep -E "\.gdb_index|\.debug_names"
+    } on error {} {
+	return 0
     }
-    return 0
+
+    return 1
 }
 
 # Return list with major and minor version of readelf, or an empty list.
 gdb_caching_proc readelf_version {} {
     set readelf_program [gdb_find_readelf]
-    set res [catch {exec $readelf_program --version} output]
-    if { $res != 0 } {
+    try {
+	set output [exec $readelf_program --version]
+    } on error {} {
 	return [list]
     }
+
     set lines [split $output \n]
     set line [lindex $lines 0]
     set res [regexp {[ \t]+([0-9]+)[.]([0-9]+)[^ \t]*$} \
@@ -9254,8 +9265,9 @@ proc exec_is_pie { executable } {
     # We're not testing readelf -d | grep "FLAGS_1.*Flags:.*PIE"
     # because the PIE flag is not set by all versions of gold, see PR
     # binutils/26039.
-    set res [catch {exec $readelf_program -h $executable} output]
-    if { $res != 0 } {
+    try {
+	set output [exec $readelf_program -h $executable]
+    } on error {} {
 	return -1
     }
     set res [regexp -line {^[ \t]*Type:[ \t]*DYN \((Position-Independent Executable|Shared object) file\)$} \
@@ -9538,22 +9550,26 @@ proc get_build_id { filename } {
     if { ([istarget "*-*-mingw*"]
 	  || [istarget *-*-cygwin*]) } {
 	set objdump_program [gdb_find_objdump]
-	set result [catch {set data [exec $objdump_program -p $filename | grep signature | cut "-d " -f4]} output]
-	verbose "result is $result"
-	verbose "output is $output"
-	if {$result == 1} {
+	try {
+	    set data [exec $objdump_program -p $filename | grep signature | cut "-d " -f4]
+	} on error {msg} {
+	    verbose "result is $msg"
 	    return ""
 	}
+	verbose "output is $data"
 	return $data
     } else {
 	set tmp [standard_output_file "${filename}-tmp"]
 	set objcopy_program [gdb_find_objcopy]
-	set result [catch {exec $objcopy_program -j .note.gnu.build-id -O binary $filename $tmp} output]
-	verbose "result is $result"
-	verbose "output is $output"
-	if {$result == 1} {
+	try {
+	    set output \
+		[exec $objcopy_program -j .note.gnu.build-id -O binary $filename $tmp]
+	} on error {msg} {
+	    verbose "result is $msg"
 	    return ""
 	}
+	verbose "output is $output"
+
 	set fi [open $tmp]
 	fconfigure $fi -translation binary
 	# Skip the NOTE header.
@@ -9617,12 +9633,14 @@ proc gdb_gnu_strip_debug { dest args } {
 
     # Get rid of the debug info, and store result in stripped_file
     # something like gdb/testsuite/gdb.base/blah.stripped.
-    set result [catch {exec $strip_to_file_program --strip-debug ${dest} -o ${stripped_file}} output]
-    verbose "result is $result"
-    verbose "output is $output"
-    if {$result == 1} {
-      return 1
+    try {
+	set output \
+	    [exec $strip_to_file_program --strip-debug ${dest} -o ${stripped_file}]
+    } on error {msg} {
+	verbose "result is $msg"
+	return 1
     }
+    verbose "output is $output"
 
     # Workaround PR binutils/10802:
     # Preserve the 'x' bit also for PIEs (Position Independent Executables).
@@ -9631,12 +9649,14 @@ proc gdb_gnu_strip_debug { dest args } {
 
     # Get rid of everything but the debug info, and store result in debug_file
     # This will be in the .debug subdirectory, see above.
-    set result [catch {exec $strip_to_file_program --only-keep-debug ${dest} -o ${debug_file}} output]
-    verbose "result is $result"
-    verbose "output is $output"
-    if {$result == 1} {
-      return 1
+    try {
+	set output \
+	    [exec $strip_to_file_program --only-keep-debug ${dest} -o ${debug_file}]
+    } on error {msg} {
+	verbose "result is $msg"
+	return 1
     }
+    verbose "output is $output"
 
     # If no-main is passed, strip the symbol for main from the separate
     # file.  This is to simulate the behavior of elfutils's eu-strip, which
@@ -9644,12 +9664,15 @@ proc gdb_gnu_strip_debug { dest args } {
     # objcopy or strip to remove the symbol table without also removing the
     # debugging sections, so this is as close as we can get.
     if {[lsearch -exact $args "no-main"] != -1} {
-	set result [catch {exec $objcopy_program -N main ${debug_file} ${debug_file}-tmp} output]
-	verbose "result is $result"
-	verbose "output is $output"
-	if {$result == 1} {
+	try {
+	    set output \
+		[exec $objcopy_program -N main ${debug_file} ${debug_file}-tmp]
+	} on error {msg} {
+	    verbose "result is $msg"
 	    return 1
 	}
+	verbose "output is $output"
+
 	file delete "${debug_file}"
 	file rename "${debug_file}-tmp" "${debug_file}"
     }
@@ -9659,12 +9682,15 @@ proc gdb_gnu_strip_debug { dest args } {
     # section to the stripped_file, containing a pointer to the
     # debug_file.
     if {[lsearch -exact $args "no-debuglink"] == -1} {
-	set result [catch {exec $objcopy_program --add-gnu-debuglink=${debug_file} ${stripped_file} ${stripped_file}-tmp} output]
-	verbose "result is $result"
-	verbose "output is $output"
-	if {$result == 1} {
+	try {
+	    set output \
+		[exec $objcopy_program --add-gnu-debuglink=${debug_file} ${stripped_file} ${stripped_file}-tmp]
+	} on error {msg} {
+	    verbose "result is $msg"
 	    return 1
 	}
+	verbose "output is $output"
+
 	file delete "${stripped_file}"
 	file rename "${stripped_file}-tmp" "${stripped_file}"
     }
@@ -10320,8 +10346,9 @@ proc core_find {binfile {deletefiles {}} {arg ""} {output_file "/dev/null"}} {
 	 true) \
 	    >${output_file} 2>&1}]
     verbose -log "Executing on build: $cmd"
-    catch {
+    try {
 	system $cmd
+    } on error {} {
     }
 
     #      remote_exec host "${binfile}"
@@ -10359,8 +10386,9 @@ proc core_find {binfile {deletefiles {}} {arg ""} {output_file "/dev/null"}} {
 	     true) \
 		>/dev/null 2>&1}]
 	verbose -log "Executing on build: $cmd"
-	catch {
+	try {
 	    system $cmd
+	} on error {} {
 	}
 
 	foreach i "${objdir}/${subdir}/core ${objdir}/${subdir}/core.coremaker.c ${binfile}.core" {
@@ -10398,15 +10426,18 @@ gdb_caching_proc gdb_target_symbol_prefix {} {
     set prefix ""
 
     set objdump_program [gdb_find_objdump]
-    set result [catch {exec $objdump_program --syms $obj} output]
-
-    if { $result == 0 \
-	&& ![regexp -lineanchor \
-	     { ([^ a-zA-Z0-9]*)main$} $output dummy prefix] } {
-	verbose "gdb_target_symbol_prefix: Could not find main in objdump output; returning null prefix" 2
+    try {
+	set output [exec $objdump_program --syms $obj]
+    } on error {} {
+	return ""
+    } finally {
+	file delete $obj
     }
 
-    file delete $obj
+    if {![regexp -lineanchor \
+	      { ([^ a-zA-Z0-9]*)main$} $output dummy prefix] } {
+	verbose "gdb_target_symbol_prefix: Could not find main in objdump output; returning null prefix" 2
+    }
 
     return $prefix
 }
@@ -10941,7 +10972,10 @@ proc gdb_stdin_log_init { } {
 
     if {[info exists in_file]} {
 	# Close existing file.
-	catch {close $in_file}
+	try {
+	    close $in_file
+	} on error {} {
+	}
     }
 
     set logfile [standard_output_file_with_gdb_instance gdb.in]
@@ -10992,7 +11026,10 @@ proc gdb_write_cmd_file { cmdline } {
     set logfile [standard_output_file_with_gdb_instance gdb.cmd]
     set cmd_file [open $logfile w]
     puts $cmd_file $cmdline
-    catch {close $cmd_file}
+    try {
+	close $cmd_file
+    } on error {} {
+    }
 }
 
 # Compare contents of FILE to string STR.  Pass with MSG if equal, otherwise
@@ -11004,12 +11041,11 @@ proc cmp_file_string { file str msg } {
 	return
     }
 
-    set caught_error [catch {
+    try {
 	set fp [open "$file" r]
 	set file_contents [read $fp]
 	close $fp
-    } error_message]
-    if {$caught_error} {
+    } on error {error_message} {
 	error "$error_message"
 	fail "$msg"
 	return
@@ -11128,12 +11164,13 @@ proc add_gdb_index { program {style ""} } {
     global srcdir GDB env
     set contrib_dir "$srcdir/../contrib"
     set env(GDB) [append_gdb_data_directory_option $GDB]
-    set result [catch {exec $contrib_dir/gdb-add-index.sh {*}$style $program} output]
-    if { $result != 0 } {
-	verbose -log "result is $result"
-	verbose -log "output is $output"
+    try {
+	set output [exec $contrib_dir/gdb-add-index.sh {*}$style $program]
+    } on error {msg} {
+	verbose -log "result is $msg"
 	return 0
     }
+    verbose -log "output is $output"
 
     return 1
 }
@@ -12108,9 +12145,12 @@ proc auto_lappend_include_files_1 {flags source {visited {}}} {
 	return
     }
 
-    if {[catch {open $source r} fh err]} {
-	error "Failed to open file '$source': $err"
+    try {
+	set fh [open $source r]
+    } on error {msg} {
+	error "Failed to open file '$source': $msg"
     }
+
     if {[tcl_version_at_least 9 0 0]} {
 	fconfigure $fh -encoding utf-8 -profile replace
     }
@@ -12235,12 +12275,14 @@ proc section_get {exec section} {
 
     set command "exec $objcopy_program -O binary --set-section-flags $section=A --change-section-address $section=0 -j $section $exec $tmp"
     verbose -log "command is $command"
-    set result [catch {{*}$command} output]
-    verbose -log "result is $result"
-    verbose -log "output is $output"
-    if {$result == 1} {
+    try {
+	set output [{*}$command]
+    } on error {msg} {
+	verbose -log "result is $msg"
 	return ""
     }
+    verbose -log "output is $output"
+
     set fi [open $tmp]
     fconfigure $fi -translation binary
     set data [read $fi]
@@ -12284,13 +12326,14 @@ proc expect_build_id_in_core_file { filename } {
     # Use readelf to find the build-id note in FILENAME.
     set readelf_program [gdb_find_readelf]
     set cmd [list $readelf_program -WS $filename | grep ".note.gnu.build-id"]
-    set res [catch {exec {*}$cmd} output]
     verbose -log "running: $cmd"
-    verbose -log "result: $res"
-    verbose -log "output: $output"
-    if { $res != 0 } {
+    try {
+	set output [exec {*}$cmd]
+    } on error {msg} {
+	verbose -log "result: $msg"
 	return false
     }
+    verbose -log "output: $output"
 
     # Extract the OFFSET from the readelf output.
     set res [regexp {NOTE[ \t]+([0-9a-f]+)[ \t]+([0-9a-f]+)} \
@@ -12304,7 +12347,9 @@ proc expect_build_id_in_core_file { filename } {
 
     # Now figure out the page size.  This should be fine for Linux
     # hosts, see the istarget check above.
-    if {[catch {exec getconf PAGESIZE} page_size]} {
+    try {
+	set page_size [exec getconf PAGESIZE]
+    } on error {} {
 	# Failed to fetch page size.
 	return false
     }
@@ -12380,7 +12425,10 @@ gdb_caching_proc have_startup_shell {} {
 
 proc dwz_version { } {
     set dwz_program "dwz"
-    set res [catch {exec $dwz_program --version} output]
+    try {
+	set output [exec $dwz_program --version]
+    } trap CHILDSTATUS {output} {
+    }
 
     # Don't check the exit value of 'dwz' process as 'dwz' doesn't
     # exit immediately after displaying the version number, and for
