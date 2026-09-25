@@ -10312,8 +10312,18 @@ proc core_find {binfile {deletefiles {}} {arg ""} {output_file "/dev/null"}} {
 	}
     }
 
-    # tclint-disable command-args
-    catch "system \"(cd ${coredir}; ulimit -c unlimited; $coredump_filter_cmd; ${binfile} ${arg}; true) >${output_file} 2>&1\""
+    set cmd [subst_vars {
+	(cd ${coredir};
+	 ulimit -c unlimited;
+	 $coredump_filter_cmd;
+	 ${binfile} ${arg};
+	 true) \
+	    >${output_file} 2>&1}]
+    verbose -log "Executing on build: $cmd"
+    catch {
+	system $cmd
+    }
+
     #      remote_exec host "${binfile}"
     set binfile_basename [file tail $binfile]
     foreach i [list \
@@ -10343,8 +10353,16 @@ proc core_find {binfile {deletefiles {}} {arg ""} {output_file "/dev/null"}} {
 	# ulimit here if we didn't find a core file above.
 	# Oh, I should mention that any "braindamaged" non-Unix system has
 	# the same problem. I like the cd bit too, it's really neat'n stuff.
-	# tclint-disable command-args
-	catch "system \"(cd ${objdir}/${subdir}; ${binfile}; true) >/dev/null 2>&1\""
+	set cmd [subst_vars {
+	    (cd ${objdir}/${subdir};
+	     ${binfile};
+	     true) \
+		>/dev/null 2>&1}]
+	verbose -log "Executing on build: $cmd"
+	catch {
+	    system $cmd
+	}
+
 	foreach i "${objdir}/${subdir}/core ${objdir}/${subdir}/core.coremaker.c ${binfile}.core" {
 	    if {[remote_file build exists $i]} {
 		remote_exec build "mv $i $destcore"
