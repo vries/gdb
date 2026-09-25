@@ -1,0 +1,86 @@
+# Copyright 2026 Free Software Foundation, Inc.
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+set lockfile [build_standard_output_file "lock.txt"]
+gdb_assert {![file exists $lockfile]} "Initial"
+
+# Scenario 1:
+# - acquire 1
+# - release 1
+with_test_prefix "simple" {
+    set res [lock_file_acquire $lockfile]
+    gdb_assert {[file exists $lockfile]} "Acquire lock"
+
+    lock_file_release $res
+    gdb_assert {![file exists $lockfile]} "Release lock"
+}
+
+# Scenario 2:
+# - acquire 1
+# - acquire 2 fails.  On retry, release 1.  Acquire 2 succeeds.
+# - release 2
+with_test_prefix "on retry unlock" {
+    set res [lock_file_acquire $lockfile]
+    gdb_assert {[file exists $lockfile]} "Acquire lock"
+
+    set on_retry [list lock_file_release $res]
+    # Try to acquire the lock.  That should fail.
+    # Then on retry, release the lock.
+    # The next try to acquire the lock should succeed.
+    set res2 [lock_file_acquire $lockfile $on_retry]
+    gdb_assert {[file exists $lockfile]} "Re-acquire lock"
+
+    lock_file_release $res2
+    gdb_assert {![file exists $lockfile]} "Release lock"
+}
+
+# Scenario 3:
+# - acquire 1
+# - acquire 2 fails, waits, and tries again in a loop.
+# - release 1, acquire 2 succeeds.
+# - release 2
+with_test_prefix "on retry wait" {
+    set res [lock_file_acquire $lockfile]
+    gdb_assert {[file exists $lockfile]} "Acquire lock"
+
+    after 1000 {lock_file_release $res}
+
+    set on_retry {
+	update
+	after 100
+    }
+    set res2 [lock_file_acquire $lockfile $on_retry]
+    gdb_assert {[file exists $lockfile]} "Re-acquire lock"
+
+    lock_file_release $res2
+    gdb_assert {![file exists $lockfile]} "Release lock"
+}
+
+# Scenario 4:
+# - acquire 1
+# - acquire 2 fails
+with_test_prefix "on retry return" {
+    set res [lock_file_acquire $lockfile]
+    gdb_assert {[file exists $lockfile]} "Acquire lock"
+
+    set on_retry {
+	return {}
+    }
+    set res2 [lock_file_acquire $lockfile $on_retry]
+    gdb_assert {$res2 == {}} "Acquire lock again"
+
+    lock_file_release $res
+    gdb_assert {![file exists $lockfile]} "Release lock"
+}

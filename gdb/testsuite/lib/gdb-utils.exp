@@ -178,27 +178,39 @@ proc version_compare { l1 op l2 } {
     return 1
 }
 
-# Acquire lock file LOCKFILE.  Tries forever until the lock file is
-# successfully created.
+# Acquire lock file LOCKFILE.
+# If the lock file doesn't exist, create it and return a file handle/file name
+# pair.
+# If lock file does exist, with default ON_RETRY try again.  A custom ON_RETRY
+# may do something different like, for instance, using return.
+# Returns {} on failure.
 
-proc lock_file_acquire {lockfile} {
+proc lock_file_acquire {lockfile {on_retry {after 10}}} {
     verbose -log "acquiring lock file: $::subdir/${::gdb_test_file_name}.exp"
-    while {true} {
+
+    while {![info exists fh]} {
 	try {
-	    open $lockfile {WRONLY CREAT EXCL}
-	} on ok {rc} {
-	    set msg "locked by $::subdir/${::gdb_test_file_name}.exp"
-	    verbose -log "lock file: $msg"
-	    # For debugging, put info in the lockfile about who owns
-	    # it.
-	    puts  $rc $msg
-	    flush $rc
-	    return [list $rc $lockfile]
-	} on error {} {
-	    # Ignore and try again.
+	    set fh [open $lockfile {WRONLY CREAT EXCL}]
+	} trap "POSIX EEXIST" {} {
+	    # Lock in use.  Ignore and try again.  Propagate all other errors.
+	    uplevel 1 $on_retry
 	}
-	after 10
     }
+
+    # Handle the case that ON_RETRY breaks out of the loop.
+    if {![info exists fh]} {
+	return {}
+    }
+
+    set msg "locked by $::subdir/${::gdb_test_file_name}.exp"
+    verbose -log "lock file: $msg"
+
+    # For debugging, put info in the lockfile about who owns
+    # it.
+    puts  $fh $msg
+    flush $fh
+
+    return [list $fh $lockfile]
 }
 
 # Release a lock file.
@@ -206,17 +218,20 @@ proc lock_file_acquire {lockfile} {
 proc lock_file_release {info} {
     verbose -log "releasing lock file: $::subdir/${::gdb_test_file_name}.exp"
 
+    set fh [lindex $info 0]
+    set lockfile [lindex $info 1]
+
     try {
-	fconfigure [lindex $info 0]
+	fconfigure $fh
     } on error {} {
 	error "invalid lock"
     }
 
     try {
-	close [lindex $info 0]
-	file delete -force [lindex $info 1]
-    } on error {rc} {
-	error "Error releasing lockfile: '$rc'"
+	close $fh
+	file delete -force $lockfile
+    } on error {err_msg} {
+	error "Error releasing lockfile: '$err_msg'"
     }
 
     return ""
