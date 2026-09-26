@@ -101,11 +101,9 @@ proc test_reload { do_kill_p follow_child_p } {
 
     if { $do_kill_p } {
 	# (Optional) Kill one of the inferiors.
-	gdb_test "kill" \
+	gdb_test "with confirm off -- kill" \
 	    "" \
-	    "Kill inferior" \
-	    "Kill the program being debugged.*y or n. $" \
-	    "y"
+	    "Kill inferior"
 
 	# Check the first inferior really did die.
 	gdb_test "info inferiors" \

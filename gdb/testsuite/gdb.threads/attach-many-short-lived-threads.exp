@@ -178,7 +178,7 @@ proc test {} {
 
 		gdb_test "detach" "Detaching from.*"
 	    } else {
-		gdb_test "kill" "" "kill process" "Kill the program being debugged.*y or n. $" "y"
+		gdb_test "with confirm off -- kill" "" "kill process"
 	    }
 
 	    gdb_test_no_output "set breakpoint always-inserted off"

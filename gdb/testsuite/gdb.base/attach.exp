@@ -186,7 +186,7 @@ proc_with_prefix do_attach_failure_tests {} {
     gdb_test_no_output "set confirm off"
     gdb_test "inferior 1" "Switching to inferior 1.*" "switch to inferior 1"
 
-    gdb_test "kill" "killed.*" "exit after attach failures"
+    gdb_test_kill "exit after attach failures"
 
     # This can probably be replaced with a call to runto or runto_main once
     # the kfail is removed.
@@ -372,11 +372,9 @@ proc_with_prefix do_attach_tests {} {
 	"attach when process' a.out not in cwd"
 
     set test "after attach3, exit"
-    gdb_test "kill" \
+    gdb_test "with confirm off -- kill" \
 	"" \
-	"$test" \
-	"Kill the program being debugged.*y or n. $" \
-	"y"
+	"$test"
 
     # Another "don't leave a process around"
     kill_wait_spawned_process $test_spawn_id

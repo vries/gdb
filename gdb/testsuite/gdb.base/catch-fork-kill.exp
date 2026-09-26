@@ -84,8 +84,7 @@ proc do_test {fork_kind exit_kind} {
 	    gdb_test "break grandparent_done" "Breakpoint .*"
 	    gdb_test "continue" "hit Breakpoint .*, grandparent_done.*"
 	} elseif {$exit_kind == "kill"} {
-	    gdb_test "kill" "" "kill parent" \
-		"Kill the program being debugged.*y or n. $" "y"
+	    gdb_test "with confirm off -- kill" "" "kill parent"
 	} else {
 	    perror "unreachable"
 	}

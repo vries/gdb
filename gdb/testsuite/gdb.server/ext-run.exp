@@ -145,7 +145,7 @@ proc do_test { clear_sysroot set_remote_exec fetch_exec_and_args } {
 	}
     }
 
-    gdb_test "kill" "" "kill" "Kill the program being debugged. .y or n. " "y"
+    gdb_test "with confirm off -- kill" "" "kill"
 
     gdb_load $::binfile
     gdb_test "monitor help" "The following monitor commands.*" \

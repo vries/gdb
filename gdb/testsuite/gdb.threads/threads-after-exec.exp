@@ -53,9 +53,7 @@ proc do_test { } {
     # on native Linux as GDB did not dispose of the pre-exec LWP for
     # the non-leader (and that LWP did not have a matching thread in
     # the core thread list).
-    gdb_test "with confirm off -- kill" \
-	"\\\[Inferior 1 (.*) killed\\\]" \
-	"kill inferior"
+    gdb_test_kill "kill inferior" 1
 }
 
 do_test

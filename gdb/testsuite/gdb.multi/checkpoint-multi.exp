@@ -153,8 +153,7 @@ with_test_prefix "check detach on non-checkpointed inferior" {
 
 with_test_prefix "check kill on non-checkpointed inferior" {
     start_2_inferiors_checkpoint_on_inf_2
-    gdb_test "kill" "" "kill non-checkpointed inferior" \
-	     "Kill the program being debugged.*y or n. $" "y"
+    gdb_test "with confirm off -- kill" "" "kill non-checkpointed inferior"
 }
 
 with_test_prefix "check restart 0 on non-checkpointed inferior" {
@@ -419,9 +418,7 @@ with_test_prefix "two inferiors with checkpoints" {
     }
 
     with_test_prefix "kill inferior 1" {
-	gdb_test "kill" "\\\[Inferior 1 \\(process $::decimal\\) killed\\\]" \
-		 "kill inferior 1" \
-		 "Kill the program being debugged.*y or n. $" "y"
+	gdb_test_kill "kill inferior 1" 1
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
@@ -559,9 +556,7 @@ with_test_prefix "three inferiors with checkpoints" {
     }
 
     with_test_prefix "kill inferior 3" {
-	gdb_test "kill" "\\\[Inferior 3 \\(process $::decimal\\) killed\\\]" \
-		 "kill inferior 3" \
-		 "Kill the program being debugged.*y or n. $" "y"
+	gdb_test_kill "kill inferior 3" 3
 
 	gdb_test "info checkpoints" \
 	    [multi_line \

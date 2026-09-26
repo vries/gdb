@@ -133,8 +133,7 @@ proc_with_prefix run_kill_and_restart_test { target_async target_non_stop } {
     gdb_continue_to_breakpoint "worker_func"
 
     # Now kill the program being debugged.
-    gdb_test "kill" "" "kill process" \
-	"Kill the program being debugged.*y or n. $" "y"
+    gdb_test "with confirm off -- kill" "" "kill process"
 
     # Check we can restart the inferior.  At one point this would trigger an
     # assertion.

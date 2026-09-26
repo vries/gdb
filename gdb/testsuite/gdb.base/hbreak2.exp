@@ -440,8 +440,7 @@ proc test_next_with_recursion {} {
 	"Hardware assisted breakpoint $decimal at .*" \
 	"hardware break at factorial"
 
-    gdb_test "kill" "" "kill program" \
-	"Kill the program being debugged.*y or n. $" "y"
+    gdb_test "with confirm off -- kill" "" "kill program"
 
     # Run until we call factorial with 6
 

@@ -735,7 +735,7 @@ proc_with_prefix test_next_with_recursion {} {
     global decimal
     global binfile
 
-    gdb_test "kill" "" "kill program" "Kill the program being debugged.*y or n. $" "y"
+    gdb_test "with confirm off -- kill" "" "kill program"
     delete_breakpoints
 
     gdb_test "break factorial" "Breakpoint $decimal at .*" "break at factorial"

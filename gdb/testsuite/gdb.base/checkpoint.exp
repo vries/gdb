@@ -266,8 +266,7 @@ gdb_test "info checkpoints" " 1 .* 2 .* 3 .* 4 .* 5 .*" \
 # Kill should now terminate all of them.
 #
 
-gdb_test "kill" "" "kill all one" \
-    "Kill the program being debugged.*y or n. $" "y"
+gdb_test "with confirm off -- kill" "" "kill all one"
 
 #
 # and confirm that all are gone
@@ -343,8 +342,7 @@ gdb_test_multiple "info checkpoints" $msg {
 # OK, kill 'em all...
 #
 
-gdb_test "kill" "" "kill all one with many checkpoints" \
-    "Kill the program being debugged.*y or n. $" "y"
+gdb_test "with confirm off -- kill" "" "kill all one with many checkpoints"
 
 #
 # Finished: cleanup

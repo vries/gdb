@@ -87,7 +87,7 @@ proc run_test { target_async target_non_stop to_disable } {
 	"attach to remote program 2"
     gdb_test "backtrace" ".*main.*" "backtrace 2"
 
-    gdb_test "kill" "" "kill" "Kill the program being debugged. .y or n. " "y"
+    gdb_test "with confirm off -- kill" "" "kill"
     gdb_test_no_output "monitor exit"
 
     kill_wait_spawned_process $test_spawn_id

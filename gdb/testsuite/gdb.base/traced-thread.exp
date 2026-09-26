@@ -47,7 +47,7 @@ gdb_test "attach $child_pid" \
 
 # Now kill the parent process, ending the trace.
 gdb_test "inferior 1" "Switching to inferior 1.*" "switch to inferior 1"
-gdb_test "kill" ".*" "kill the parent process"
+gdb_test "with confirm off -- kill" ".*" "kill the parent process"
 
 # Kill the child process as well.  Use the shell to avoid funny
 # business with gdbserver testing.

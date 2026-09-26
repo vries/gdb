@@ -66,8 +66,8 @@ with_timeout_factor 10 {
 	"save process recfile"
 }
 
-gdb_test "kill" "" "kill process, prepare to debug log file" \
-    "Kill the program being debugged\\? \\(y or n\\) " "y"
+gdb_test "with confirm off -- kill" "" \
+    "kill process, prepare to debug log file"
 
 clean_restart ${::testfile}
 

@@ -365,6 +365,22 @@ set octal {(?:[0-7]+)}
 
 set inferior_exited_re "(?:\\\[Inferior ${::decimal} \\(\[^\n\r\]*\\) exited)"
 
+# Match gdb output for the kill command.  The match can be made more specific
+# using INFERIOR_RE and PROCESS_RE.
+proc inferior_killed_re {{inferior_re ""} {process_re ""}} {
+    if {$inferior_re == ""} {
+	set inferior_re $::decimal
+    }
+    if {$process_re == ""} {
+	set process_re \
+	    [subst_vars \
+		 {process ${::decimal}[^\r\n]*|remote target}]
+    }
+    return \
+	[subst_vars \
+	     {\[Inferior (?:$inferior_re) \((?:$process_re)\) killed\]}]
+}
+
 # A regular expression that matches the first word of a thread
 # description after the thread number info 'info threads'
 set tdlabel_re "(process|Thread|LWP)"
@@ -7867,6 +7883,16 @@ proc kill_wait_spawned_process { proc_spawn_id } {
     # don't care about the exit status.  */
     wait -nowait -i $proc_spawn_id
     clean_up_spawn_id target $proc_spawn_id
+}
+
+# Kill the current inferior with MESSAGE.  Check that the killed inferior is
+# INFERIOR_RE, if non-empty.
+
+proc gdb_test_kill {message {inferior_re ""}} {
+    gdb_test \
+	"with confirm off -- kill" \
+	[inferior_killed_re $inferior_re] \
+	$message
 }
 
 # Returns the process id corresponding to the given spawn id.
