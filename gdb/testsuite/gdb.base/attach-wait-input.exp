@@ -102,11 +102,9 @@ proc test { editing } {
 
 	# As we've used attach, on quit, we'll detach from the
 	# program.  Explicitly kill it in case we failed above.
-	gdb_test "kill" \
+	gdb_test "with confirm off -- kill" \
 	    "" \
-	    "after attach, exit" \
-	    "Kill the program being debugged.*y or n. $" \
-	    "y"
+	    "after attach, exit"
     }
 }
 

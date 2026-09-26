@@ -67,8 +67,7 @@ proc test_setup {} {
 # Assuming inferior 2 is already selected, kill the current inferior
 # (inferior 2), select inferior 1, and then remove inferior 2.
 proc kill_and_remove_inferior_2 {} {
-    gdb_test "kill" "" "kill inferior 2" \
-	"Kill the program being debugged.*y or n. $" "y"
+    gdb_test "with confirm off -- kill" "" "kill inferior 2"
 
     gdb_test "inferior 1" "Switching to inferior 1 .*" \
 	"select inferior 1"

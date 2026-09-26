@@ -463,7 +463,7 @@ proc test_ld {file ifmain trynosym displacement} {
     }
 
     # Try re-run if the new PIE displacement takes effect.
-    gdb_test "kill" "" "kill" {Kill the program being debugged\? \(y or n\) } "y"
+    gdb_test "with confirm off -- kill" "" "kill"
     reach $solib_bp "run" $displacement 2
     gdb_test_no_output "set verbose off"
 

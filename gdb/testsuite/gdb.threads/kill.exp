@@ -67,11 +67,7 @@ proc test {threaded} {
 	#
 	# the above would mean that the remote end crashed.
 
-	gdb_test_multiple "kill" "kill" {
-	    -re "Kill the program being debugged\\? \\(y or n\\) $" {
-		gdb_test "y" "\\\[Inferior $decimal \\(.*\\) killed\\\]" "kill"
-	    }
-	}
+	gdb_test_kill "kill"
     }
 }
 

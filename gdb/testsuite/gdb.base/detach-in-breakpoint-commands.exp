@@ -49,5 +49,5 @@ gdb_test \
     "kill in commands"
 
 gdb_test "run" \
-    [subst_vars {\[Inferior $decimal \([^\r\n]*\) killed\]}] \
+    [inferior_killed_re] \
     "run - kill"

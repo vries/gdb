@@ -69,7 +69,7 @@ proc do_test { action1 action2 } {
     gdb_test -no-prompt-anchor "continue &"
 
     if { $action1 == "kill" } {
-	gdb_test "kill" "Inferior 1 .* killed.*"
+	gdb_test_kill "kill" 1
     } elseif { $action1 == "detach" } {
 	set child_pid [get_integer_valueof "mypid" -1]
 	if { $child_pid == -1 } {

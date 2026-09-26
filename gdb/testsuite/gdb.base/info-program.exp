@@ -95,8 +95,7 @@ proc do_test { threads non-stop } {
 	}
     }
 
-    gdb_test "kill" "" "kill program" \
-	"Kill the program being debugged.*y or n. $" "y"
+    gdb_test "with confirm off -- kill" "" "kill program"
 
     gdb_test "info program" "The program being debugged is not being run." \
 	"info program, after kill"

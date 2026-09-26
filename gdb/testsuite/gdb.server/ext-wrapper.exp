@@ -74,6 +74,6 @@ with_test_prefix "restart" {
     gdb_test "print d" "${::valnum_re} = ${hex} \"1\".*"
 }
 
-gdb_test "kill" "" "kill" "Kill the program being debugged. .y or n. " "y"
+gdb_test "with confirm off -- kill" "" "kill"
 
 gdb_test_no_output "monitor exit"

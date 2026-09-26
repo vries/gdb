@@ -404,9 +404,7 @@ proc test_value_after_death {} {
     "create PTR type" 1
 
   # Kill the inferior and remove the symbols.
-  gdb_test "kill" "" "kill the inferior" \
-    "Kill the program being debugged. .y or n. $" \
-    "y"
+  gdb_test "with confirm off -- kill" "" "kill the inferior"
   gdb_test "file" "" "discard the symbols" \
     "Discard symbol table from.*y or n. $" \
     "y"
