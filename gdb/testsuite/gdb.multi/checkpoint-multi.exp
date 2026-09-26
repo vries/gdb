@@ -148,7 +148,13 @@ proc start_2_inferiors_checkpoint_on_inf_2_alt {} {
 
 with_test_prefix "check detach on non-checkpointed inferior" {
     start_2_inferiors_checkpoint_on_inf_2
+    set pid [get_inferior_pid]
     gdb_test "detach" "Detaching from program.*$::exec1.*Inferior 1.*detached.*"
+    with_test_prefix cleanup {
+	gdb_test "inferior 1" "Switching to inferior 1 .*"
+	gdb_test "attach $pid" "Attaching to program: .*" "re-attach for kill"
+	gdb_test_kill "kill"
+    }
 }
 
 with_test_prefix "check kill on non-checkpointed inferior" {
