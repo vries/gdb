@@ -32,7 +32,6 @@ gdb_start
 
 # Check 'set prompt' affects console output even for "interpreter-exec mi".
 
-set gdb_prompt {\(banana\)}
-gdb_test_no_output "set prompt (banana) "
-
-gdb_test "interpreter-exec mi -break-list" "\r\n\\^done,.*}"
+with_gdb_prompt "(banana)" {
+    gdb_test "interpreter-exec mi -break-list" "\r\n\\^done,.*\}"
+}

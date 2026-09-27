@@ -3627,6 +3627,64 @@ proc with_gdb_cwd { dir body } {
     }
 }
 
+# Parse an escape sequence, the way the gdb set command does.  Based on
+# parse_escape in gdb/utils.c.
+
+proc gdb_parse_escape {str} {
+    set res ""
+
+    set have_bs 0
+    for {set i 0} {$i < [string length $str]} {incr i} {
+	set c [string index $str $i]
+	if {!$have_bs} {
+	    if {$c == "\\"} {
+		set have_bs 1
+	    } else {
+		append res $c
+	    }
+	    continue
+	}
+
+	if {[regexp {[0-7]} $c]} {
+	    set have_bs 0
+
+	    # Get number.
+	    set tail [string range $str $i end]
+	    regexp {[0-7]{1,3}} $tail n
+
+	    # Convert number to char, and append.
+	    append res [format "%c" [scan $n "%o"]]
+
+	    # Skip over number.
+	    set n_len [string length $n]
+	    incr i $n_len
+
+	    # Compensate for incr i in for.
+	    incr i -1
+	    continue
+	}
+
+	switch -exact $c {
+	    a { set c "\a"}
+	    b { set c "\b"}
+	    f { set c "\f"}
+	    n { set c "\r\n"}
+	    r { set c "\r"}
+	    t { set c "\t"}
+	    v { set c "\v"}
+	    default {}
+	}
+	set have_bs 0
+	append res $c
+    }
+
+    if {$have_bs} {
+	append res "\\"
+    }
+
+    return $res
+}
+
 # Run tests in BODY with GDB prompt and variable $gdb_prompt set to
 # PROMPT.  When BODY is finished, restore GDB prompt and variable
 # $gdb_prompt.
@@ -3649,29 +3707,43 @@ proc with_gdb_cwd { dir body } {
 proc with_gdb_prompt { prompt body } {
     global gdb_prompt
 
-    # Convert "(foo)" to "\(foo\)".
-    # We don't use string_to_regexp because while it works today it's not
-    # clear it will work tomorrow: the value we need must work as both a
-    # regexp *and* as the argument to the "set prompt" command, at least until
-    # we start recording both forms separately instead of just $gdb_prompt.
-    # The testsuite is pretty-much hardwired to interpret $gdb_prompt as the
-    # regexp form.
-    # We use a backslash to escape the closing square bracket, even if it's
-    # the first character, to unconfuse emacs tcl-mode.
-    regsub -all {[\]*+.|()^$\[\\]} $prompt {\\&} prompt
+    # Save old prompt.
+    set saved_prompt 0
+    gdb_test_multiple "show prompt" "" {
+	-re -wrap {Gdb's prompt is "([^\r\n]+)"\.} {
+	    set saved $expect_out(1,string)
+	    set saved_prompt 1
+	}
+	-re -wrap {
+	}
+    }
+    if {!$saved_prompt} {
+	error "Failed to save old prompt"
+    }
 
-    set saved $gdb_prompt
+    # Save old prompt regexp.
+    set re_saved $gdb_prompt
 
-    verbose -log "Setting gdb prompt to \"$prompt \"."
-    set gdb_prompt $prompt
-    gdb_test_no_output "set prompt $prompt " ""
+    # Set gdb prompt re.
+    set re_prompt "[string_to_regexp [gdb_parse_escape $prompt]]"
+    verbose -log "Setting gdb prompt re to \"$re_prompt\"."
+    set gdb_prompt "$re_prompt"
+
+    # Add trailing space.
+    append prompt " "
+
+    # Set gdb prompt.
+    verbose -log "Setting gdb prompt to \"$prompt\"."
+    gdb_test_no_output "set prompt $prompt" ""
 
     try {
 	transparent_uplevel $body
     } finally {
-	verbose -log "Restoring gdb prompt to \"$saved \"."
-	set gdb_prompt $saved
-	gdb_test_no_output "set prompt $saved " ""
+	verbose -log "Restoring gdb prompt re to \"$re_saved\"."
+	set gdb_prompt $re_saved
+
+	verbose -log "Restoring gdb prompt to \"$saved\"."
+	gdb_test_no_output "set prompt $saved" "Restoring prompt"
     }
 }
 

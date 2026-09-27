@@ -1,0 +1,29 @@
+clean_restart
+
+with_test_prefix 1 {
+    set custom_prompt {?gdb?}
+    with_gdb_prompt $custom_prompt {
+	gdb_test "print 1" "^$valnum_re = 1"
+    }
+}
+
+with_test_prefix 2 {
+    set custom_prompt {g\\d\\b}
+    with_gdb_prompt $custom_prompt {
+	gdb_test "print 1" "^$valnum_re = 1"
+    }
+}
+
+with_test_prefix 3 {
+    set custom_prompt {g\nd\nb}
+    with_gdb_prompt $custom_prompt {
+	gdb_test "print 1" "^$valnum_re = 1"
+    }
+}
+
+with_test_prefix 4 {
+    set custom_prompt {g\040d\40b}
+    with_gdb_prompt $custom_prompt {
+	gdb_test "print 1" "^$valnum_re = 1"
+    }
+}
