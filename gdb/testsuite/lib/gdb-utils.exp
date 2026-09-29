@@ -189,8 +189,8 @@ proc lock_file_acquire {lockfile} {
     while {![info exists fh]} {
 	try {
 	    set fh [open $lockfile {WRONLY CREAT EXCL}]
-	} on error {} {
-	    # Ignore and try again.
+	} trap "POSIX EEXIST" {} {
+	    # Lock in use.  Ignore and try again.  Propagate all other errors.
 	    after 10
 	}
     }
