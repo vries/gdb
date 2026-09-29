@@ -66,3 +66,26 @@ with_test_prefix "on retry return" {
     lock_file_release $res
     gdb_assert {![file exists $lockfile]} "Release lock"
 }
+
+# Scenario 4:
+# - acquire 1
+# - acquire 2 fails.  On retry, release 1.  Acquire 2 succeeds.
+# - release 2
+with_test_prefix "on retry unlock" {
+    set res [lock_file_acquire $lockfile]
+    gdb_assert {[file exists $lockfile]} "Acquire lock"
+
+    proc on_retry {} {
+	lock_file_release $::res
+	return 1
+    }
+
+    # Try to acquire the lock.  That should fail.
+    # Then on retry, release the lock.
+    # The next try to acquire the lock should succeed.
+    set res2 [lock_file_acquire $lockfile on_retry]
+    gdb_assert {[file exists $lockfile]} "Re-acquire lock"
+
+    lock_file_release $res2
+    gdb_assert {![file exists $lockfile]} "Release lock"
+}
