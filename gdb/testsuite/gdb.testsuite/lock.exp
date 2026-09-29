@@ -26,3 +26,43 @@ with_test_prefix "simple" {
     lock_file_release $res
     gdb_assert {![file exists $lockfile]} "Release lock"
 }
+
+# Scenario 2:
+# - acquire 1
+# - acquire 2 fails, waits, and tries again in a loop.
+# - release 1, acquire 2 succeeds.
+# - release 2
+with_test_prefix "on retry wait" {
+    set res [lock_file_acquire $lockfile]
+    gdb_assert {[file exists $lockfile]} "Acquire lock"
+
+    after 1000 {lock_file_release $res}
+
+    proc on_retry {} {
+	update
+	after 100
+	return 1
+    }
+    set res2 [lock_file_acquire $lockfile on_retry]
+    gdb_assert {[file exists $lockfile]} "Re-acquire lock"
+
+    lock_file_release $res2
+    gdb_assert {![file exists $lockfile]} "Release lock"
+}
+
+# Scenario 3:
+# - acquire 1
+# - acquire 2 fails
+with_test_prefix "on retry return" {
+    set res [lock_file_acquire $lockfile]
+    gdb_assert {[file exists $lockfile]} "Acquire lock"
+
+    proc on_retry {} {
+	return 0
+    }
+    set res2 [lock_file_acquire $lockfile on_retry]
+    gdb_assert {$res2 == {}} "Acquire lock again"
+
+    lock_file_release $res
+    gdb_assert {![file exists $lockfile]} "Release lock"
+}

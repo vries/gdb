@@ -180,10 +180,15 @@ proc version_compare { l1 op l2 } {
     return 1
 }
 
-# Acquire lock file LOCKFILE.  Tries forever until the lock file is
-# successfully created.
+# Acquire lock file LOCKFILE.
+# If the lock file:
+# - doesn't exist, create it and return a file handle/file name pair.
+# - does exist, and:
+#   - ON_RETRY is empty, wait a bit and try again.
+#   - ON_RETRY is non-empty, call it.  If it returns 0, don't retry and
+#     return {} to indicate failure.
 
-proc lock_file_acquire {lockfile} {
+proc lock_file_acquire {lockfile {on_retry ""}} {
     verbose -log "acquiring lock file: $::subdir/${::gdb_test_file_name}.exp"
 
     while {![info exists fh]} {
@@ -191,7 +196,11 @@ proc lock_file_acquire {lockfile} {
 	    set fh [open $lockfile {WRONLY CREAT EXCL}]
 	} trap "POSIX EEXIST" {} {
 	    # Lock in use.  Ignore and try again.  Propagate all other errors.
-	    after 10
+	    if {$on_retry == ""} {
+		after 10
+	    } elseif {![$on_retry]} {
+		return {}
+	    }
 	}
     }
 
