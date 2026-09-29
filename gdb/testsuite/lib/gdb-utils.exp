@@ -188,14 +188,14 @@ proc lock_file_acquire {lockfile} {
     while {true} {
 	try {
 	    open $lockfile {WRONLY CREAT EXCL}
-	} on ok {rc} {
+	} on ok {fh} {
 	    set msg "locked by $::subdir/${::gdb_test_file_name}.exp"
 	    verbose -log "lock file: $msg"
 	    # For debugging, put info in the lockfile about who owns
 	    # it.
-	    puts  $rc $msg
-	    flush $rc
-	    return [list $rc $lockfile]
+	    puts $fh $msg
+	    flush $fh
+	    return [list $fh $lockfile]
 	} on error {} {
 	    # Ignore and try again.
 	}
@@ -208,17 +208,20 @@ proc lock_file_acquire {lockfile} {
 proc lock_file_release {info} {
     verbose -log "releasing lock file: $::subdir/${::gdb_test_file_name}.exp"
 
+    set fh [lindex $info 0]
+    set lockfile [lindex $info 1]
+
     try {
-	fconfigure [lindex $info 0]
+	fconfigure $fh
     } on error {} {
 	error "invalid lock"
     }
 
     try {
-	close [lindex $info 0]
-	file delete -force [lindex $info 1]
-    } on error {rc} {
-	error "Error releasing lockfile: '$rc'"
+	close $fh
+	file delete -force $lockfile
+    } on error {err_msg} {
+	error "Error releasing lockfile: '$err_msg'"
     }
 
     return ""
