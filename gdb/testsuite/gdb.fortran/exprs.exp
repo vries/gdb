@@ -198,8 +198,8 @@ proc test_arithmetic_expressions {} {
 
     # Test unary minus with various operands
 
-#    gdb_test "p -(TRUE)"	" = -1"	"unary minus applied to bool"
-#    gdb_test "p -('a')"	" = xxx"	"unary minus applied to char"
+#    gdb_test "p -(TRUE)"       " = -1" "unary minus applied to bool"
+#    gdb_test "p -('a')"        " = xxx"        "unary minus applied to char"
     gdb_test "p -(1)"		" = -1"	"unary minus applied to int"
     gdb_test "p -(1.0)"	" = -1"	"unary minus applied to real"
 

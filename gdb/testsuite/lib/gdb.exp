@@ -1196,13 +1196,13 @@ proc command_to_message { command } {
 # into:
 #   set breakpoint_pattern "(?:Breakpoint|Temporary breakpoint) .* (at|in)"
 #   gdb_test_multiple "continue" "continue to breakpoint: <msg>"  {
-#	-early -re "internal-error: <assert>" {
-#	    setup_kfail gdb/nnnnn "*-*-*"
-#	    exp_continue
-#	}
-#	-re "$breakpoint_pattern <pattern>\r\n$gdb_prompt $" {
-#	    pass $gdb_test_name
-#	}
+#       -early -re "internal-error: <assert>" {
+#           setup_kfail gdb/nnnnn "*-*-*"
+#           exp_continue
+#       }
+#       -re "$breakpoint_pattern <pattern>\r\n$gdb_prompt $" {
+#           pass $gdb_test_name
+#       }
 #    }
 #
 proc gdb_test_multiple { command message args } {
@@ -2078,8 +2078,8 @@ proc gdb_test_exact { args } {
 #    "\[^\r\n\]+\[\r\n\]+" \
 #    "\[^\r\n\]+" \
 #     { \
-#	{expected result 1} \
-#	{expected result 2} \
+#       {expected result 1} \
+#       {expected result 2} \
 #     }
 
 proc gdb_test_list_exact { cmd name elm_find_regexp elm_extract_regexp result_match_list } {
@@ -7476,7 +7476,7 @@ proc gdb_compile_objc {source dest type options} {
     set base_libs {-lgnustep-base -lobjc}
     foreach lib {-lpthreads -lpthread -lthread "-lpthread -lposix4"} {
 	# This kind of wipes out whatever libs the caller may have
-	# set.	Or maybe theirs will override ours.  How infelicitous.
+	# set.  Or maybe theirs will override ours.  How infelicitous.
 	set lib "$base_libs $lib"
 	set options_with_lib [concat $options [list libs=$lib quiet]]
 	set ccout [gdb_compile $source $dest $type $options_with_lib]
@@ -7933,7 +7933,7 @@ proc spawn_wait_for_attach { executable_list } {
 
 #
 # gdb_load_cmd -- load a file into the debugger.
-#		  ARGS - additional args to load command.
+#                 ARGS - additional args to load command.
 #                 return a -1 if anything goes wrong.
 #
 proc gdb_load_cmd { args } {
@@ -9041,10 +9041,10 @@ proc setup_xfail_format { format } {
 #
 # (Yes, Tcl knows how to handle the nested quotes and brackets.
 # Try this:
-# 	$ tclsh
-# 	% puts "foo [lindex "bar baz" 1]"
-# 	foo baz
-# 	%
+#       $ tclsh
+#       % puts "foo [lindex "bar baz" 1]"
+#       foo baz
+#       %
 # Tcl is quite clever, for a little stringy language.)
 #
 # ===
@@ -9120,13 +9120,13 @@ proc gdb_get_line_number { text { file "" } } {
 # Continue the program until it ends.
 #
 # MSSG is the error message that gets printed.  If not given, a
-#	default is used.
+#       default is used.
 # COMMAND is the command to invoke.  If not given, "continue" is
-#	used.
+#       used.
 # ALLOW_EXTRA is a flag indicating whether the test should expect
-#	extra output between the "Continuing." line and the program
-#	exiting.  By default it is zero; if nonzero, any extra output
-#	is accepted.
+#       extra output between the "Continuing." line and the program
+#       exiting.  By default it is zero; if nonzero, any extra output
+#       is accepted.
 
 proc gdb_continue_to_end {{mssg ""} {command continue} {allow_extra 0}} {
     global inferior_exited_re use_gdb_stub

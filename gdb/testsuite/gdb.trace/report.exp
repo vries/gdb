@@ -274,7 +274,7 @@ proc use_collected_data { data_source } {
 	}
 
 	#gdb_test "print \$trace_file" "\"$srcdir/$subdir/$srcfile\"" \
-	    #	"11.4: test \$trace_file"
+	    #   "11.4: test \$trace_file"
 
 	#
 	# 12.x test report generation using arbitrary GDB commands, loops etc.

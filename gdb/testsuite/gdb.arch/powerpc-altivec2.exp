@@ -44,7 +44,7 @@ gdb_test_multiple $test $test {
 
 proc instr_to_patt {instr} {
     global decimal hex
-    # 0x0000000000000018 <+24>:	stxvd2x vs43,r4,r5
+    # 0x0000000000000018 <+24>: stxvd2x vs43,r4,r5
     return "\[ \t\]*$hex <\\+$decimal>:\[ \t\]*[string_to_regexp $instr]"
 }
 

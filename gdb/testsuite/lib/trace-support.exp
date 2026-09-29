@@ -140,12 +140,12 @@ proc gdb_delete_tracepoints {} {
 #   Arguments:
 #       actions_command -- the command used to create the actions.
 #                          either "actions" or "commands".
-#	testname   -- identifying string for pass/fail output
-#	tracepoint -- to which tracepoint(s) do these actions apply? (optional)
-#	args       -- list of actions to be defined.
+#       testname   -- identifying string for pass/fail output
+#       tracepoint -- to which tracepoint(s) do these actions apply? (optional)
+#       args       -- list of actions to be defined.
 #   Returns:
-#	zero       -- success
-#	non-zero   -- failure
+#       zero       -- success
+#       non-zero   -- failure
 
 proc gdb_trace_setactions_command { actions_command testname tracepoint args } {
     global gdb_prompt
@@ -233,13 +233,13 @@ proc gdb_trace_setcommands { testname tracepoint args } {
 # Procedure: gdb_tfind_test
 #   Find a specified trace frame.
 #   Arguments:
-#	testname   -- identifying string for pass/fail output
-#	tfind_arg  -- frame (line, PC, etc.) identifier
-#	exp_res    -- Expected result of frame test
-#	args       -- Test expression
+#       testname   -- identifying string for pass/fail output
+#       tfind_arg  -- frame (line, PC, etc.) identifier
+#       exp_res    -- Expected result of frame test
+#       args       -- Test expression
 #   Returns:
-#	zero       -- success
-#	non-zero   -- failure
+#       zero       -- success
+#       non-zero   -- failure
 #
 
 proc gdb_tfind_test { testname tfind_arg exp_res args } {
@@ -275,9 +275,9 @@ proc gdb_tfind_test { testname tfind_arg exp_res args } {
 #
 # Procedure: gdb_readexpr
 #   Arguments:
-#	gdb_expr    -- the expression whose value is desired
+#       gdb_expr    -- the expression whose value is desired
 #   Returns:
-#	the value of gdb_expr, as evaluated by gdb.
+#       the value of gdb_expr, as evaluated by gdb.
 #       [FIXME: returns -1 on error, which is sometimes a legit value]
 #
 
@@ -299,9 +299,9 @@ proc gdb_readexpr { gdb_expr } {
 #
 # Procedure: gdb_gettpnum
 #   Arguments:
-#	tracepoint (optional): if supplied, set a tracepoint here.
+#       tracepoint (optional): if supplied, set a tracepoint here.
 #   Returns:
-#	the tracepoint ID of the most recently set tracepoint.
+#       the tracepoint ID of the most recently set tracepoint.
 #
 
 proc gdb_gettpnum { tracepoint } {
@@ -317,12 +317,12 @@ proc gdb_gettpnum { tracepoint } {
 #
 # Procedure: gdb_find_function_baseline
 #   Arguments:
-#	func_name -- name of source function
+#       func_name -- name of source function
 #   Returns:
-#	Sourcefile line of function definition (open curly brace),
-#	or -1 on failure.  Caller must check return value.
+#       Sourcefile line of function definition (open curly brace),
+#       or -1 on failure.  Caller must check return value.
 #   Note:
-#	Works only for open curly brace at beginning of source line!
+#       Works only for open curly brace at beginning of source line!
 #
 
 proc gdb_find_function_baseline { func_name } {
@@ -332,8 +332,8 @@ proc gdb_find_function_baseline { func_name } {
 
     send_gdb "list $func_name\n"
 #    gdb_expect {
-#	-re "\[\r\n\]\[\{\].*$gdb_prompt $" {
-#	    set baseline 1
+#       -re "\[\r\n\]\[\{\].*$gdb_prompt $" {
+#           set baseline 1
 #        }
 #    }
 }
@@ -341,12 +341,12 @@ proc gdb_find_function_baseline { func_name } {
 #
 # Procedure: gdb_find_function_baseline
 #   Arguments:
-#	filename: name of source file of desired function.
+#       filename: name of source file of desired function.
 #   Returns:
-#	Sourcefile line of function definition (open curly brace),
-#	or -1 on failure.  Caller must check return value.
+#       Sourcefile line of function definition (open curly brace),
+#       or -1 on failure.  Caller must check return value.
 #   Note:
-#	Works only for open curly brace at beginning of source line!
+#       Works only for open curly brace at beginning of source line!
 #
 
 proc gdb_find_recursion_test_baseline { filename } {

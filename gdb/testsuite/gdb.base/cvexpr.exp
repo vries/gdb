@@ -207,66 +207,66 @@ proc do_test {dir options} {
     #
 
     #gdb_test "whatis (signed const char) v_signed_char" \
-	#	"type = const char" \
-	#	"cast to signed const char"
+	#       "type = const char" \
+	#       "cast to signed const char"
     #gdb_test "whatis (unsigned const char) v_unsigned_char" \
-	#	"type = const (unsigned char|char)" \
-	#	"cast to unsigned const char"
+	#       "type = const (unsigned char|char)" \
+	#       "cast to unsigned const char"
     #gdb_test "whatis (signed const short) v_signed_short" \
-	#	"type = const (short|short int|signed short|signed short int)" \
-	#	"cast to signed const short"
+	#       "type = const (short|short int|signed short|signed short int)" \
+	#       "cast to signed const short"
     #gdb_test "whatis (unsigned const short) v_unsigned_short" \
-	#	"type = const (unsigned short|short unsigned int)" \
-	#	"cast to unsigned const short"
+	#       "type = const (unsigned short|short unsigned int)" \
+	#       "cast to unsigned const short"
     #gdb_test "whatis (signed const int) v_signed_int" \
-	#	"type = const (signed int|int)" \
-	#	"cast to signed const int"
+	#       "type = const (signed int|int)" \
+	#       "cast to signed const int"
     #gdb_test "whatis (unsigned const int) v_unsigned_int" \
-	#	"type = const unsigned int" \
-	#	"cast to unsigned const int"
+	#       "type = const unsigned int" \
+	#       "cast to unsigned const int"
     #gdb_test "whatis (signed const long) v_signed_long" \
-	#	"type = const (signed |)long( int|)" \
-	#	"cast to signed const long"
+	#       "type = const (signed |)long( int|)" \
+	#       "cast to signed const long"
     #gdb_test "whatis (unsigned const long) v_unsigned_long" \
-	#	"type = const (unsigned long|long unsigned int)" \
-	#	"cast to unsigned const long"
+	#       "type = const (unsigned long|long unsigned int)" \
+	#       "cast to unsigned const long"
     #gdb_test "whatis (signed const long long) v_signed_long_long" \
-	#	"type = const (signed |)long long( int|)" \
-	#	"cast to signed const long long"
+	#       "type = const (signed |)long long( int|)" \
+	#       "cast to signed const long long"
     #gdb_test "whatis (unsigned const long long) v_unsigned_long_long" \
-	#	"type = const (unsigned long long|long long unsigned int)" \
-	#	"cast to const unsigned long long"
+	#       "type = const (unsigned long long|long long unsigned int)" \
+	#       "cast to const unsigned long long"
 
     #gdb_test "whatis (signed volatile char) v_signed_char" \
-	#	"type = volatile char" \
-	#	"cast to signed volatile char"
+	#       "type = volatile char" \
+	#       "cast to signed volatile char"
     #gdb_test "whatis (unsigned volatile char) v_unsigned_char" \
-	#	"type = volatile (unsigned char|char)" \
-	#	"cast to unsigned volatile char"
+	#       "type = volatile (unsigned char|char)" \
+	#       "cast to unsigned volatile char"
     #gdb_test "whatis (signed volatile short) v_signed_short" \
-	#	"type = volatile (short|short int|signed short|signed short int)" \
-	#	"cast to signed volatile short"
+	#       "type = volatile (short|short int|signed short|signed short int)" \
+	#       "cast to signed volatile short"
     #gdb_test "whatis (unsigned volatile short) v_unsigned_short" \
-	#	"type = volatile (unsigned short|short unsigned int)" \
-	#	"cast to unsigned volatile short"
+	#       "type = volatile (unsigned short|short unsigned int)" \
+	#       "cast to unsigned volatile short"
     #gdb_test "whatis (signed volatile int) v_signed_int" \
-	#	"type = volatile (signed int|int)" \
-	#	"cast to signed volatile int"
+	#       "type = volatile (signed int|int)" \
+	#       "cast to signed volatile int"
     #gdb_test "whatis (unsigned volatile int) v_unsigned_int" \
-	#	"type = volatile unsigned int" \
-	#	"cast to unsigned volatile int"
+	#       "type = volatile unsigned int" \
+	#       "cast to unsigned volatile int"
     #gdb_test "whatis (signed volatile long) v_signed_long" \
-	#	"type = volatile (signed |)long( int|)" \
-	#	"cast to signed volatile long"
+	#       "type = volatile (signed |)long( int|)" \
+	#       "cast to signed volatile long"
     #gdb_test "whatis (unsigned volatile long) v_unsigned_long" \
-	#	"type = volatile (unsigned long|long unsigned int)" \
-	#	"cast to unsigned volatile long"
+	#       "type = volatile (unsigned long|long unsigned int)" \
+	#       "cast to unsigned volatile long"
     #gdb_test "whatis (signed volatile long long) v_signed_long_long" \
-	#	"type = volatile (signed |)long long( int|)" \
-	#	"cast to signed volatile long long"
+	#       "type = volatile (signed |)long long( int|)" \
+	#       "cast to signed volatile long long"
     #gdb_test "whatis (unsigned volatile long long) v_unsigned_long_long" \
-	#	"type = volatile (unsigned long long|long long unsigned int)" \
-	#	"cast to unsigned volatile long long"
+	#       "type = volatile (unsigned long long|long long unsigned int)" \
+	#       "cast to unsigned volatile long long"
 
     #
     # Now put the 'const' and 'volatile' keywords after the base type.

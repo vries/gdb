@@ -6,7 +6,7 @@
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
@@ -45,7 +45,7 @@ set binfile_rtld [standard_output_file ${rtld_basename}]
 # Placing 'pie' in the flag list (for rtld_flags) doesn't work, but
 # using -static-pie -FPIE in additional_flags does.  Apparently, when
 # 'pie' is listed, gdb_compile will (on Linux) use both -fPIE and
-# -pie.	 Testing shows that use of -pie creates a dynamically linked
+# -pie.  Testing shows that use of -pie creates a dynamically linked
 # executable when either a static or static-pie executable is desired
 # instead.  (This is probably fragile.)
 #
@@ -58,7 +58,7 @@ set binfile_rtld [standard_output_file ${rtld_basename}]
 # code which would work on other Linux distributions / releases.
 #
 # When testing against earlier versions of Fedora, RHEL 9, and
-# also Ubuntu 22.04, that short flag list didn't work.	For these
+# also Ubuntu 22.04, that short flag list didn't work.  For these
 # linux releases, it was found that -nostdlib -lc were also required.
 # Due to the use of -nostdlib, a _start() function had to be added
 # to the RTLD code.

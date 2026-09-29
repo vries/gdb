@@ -24,7 +24,7 @@
 # Remote debugging using | vgdb --pid=31595
 #   ...
 # $hex in __GI___nanosleep () at nanosleep.c:27
-# 27	  return SYSCALL_CANCEL (nanosleep, requested_time, remaining);
+# 27      return SYSCALL_CANCEL (nanosleep, requested_time, remaining);
 # (gdb) p printf ("bla")
 # terminate called after throwing an instance of 'gdb_exception_error'
 # Aborted (core dumped)

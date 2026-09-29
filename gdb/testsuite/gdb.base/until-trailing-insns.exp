@@ -22,7 +22,7 @@
 # but still associated with the same loop header line.  For example,
 # consider the following C code:
 #
-# 10:	for (i = 0; i < 10; ++i)
+# 10:   for (i = 0; i < 10; ++i)
 # 11:     loop_body ();
 # 12:   other_stuff ();
 #

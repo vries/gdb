@@ -42,7 +42,7 @@
 #
 # Notice that this does not print the current frame, i.e.:
 #   bar (y=1) at solib-vanish-lib2.c:19
-#   19	  return y + 1; /* break here */
+#   19    return y + 1; /* break here */
 #   (gdb)
 #
 # The current gdb git tip segfaults if we then try to step:

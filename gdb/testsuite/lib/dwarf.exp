@@ -82,7 +82,7 @@ proc strip_dwo_information { filename } {
 # ARGS is a series of lists.  Each list is a spec for one source file
 # that will be compiled to make EXECUTABLE.  Each spec in ARGS has the
 # form:
-#	[ SOURCE OPTIONS ]
+#       [ SOURCE OPTIONS ]
 # or:
 #       [ SOURCE OPTIONS OBJFILE ]
 #

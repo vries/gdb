@@ -36,7 +36,7 @@
 #   "info " ambiguous (all info commands)
 #   "p \"break1" unambiguous (completes to filename "break1.c")
 #   "p \"break1." unambiguous (should complete to "break1.c" but does not,
-#	due to readline limitations)
+#       due to readline limitations)
 #   "p 'arg" ambiguous (all symbols starting with arg)
 #   "p b-arg" ambiguous (all symbols starting with arg)
 #   "p b-" ambiguous (all symbols)

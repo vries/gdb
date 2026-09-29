@@ -26,11 +26,11 @@
 #
 # 2002-08-29  Jim Blandy  <jimb@redhat.com>
 #
-# 	* symtab.c (lookup_symbol_aux): In the cases where we find a
-# 	minimal symbol of an appropriate name and use its address to
-# 	select a symtab to read and search, use `name' (as passed to us)
-# 	as the demangled name when searching the symtab's global and
-# 	static blocks, not the minsym's name.
+#       * symtab.c (lookup_symbol_aux): In the cases where we find a
+#       minimal symbol of an appropriate name and use its address to
+#       select a symtab to read and search, use `name' (as passed to us)
+#       as the demangled name when searching the symtab's global and
+#       static blocks, not the minsym's name.
 #
 # The original bug was that you'd try to set a breakpoint on a method
 # (e.g., `break s::method1'), and you'd get an error, but if you

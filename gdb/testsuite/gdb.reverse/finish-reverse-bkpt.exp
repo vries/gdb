@@ -26,10 +26,10 @@
 # r2 and then reaches the LEP.
 #
 #   <void_func>:
-#  	lis     r2,4098        <- GEP
-#   	addi    r2,r2,32512
-#   	mflr    r0             <- LEP
-#   	std     r0,16(r1)
+#       lis     r2,4098        <- GEP
+#       addi    r2,r2,32512
+#       mflr    r0             <- LEP
+#       std     r0,16(r1)
 #        ....
 
 #

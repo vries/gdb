@@ -705,11 +705,11 @@ proc gdb_trace_collection_test {} {
     #
     # Expression tests:
     #
-    # *x	(**x, ...)
-    # x.y	(x.y.z, ...)
-    # x->y	(x->y->z, ...)
-    # x[2]	(x[2][3], ...) (const index)
-    # x[y]	(x[y][z], ...) (index to be char, short, long, float, double)
+    # *x        (**x, ...)
+    # x.y       (x.y.z, ...)
+    # x->y      (x->y->z, ...)
+    # x[2]      (x[2][3], ...) (const index)
+    # x[y]      (x[y][z], ...) (index to be char, short, long, float, double)
     #  NOTE:
     #  We test the following operators by using them in an array index
     #  expression -- because the naked result of an operator is not really

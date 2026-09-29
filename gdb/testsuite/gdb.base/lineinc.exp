@@ -26,11 +26,11 @@
 #     $ readelf -wml lineinc
 #     ...
 #      The File Name Table:
-#       Entry	Dir	Time	Size	Name
-#       1	0	0	0	lineinc.c
-#       2	0	0	0	lineinc1.h
-#       3	0	0	0	lineinc2.h
-#       4	0	0	0	lineinc3.h
+#       Entry   Dir     Time    Size    Name
+#       1       0       0       0       lineinc.c
+#       2       0       0       0       lineinc1.h
+#       3       0       0       0       lineinc2.h
+#       4       0       0       0       lineinc3.h
 #     ...
 #     Contents of the .debug_macinfo section:
 #

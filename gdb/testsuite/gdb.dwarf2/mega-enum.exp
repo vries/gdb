@@ -43,7 +43,7 @@ Dwarf::assemble $asm_file {
 		DW_AT_type :$integer_label
 	    } {
 		# In the past gdb used a 'short' for the field count.
-		# But this fails if there are too many fields.	If the
+		# But this fails if there are too many fields.  If the
 		# field count here is too high, gas takes a long time;
 		# so use a number that's just big enough.
 		for {set i 0} {$i < 65538} {incr i} {

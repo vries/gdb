@@ -593,7 +593,7 @@ namespace eval GenPerfTest {
 	puts $f ""
 	set nr_static_globals [_get_param $self(nr_static_globals) $run_nr]
 	# Rather than parameterize the number of const/non-const globals,
-	# and their types, we keep it simple for now.	Even the number of
+	# and their types, we keep it simple for now.   Even the number of
 	# bss/non-bss globals may be useful; later, if warranted.
 	for { set i 0 } { $i < $nr_static_globals } { incr i } {
 	    if { $i % 2 == 0 } {
@@ -612,7 +612,7 @@ namespace eval GenPerfTest {
 	puts $f ""
 	set nr_extern_globals [_get_param $self(nr_extern_globals) $run_nr]
 	# Rather than parameterize the number of const/non-const globals,
-	# and their types, we keep it simple for now.	Even the number of
+	# and their types, we keep it simple for now.   Even the number of
 	# bss/non-bss globals may be useful; later, if warranted.
 	for { set i 0 } { $i < $nr_extern_globals } { incr i } {
 	    if { $i % 2 == 0 } {

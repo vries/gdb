@@ -36,9 +36,9 @@ if {[runto_main]} {
     # The bug was fixed by
     #Tue Jun 29 11:02:58 1993  Jim Kingdon  (kingdon@lioth.cygnus.com)
     #
-    #	* infrun.c (wait_for_inferior): Use find_pc_line not
-    #	find_pc_symtab to check whether there is line number
-    #	information.
+    #   * infrun.c (wait_for_inferior): Use find_pc_line not
+    #   find_pc_symtab to check whether there is line number
+    #   information.
 
     gdb_test "step" "nothing \\(\\) at.*"
 }

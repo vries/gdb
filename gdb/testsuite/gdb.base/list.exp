@@ -223,9 +223,9 @@ proc test_list_range {} {
 
     gdb_test "list 2,5" "2\[ \t\]+\r\n3\[ \t\]+int main \[)(\]+.*5\[ \t\]+int x;" "list range; line1,line2"
 
-#    gdb_test     "list -1,6" 	"Line number 0 out of range; .*list0.c has 39 lines." "list range; lower bound negative"
+#    gdb_test     "list -1,6"   "Line number 0 out of range; .*list0.c has 39 lines." "list range; lower bound negative"
 
-#    gdb_test     "list -100,-40" 	"Line number -60 out of range; .*list0.c has 39 lines." "list range; both bounds negative"
+#    gdb_test     "list -100,-40"       "Line number -60 out of range; .*list0.c has 39 lines." "list range; both bounds negative"
 
     set past_end [expr {${last_line} + 10}]
     set much_past_end [expr {${past_end} + 10}]

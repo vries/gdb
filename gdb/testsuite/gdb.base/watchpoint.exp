@@ -44,10 +44,10 @@ set no_hw 0
 # watchpoints by number, we expect a particular ordering and numbering of
 # each in the combined breakpoint/watchpoint table, as follows:
 #
-#	Number		What		Where
-#	1		Breakpoint	marker1()
-#	2		Breakpoint	marker2()
-#	3		Watchpoint	ival3
+#       Number          What            Where
+#       1               Breakpoint      marker1()
+#       2               Breakpoint      marker2()
+#       3               Watchpoint      ival3
 
 proc initialize {} {
     global gdb_prompt

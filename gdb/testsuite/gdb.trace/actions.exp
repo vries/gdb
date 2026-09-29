@@ -170,7 +170,7 @@ gdb_test "actions [expr {$trcpt2 + $trcpt3}]" \
 			"5.6: actions for invalid tracepoint number"
 
 # 5.7 invalid action (other than 'collect', 'while-stepping' or 'end')
-#	    "warning: .print gdb_c_test. is not a supported trace.*> $" \
+#           "warning: .print gdb_c_test. is not a supported trace.*> $" \
 
 gdb_trace_setactions "5.7: invalid action" \
 	"$trcpt1" \

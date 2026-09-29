@@ -62,13 +62,13 @@ proc saved_regs_to_str { savedregs funcname } {
 }
 
 # Arguments:
-# funcname -	name of function to test
-# savedregs -	list of register saved in the frame.  Each entry can be either
-#		a string, where it is a register name, or it is a list of two
-#		items - name of register and it's offset relatively to SP in
-#		the memory.  SP value is at the moment of prologue end.
-# fp_offset -	if not an empty string, then proc will test that FP register
-#		has a value that is (SP + offset).
+# funcname -    name of function to test
+# savedregs -   list of register saved in the frame.  Each entry can be either
+#               a string, where it is a register name, or it is a list of two
+#               items - name of register and it's offset relatively to SP in
+#               the memory.  SP value is at the moment of prologue end.
+# fp_offset -   if not an empty string, then proc will test that FP register
+#               has a value that is (SP + offset).
 
 proc prologue_test {funcname {savedregs ""} {fp_offset ""} } {
     global hex

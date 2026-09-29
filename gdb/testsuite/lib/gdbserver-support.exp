@@ -20,24 +20,24 @@
 # To be addressed or set in your baseboard config file:
 #
 #   set_board_info gdb_protocol "remote"
-#	Unless you have a gdbserver that uses a different protocol...
-#	After GDB starts you should check global $gdbserver_protocol instead as
-#	the testfile may force a specific different target protocol itself.
+#       Unless you have a gdbserver that uses a different protocol...
+#       After GDB starts you should check global $gdbserver_protocol instead as
+#       the testfile may force a specific different target protocol itself.
 #
 #   set_board_info gdb_server_prog
-#	This will be the path to the gdbserver program you want to test.
-#	Defaults to "gdbserver".
+#       This will be the path to the gdbserver program you want to test.
+#       Defaults to "gdbserver".
 #
 #   set_board_info sockethost
-#	The name of the host computer whose socket is being used.
-#	Defaults to "localhost".  Note: old gdbserver requires
-#	that you define this, but libremote/gdbserver does not.
+#       The name of the host computer whose socket is being used.
+#       Defaults to "localhost".  Note: old gdbserver requires
+#       that you define this, but libremote/gdbserver does not.
 #
 #   set_board_info gdb,socketport
-#	Port id to use for socket connection.  If not set explicitly,
-#	it will start at "2345" and increment for each use.
-#	After GDB starts you should check global $gdbserver_gdbport for the
-#	real port used.  It is not useful if $gdbserver_reconnect_p was not set.
+#       Port id to use for socket connection.  If not set explicitly,
+#       it will start at "2345" and increment for each use.
+#       After GDB starts you should check global $gdbserver_gdbport for the
+#       real port used.  It is not useful if $gdbserver_reconnect_p was not set.
 #
 
 #

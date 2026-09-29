@@ -37,5 +37,5 @@ gdb_test_multiple "" $test {
 gdb_test "x/wx \$esp" "0x\[0-9a-f\]*:\t0xdeadf00d"
 
 # Failure case would be:
-# 	0xff8d7f00:     Cannot access memory at address 0xff8d7f00
+#       0xff8d7f00:     Cannot access memory at address 0xff8d7f00
 gdb_test "x/wx \$ebx" "0x\[0-9a-f\]*:\t0xdeadf00d"

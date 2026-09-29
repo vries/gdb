@@ -44,7 +44,7 @@ proc cannot_resolve {meth} {
 # is an inferior function call, while the latter is a reference to the
 # function.
 
-     #SCOPE				#PREFIX         #PRINT-SCOPE-QUOTED
+     #SCOPE                             #PREFIX         #PRINT-SCOPE-QUOTED
 							#PRINT-SCOPE-UNQUOTED (opt)
 set cxx_scopes_list {
     {"S::method()"			"S_M"		{= \{void \(S \* const\)\} $hex <S::method\(\)>}
@@ -118,7 +118,7 @@ set c_scopes_list {
 # second column is a regex matching what printing the variable should
 # output.
 
-     #VAR		#PRINT
+     #VAR               #PRINT
 set vars_list {
     {"s_var_int"	" = 4"}
     {"s_var_float"	" = 3.14.*"}

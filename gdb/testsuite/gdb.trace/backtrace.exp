@@ -128,8 +128,8 @@ if {    $tdp2 <= 0 || $tdp3 <= 0 || \
 }
 
 #gdb_trace_setactions "setup TP to collect FP" \
-#	"$tdp2" \
-#	"collect \$fp" ""
+#       "$tdp2" \
+#       "collect \$fp" ""
 #
 
 gdb_trace_setactions "8.6: setup TP to collect regs" \

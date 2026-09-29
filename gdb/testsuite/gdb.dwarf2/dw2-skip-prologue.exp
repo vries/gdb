@@ -21,14 +21,14 @@ load_lib dwarf.exp
 # File name                            Line number    Starting address
 # main.c                                         5    func_start
 # other.c                                        1    func0
-# 	`inlined' called at main.c line 8
+#       `inlined' called at main.c line 8
 # main.c                                         9    func1
-# 	func1 = Breakpoint location 1
+#       func1 = Breakpoint location 1
 # other.c                                        1    func2
-# 	`inlined2' called at main.c line 11
+#       `inlined2' called at main.c line 11
 # main.c                                         9    func3
-# 	func3 = Breakpoint location 2
-# 	`otherinline' called at main.c line 9
+#       func3 = Breakpoint location 2
+#       `otherinline' called at main.c line 9
 # end of main                                         func_end
 
 # This test can only be run on targets which support DWARF-2 and use gas.

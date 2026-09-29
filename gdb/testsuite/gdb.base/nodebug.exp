@@ -143,7 +143,7 @@ if {[nodebug_runto inner]} {
 
 	set pascal_ptype_re "type = procedure  : <unknown return type>"
 
-	#LANG		#PRINT		#WHATIS		#PTYPE
+	#LANG           #PRINT          #WHATIS         #PTYPE
 	foreach lang_line {
 	    {"ada"		$c_print_re	$c_whatis_re	$ada_ptype_re}
 	    {"asm"		$c_print_re	$c_whatis_re	$c_ptype_re}
@@ -194,7 +194,7 @@ if {[nodebug_runto inner]} {
 
     set dataglobal_unk_re "dataglobal.*$unk_type_re"
 
-	 #exp				#fmt #print						#ptype/whatis
+	 #exp                           #fmt #print                                             #ptype/whatis
     foreach line {
 	{"dataglobal"			""   $dataglobal_unk_re					" = $data_var_type"}
 	{"(int) dataglobal"		""   "= 3"						" = int"}

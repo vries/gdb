@@ -20,8 +20,8 @@
 # lnia is an extended mnemonic for the addpcis instruction, which
 # stores the $NIA plus an immediate value into a register.
 #
-#		lnia Rx == addpcis Rx,0 == lnia Rx
-#		subcis Rx,value == addpcis Rx,-value
+#               lnia Rx == addpcis Rx,0 == lnia Rx
+#               subcis Rx,value == addpcis Rx,-value
 
 require {istarget powerpc*-*}
 
