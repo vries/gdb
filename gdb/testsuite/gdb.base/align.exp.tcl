@@ -111,7 +111,7 @@ proc prepare_test_source_file { lang } {
 
     # Epilogue.
     puts $outfile "
-	int main() {
+	int main() \{
     "
 
     # Clang with LTO garbage collects unused global variables, even at
@@ -154,7 +154,7 @@ proc prepare_test_source_file { lang } {
 
     puts $outfile "
 	    return 0;
-	}
+	\}
     "
 
     close $outfile
