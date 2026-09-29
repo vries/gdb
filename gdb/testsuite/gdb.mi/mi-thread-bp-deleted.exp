@@ -62,7 +62,7 @@ foreach_mi_ui_mode mode {
     # Place a breakpoint on 'breakpt' and run to this breakpoint.
     mi_create_breakpoint "breakpt" "place breakpoint on breakpt"
     set breakpt_num [mi_get_valueof "/d" "\$bpnum" "INVALID" \
-			"get number for breakpt breakpoint"]
+			 "get number for breakpt breakpoint"]
     mi_execute_to "exec-continue" "breakpoint-hit" "breakpt" "" \
 	".*" ".*" {"" "disp=\"keep\""} \
 	"continue to breakpoint in breakpt"
@@ -75,8 +75,8 @@ foreach_mi_ui_mode mode {
 		-re "Thread 1 \[^\r\n\]+ hit Breakpoint $decimal,\
 		      breakpt \\(\\) at\
 		      \[^\r\n\]+\r\n$decimal\\s+\[^\r\n\]+\r\n" {
-		    pass $gdb_test_name
-		}
+			  pass $gdb_test_name
+		      }
 	    }
 	}
     }
@@ -90,7 +90,7 @@ foreach_mi_ui_mode mode {
 	"place thread breakpoint on main" \
 	-thread "$worker_thread"
     set bpnum [mi_get_valueof "/d" "\$bpnum" "INVALID" \
-		  "get number for thread-specific breakpoint"]
+		   "get number for thread-specific breakpoint"]
 
     set loc1 [mi_make_breakpoint -number "$breakpt_num"]
     set loc2 [mi_make_breakpoint -number "$bpnum" -thread "$worker_thread"]
@@ -133,111 +133,111 @@ foreach_mi_ui_mode mode {
     gdb_test_multiple $cmd "collect thread exited output" \
 	-prompt "$::mi_gdb_prompt$" {
 
-	-re "^~\"\\\[Thread \[^\r\n\]+ exited\\\]\\\\n\"\r\n" {
-	    set saw_cli_thread_exited true
-	    exp_continue
-	}
+	    -re "^~\"\\\[Thread \[^\r\n\]+ exited\\\]\\\\n\"\r\n" {
+		set saw_cli_thread_exited true
+		exp_continue
+	    }
 
-	-re "^~\"Thread-specific breakpoint $bpnum deleted -\
+	    -re "^~\"Thread-specific breakpoint $bpnum deleted -\
 	     thread $worker_thread no longer in the thread list\\.\\\\n\"\r\n" {
-	    set saw_cli_bp_deleted true
-	    exp_continue
-	}
+		 set saw_cli_bp_deleted true
+		 exp_continue
+	     }
 
-	-re "^=thread-exited,id=\"$worker_thread\",group-id=\"i1\"\r\n" {
-	    set saw_mi_thread_exited true
+	    -re "^=thread-exited,id=\"$worker_thread\",group-id=\"i1\"\r\n" {
+		set saw_mi_thread_exited true
 
-	    # The order of the MI notifications depends on the order in which
-	    # the observers where registered within GDB.  If we have not seen
-	    # the other MI notification yet then keep looking.
-	    #
-	    # Additionally, for remote targets, we're going to wait for the
-	    # output of the '-thread-info 99' command before we check the
-	    # results.
-	    if {!$saw_mi_bp_deleted || $is_remote} {
+		# The order of the MI notifications depends on the order in which
+		# the observers where registered within GDB.  If we have not seen
+		# the other MI notification yet then keep looking.
+		#
+		# Additionally, for remote targets, we're going to wait for the
+		# output of the '-thread-info 99' command before we check the
+		# results.
+		if {!$saw_mi_bp_deleted || $is_remote} {
+		    exp_continue
+		}
+
+		# We get here with a native target; check we saw all the output
+		# that we expected.
+		if {$mode eq "separate"} {
+		    gdb_assert { $saw_mi_thread_exited && $saw_mi_bp_deleted \
+				     && !$saw_cli_thread_exited \
+				     && !$saw_cli_bp_deleted } \
+			$gdb_test_name
+		} else {
+		    gdb_assert { $saw_mi_thread_exited && $saw_mi_bp_deleted \
+				     && $saw_cli_thread_exited \
+				     && $saw_cli_bp_deleted } \
+			$gdb_test_name
+		}
+	    }
+
+	    -re "^=breakpoint-deleted,id=\"3\"\r\n" {
+		set saw_mi_bp_deleted true
+
+		# The order of the MI notifications depends on the order in which
+		# the observers where registered within GDB.  If we have not seen
+		# the other MI notification yet then keep looking.
+		#
+		# Additionally, for remote targets, we're going to wait for the
+		# output of the '-thread-info 99' command before we check the
+		# results.
+		if {!$saw_mi_thread_exited || $is_remote} {
+		    exp_continue
+		}
+
+		# We get here with a native target; check we saw all the output
+		# that we expected.
+		if {$mode eq "separate"} {
+		    gdb_assert { $saw_mi_thread_exited && $saw_mi_bp_deleted \
+				     && !$saw_cli_thread_exited \
+				     && !$saw_cli_bp_deleted } \
+			$gdb_test_name
+		} else {
+		    gdb_assert { $saw_mi_thread_exited && $saw_mi_bp_deleted \
+				     && $saw_cli_thread_exited \
+				     && $saw_cli_bp_deleted } \
+			$gdb_test_name
+		}
+	    }
+
+	    -re "^-thread-info 99\r\n" {
+		if {!$is_remote} {
+		    fail "$gdb_test_name (unexpected output)"
+		}
+		# This is the command being echoed back, ignore it.
 		exp_continue
 	    }
 
-	    # We get here with a native target; check we saw all the output
-	    # that we expected.
-	    if {$mode eq "separate"} {
+	    -re "^\\^done,threads=\\\[\\\]\r\n$::mi_gdb_prompt$" {
+
+		# This is the result of the '-thread-info 99' trick, which is only
+		# used in remote mode.  If we see this in native mode then
+		# something has gone wrong.
+		if {!$is_remote} {
+		    fail "$gdb_test_name (unexpected output)"
+		}
+
+		# If we've not seen any of the expected output yet then maybe the
+		# remote thread just hasn't exited yet.  Wait a short while and
+		# try again.
+		if { !$saw_mi_thread_exited && !$saw_mi_bp_deleted \
+			 && !$saw_cli_thread_exited && !$saw_cli_bp_deleted \
+			 && $attempt_count > 0 } {
+		    sleep 1
+		    incr attempt_count -1
+		    send_gdb "$cmd\n"
+		    exp_continue
+		}
+
+		# The output has arrived!  Check how we did.  There are other bugs
+		# that come into play here which change what output we'll see.
 		gdb_assert { $saw_mi_thread_exited && $saw_mi_bp_deleted \
-			     && !$saw_cli_thread_exited \
-			     && !$saw_cli_bp_deleted } \
-		    $gdb_test_name
-	    } else {
-		gdb_assert { $saw_mi_thread_exited && $saw_mi_bp_deleted \
-			     && $saw_cli_thread_exited \
-			     && $saw_cli_bp_deleted } \
-		    $gdb_test_name
+				 && $saw_cli_thread_exited \
+				 && $saw_cli_bp_deleted } $gdb_test_name
 	    }
 	}
-
-	-re "^=breakpoint-deleted,id=\"3\"\r\n" {
-	    set saw_mi_bp_deleted true
-
-	    # The order of the MI notifications depends on the order in which
-	    # the observers where registered within GDB.  If we have not seen
-	    # the other MI notification yet then keep looking.
-	    #
-	    # Additionally, for remote targets, we're going to wait for the
-	    # output of the '-thread-info 99' command before we check the
-	    # results.
-	    if {!$saw_mi_thread_exited || $is_remote} {
-		exp_continue
-	    }
-
-	    # We get here with a native target; check we saw all the output
-	    # that we expected.
-	    if {$mode eq "separate"} {
-		gdb_assert { $saw_mi_thread_exited && $saw_mi_bp_deleted \
-			     && !$saw_cli_thread_exited \
-			     && !$saw_cli_bp_deleted } \
-		    $gdb_test_name
-	    } else {
-		gdb_assert { $saw_mi_thread_exited && $saw_mi_bp_deleted \
-			     && $saw_cli_thread_exited \
-			     && $saw_cli_bp_deleted } \
-		    $gdb_test_name
-	    }
-	}
-
-	-re "^-thread-info 99\r\n" {
-	    if {!$is_remote} {
-		fail "$gdb_test_name (unexpected output)"
-	    }
-	    # This is the command being echoed back, ignore it.
-	    exp_continue
-	}
-
-	-re "^\\^done,threads=\\\[\\\]\r\n$::mi_gdb_prompt$" {
-
-	    # This is the result of the '-thread-info 99' trick, which is only
-	    # used in remote mode.  If we see this in native mode then
-	    # something has gone wrong.
-	    if {!$is_remote} {
-		fail "$gdb_test_name (unexpected output)"
-	    }
-
-	    # If we've not seen any of the expected output yet then maybe the
-	    # remote thread just hasn't exited yet.  Wait a short while and
-	    # try again.
-	    if { !$saw_mi_thread_exited && !$saw_mi_bp_deleted \
-		     && !$saw_cli_thread_exited && !$saw_cli_bp_deleted \
-		     && $attempt_count > 0 } {
-		sleep 1
-		incr attempt_count -1
-		send_gdb "$cmd\n"
-		exp_continue
-	    }
-
-	    # The output has arrived!  Check how we did.  There are other bugs
-	    # that come into play here which change what output we'll see.
-	    gdb_assert { $saw_mi_thread_exited && $saw_mi_bp_deleted \
-			     && $saw_cli_thread_exited \
-			     && $saw_cli_bp_deleted } $gdb_test_name
-	}
-    }
 
     # When the MI is running on a separate UI the CLI message will be seen
     # over there, but only if we are not running remote.  When we are running
@@ -257,9 +257,9 @@ foreach_mi_ui_mode mode {
 
 		-re "^Thread-specific breakpoint $bpnum deleted -\
 		     thread $worker_thread no longer in the thread list\\.\r\n" {
-		    gdb_assert { $saw_thread_exited } \
-			$gdb_test_name
-		}
+			 gdb_assert { $saw_thread_exited } \
+			     $gdb_test_name
+		     }
 	    }
 	}
     }

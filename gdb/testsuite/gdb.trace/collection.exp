@@ -671,32 +671,32 @@ proc gdb_trace_collection_test {} {
     global pcreg
 
     gdb_collect_args_test "\$args" \
-	    "args collectively"
+	"args collectively"
     gdb_collect_args_test "argc, argi, argf, argd, argstruct, argarray" \
-	    "args individually"
+	"args individually"
     gdb_collect_argstruct_test "\$args" \
-	    "argstruct collectively"
+	"argstruct collectively"
     gdb_collect_argstruct_test "argstruct" \
-	    "argstruct individually"
+	"argstruct individually"
     gdb_collect_argarray_test "\$args" \
-	    "argarray collectively"
+	"argarray collectively"
     gdb_collect_argarray_test "argarray" \
-	    "argarray individually"
+	"argarray individually"
     gdb_collect_locals_test local_test_func "\$locals" \
-	    "auto locals collectively"
+	"auto locals collectively"
     gdb_collect_locals_test local_test_func \
-	    "locc, loci, locf, locd, locst, locar" \
-	    "auto locals individually"
+	"locc, loci, locf, locd, locst, locar" \
+	"auto locals individually"
     gdb_collect_locals_test reglocal_test_func "\$locals" \
-	    "register locals collectively"
+	"register locals collectively"
     gdb_collect_locals_test reglocal_test_func \
-	    "locc, loci, locf, locd, locst, locar" \
-	    "register locals individually"
+	"locc, loci, locf, locd, locst, locar" \
+	"register locals individually"
     gdb_collect_locals_test statlocal_test_func "\$locals" \
-	    "static locals collectively"
+	"static locals collectively"
     gdb_collect_locals_test statlocal_test_func \
-	    "locc, loci, locf, locd, locst, locar" \
-	    "static locals individually"
+	"locc, loci, locf, locd, locst, locar" \
+	"static locals individually"
     gdb_collect_registers_test "\$regs"
     gdb_collect_registers_test "\$$fpreg, \$$spreg, \$$pcreg"
     gdb_collect_globals_test
@@ -749,37 +749,37 @@ proc gdb_trace_collection_test {} {
     # stack data
 
     gdb_collect_expression_test globals_test_func \
-	    "globalstruct.memberi"  "82"     "a.b"
+	"globalstruct.memberi"  "82"     "a.b"
     gdb_collect_expression_test globals_test_func \
-	    "globalp->memberc"      "81 'Q'" "a->b"
+	"globalp->memberc"      "81 'Q'" "a->b"
     gdb_collect_expression_test globals_test_func \
-	    "globalarr\[2\]"        "2"      "a\[2\]"
+	"globalarr\[2\]"        "2"      "a\[2\]"
     gdb_collect_expression_test globals_test_func \
-	    "globalarr\[l3\]"       "3"      "a\[b\]"
+	"globalarr\[l3\]"       "3"      "a\[b\]"
     gdb_collect_expression_test globals_test_func \
-	    "globalarr\[l3 + l2\]"  "5"      "a\[b + c\]"
+	"globalarr\[l3 + l2\]"  "5"      "a\[b + c\]"
     gdb_collect_expression_test globals_test_func \
-	    "globalarr\[l3 - l2\]"  "1"      "a\[b - c\]"
+	"globalarr\[l3 - l2\]"  "1"      "a\[b - c\]"
     gdb_collect_expression_test globals_test_func \
-	    "globalarr\[l3 * l2\]"  "6"      "a\[b * c\]"
+	"globalarr\[l3 * l2\]"  "6"      "a\[b * c\]"
     gdb_collect_expression_test globals_test_func \
-	    "globalarr\[l6 / l3\]"  "2"      "a\[b / c\]"
+	"globalarr\[l6 / l3\]"  "2"      "a\[b / c\]"
     gdb_collect_expression_test globals_test_func \
-	    "globalarr\[l7 % l3\]"  "1"      "a\[b % c\]"
+	"globalarr\[l7 % l3\]"  "1"      "a\[b % c\]"
     gdb_collect_expression_test globals_test_func \
-	    "globalarr\[+l1\]"      "1"      "a\[+b\]"
+	"globalarr\[+l1\]"      "1"      "a\[+b\]"
     gdb_collect_expression_test globals_test_func \
-	    "globalarr\[-lminus\]"  "2"      "a\[-b\]"
+	"globalarr\[-lminus\]"  "2"      "a\[-b\]"
     gdb_collect_expression_test globals_test_func \
-	    "globalarr\[\(l6, l7\)\]" "7"    "a\[\(b, c\)\]"
+	"globalarr\[\(l6, l7\)\]" "7"    "a\[\(b, c\)\]"
 
     gdb_collect_return_test
 
     gdb_collect_strings_test strings_test_func "locstr" "abcdef" "" \
-	    "local string"
+	"local string"
 
     gdb_collect_strings_test strings_test_func "longloc" "how now brown c" 15 \
-	    "long local string"
+	"long local string"
 
 }
 

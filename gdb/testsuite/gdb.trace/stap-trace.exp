@@ -70,13 +70,13 @@ proc run_trace_experiment { test_probe msg } {
     }
 
     gdb_test "continue" \
-	    "Continuing.*Breakpoint ${::decimal}.*" \
-	    "collect $msg: run trace experiment"
+	"Continuing.*Breakpoint ${::decimal}.*" \
+	"collect $msg: run trace experiment"
     gdb_test_no_output "tstop" \
-	    "collect $msg: stop trace experiment"
+	"collect $msg: stop trace experiment"
     gdb_test "tfind start" \
-	    "#0 .*" \
-	    "collect $msg: tfind test frame"
+	"#0 .*" \
+	"collect $msg: tfind test frame"
 }
 
 proc gdb_collect_probe_arg { msg probe val_arg0 } {
@@ -85,18 +85,18 @@ proc gdb_collect_probe_arg { msg probe val_arg0 } {
     prepare_for_trace_test
 
     gdb_test "trace $probe" \
-	    "Tracepoint ${::decimal} at .*" \
-	    "collect $msg: set tracepoint"
+	"Tracepoint ${::decimal} at .*" \
+	"collect $msg: set tracepoint"
     gdb_trace_setactions "collect $msg: define actions" \
-	    "" \
-	    "collect \$_probe_arg0" "^$"
+	"" \
+	"collect \$_probe_arg0" "^$"
 
     # Begin the test.
     run_trace_experiment $msg $probe
 
     gdb_test "print \$_probe_arg0" \
-	    "${::valnum_re} = $val_arg0" \
-	    "collect $msg: collected probe arg0"
+	"${::valnum_re} = $val_arg0" \
+	"collect $msg: collected probe arg0"
 }
 
 if {![compile_stap_bin "stap-probe-nosem"]} {

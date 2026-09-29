@@ -40,7 +40,7 @@ if {![runto_main]} {
 }
 
 set remote_python_file [gdb_remote_download host \
-			${srcdir}/${subdir}/${testfile}.py]
+			    ${srcdir}/${subdir}/${testfile}.py]
 
 gdb_breakpoint [gdb_get_line_number "Break here."]
 gdb_continue_to_breakpoint "Break here" ".*Break here.*"

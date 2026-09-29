@@ -100,8 +100,8 @@ proc run_lang_tests {exefile lang} {
 
     gdb_test "print estring" " = \"embedded x\\\\201\\\\202\\\\203\\\\204\""
     if { ![is_address_zero_readable] } {
-	    gdb_test "print estring3" \
-		" = <error reading variable: Cannot create a lazy string with address 0x0, and a non-zero length.>"
+	gdb_test "print estring3" \
+	    " = <error reading variable: Cannot create a lazy string with address 0x0, and a non-zero length.>"
     }
 
     gdb_test_no_output "python pp_ls_encoding = 'UTF-8'"
@@ -137,47 +137,47 @@ proc run_lang_tests {exefile lang} {
 	     "\\s+\\\[0\\\] = 23," \
 	     "\\s+\\\[1\\\] = 72" \
 	     "}"] \
-	"print c, pretty printing on, exception raised from display_hint"
+    "print c, pretty printing on, exception raised from display_hint"
 
-    # Unset is_array_p so that display_hint no longer raises an
-    # exception.
-    gdb_test_no_output "set variable c.is_array_p=0"
+# Unset is_array_p so that display_hint no longer raises an
+# exception.
+gdb_test_no_output "set variable c.is_array_p=0"
 
-    gdb_test "print c" " = container \"container\" with 2 elements = \{$nl  \\\[23\\\] = 72$nl\}" \
-	"print c, pretty printing on, display hint is now map"
+gdb_test "print c" " = container \"container\" with 2 elements = \{$nl  \\\[23\\\] = 72$nl\}" \
+    "print c, pretty printing on, display hint is now map"
 
-    gdb_test "print nstype" " = {$nl *.0. = 7,$nl *.1. = 42$nl}"
+gdb_test "print nstype" " = {$nl *.0. = 7,$nl *.1. = 42$nl}"
 
-    gdb_test_no_output "set print pretty off"
-    gdb_test "print nstype" " = {.0. = 7, .1. = 42}" \
-	"print nstype on one line"
+gdb_test_no_output "set print pretty off"
+gdb_test "print nstype" " = {.0. = 7, .1. = 42}" \
+    "print nstype on one line"
 
-    # Now we have pretty printing turned off, try printing 'c' again.
-    gdb_test "print c" " = container \"container\" with 2 elements = \{\\\[23\\\] = 72\}" \
-	"print c, pretty printing off, display hint is now map"
+# Now we have pretty printing turned off, try printing 'c' again.
+gdb_test "print c" " = container \"container\" with 2 elements = \{\\\[23\\\] = 72\}" \
+    "print c, pretty printing off, display hint is now map"
 
-    gdb_test_no_output "set variable c.is_map_p=0"
-    gdb_test "print c" " = container \"container\" with 2 elements = \{\\\[0\\\] = 23, \\\[1\\\] = 72\}" \
-	"print c, pretty printing off, default display hint"
+gdb_test_no_output "set variable c.is_map_p=0"
+gdb_test "print c" " = container \"container\" with 2 elements = \{\\\[0\\\] = 23, \\\[1\\\] = 72\}" \
+    "print c, pretty printing off, default display hint"
 
-    # Check that GDB doesn't lose typedefs when looking for a printer.
-    gdb_test "print an_int" " = -1"
-    gdb_test "print (int) an_int" " = -1"
-    gdb_test "print (int_type) an_int" " = type=int_type, val=-1"
+# Check that GDB doesn't lose typedefs when looking for a printer.
+gdb_test "print an_int" " = -1"
+gdb_test "print (int) an_int" " = -1"
+gdb_test "print (int_type) an_int" " = type=int_type, val=-1"
 
-    gdb_test "print an_int_type" " = type=int_type, val=1"
-    gdb_test "print (int_type) an_int_type" " = type=int_type, val=1"
+gdb_test "print an_int_type" " = type=int_type, val=1"
+gdb_test "print (int_type) an_int_type" " = type=int_type, val=1"
 
-    gdb_test "print an_int_type2" " = type=int_type2, val=2"
-    gdb_test "print (int) an_int_type2" " = 2"
-    gdb_test "print (int_type) an_int_type2" " = type=int_type, val=2"
-    gdb_test "print (int_type2) an_int_type2" " = type=int_type2, val=2"
+gdb_test "print an_int_type2" " = type=int_type2, val=2"
+gdb_test "print (int) an_int_type2" " = 2"
+gdb_test "print (int_type) an_int_type2" " = type=int_type, val=2"
+gdb_test "print (int_type2) an_int_type2" " = type=int_type2, val=2"
 
-    # PR python/16047: it is ok for a pretty printer not to have a
-    # to_string method.
-    gdb_test "print (int_type3) an_int_type2" " = {s = 27}"
+# PR python/16047: it is ok for a pretty printer not to have a
+# to_string method.
+gdb_test "print (int_type3) an_int_type2" " = {s = 27}"
 
-    gdb_continue_to_end
+gdb_continue_to_end
 }
 
 with_test_prefix c {

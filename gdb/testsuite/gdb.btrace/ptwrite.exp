@@ -55,33 +55,33 @@ gdb_test "next 2" ".*"
 with_test_prefix "Default" {
     # Test record instruction-history
     gdb_test "record instruction-history 1" [multi_line \
-	".*${::decimal}\t   $hex <ptwrite1\\+${::decimal}>:\tptwrite %\[a-z\]+" \
-	"${::decimal}\t     \\\[0x42\\\]" \
-	".*${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:\tptwrite %\[a-z\]+" \
-	"${::decimal}\t     \\\[0x43\\\].*" \
-	]
+						 ".*${::decimal}\t   $hex <ptwrite1\\+${::decimal}>:\tptwrite %\[a-z\]+" \
+						 "${::decimal}\t     \\\[0x42\\\]" \
+						 ".*${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:\tptwrite %\[a-z\]+" \
+						 "${::decimal}\t     \\\[0x43\\\].*" \
+						]
 
     gdb_test "record instruction-history /a 1" [multi_line \
-	".*${::decimal}\t   $hex <ptwrite1\\+${::decimal}>:\tptwrite %\[a-z\]+" \
-	".*${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:\tptwrite %\[a-z\]+.*" \
-	]
+						    ".*${::decimal}\t   $hex <ptwrite1\\+${::decimal}>:\tptwrite %\[a-z\]+" \
+						    ".*${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:\tptwrite %\[a-z\]+.*" \
+						   ]
 
     # Test function call history
     gdb_test "record function-call-history 1,4" [multi_line \
-	"1\tmain" \
-	"2\tptwrite1" \
-	"\t  \\\[0x42\\\]" \
-	"3\tmain" \
-	"4\tptwrite2" \
-	"\t  \\\[0x43\\\]" \
-	]
+						     "1\tmain" \
+						     "2\tptwrite1" \
+						     "\t  \\\[0x42\\\]" \
+						     "3\tmain" \
+						     "4\tptwrite2" \
+						     "\t  \\\[0x43\\\]" \
+						    ]
 
     gdb_test "record function-call-history /a 1,4" [multi_line \
-	"1\tmain" \
-	"2\tptwrite1" \
-	"3\tmain" \
-	"4\tptwrite2" \
-	]
+							"1\tmain" \
+							"2\tptwrite1" \
+							"3\tmain" \
+							"4\tptwrite2" \
+						       ]
 }
 
 # Test payload printing during stepping
@@ -91,13 +91,13 @@ with_test_prefix "Stepping" {
     gdb_test "stepi" ".*\\\[0x42\\\].*"
     gdb_test "reverse-stepi" ".*\\\[0x42\\\].*"
     gdb_test "continue" [multi_line \
-	    ".*\\\[0x42\\\]" \
-	    "\\\[0x43\\\].*" \
-	    ]
+			     ".*\\\[0x42\\\]" \
+			     "\\\[0x43\\\].*" \
+			    ]
     gdb_test "reverse-continue" [multi_line \
-	    ".*\\\[0x43\\\]" \
-	    "\\\[0x42\\\].*" \
-	    ]
+				     ".*\\\[0x43\\\]" \
+				     "\\\[0x42\\\].*" \
+				    ]
 }
 
 # Test auxiliary type in python
@@ -111,14 +111,14 @@ gdb_test_multiline "auxiliary type in python" \
     "        print(insn.data)" "" \
     "end" \
     [multi_line \
-	".*mov    -0x4\\\(%(e|r)bp\\\),%(e|r)ax" \
-	"ptwrite %eax" \
-	"0x42" \
-	"nop.*" \
-	"mov    -0x4\\\(%(e|r)bp\\\),%(e|r)ax" \
-	"ptwrite %eax" \
-	"0x43" \
-	"nop.*"
+	 ".*mov    -0x4\\\(%(e|r)bp\\\),%(e|r)ax" \
+	 "ptwrite %eax" \
+	 "0x42" \
+	 "nop.*" \
+	 "mov    -0x4\\\(%(e|r)bp\\\),%(e|r)ax" \
+	 "ptwrite %eax" \
+	 "0x43" \
+	 "nop.*"
     ]
 
 
@@ -138,11 +138,11 @@ with_test_prefix "Custom" {
 	"end" ""
 
     gdb_test "record instruction-history 1" [multi_line \
-	".*${::decimal}\t   $hex <ptwrite1\\+${::decimal}>:\tptwrite %\[a-z\]+" \
-	"${::decimal}\t     \\\[payload: 66, ip: $hex\\\]" \
-	".*${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:\tptwrite %\[a-z\]+" \
-	"${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:.*" \
-	]
+						 ".*${::decimal}\t   $hex <ptwrite1\\+${::decimal}>:\tptwrite %\[a-z\]+" \
+						 "${::decimal}\t     \\\[payload: 66, ip: $hex\\\]" \
+						 ".*${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:\tptwrite %\[a-z\]+" \
+						 "${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:.*" \
+						]
 }
 
 ### 2.2 None as filter. This resets the default behavior.
@@ -154,11 +154,11 @@ with_test_prefix "None" {
 	"end" ""
 
     gdb_test "record instruction-history 1" [multi_line \
-	".*${::decimal}\t   $hex <ptwrite1\\+${::decimal}>:\tptwrite %\[a-z\]+" \
-	"${::decimal}\t     \\\[0x42\\\]" \
-	".*${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:\tptwrite %\[a-z\]+" \
-	"${::decimal}\t     \\\[0x43\\\].*" \
-	]
+						 ".*${::decimal}\t   $hex <ptwrite1\\+${::decimal}>:\tptwrite %\[a-z\]+" \
+						 "${::decimal}\t     \\\[0x42\\\]" \
+						 ".*${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:\tptwrite %\[a-z\]+" \
+						 "${::decimal}\t     \\\[0x43\\\].*" \
+						]
 }
 
 ### 2.3 Lambdas as filter
@@ -171,11 +171,11 @@ with_test_prefix "Lambdas" {
 	"end" ""
 
     gdb_test "record instruction-history 1" [multi_line \
-	".*${::decimal}\t   $hex <ptwrite1\\+${::decimal}>:\tptwrite %\[a-z\]+" \
-	"${::decimal}\t     \\\[68\\\]" \
-	".*${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:\tptwrite %\[a-z\]+" \
-	"${::decimal}\t     \\\[69\\\].*" \
-	] "Lambdas: record instruction-history 1"
+						 ".*${::decimal}\t   $hex <ptwrite1\\+${::decimal}>:\tptwrite %\[a-z\]+" \
+						 "${::decimal}\t     \\\[68\\\]" \
+						 ".*${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:\tptwrite %\[a-z\]+" \
+						 "${::decimal}\t     \\\[69\\\].*" \
+						] "Lambdas: record instruction-history 1"
 }
 
 ### 2.4 Functors as filter
@@ -193,9 +193,9 @@ with_test_prefix "Functors" {
 	"end" ""
 
     gdb_test "record instruction-history 1" [multi_line \
-	".*${::decimal}\t   $hex <ptwrite1\\+${::decimal}>:\tptwrite %\[a-z\]+" \
-	"${::decimal}\t     \\\[1, 66\\\]" \
-	".*${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:\tptwrite %\[a-z\]+" \
-	"${::decimal}\t     \\\[2, 67\\\].*" \
-	] "Functors: record instruction-history 1"
+						 ".*${::decimal}\t   $hex <ptwrite1\\+${::decimal}>:\tptwrite %\[a-z\]+" \
+						 "${::decimal}\t     \\\[1, 66\\\]" \
+						 ".*${::decimal}\t   $hex <ptwrite2\\+${::decimal}>:\tptwrite %\[a-z\]+" \
+						 "${::decimal}\t     \\\[2, 67\\\].*" \
+						] "Functors: record instruction-history 1"
 }

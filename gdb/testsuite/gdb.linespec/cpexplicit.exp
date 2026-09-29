@@ -58,54 +58,54 @@ namespace eval $testfile {
     set lineno(operator) [gdb_get_line_number "operator location" $srcfile]
     foreach v [array names lineno] {
 	set location($v) ".*[string_to_regexp "$srcfile:$lineno($v)"].*"
-    }
+}
 
-    # A list of explicit linespecs and the corresponding location
-    variable linespecs
-    set linespecs(linespecs) {}
-    set linespecs(location) {}
+# A list of explicit linespecs and the corresponding location
+variable linespecs
+set linespecs(linespecs) {}
+set linespecs(location) {}
 
-    add linespecs "-source $srcfile -function myclass::myfunction" \
-	$location(normal)
-    add linespecs "-source $srcfile -function myclass::myfunction -label top" \
-	$location(top)
+add linespecs "-source $srcfile -function myclass::myfunction" \
+    $location(normal)
+add linespecs "-source $srcfile -function myclass::myfunction -label top" \
+    $location(top)
 
-    # This isn't implemented yet; -line is silently ignored.
-    add linespecs \
-	"-source $srcfile -function myclass::myfunction -label top -line 3" \
-	$location(top)
-    add linespecs "-source $srcfile -line $lineno(top)" $location(top)
-    add linespecs "-function myclass::myfunction" $location(normal)
-    add linespecs "-function myclass::myfunction -label top" $location(top)
+# This isn't implemented yet; -line is silently ignored.
+add linespecs \
+    "-source $srcfile -function myclass::myfunction -label top -line 3" \
+    $location(top)
+add linespecs "-source $srcfile -line $lineno(top)" $location(top)
+add linespecs "-function myclass::myfunction" $location(normal)
+add linespecs "-function myclass::myfunction -label top" $location(top)
 
-    # These are also not yet supported; -line is silently ignored.
-    add linespecs "-function myclass::myfunction -line 3" $location(normal)
-    add linespecs "-function myclass::myfunction -label top -line 3" \
-	$location(top)
-    add linespecs "-line 25" $location(normal)
-    add linespecs "-function myclass::operator," $location(operator)
-    add linespecs "-function 'myclass::operator,'" $location(operator)
-    add linespecs "-function \"myclass::operator,\"" $location(operator)
+# These are also not yet supported; -line is silently ignored.
+add linespecs "-function myclass::myfunction -line 3" $location(normal)
+add linespecs "-function myclass::myfunction -label top -line 3" \
+    $location(top)
+add linespecs "-line 25" $location(normal)
+add linespecs "-function myclass::operator," $location(operator)
+add linespecs "-function 'myclass::operator,'" $location(operator)
+add linespecs "-function \"myclass::operator,\"" $location(operator)
 
-    # Fire up gdb.
-    if {![runto_main]} {
-	namespace delete $testfile
-	return
-    }
+# Fire up gdb.
+if {![runto_main]} {
+    namespace delete $testfile
+    return
+}
 
-    # Test explicit linespecs, with and without conditions.
-    foreach linespec $linespecs(linespecs) loc_pattern $linespecs(locations) {
-	# Test the linespec
-	test_breakpoint $linespec $loc_pattern
-    }
+# Test explicit linespecs, with and without conditions.
+foreach linespec $linespecs(linespecs) loc_pattern $linespecs(locations) {
+    # Test the linespec
+    test_breakpoint $linespec $loc_pattern
+}
 
-    # Special (orphaned) dprintf cases.
-    gdb_test "dprintf -function myclass::operator,,\"hello\"" \
-	"Dprintf .*$srcfile, line $lineno(operator)\\."
-    gdb_test "dprintf -function 'myclass::operator,',\"hello\"" \
-	"Dprintf .*$srcfile, line $lineno(operator)\\."
-    gdb_test "dprintf -function \"myclass::operator,\",\"hello\"" \
-	"Dprintf .*$srcfile, line $lineno(operator)\\."
+# Special (orphaned) dprintf cases.
+gdb_test "dprintf -function myclass::operator,,\"hello\"" \
+    "Dprintf .*$srcfile, line $lineno(operator)\\."
+gdb_test "dprintf -function 'myclass::operator,',\"hello\"" \
+    "Dprintf .*$srcfile, line $lineno(operator)\\."
+gdb_test "dprintf -function \"myclass::operator,\",\"hello\"" \
+    "Dprintf .*$srcfile, line $lineno(operator)\\."
 }
 
 namespace delete $testfile

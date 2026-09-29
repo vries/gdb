@@ -46,7 +46,7 @@ save_vars { ::env(GLIBC_TUNABLES) } {
     append_environment GLIBC_TUNABLES "glibc.cpu.hwcaps" "SHSTK"
 
     if { [prepare_for_testing "failed to prepare" $testfile $srcfile \
-	  {debug additional_flags="-fcf-protection=return"}] } {
+	      {debug additional_flags="-fcf-protection=return"}] } {
 	return
     }
 
@@ -61,7 +61,7 @@ save_vars { ::env(GLIBC_TUNABLES) } {
     set core_filename [core_find $binfile {} {} "${binfile}.out"]
     set core_generated [expr {$core_filename != ""}]
 
-   if {!$core_generated} {
+    if {!$core_generated} {
 	untested "unable to create or find corefile"
     }
 
@@ -95,11 +95,11 @@ save_vars { ::env(GLIBC_TUNABLES) } {
 
     gdb_test "continue" \
 	[multi_line \
-	    "Continuing\\." \
-	    "($hex\r\n)?" \
-	    "Program received signal SIGSEGV, Segmentation fault.*" \
-	    "function \\(\\) at .*amd64-shadow-stack-corefile.c:$decimal" \
-	    {.*__asm__ volatile \("ret\\n"\);}] \
+	     "Continuing\\." \
+	     "($hex\r\n)?" \
+	     "Program received signal SIGSEGV, Segmentation fault.*" \
+	     "function \\(\\) at .*amd64-shadow-stack-corefile.c:$decimal" \
+	     {.*__asm__ volatile \("ret\\n"\);}] \
 	"continue to SIGSEGV"
 
     set ssp_in_gcore [get_valueof "/x" "\$pl3_ssp" "*unknown*"]

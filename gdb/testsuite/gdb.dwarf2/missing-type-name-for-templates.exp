@@ -153,7 +153,7 @@ Dwarf::assemble $asm_file {
 }
 
 if { [prepare_for_testing "failed to prepare" ${testfile} \
-	[list $srcfile $asm_file] $nodebug_flags] } {
+	  [list $srcfile $asm_file] $nodebug_flags] } {
     return
 }
 
@@ -162,10 +162,10 @@ if {![runto_main]} {
 }
 
 gdb_test "ptype var1" [multi_line \
-    "type = struct template_var1<int, float> \\\[with <unnamed0> = int, second = float\\\] {" \
-    "    <unnamed0> me;" \
-    "    second me2;" \
-    "}"]
+			   "type = struct template_var1<int, float> \\\[with <unnamed0> = int, second = float\\\] {" \
+			   "    <unnamed0> me;" \
+			   "    second me2;" \
+			   "}"]
 
 gdb_test "ptype var2" [multi_line \
     "type = class template_var2<int, float> \\\[with <unnamed0> = int, <unnamed1> = float\\\] {" \

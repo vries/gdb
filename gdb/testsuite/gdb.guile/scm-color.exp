@@ -30,11 +30,11 @@ gdb_install_guile_utils
 gdb_install_guile_module
 
 gdb_test_no_output [concat "guile (define (print_color_attrs c) " \
-    "(display (color-string c)) (display \" \") " \
-    "(display (color-colorspace c)) (display \" \") " \
-    "(display (color-none? c)) (display \" \") " \
-    "(display (color-indexed? c)) (display \" \") " \
-    "(display (color-direct? c)) (newline))"] \
+			"(display (color-string c)) (display \" \") " \
+			"(display (color-colorspace c)) (display \" \") " \
+			"(display (color-none? c)) (display \" \") " \
+			"(display (color-indexed? c)) (display \" \") " \
+			"(display (color-direct? c)) (newline))"] \
     "print_color_attrs helper"
 
 gdb_test "guile (print_color_attrs (make-color))" \
@@ -102,13 +102,13 @@ gdb_test_no_output "guile (define c_red (make-color \"red\"))" \
 gdb_test_no_output "guile (define c_green (make-color \"green\"))" \
     "save yellow color"
 gdb_test [concat "guile " \
-    "(display (color-escape-sequence c_red #t)) " \
-    "(display (color-escape-sequence c_green #f)) " \
-    "(display \"red on green\") " \
-    "(display (color-escape-sequence c_none #f)) " \
-    "(display \" red on default\") " \
-    "(display (color-escape-sequence c_none #t)) " \
-    "(newline)"] \
+	      "(display (color-escape-sequence c_red #t)) " \
+	      "(display (color-escape-sequence c_green #f)) " \
+	      "(display \"red on green\") " \
+	      "(display (color-escape-sequence c_none #f)) " \
+	      "(display \" red on default\") " \
+	      "(display (color-escape-sequence c_none #t)) " \
+	      "(newline)"] \
     "\033\\\[31m\033\\\[42mred on green\033\\\[49m red on default\033\\\[39m" \
     "escape sequences"
 

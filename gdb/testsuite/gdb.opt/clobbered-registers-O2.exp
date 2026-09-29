@@ -27,7 +27,7 @@ if {[prepare_for_testing "failed to prepare" $testfile \
 }
 
 if {![runto start_sequence]} {
-   return
+    return
 }
 
 gdb_test "frame 1" "#1.*in gen_movsd.*" "backtracing"

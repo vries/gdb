@@ -106,7 +106,7 @@ gdb_test "p foo(ttoa, 'a')" "= 23"
 
 #test that lookup is not thwarted by anonymous types
 gdb_test "p foo (p_union)" \
-  "Cannot resolve function foo to any overloaded instance"
+    "Cannot resolve function foo to any overloaded instance"
 
 # test lookup of namespace user-defined operators
 # and overload resolution:

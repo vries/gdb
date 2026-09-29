@@ -152,8 +152,8 @@ proc test_startup {} {
     # Check that we can continue and create the first thread.
     gdb_test "break thread1" "Breakpoint .* file .*$srcfile.*"
     gdb_test "continue" \
-	    "Continuing.*Breakpoint .*, thread1 \\(arg=0xfeedface\\).*at.*$srcfile.*" \
-	    "Continue to creation of first thread"
+	"Continuing.*Breakpoint .*, thread1 \\(arg=0xfeedface\\).*at.*$srcfile.*" \
+	"Continue to creation of first thread"
     gdb_test_no_output "disable"
 
     # Extract the thread id number of thread 1 from "info threads" output.
@@ -168,8 +168,8 @@ proc test_startup {} {
     # ignoring the first thread for the moment.
     gdb_test "break thread2" "Breakpoint .* file .*$srcfile.*"
     gdb_test "continue" \
-	    "Continuing.*Breakpoint .*, thread2 \\(arg=0xdeadbeef\\).*at.*$srcfile.*" \
-	    "continue to creation of second thread"
+	"Continuing.*Breakpoint .*, thread2 \\(arg=0xdeadbeef\\).*at.*$srcfile.*" \
+	"continue to creation of second thread"
 
     # Extract the thread id number of thread 2 from "info threads" output.
     gdb_test_multiple "info threads" "get thread 2 id" {
@@ -230,28 +230,28 @@ proc check_backtraces {} {
     # Check that the "thread apply N backtrace" command works
 
     gdb_test "thread apply $main_id backtrace" \
-	    ".* in main \\(argc=.*, argv=.*\\).*" \
-	    "check backtrace from main thread"
+	".* in main \\(argc=.*, argv=.*\\).*" \
+	"check backtrace from main thread"
     gdb_test "thread apply $thread1_id backtrace" \
-	    ".* in thread1 \\(arg=0xfeedface\\).*" \
-	    "check backtrace from thread 1"
+	".* in thread1 \\(arg=0xfeedface\\).*" \
+	"check backtrace from thread 1"
     gdb_test "thread apply $thread2_id backtrace" \
-	    ".* in thread2 \\(arg=0xdeadbeef\\).*" \
-	    "check backtrace from thread 2"
+	".* in thread2 \\(arg=0xdeadbeef\\).*" \
+	"check backtrace from thread 2"
 
     # Check that we can apply the backtrace command to all
     # three threads with a single gdb command
 
     gdb_test "thread apply $main_id $thread1_id $thread2_id bt" \
-	    ".* in main .* in thread1 .* in thread2.*" \
-	    "apply backtrace command to all three threads"
+	".* in main .* in thread1 .* in thread2.*" \
+	"apply backtrace command to all three threads"
 
     # Check that we can do thread specific backtraces
     # This also tests that we can do thread specific breakpoints.
 
     gdb_test "break common_routine thread $thread2_id" \
-	    "Breakpoint .* at 0x.* file .* line .*" \
-	    "set break at common_routine in thread 2"
+	"Breakpoint .* at 0x.* file .* line .*" \
+	"set break at common_routine in thread 2"
 
     gdb_test_multiple "continue" "continue to bkpt at common_routine in thread 2" {
 	-re "Breakpoint .* common_routine \\(arg=2\\).*$gdb_prompt $" {

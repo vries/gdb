@@ -36,11 +36,11 @@ gdb_test "continue" "Continuing.*Breakpoint \[0-9\]*, stop_here.*" \
 
 # Turn on unwind-on-signal.
 gdb_test_no_output "set unwind-on-signal on" \
-	"setting unwind-on-signal"
+    "setting unwind-on-signal"
 
 gdb_test "show unwind-on-signal" \
-	"Unwinding of stack .* is on." \
-	"showing unwind-on-signal"
+    "Unwinding of stack .* is on." \
+    "showing unwind-on-signal"
 
 # For backward compatibility we maintain a 'unwindonsignal' alias for
 # 'unwind-on-signal', check it now.
@@ -74,18 +74,18 @@ if {[gdb_test "call gen_signal ()"  \
 # Verify the stack got unwound.
 gdb_test "bt" \
     "#0 *\[x0-9a-f in\]*stop_here \\(.*\\) at .*#1 *\[x0-9a-f in\]*main \\(.*\\) at .*" \
-	"stack unwound"
+    "stack unwound"
 
 # Verify the dummy frame got removed from dummy_frame_stack.
 gdb_test_multiple "maint print dummy-frames" \
-	"unwind-on-signal, dummy frame removed" {
-    -re "\[\r\n\]*.*stack=.*code=.*\[\r\n\]+$gdb_prompt $" {
-	fail $gdb_test_name
+    "unwind-on-signal, dummy frame removed" {
+	-re "\[\r\n\]*.*stack=.*code=.*\[\r\n\]+$gdb_prompt $" {
+	    fail $gdb_test_name
+	}
+	-re "\[\r\n\]+$gdb_prompt $" {
+	    pass $gdb_test_name
+	}
     }
-    -re "\[\r\n\]+$gdb_prompt $" {
-	pass $gdb_test_name
-    }
-}
 
 # After the unwound infcall, the thread should be stopped, and a
 # subsequent resumption command should be accepted.  Regression test

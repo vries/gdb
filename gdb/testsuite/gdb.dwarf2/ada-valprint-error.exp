@@ -131,4 +131,4 @@ if {$unsupported} {
 gdb_test_no_output "set language ada"
 
 gdb_test "print fd.global" \
-	 " = <error reading variable: unable to read value of fd__Tints_doubledC___XVZ \\(value has been optimized out\\)>"
+    " = <error reading variable: unable to read value of fd__Tints_doubledC___XVZ \\(value has been optimized out\\)>"

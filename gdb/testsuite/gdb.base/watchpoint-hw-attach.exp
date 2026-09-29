@@ -47,9 +47,9 @@ gdb_continue_to_breakpoint "$srcfile:pidacquired"
 gdb_test_no_output "set should_continue = 1"
 
 gdb_test "watch watched_variable" \
-	 "Hardware watchpoint $decimal: watched_variable"
+    "Hardware watchpoint $decimal: watched_variable"
 
 gdb_test "continue" \
-	 "continue.*Continuing.*\.Hardware watchpoint $decimal: watched_variable.*Old value = 0.*New value = 4.*watched_variable\\);"
+    "continue.*Continuing.*\.Hardware watchpoint $decimal: watched_variable.*Old value = 0.*New value = 4.*watched_variable\\);"
 
 kill_wait_spawned_process $test_spawn_id

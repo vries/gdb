@@ -36,7 +36,7 @@ set nl "\[\r\n\]+"
 
 gdb_breakpoint foo
 gdb_test "continue" "Breakpoint $decimal, foo .*" \
-	"continue to breakpoint in foo"
+    "continue to breakpoint in foo"
 
 set bp_addr 0
 set stop_addr 0
@@ -49,7 +49,7 @@ gdb_test_multiple "x /2i \$pc" "get breakpoint address for foo" {
 }
 
 gdb_test "break \*$bp_addr" "Breakpoint $decimal at $bp_addr: file .*" \
-	"set bp, 2nd instr"
+    "set bp, 2nd instr"
 
 gdb_test_multiple "step" "stopped at bp, 2nd instr" {
     -re -wrap "Breakpoint $decimal, ($hex) in foo.*" {

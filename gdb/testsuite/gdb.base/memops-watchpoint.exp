@@ -69,31 +69,31 @@ proc continue_to_watchpoint {array_re source_function function_re
 	     "New value = ${new_value_re}"]
     gdb_test_multiple "continue" \
 	"continue until $source_function watchpoint hits" {
-	-re $watch_trigger_re {
-	    set saw_watch_trigger 1
-	    exp_continue
-	}
-	-re "${function_re}.* \\(\\) at \[^\r\n\]+:${::decimal}(?=\r\n)" {
-	    set saw_function 1
-	    exp_continue
-	}
-	-re "${function_re}.* \\(\\) from \[^\r\n\]+(?=\r\n)" {
-	    set saw_function 1
-	    exp_continue
-	}
-	-re "in \\?\\? \\(\\) from \[^\r\n\]+(?=\r\n)" {
-	    set is_supported 0
-	    unsupported "symbol for ${source_function} not found"
-	    exp_continue
-	}
-	-re -wrap "" {
-	    if { $is_supported } {
-		setup_kfail breakpoints/31665 arm*-*-linux*
-		gdb_assert { $saw_watch_trigger && $saw_function } \
-		    $gdb_test_name
+	    -re $watch_trigger_re {
+		set saw_watch_trigger 1
+		exp_continue
+	    }
+	    -re "${function_re}.* \\(\\) at \[^\r\n\]+:${::decimal}(?=\r\n)" {
+		set saw_function 1
+		exp_continue
+	    }
+	    -re "${function_re}.* \\(\\) from \[^\r\n\]+(?=\r\n)" {
+		set saw_function 1
+		exp_continue
+	    }
+	    -re "in \\?\\? \\(\\) from \[^\r\n\]+(?=\r\n)" {
+		set is_supported 0
+		unsupported "symbol for ${source_function} not found"
+		exp_continue
+	    }
+	    -re -wrap "" {
+		if { $is_supported } {
+		    setup_kfail breakpoints/31665 arm*-*-linux*
+		    gdb_assert { $saw_watch_trigger && $saw_function } \
+			$gdb_test_name
+		}
 	    }
 	}
-    }
 }
 
 # Note: Some architectures use memmove for memset.

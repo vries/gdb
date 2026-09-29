@@ -59,7 +59,7 @@ delete_breakpoints
 gdb_breakpoint "breakpt"
 gdb_continue_to_breakpoint "continue to first breakpt call"
 set breakpt_num [get_integer_valueof "\$bpnum" "INVALID" \
-		    "get number for breakpoint in breakpt"]
+		     "get number for breakpoint in breakpt"]
 
 # Check info threads just to confirm the thread numbering.  The rest
 # of this script just assumes we have threads numbered 1 and 2.
@@ -143,9 +143,9 @@ if {$is_remote} {
 
 	-re "^Thread-specific breakpoint $bpnum deleted -\
 	     thread $worker_thread no longer in the thread list\\.\r\n" {
-	    set saw_bp_deleted true
-	    exp_continue
-	}
+		 set saw_bp_deleted true
+		 exp_continue
+	     }
 
 	-re "No threads matched\\.\r\n$gdb_prompt $" {
 	    if {!$saw_thread_exited && !$saw_bp_deleted && $attempt_count > 0} {
@@ -171,7 +171,7 @@ if {$is_remote} {
 	     thread $worker_thread no longer in the thread list\\.\r\n" {
 		 gdb_assert { $saw_thread_exited } \
 		     $gdb_test_name
-	}
+	     }
     }
 }
 
@@ -195,6 +195,6 @@ gdb_test "print do_spin = 0" "${::valnum_re} = 0"
 gdb_test_multiple "" "wait for stop" {
     -re "Thread $main_thread \[^\r\n\]+ hit Breakpoint ${breakpt_num},\
 	 breakpt \\(\\) \[^\r\n\]+\r\n$decimal\\s+\[^\r\n\]+\r\n" {
-	pass $gdb_test_name
-    }
+	     pass $gdb_test_name
+	 }
 }

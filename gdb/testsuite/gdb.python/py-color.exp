@@ -106,15 +106,15 @@ gdb_test_no_output "python c_red = gdb.Color ('red')" \
 gdb_test_no_output "python c_green = gdb.Color ('green')" \
     "save yellow color"
 gdb_test [concat "python print (c_red.escape_sequence (True) + " \
-    "c_green.escape_sequence (False) + 'red on green' + " \
-    "c_none.escape_sequence (False) + ' red on default' + " \
-    "c_none.escape_sequence (True))"] \
+	      "c_green.escape_sequence (False) + 'red on green' + " \
+	      "c_none.escape_sequence (False) + ' red on default' + " \
+	      "c_none.escape_sequence (True))"] \
     "\033\\\[31m\033\\\[42mred on green\033\\\[49m red on default\033\\\[39m" \
     "escape sequences"
 gdb_test [concat "python print (c_red.escape_sequence (is_foreground = True) + " \
-    "c_green.escape_sequence (is_foreground = False) + 'red on green' + " \
-    "c_none.escape_sequence (is_foreground = False) + ' red on default' + " \
-    "c_none.escape_sequence (is_foreground = True))"] \
+	      "c_green.escape_sequence (is_foreground = False) + 'red on green' + " \
+	      "c_none.escape_sequence (is_foreground = False) + ' red on default' + " \
+	      "c_none.escape_sequence (is_foreground = True))"] \
     "\033\\\[31m\033\\\[42mred on green\033\\\[49m red on default\033\\\[39m" \
     "escape sequences using keyword arguments"
 

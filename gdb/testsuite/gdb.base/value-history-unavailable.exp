@@ -49,9 +49,9 @@ gdb_test "print \$2\[1023\]" "\\\$7 = 0 '\\\\000'"
 gdb_test "print \$2\[-1\]" "\\\$8 = <unavailable>"
 gdb_test "print \$2\[1024\]" "\\\$9 = <unavailable>"
 gdb_test "print \$2\[-1LL << 63 - $target_char_rank\]" \
-	"\\\$10 = <unavailable>"
+    "\\\$10 = <unavailable>"
 gdb_test "print \$2\[(1LL << 63 - $target_char_rank) - 1\]" \
-	"\\\$11 = <unavailable>"
+    "\\\$11 = <unavailable>"
 
 # Accesses through pointers in history go straight to the inferior though.
 gdb_test "print \$2\[0\]@1" "\\\$12 = \"\""

@@ -427,14 +427,14 @@ proc perform_all_tests {prototypes} {
     if {![gdb_test "bt 2" \
 	      "#0  main.*" \
 	      "bt after continuing from call dummy breakpoint"]} then {
-		 set new_reg_content [fetch_all_registers \
-					  "register contents after stop in call dummy"]
-		 if {$old_reg_content == $new_reg_content} {
-		     pass "continue after stop in call dummy preserves register contents"
-		 } else {
-		     fail "continue after stop in call dummy preserves register contents"
-		 }
-	     }
+	set new_reg_content [fetch_all_registers \
+				 "register contents after stop in call dummy"]
+	if {$old_reg_content == $new_reg_content} {
+	    pass "continue after stop in call dummy preserves register contents"
+	} else {
+	    fail "continue after stop in call dummy preserves register contents"
+	}
+    }
 
     rerun_and_prepare $prototypes
     # Set breakpoint at a function we will call from gdb.
@@ -453,14 +453,14 @@ proc perform_all_tests {prototypes} {
     if {![gdb_test "bt 2" \
 	      "#0  main.*" \
 	      "bt after finishing from call dummy breakpoint"]} then {
-		 set new_reg_content [fetch_all_registers \
-					  "register contents after finish in call dummy"]
-		 if {$old_reg_content == $new_reg_content} {
-		     pass "finish after stop in call dummy preserves register contents"
-		 } else {
-		     fail "finish after stop in call dummy preserves register contents"
-		 }
-	     }
+	set new_reg_content [fetch_all_registers \
+				 "register contents after finish in call dummy"]
+	if {$old_reg_content == $new_reg_content} {
+	    pass "finish after stop in call dummy preserves register contents"
+	} else {
+	    fail "finish after stop in call dummy preserves register contents"
+	}
+    }
 
     rerun_and_prepare $prototypes
     # Set breakpoint at a function we will call from gdb.
@@ -478,14 +478,14 @@ proc perform_all_tests {prototypes} {
 	      "back at main after return from call dummy breakpoint" \
 	      "Make add return now. .y or n.*" \
 	      "y"]} then {
-		 set new_reg_content [fetch_all_registers \
-					  "register contents after return in call dummy"]
-		 if {$old_reg_content == $new_reg_content} {
-		     pass "return after stop in call dummy preserves register contents"
-		 } else {
-		     fail "return after stop in call dummy preserves register contents"
-		 }
-	     }
+	set new_reg_content [fetch_all_registers \
+				 "register contents after return in call dummy"]
+	if {$old_reg_content == $new_reg_content} {
+	    pass "return after stop in call dummy preserves register contents"
+	} else {
+	    fail "return after stop in call dummy preserves register contents"
+	}
+    }
 
     rerun_and_prepare $prototypes
     # Set breakpoint at a function we will call from gdb.

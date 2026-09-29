@@ -113,25 +113,25 @@ proc build_hint_re { width with_style } {
     if { $width > 66 || $width < 51 } {
 	lappend msg \
 	    {{none {Type "}}
-	     {command {apropos word}}
-	     {none "\" to search for commands related to \"word\"."}}
+		{command {apropos word}}
+		{none "\" to search for commands related to \"word\"."}}
     } elseif { $width > 56 } {
 	lappend msg \
 	    {{none {Type "}}
-	     {command {apropos word}}
-	     {none {" to search for commands related to}}} \
+		{command {apropos word}}
+		{none {" to search for commands related to}}} \
 	    {{none {"word".}}}
     } elseif { $width > 53 } {
 	lappend msg \
 	    {{none {Type "}}
-	     {command {apropos word}}
-	     {none {" to search for commands related}}}	 \
+		{command {apropos word}}
+		{none {" to search for commands related}}}	 \
 	    {{none {to "word".}}}
     } else {
 	lappend msg \
 	    {{none {Type "}}
-	     {command {apropos word}}
-	     {none {" to search for commands}}} \
+		{command {apropos word}}
+		{none {" to search for commands}}} \
 	    {{none {related to "word".}}}
     }
 
@@ -151,32 +151,32 @@ proc build_hint_re { width with_style } {
 	# the line is converted to a regexp, which might add escape
 	# characters.
 	set top_bottom [string_to_regexp "+[string repeat "-" [expr {$width - 2}]]+"]
-	set lines [list $top_bottom]
-	set side [string_to_regexp "|"]
-	foreach m $msg {
-	    set plain [parts_to_string false false $m]
-	    set space_count [expr {$width - 4 - [string length $plain]}]
-	    set spaces [string repeat " " $space_count]
-	    set maybe_styled [parts_to_string $with_style true $m]
-	    lappend lines "$side $maybe_styled$spaces $side"
-	}
-	lappend lines $top_bottom
-    } else {
-	# For narrow terminals no box is added.  Just convert each line in
-	# MSG to a regexp, adding style escape sequences when WITH_STYLE is
-	# true.
-	set lines {}
-	foreach m $msg {
-	    lappend lines [parts_to_string $with_style true $m]
-	}
+    set lines [list $top_bottom]
+    set side [string_to_regexp "|"]
+    foreach m $msg {
+	set plain [parts_to_string false false $m]
+	set space_count [expr {$width - 4 - [string length $plain]}]
+	set spaces [string repeat " " $space_count]
+	set maybe_styled [parts_to_string $with_style true $m]
+	lappend lines "$side $maybe_styled$spaces $side"
     }
+    lappend lines $top_bottom
+} else {
+    # For narrow terminals no box is added.  Just convert each line in
+    # MSG to a regexp, adding style escape sequences when WITH_STYLE is
+    # true.
+    set lines {}
+    foreach m $msg {
+	lappend lines [parts_to_string $with_style true $m]
+    }
+}
 
-    # Add blank line before and after current lines.
-    set lines [linsert $lines 0 ""]
-    lappend lines ""
+# Add blank line before and after current lines.
+set lines [linsert $lines 0 ""]
+lappend lines ""
 
-    # Join the regexp together.
-    return [multi_line {*}$lines]
+# Join the regexp together.
+return [multi_line {*}$lines]
 }
 
 # Tell GDB to start with a terminal width of WIDTH, then start GDB.

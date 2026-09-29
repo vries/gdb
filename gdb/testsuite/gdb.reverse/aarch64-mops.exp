@@ -91,7 +91,7 @@ foreach_with_prefix insn_prefix {"set" "cpy" "cpyf"} {
 
     # Record the new memory and register values.
     set dest_new [get_valueof "/x" "dest" "unable to read new" \
-			  "get dest new value"]
+		      "get dest new value"]
     set x19_new [capture_command_output "info register x19" ""]
     set x21_new [capture_command_output "info register x21" ""]
 

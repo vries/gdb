@@ -34,13 +34,13 @@ set reg_handler_value "0xff008041"
 
 proc check_fpmr {value} {
     gdb_test "print /x \$fpmr" ".* = {?$value}?" \
-	     "check register \$fpmr has value $value"
+	"check register \$fpmr has value $value"
 }
 
 # Run until end of signal handler.
 
 gdb_test "continue" "Continuing.*Program received signal SIGILL.*" \
-	 "continue until signal"
+    "continue until signal"
 
 gdb_breakpoint [gdb_get_line_number "exit (0)"]
 gdb_continue_to_breakpoint "exit" ".*exit.*"
@@ -51,24 +51,24 @@ set mainframe [expr {$handlerframe + 2}]
 # Check register values.
 
 with_test_prefix "handler frame 1st" {
-  check_fpmr $reg_handler_value
+    check_fpmr $reg_handler_value
 }
 
 # Switch to the frame for main (), and check register values.
 
 gdb_test "frame $mainframe" "#$mainframe.*main ().*" \
-	 "set to main frame"
+    "set to main frame"
 
 with_test_prefix "main frame" {
-  check_fpmr $reg_main_value
+    check_fpmr $reg_main_value
 }
 
 # Switch back to the signal handler frame, and check register values.
 
 gdb_test "frame $handlerframe" \
-	 "#$handlerframe.*handler \\\(sig=4\\\).*" \
-	 "set to signal handler frame"
+    "#$handlerframe.*handler \\\(sig=4\\\).*" \
+    "set to signal handler frame"
 
 with_test_prefix "handler frame 2nd" {
-  check_fpmr $reg_handler_value
+    check_fpmr $reg_handler_value
 }

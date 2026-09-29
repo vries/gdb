@@ -32,7 +32,7 @@ clean_restart ${::testfile}
 runto_main
 
 gdb_test "b [gdb_get_line_number {breakpoint here} ${testfile}.cc ]" \
-	 ".*Breakpoint .*call-c.*"
+    ".*Breakpoint .*call-c.*"
 
 gdb_test "print foo(1)" "${::valnum_re} = 1"
 gdb_test "continue" ".*breakpoint here.*" "continue to bp"

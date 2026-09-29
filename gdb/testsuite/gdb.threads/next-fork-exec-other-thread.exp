@@ -36,7 +36,7 @@ set break_here_line [gdb_get_line_number "break here"]
 foreach_with_prefix fork_func {fork vfork} {
     set opts [list debug pthreads additional_flags=-DFORK_FUNC=${fork_func}]
     if { [build_executable "failed to prepare" \
-	    ${testfile}-${fork_func} ${srcfile} $opts] } {
+	      ${testfile}-${fork_func} ${srcfile} $opts] } {
 	return
     }
 }
@@ -49,7 +49,7 @@ proc drain_gdbserver_output { } {
 	    -i "$::server_spawn_id"
 	    -timeout 0
 	    -re ".+" {
-	      exp_continue
+		exp_continue
 	    }
 	}
     }

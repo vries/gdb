@@ -69,8 +69,8 @@ proc check_thread_local {number} {
     set expected_value [compute_expected_value ${me_variable}]
 
     gdb_test "p a_thread_local" \
-	    "= $expected_value" \
-	    "${number} thread local storage"
+	"= $expected_value" \
+	"${number} thread local storage"
 
     if {[allow_python_tests]} {
 	gdb_test_no_output \
@@ -84,16 +84,16 @@ proc check_thread_local {number} {
     }
 
     gdb_test "p K::another_thread_local" \
-	    "= $me_variable" \
-	    "${number} another thread local storage"
+	"= $me_variable" \
+	"${number} another thread local storage"
 
     gdb_test "info address a_thread_local" \
-	    ".*a_thread_local.*a thread-local variable at offset.*" \
-	    "${number} info address a_thread_local"
+	".*a_thread_local.*a thread-local variable at offset.*" \
+	"${number} info address a_thread_local"
 
     gdb_test "info address K::another_thread_local" \
-	    ".*another_thread_local.*a thread-local variable at offset.*" \
-	    "${number} info address another_thread_local"
+	".*another_thread_local.*a thread-local variable at offset.*" \
+	"${number} info address another_thread_local"
 }
 
 ### Select a particular thread.
@@ -143,9 +143,9 @@ proc check_thread_stack {number spin_threads spin_threads_level} {
 	    }
 	}
 	-re ".*$gdb_prompt $" {
-	 set tarr($number) 0
-	 set tarrl($number) 0
-	 pass "backtrace of thread number $number not relevant"
+	    set tarr($number) 0
+	    set tarrl($number) 0
+	    pass "backtrace of thread number $number not relevant"
 	}
 	timeout {
 	    fail "backtrace of thread number $number (timeout)"
@@ -172,17 +172,17 @@ if {![runto_main]} {
 # test the thread local's value.
 #
 gdb_test "b [gdb_get_line_number "here we know tls value"]" \
-	 ".*Breakpoint 2.*tls.*"   "set breakpoint at all threads"
+    ".*Breakpoint 2.*tls.*"   "set breakpoint at all threads"
 
 # Set a bp at a point where we know all threads are alive.
 #
 gdb_test "b [gdb_get_line_number "still alive"]" \
-	 ".*Breakpoint 3.*tls.*" "set breakpoint at synch point"
+    ".*Breakpoint 3.*tls.*" "set breakpoint at synch point"
 
 # Set a bp at the end to see if all threads are finished.
 #
 gdb_test "b [gdb_get_line_number "before exit"]" \
-	 ".*Breakpoint 4.*tls.*" "set breakpoint at exit"
+    ".*Breakpoint 4.*tls.*" "set breakpoint at exit"
 
 send_gdb "continue\n"
 gdb_expect {
@@ -208,19 +208,19 @@ gdb_expect {
 }
 
 gdb_test "info thread" ".*${tdlabel_re}.*spin.*" \
-	"at least one th in spin while stopped at first th"
+    "at least one th in spin while stopped at first th"
 
 check_thread_local "first"
 
 gdb_test "continue" ".*Breakpoint 2.*tls value.*" "continue to second thread"
 gdb_test "info thread" "${tdlabel_re}.*spin.*" \
-	"at least one th in spin while stopped at second th"
+    "at least one th in spin while stopped at second th"
 
 check_thread_local "second"
 
 gdb_test "continue" ".*Breakpoint 2.*tls value.*" "continue to third thread"
 gdb_test "info thread" ".*${tdlabel_re}.*spin.*" \
-	"at least one th in spin while stopped at third th"
+    "at least one th in spin while stopped at third th"
 
 check_thread_local "third"
 
@@ -230,15 +230,15 @@ set no_of_threads 0
 send_gdb "info thread\n"
 gdb_expect {
     -re "^info thread\[ \t\r\n\]+ *Id .*Frame\[ \t\r\n\]+.*(${::decimal}) *${tdlabel_re}\[^\r\n\]+\r\n$gdb_prompt $" {
-	   set no_of_threads $expect_out(1,string)
-	   pass "get number of threads"
-	}
-	-re "$gdb_prompt $" {
-	    fail "get number of threads"
-	}
-	timeout {
-	    fail "get number of threads (timeout)"
-	}
+	set no_of_threads $expect_out(1,string)
+	pass "get number of threads"
+    }
+    -re "$gdb_prompt $" {
+	fail "get number of threads"
+    }
+    timeout {
+	fail "get number of threads (timeout)"
+    }
 }
 
 array set spin_threads {}
@@ -257,23 +257,23 @@ for {set i 1} {$i <= $no_of_threads} {incr i} {
 set thrs_in_spin 0
 foreach i [array names spin_threads] {
     if {$spin_threads($i) == 1} {
-      incr thrs_in_spin
+	incr thrs_in_spin
 
-      with_test_prefix "spin_threads" {
-	select_thread $i
-      }
-      set level $spin_threads_level($i)
-      # We expect to be in sem_wait, but if the thread has not yet
-      # been scheduled, we might be in sem_post still.  We could be at
-      # any intermediate point in spin, too, but that is much less
-      # likely.
-      gdb_test "up $level" ".*spin.*sem_(wait|post).*" "thread $i up"
-      check_thread_local $i
+	with_test_prefix "spin_threads" {
+	    select_thread $i
+	}
+	set level $spin_threads_level($i)
+	# We expect to be in sem_wait, but if the thread has not yet
+	# been scheduled, we might be in sem_post still.  We could be at
+	# any intermediate point in spin, too, but that is much less
+	# likely.
+	gdb_test "up $level" ".*spin.*sem_(wait|post).*" "thread $i up"
+	check_thread_local $i
     }
 }
 
 if {$thrs_in_spin == 0} {
-  fail "no thread backtrace reported spin (vsyscall kernel problem?)"
+    fail "no thread backtrace reported spin (vsyscall kernel problem?)"
 }
 
 gdb_test "continue" ".*Breakpoint 4.*before exit.*" "threads exited"
@@ -300,7 +300,7 @@ gdb_expect {
 runto spin
 
 gdb_test "info address a_global" \
-	".*a_global.*static storage at address.*"
+    ".*a_global.*static storage at address.*"
 
 gdb_test "info address me" ".*me.*is a (complex DWARF expression:|variable).*"
 

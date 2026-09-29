@@ -41,26 +41,26 @@ set srcfiles [list $mainfile $f2file]
 # This file will be removed after compilation.
 set fd [open "$mainfile" w]
 puts $fd {
-extern int f2(int);
-int
-main ()
-{
-  int a = 4;
-  a = f2(a);
-  return a - a;
-}
+    extern int f2(int);
+    int
+    main ()
+    {
+	int a = 4;
+	a = f2(a);
+	return a - a;
+    }
 }
 close $fd
 
 # Step 2: Write the f2.c file into the output directory.
 set fd [open "$f2file" w]
 puts $fd {
-int
-f2 (int x)
-{
-  x <<= 1;
-  return x+5;
-}
+    int
+    f2 (int x)
+    {
+	x <<= 1;
+	return x+5;
+    }
 }
 close $fd
 

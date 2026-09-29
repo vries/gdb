@@ -23,9 +23,9 @@ clean_restart
 # loaded.
 foreach filename [lsort [glob $srcdir/$subdir/riscv-tdesc-loading-*.xml]] {
     if {[is_remote host]} {
-       set test_path [remote_download host $filename]
+	set test_path [remote_download host $filename]
     } else {
-       set test_path $filename
+	set test_path $filename
     }
 
     # Currently it is expected that all of the target descriptions in

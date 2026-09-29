@@ -42,7 +42,7 @@ proc noreturn_test { } {
 	-re "Not confirmed.*$gdb_prompt $" {
 	    pass $test
 	}
-   }
+    }
 }
 
 noreturn_test

@@ -101,7 +101,7 @@ Dwarf::assemble $dwarf_asm {
 }
 
 if { [build_executable ${testfile}.exp ${testfile} "$srcfile $dwarf_asm" \
-      {additional_flags=-nostdlib additional_flags=-static}] != 0 } {
+	  {additional_flags=-nostdlib additional_flags=-static}] != 0 } {
     untested "failed to compile"
     return
 }

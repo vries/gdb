@@ -41,12 +41,12 @@ gdb_test "shell stty intr '^C'" ".*"
 
 set message "first continue"
 gdb_test_multiple "continue" "first continue" {
-  -re "error:.*$gdb_prompt $" {
-    fail "$message"
-  }
-  -re "Continuing" {
-    pass "$message"
-  }
+    -re "error:.*$gdb_prompt $" {
+	fail "$message"
+    }
+    -re "Continuing" {
+	pass "$message"
+    }
 }
 
 # Wait one second.  This is better than the TCL "after" command, because
@@ -134,37 +134,37 @@ gdb_test "info threads" ".*zardoz.*" "check thread name"
 
 set message "second continue"
 gdb_test_multiple "continue" "second continue" {
-  -re "error:.*$gdb_prompt $" {
-    fail "$message"
-  }
-  -re "Continuing" {
-    pass "$message"
-  }
+    -re "error:.*$gdb_prompt $" {
+	fail "$message"
+    }
+    -re "Continuing" {
+	pass "$message"
+    }
 }
 
 # Wait another second.  If the program stops on its own, GDB has failed
 # to handle duplicate SIGINTs sent to multiple threads.
 set failed 0
 remote_expect host 1 {
-  -re "\\\[New \[^\]\]*\\\]\r\n" {
-    exp_continue -continue_timer
-  }
-  -re "\\\[\[^\]\]* exited\\\]\r\n" {
-    exp_continue -continue_timer
-  }
-  -re " received signal SIGINT.*$gdb_prompt $" {
-    if { $failed == 0 } {
-      fail "check for duplicate SIGINT"
+    -re "\\\[New \[^\]\]*\\\]\r\n" {
+	exp_continue -continue_timer
     }
-    send_gdb "continue\n"
-    set failed 1
-    exp_continue
-  }
-  timeout {
-    if { $failed == 0 } {
-      pass "check for duplicate SIGINT"
+    -re "\\\[\[^\]\]* exited\\\]\r\n" {
+	exp_continue -continue_timer
     }
-  }
+    -re " received signal SIGINT.*$gdb_prompt $" {
+	if { $failed == 0 } {
+	    fail "check for duplicate SIGINT"
+	}
+	send_gdb "continue\n"
+	set failed 1
+	exp_continue
+    }
+    timeout {
+	if { $failed == 0 } {
+	    pass "check for duplicate SIGINT"
+	}
+    }
 }
 
 # Send another Ctrl-C and verify that we can do info threads and quit

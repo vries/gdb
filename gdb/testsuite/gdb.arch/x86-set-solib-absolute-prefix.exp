@@ -30,7 +30,7 @@ standard_testfile
 # `__kernel_vsyscall' originates from vDSO.
 set flags { debug }
 if { ![is_ilp32_target] } {
-     lappend flags  "additional_flags=-m32"
+    lappend flags  "additional_flags=-m32"
 }
 
 if { [prepare_for_testing $testfile.exp $testfile $srcfile $flags] } {

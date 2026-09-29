@@ -33,11 +33,11 @@ mi_clean_restart $::testfile
 mi_create_breakpoint "$srcfile:$main_break_line" "set breakpoint in main"
 mi_run_cmd
 mi_expect_stop "breakpoint-hit" "main" "" $srcfile $main_break_line \
-	 { "" "disp=\"keep\"" } "run to breakpoint in main"
+    { "" "disp=\"keep\"" } "run to breakpoint in main"
 
 mi_gdb_test "thread" \
-	".*Current thread is 1.*" \
-	"info thread 1"
+    ".*Current thread is 1.*" \
+    "info thread 1"
 
 # Run -stack-info-depth in a different thread, the current thread
 # should not change.

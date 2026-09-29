@@ -19,7 +19,7 @@ load_lib "trace-support.exp"
 standard_testfile
 
 if {[prepare_for_testing "failed to prepare" $testfile $srcfile \
-     [list debug additional_flags=-mavx]]} {
+	 [list debug additional_flags=-mavx]]} {
     return
 }
 
@@ -45,7 +45,7 @@ gdb_test_multiple "print \$ymm15" "check for AVX support" {
 gdb_test "trace traceme" ".*"
 
 gdb_trace_setactions "set actions for tracepoint" "" \
-	"collect \$ymm15" "^$"
+    "collect \$ymm15" "^$"
 
 gdb_breakpoint "end"
 
@@ -62,7 +62,7 @@ gdb_test "tsave ${tracefile}.tf" \
 
 # Change target to tfile.
 gdb_test "target tfile ${tracefile}.tf" "" "change to tfile target" \
-  "A program is being debugged already.  Kill it. .y or n. $" "y"
+    "A program is being debugged already.  Kill it. .y or n. $" "y"
 
 gdb_test "tfind 0" "Found trace frame 0, tracepoint .*"
 

@@ -56,37 +56,37 @@ Dwarf::assemble $asm_file {
 	    }
 
 	    DW_TAG_subprogram {
-		 DW_AT_name main
-		 DW_AT_low_pc $main_start DW_FORM_addr
-		 DW_AT_high_pc $main_end DW_FORM_addr
+		DW_AT_name main
+		DW_AT_low_pc $main_start DW_FORM_addr
+		DW_AT_high_pc $main_end DW_FORM_addr
 	    } {
 		DW_TAG_variable {
-		     DW_AT_name argc
-		     DW_AT_type :$integer
-		     DW_AT_location {
+		    DW_AT_name argc
+		    DW_AT_type :$integer
+		    DW_AT_location {
 			DW_OP_entry_value {
 			    DW_OP_regx $::dwarf_regnum
 			}
 			DW_OP_stack_value
-		     } SPECIAL_expr
+		    } SPECIAL_expr
 		}
 
 		DW_TAG_variable {
-		     DW_AT_name argc2
-		     DW_AT_type :$integer
-		     DW_AT_location {
+		    DW_AT_name argc2
+		    DW_AT_type :$integer
+		    DW_AT_location {
 			DW_OP_entry_value {
 			    DW_OP_regx $::dwarf_regnum
 			}
 			DW_OP_plus_uconst 3
 			DW_OP_stack_value
-		     } SPECIAL_expr
+		    } SPECIAL_expr
 		}
 
 		DW_TAG_variable {
-		     DW_AT_name argc3
-		     DW_AT_type :$integer
-		     DW_AT_location {
+		    DW_AT_name argc3
+		    DW_AT_type :$integer
+		    DW_AT_location {
 			DW_OP_addr [gdb_target_symbol fake_data]
 			DW_OP_entry_value {
 			    DW_OP_regx $::dwarf_regnum
@@ -94,38 +94,38 @@ Dwarf::assemble $asm_file {
 			DW_OP_const1u 3
 			DW_OP_shl
 			DW_OP_plus
-		     } SPECIAL_expr
+		    } SPECIAL_expr
 		}
 	    }
 
 	    DW_TAG_subprogram {
-		 DW_AT_name bar
-		 DW_AT_low_pc $bar_start DW_FORM_addr
-		 DW_AT_high_pc $bar_end DW_FORM_addr
+		DW_AT_name bar
+		DW_AT_low_pc $bar_start DW_FORM_addr
+		DW_AT_high_pc $bar_end DW_FORM_addr
 	    } {
 		DW_TAG_variable {
-		     DW_AT_name foo
-		     DW_AT_type :$integer
-		     DW_AT_location {
+		    DW_AT_name foo
+		    DW_AT_type :$integer
+		    DW_AT_location {
 			DW_OP_entry_value {
 			    DW_OP_bregx $::dwarf_regnum 0
 			    DW_OP_deref_size 4
 			}
 			DW_OP_stack_value
-		     } SPECIAL_expr
+		    } SPECIAL_expr
 		}
 
 		DW_TAG_variable {
-		     DW_AT_name foo2
-		     DW_AT_type :$integer
-		     DW_AT_location {
+		    DW_AT_name foo2
+		    DW_AT_type :$integer
+		    DW_AT_location {
 			DW_OP_entry_value {
 			    DW_OP_bregx $::dwarf_regnum 0
 			    DW_OP_deref_size 4
 			}
 			DW_OP_plus_uconst 1
 			DW_OP_stack_value
-		     } SPECIAL_expr
+		    } SPECIAL_expr
 		}
 	    }
 	}

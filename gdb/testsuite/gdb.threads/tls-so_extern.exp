@@ -40,35 +40,35 @@ gdb_test "print so_extern" "0x0" "print thread local storage variable"
 gdb_test "ptype so_extern" "void \\*" "ptype of thread local storage variable"
 
 gdb_test "info address so_extern" \
-	"Symbol \\\"so_extern\\\" is a thread-local variable at offset 0x0 in the thread-local storage for .*tls-so_extern.*" \
-	"print storage info for thread local storage variable"
+    "Symbol \\\"so_extern\\\" is a thread-local variable at offset 0x0 in the thread-local storage for .*tls-so_extern.*" \
+    "print storage info for thread local storage variable"
 
 set line_number [gdb_get_line_number "break here to check result"]
 
 gdb_test "break $line_number" \
-	"Breakpoint.*at.*file.*tls-so_extern_main.c.*line ${line_number}." \
-	"break in thread function"
+    "Breakpoint.*at.*file.*tls-so_extern_main.c.*line ${line_number}." \
+    "break in thread function"
 gdb_test "continue" \
-	"tls_ptr .* at .*:.*break here to check result.*" \
-	"continue to break in tls_ptr called by main"
+    "tls_ptr .* at .*:.*break here to check result.*" \
+    "continue to break in tls_ptr called by main"
 gdb_test "print so_extern == &so_extern" \
-	 " = 1" \
-	"check so_extern address in main"
+    " = 1" \
+    "check so_extern address in main"
 gdb_test "continue" \
-	"tls_ptr .* at .*:.*break here to check result.*" \
-	"continue to break in a thread"
+    "tls_ptr .* at .*:.*break here to check result.*" \
+    "continue to break in a thread"
 gdb_test "print so_extern == &so_extern" \
-	 " = 1" \
-	"check so_extern address"
+    " = 1" \
+    "check so_extern address"
 gdb_test "continue" \
-	"tls_ptr .* at .*:.*break here to check result.*" \
-	"continue to break in the other thread"
+    "tls_ptr .* at .*:.*break here to check result.*" \
+    "continue to break in the other thread"
 gdb_test "print so_extern == &so_extern" \
-	 " = 1" \
-	"check so_extern address in other thread"
+    " = 1" \
+    "check so_extern address in other thread"
 gdb_test "continue" \
-	"tls_ptr .* at .*:.*break here to check result.*" \
-	"continue to break in tls_ptr called at end of main"
+    "tls_ptr .* at .*:.*break here to check result.*" \
+    "continue to break in tls_ptr called at end of main"
 gdb_test "print so_extern == &so_extern" \
-	 " = 1" \
-	"check so_extern address at end of main"
+    " = 1" \
+    "check so_extern address at end of main"

@@ -146,7 +146,7 @@ gdb_test_multiple "delete tracepoint $trcpt3" "3.2f: delete third tracepoint" {
 # send_gdb "ARF! \\n\n"
 gdb_test "info tracepoints" \
     "No tracepoints." \
-			"3.2g: verify delete third tracepoint"
+    "3.2g: verify delete third tracepoint"
 
 # 3.3 delete three tracepoints at once
 gdb_delete_tracepoints
@@ -185,18 +185,18 @@ gdb_test_multiple "delete tracepoint $trcpt1 $trcpt2 $trcpt3" \
 
 gdb_test "info tracepoints" \
     "No tracepoints." \
-			"3.3c: verify delete three tracepoints"
+    "3.3c: verify delete three tracepoints"
 
 # 3.4 delete invalid tracepoint number
 gdb_test "delete tracepoint [expr {$trcpt2 + $trcpt3}]" \
     "No breakpoint number [expr {$trcpt2 + $trcpt3}]." \
-			"3.4: delete invalid tracepoint number"
+    "3.4: delete invalid tracepoint number"
 
 # 3.5 delete tracepoint number zero
 gdb_test "delete tracepoint 0" "bad breakpoint number at or near '0'" \
-			"3.5: delete tracepoint number zero"
+    "3.5: delete tracepoint number zero"
 
 # 3.6 help delete tracepoints
 gdb_test "help delete tracepoints" \
     "Delete specified tracepoints.*" \
-			"3.6: help delete tracepoints"
+    "3.6: help delete tracepoints"

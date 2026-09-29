@@ -52,7 +52,7 @@ gdb_test \
 # Test memory read operations without execution.
 
 gdb_py_test_silent_cmd "python addr = gdb.lookup_global_symbol ('int8_global').value().address" \
-  "get global variable address" 0
+    "get global variable address" 0
 gdb_test "python \
 	    int8_global_mv = gdb.selected_inferior().read_memory (addr, 1); \
 	    print(int.from_bytes(int8_global_mv\[0\], byteorder='little'))" \
@@ -157,7 +157,7 @@ gdb_test "python print(worker_thread._user_attribute)" "123" \
 # Test memory read and write operations.
 
 gdb_py_test_silent_cmd "python addr = gdb.selected_frame ().read_var ('str')" \
-  "read str address" 0
+    "read str address" 0
 gdb_test "python astr = gdb.inferiors()\[0\].read_memory (addr, 5); print(astr)" \
     "<memory at $hex>" \
     "read str contents"
@@ -165,9 +165,9 @@ gdb_test "python print(astr\[0\])" "b'h'"
 gdb_py_test_silent_cmd "python a = bytes('a', 'ascii')" "" 0
 gdb_py_test_silent_cmd "python astr\[1\] = a" "change str" 0
 gdb_py_test_silent_cmd "python gdb.inferiors()\[0\].write_memory (addr, astr)" \
-  "write str" 1
+    "write str" 1
 gdb_test "print str" " = \"hallo, testsuite\"" \
-  "ensure str was changed in the inferior"
+    "ensure str was changed in the inferior"
 
 # Add a new inferior here, so we can test that operations work on the
 # correct inferior.

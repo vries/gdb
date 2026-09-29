@@ -211,21 +211,21 @@ test_expr "set variable v_unsigned_long = 0" "print (void*)v_unsigned_long" "${:
 #
 gdb_test_multiple "print sizeof (long long) > sizeof (long)" \
     "sizeof long long > sizeof long" {
-    -re "${::valnum_re} = $true.*$gdb_prompt" {
-	set ok 1
-	pass "sizeof (long long) > sizeof (long) (true)"
+	-re "${::valnum_re} = $true.*$gdb_prompt" {
+	    set ok 1
+	    pass "sizeof (long long) > sizeof (long) (true)"
+	}
+	-re "${::valnum_re} = $false.*$gdb_prompt" {
+	    set ok 0
+	    pass "sizeof (long long) > sizeof (long) (false)"
+	}
     }
-    -re "${::valnum_re} = $false.*$gdb_prompt" {
-	set ok 0
-	pass "sizeof (long long) > sizeof (long) (false)"
-    }
-}
 if {!$ok} { setup_xfail "*-*-*" }
 gdb_test "print (void*) ((long long) (unsigned long) -1 + 1)" \
-	"warning: value truncated.*" "truncate (void*) 0x00000000ffffffff + 1"
+    "warning: value truncated.*" "truncate (void*) 0x00000000ffffffff + 1"
 if {!$ok} { setup_xfail "*-*-*" }
 gdb_test "print (void*) (~((long long)(unsigned long) -1) - 1)" \
-	"warning: value truncated.*" "truncate (void*) 0xffffffff00000000 - 1"
+    "warning: value truncated.*" "truncate (void*) 0xffffffff00000000 - 1"
 
 # String concatenation.
 test_expr "print \"x\" \"y\"" "${::valnum_re} = \"xy\""

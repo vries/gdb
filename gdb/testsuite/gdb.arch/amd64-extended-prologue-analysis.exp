@@ -95,7 +95,7 @@ with_test_prefix "w/o .cfi directives" {
 	# -fno-asynchronous-unwind-tables is needed to get rid of .cfi
 	# directives in .eh_frame section.
 	if { [gdb_can_simple_compile fno-asynchronous-unwind-tables \
-	    { void foo () { } } object -fno-asynchronous-unwind-tables] == 0 } {
+		  { void foo () { } } object -fno-asynchronous-unwind-tables] == 0 } {
 	    unsupported \
 		"compiler doesn't support -fno-asynchronous-unwind-tables flag"
 	} else {
@@ -105,9 +105,9 @@ with_test_prefix "w/o .cfi directives" {
 	    # At least gcc 11.4 and later by default does not generate full
 	    # debug info, "nodebug" is there for other compilers.
 	    if { [prepare_for_testing "failed to prepare" "$testfile-no-cfi-C" \
-		$srcfile { optimize=-O1 nodebug
-		additional_flags=-fno-asynchronous-unwind-tables
-		additional_flags=-fno-omit-frame-pointer}] } {
+		      $srcfile { optimize=-O1 nodebug
+			  additional_flags=-fno-asynchronous-unwind-tables
+			  additional_flags=-fno-omit-frame-pointer}] } {
 		return
 	    }
 
@@ -122,7 +122,7 @@ with_test_prefix "w/o .cfi directives" {
 
     with_test_prefix "ASM source" {
 	if { [prepare_for_testing "failed to prepare" "$testfile-no-cfi-S" \
-	    $srcfile2 nodebug ] } {
+		  $srcfile2 nodebug ] } {
 	    return
 	}
 
@@ -138,8 +138,8 @@ with_test_prefix "w/o .cfi directives" {
 with_test_prefix "with .cfi directives" {
     with_test_prefix "compiler gen" {
 	if { [prepare_for_testing "failed to prepare" "$testfile-cfi-C" \
-	    $srcfile { optimize=-O1
-	    nodebug additional_flags=-fno-omit-frame-pointer}] } {
+		  $srcfile { optimize=-O1
+		      nodebug additional_flags=-fno-omit-frame-pointer}] } {
 	    return
 	}
 
@@ -153,7 +153,7 @@ with_test_prefix "with .cfi directives" {
 
     with_test_prefix "ASM source" {
 	if { [prepare_for_testing "failed to prepare" "$testfile-cfi-S" \
-	    $srcfile3 nodebug ] } {
+		  $srcfile3 nodebug ] } {
 	    return
 	}
 
@@ -172,14 +172,14 @@ with_test_prefix "with .cfi directives" {
 with_test_prefix "offset initialization" {
     with_test_prefix "compiler gen" {
 	if { [gdb_can_simple_compile fno-asynchronous-unwind-tables \
-	    { void foo () { } } object -fno-asynchronous-unwind-tables] == 0 } {
+		  { void foo () { } } object -fno-asynchronous-unwind-tables] == 0 } {
 	    unsupported \
 		"compiler doesn't support -fno-asynchronous-unwind-tables flag"
 	} else {
 	    if { [prepare_for_testing "failed to prepare" "$testfile-offset-C" \
-		$srcfile { optimize=-O1 nodebug
-		additional_flags=-fno-asynchronous-unwind-tables
-		additional_flags=-fomit-frame-pointer}] } {
+		      $srcfile { optimize=-O1 nodebug
+			  additional_flags=-fno-asynchronous-unwind-tables
+			  additional_flags=-fomit-frame-pointer}] } {
 		return
 	    }
 
@@ -194,7 +194,7 @@ with_test_prefix "offset initialization" {
 
     with_test_prefix "ASM source" {
 	if { [prepare_for_testing "failed to prepare" "$testfile-offset-S" \
-	    $srcfile4 nodebug ] } {
+		  $srcfile4 nodebug ] } {
 	    return
 	}
 

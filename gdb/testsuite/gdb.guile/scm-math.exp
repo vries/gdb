@@ -338,7 +338,7 @@ if {[prepare_for_testing "failed to prepare" $testfile $srcfile {debug c}]} {
 }
 
 if {![gdb_guile_runto_main]} {
-   return
+    return
 }
 
 test_value_numeric_ops

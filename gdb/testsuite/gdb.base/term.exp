@@ -48,11 +48,11 @@ proc compare_gdb_and_inferior_settings { t } {
     array set termios $t
 
     gdb_test "info terminal" \
-    [multi_line "Inferior's terminal status .currently saved by GDB.:" \
-		"File descriptor flags = .*" \
-		"Process group = $decimal" \
-		"c_iflag = ${termios(c_iflag)}, c_oflag = ${termios(c_oflag)}," \
-		"c_cflag = ${termios(c_cflag)}, c_lflag = ${termios(c_lflag)}.*" ]
+	[multi_line "Inferior's terminal status .currently saved by GDB.:" \
+	     "File descriptor flags = .*" \
+	     "Process group = $decimal" \
+	     "c_iflag = ${termios(c_iflag)}, c_oflag = ${termios(c_oflag)}," \
+	     "c_cflag = ${termios(c_cflag)}, c_lflag = ${termios(c_lflag)}.*" ]
 }
 
 if {[target_info gdb_protocol] == ""} {

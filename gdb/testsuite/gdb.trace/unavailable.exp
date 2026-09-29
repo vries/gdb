@@ -73,13 +73,13 @@ proc run_trace_experiment { test_func } {
     gdb_test_no_output "tstart" "start trace experiment"
 
     gdb_test "continue" \
-	    "Continuing.*Breakpoint ${::decimal}, end.*" \
-	    "run trace experiment"
+	"Continuing.*Breakpoint ${::decimal}, end.*" \
+	"run trace experiment"
     gdb_test_no_output "tstop" \
-	    "stop trace experiment"
+	"stop trace experiment"
     gdb_test "tfind start" \
-	    "#0  $test_func .*" \
-	    "tfind test frame"
+	"#0  $test_func .*" \
+	"tfind test frame"
 }
 
 # Test that "display VAR" works as expected, assuming VAR is wholly

@@ -70,7 +70,7 @@ proc gdb_load { arg } {
     set try_count 0
     send_gdb $command
     gdb_expect {
-	 -re "Unknown response.*resetting the board.|remote timeout" {
+	-re "Unknown response.*resetting the board.|remote timeout" {
 	    incr try_count
 	    if { $try_count > 3 } {
 		set try_count 0
@@ -81,13 +81,13 @@ proc gdb_load { arg } {
 	    send_gdb $command
 	    exp_continue
 	}
-	 -re "Remote target.*$gdb_prompt $" { }
-	 -re ".*SPARClite appears to be alive.*$gdb_prompt $"	{
+	-re "Remote target.*$gdb_prompt $" { }
+	-re ".*SPARClite appears to be alive.*$gdb_prompt $"	{
 	    if {$verbose > 1} {
 		send_user "Set target to $targetname\n"
 	    }
 	}
-	 timeout {
+	timeout {
 	    perror "Couldn't set SLITE target."
 	    set timeout 10
 	    verbose "Timeout is now $timeout seconds" 2
@@ -113,17 +113,17 @@ proc gdb_load { arg } {
 	set timeout 2400
 	verbose "Timeout is now $timeout seconds" 2
 	gdb_expect {
-	     -re "Loading.*$gdb_prompt $" {
+	    -re "Loading.*$gdb_prompt $" {
 		verbose "Loaded $arg into $GDB" 1
 		set timeout 30
 		verbose "Timeout is now $timeout seconds" 2
 	    }
-	     -re "$gdb_prompt $"     {
+	    -re "$gdb_prompt $"     {
 		if {$verbose > 1} {
 		    perror "GDB couldn't load."
 		}
 	    }
-	     timeout {
+	    timeout {
 		if {$verbose > 1} {
 		    perror "Timed out trying to load $arg."
 		}
@@ -139,8 +139,8 @@ proc gdb_load { arg } {
 	sleep 2
 	send_gdb ""
 	gdb_expect {
-	     -re ".*$gdb_prompt $" { verbose "Run command succeeded" }
-	     default {
+	    -re ".*$gdb_prompt $" { verbose "Run command succeeded" }
+	    default {
 		perror "error sending monitor run command"
 	    }
 	}
@@ -157,14 +157,14 @@ proc gdb_load { arg } {
     set timeout 60
     verbose "Timeout is now $timeout seconds" 2
     gdb_expect {
-	 -re ".*Kill it?.*y or n.*" {
+	-re ".*Kill it?.*y or n.*" {
 	    send_gdb "y\n"
 	    exp_continue
 	}
-	 -re ".*$gdb_prompt $"	{
+	-re ".*$gdb_prompt $"	{
 	    verbose "Set remote target to [target_info serial]" 2
 	}
-	 timeout {
+	timeout {
 	    perror "Couldn't set remote target."
 	    set timeout 10
 	    verbose "Timeout is now $timeout seconds" 2

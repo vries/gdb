@@ -77,7 +77,7 @@ with_test_prefix "test-param" {
 	[multi_line \
 	     "^Set the state of the boolean test-param\\." \
 	     "When enabled, test param does something useful\\. When disabled, does nothing\\."] \
-	 "set help"
+	"set help"
     gdb_test "help set print" \
 	"set print test-param -- Set the state of the boolean test-param.*" \
 	"general help"
@@ -201,11 +201,11 @@ foreach_with_prefix kind {
 
     set param_integer_error \
 	[multi_line \
-	    "ERROR: In procedure set-parameter-value!:" \
-	    "(ERROR: )?In procedure gdbscm_set_parameter_value_x:\
+	     "ERROR: In procedure set-parameter-value!:" \
+	     "(ERROR: )?In procedure gdbscm_set_parameter_value_x:\
 	     Wrong type argument in position 2 \\(expecting integer\\):\
 	     #:unlimited" \
-	    "Error while executing Scheme code\\."]
+	 "Error while executing Scheme code\\."]
     set param_minus_one_error "integer -1 out of range"
     set param_minus_two_error "integer -2 out of range"
     switch -- $kind {
@@ -334,7 +334,7 @@ with_test_prefix "test-undocumented-param" {
 	[multi_line \
 	     "Set the current value of 'print test-undoc-param'\\." \
 	     "This command is not documented\\."] \
-	 "set help"
+	"set help"
     gdb_test "help set print" "set print test-undoc-param -- Set the current value of 'print test-undoc-param'\\..*" "general help"
 }
 

@@ -453,17 +453,17 @@ set y_or_n [string_to_regexp "(y or n)"]
 
 send_gdb "run\n"
 gdb_expect {
-  -re "pre-query.*already.*$y_or_n.*query\r\n" {
-	 send_gdb "y\n"
-	 gdb_expect {
-	     -re ".*post-query.*$gdb_prompt$" \
-		     { pass "re-run" }
-	     -re ".*$gdb_prompt$"  { fail "re-run" }
-	     timeout { fail "re-run (timeout)" }
-	 }
-     }
-  -re ".*$gdb_prompt$"  { fail "re-run" }
-  timeout { fail "re-run (timeout)" }
+    -re "pre-query.*already.*$y_or_n.*query\r\n" {
+	send_gdb "y\n"
+	gdb_expect {
+	    -re ".*post-query.*$gdb_prompt$" \
+		{ pass "re-run" }
+	    -re ".*$gdb_prompt$"  { fail "re-run" }
+	    timeout { fail "re-run (timeout)" }
+	}
+    }
+    -re ".*$gdb_prompt$"  { fail "re-run" }
+    timeout { fail "re-run (timeout)" }
 }
 
 #
@@ -579,11 +579,11 @@ proc thread_test {} {
 	    }
 	}
 
-    gdb_test_multiple "continue" "thread exit" {
+	gdb_test_multiple "continue" "thread exit" {
 	    -re "\032\032thread-exited,id=\"${decimal}\",group-id=\"i${decimal}\".*\r\n$gdb_prompt$" {
 		pass $gdb_test_name
 	    }
-    }
+	}
     }
 }
 

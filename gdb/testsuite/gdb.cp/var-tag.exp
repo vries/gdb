@@ -22,7 +22,7 @@ require allow_cplus_tests
 standard_testfile var-tag.cc var-tag-2.cc var-tag-3.cc var-tag-4.cc
 
 if {[prepare_for_testing "failed to prepare" $testfile \
-    [list $srcfile $srcfile2 $srcfile3 $srcfile4] {debug c++}]} {
+	 [list $srcfile $srcfile2 $srcfile3 $srcfile4] {debug c++}]} {
     return
 }
 
@@ -37,40 +37,40 @@ proc do_global_tests {lang} {
     set ptypefmt "type = (class|enum|union|struct) %s $opt_underlying{.*}"
 
     with_test_prefix $lang {
-    gdb_test_no_output "set language $lang"
-    gdb_test "ptype C" "type = class C {.*}"
-    gdb_test "print E" "= a"
-    gdb_test "ptype E" "type = enum E $opt_underlying{.*}"
-    gdb_test "print S" "= {<No data fields>}"
-    gdb_test "ptype S" "type = struct S {.*}"
-    gdb_test "print U" "= {.*}"
-    gdb_test "ptype U" "type = union U {.*}"
-    gdb_test "print cc" "= {.*}"
-    gdb_test "ptype cc" "type = class CC {.*}"
-    gdb_test "print CC" [format $invalid_print "CC"]
-    gdb_test "ptype CC" [format $ptypefmt "CC"]
-    gdb_test "print ss" "= {<No data fields>}"
-    gdb_test "ptype ss" "type = struct SS {.*}"
-    gdb_test "print SS" [format $invalid_print "SS"]
-    gdb_test "ptype SS" [format $ptypefmt "SS"]
-    gdb_test "print ee" "= .*"
-    gdb_test "ptype ee" "type = enum EE $opt_underlying{.*}"
-    gdb_test "print EE" [format $invalid_print "EE"]
-    gdb_test "ptype EE" [format $ptypefmt "EE"]
-    gdb_test "print uu" "= {.*}"
-    gdb_test "ptype uu" "type = union UU {.*}"
-    gdb_test "print UU" [format $invalid_print  "UU"]
-    gdb_test "ptype UU" [format $ptypefmt "UU"]
+	gdb_test_no_output "set language $lang"
+	gdb_test "ptype C" "type = class C {.*}"
+	gdb_test "print E" "= a"
+	gdb_test "ptype E" "type = enum E $opt_underlying{.*}"
+	gdb_test "print S" "= {<No data fields>}"
+	gdb_test "ptype S" "type = struct S {.*}"
+	gdb_test "print U" "= {.*}"
+	gdb_test "ptype U" "type = union U {.*}"
+	gdb_test "print cc" "= {.*}"
+	gdb_test "ptype cc" "type = class CC {.*}"
+	gdb_test "print CC" [format $invalid_print "CC"]
+	gdb_test "ptype CC" [format $ptypefmt "CC"]
+	gdb_test "print ss" "= {<No data fields>}"
+	gdb_test "ptype ss" "type = struct SS {.*}"
+	gdb_test "print SS" [format $invalid_print "SS"]
+	gdb_test "ptype SS" [format $ptypefmt "SS"]
+	gdb_test "print ee" "= .*"
+	gdb_test "ptype ee" "type = enum EE $opt_underlying{.*}"
+	gdb_test "print EE" [format $invalid_print "EE"]
+	gdb_test "ptype EE" [format $ptypefmt "EE"]
+	gdb_test "print uu" "= {.*}"
+	gdb_test "ptype uu" "type = union UU {.*}"
+	gdb_test "print UU" [format $invalid_print  "UU"]
+	gdb_test "ptype UU" [format $ptypefmt "UU"]
 
-    # These tests exercise lookup of symbols using the "quick fns" API.
-    # Each of them is in a separate CU as once its CU is expanded,
-    # we're no longer using the quick fns API.
-    gdb_test "print E2" "= a2"
-    gdb_test "ptype E2" "type = enum E2 $opt_underlying{.*}"
-    gdb_test "print S2" "= {<No data fields>}"
-    gdb_test "ptype S2" "type = struct S2 {.*}"
-    gdb_test "print U2" "= {.*}"
-    gdb_test "ptype U2" "type = union U2 {.*}"
+	# These tests exercise lookup of symbols using the "quick fns" API.
+	# Each of them is in a separate CU as once its CU is expanded,
+	# we're no longer using the quick fns API.
+	gdb_test "print E2" "= a2"
+	gdb_test "ptype E2" "type = enum E2 $opt_underlying{.*}"
+	gdb_test "print S2" "= {<No data fields>}"
+	gdb_test "ptype S2" "type = struct S2 {.*}"
+	gdb_test "print U2" "= {.*}"
+	gdb_test "ptype U2" "type = union U2 {.*}"
     }
 }
 

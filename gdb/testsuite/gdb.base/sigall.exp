@@ -49,7 +49,7 @@ proc test_one_sig {nextsig} {
 
 	gdb_test "continue" \
 	    "Continuing.* received signal SIG$esig.*" \
-		"get signal $esig"
+	    "get signal $esig"
     }
 
     if {$need_another_continue} {

@@ -60,16 +60,16 @@ set have_cl_khr_fp16 [get_integer_valueof "have_cl_khr_fp16" 0]
 
 # Check function call / return sequence
 proc call_test { type var } {
-  global opencl_version
+    global opencl_version
 
-  gdb_test "print/d call_${type} (${var}, ${var})" " = 2"
-  gdb_test "print/d call_${type}2 (${var}2, ${var}2)" " = \\{2, 4\\}"
-  if { ${opencl_version} >= 110 } {
-    gdb_test "print/d call_${type}3 (${var}3, ${var}3)" " = \\{2, 4, 6\\}"
-  }
-  gdb_test "print/d call_${type}4 (${var}4, ${var}4)" " = \\{2, 4, 6, 8\\}"
-  gdb_test "print/d call_${type}8 (${var}8, ${var}8)" " = \\{2, 4, 6, 8, 10, 12, 14, 16\\}"
-  gdb_test "print/d call_${type}16 (${var}16, ${var}16)" " = \\{2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32\\}"
+    gdb_test "print/d call_${type} (${var}, ${var})" " = 2"
+    gdb_test "print/d call_${type}2 (${var}2, ${var}2)" " = \\{2, 4\\}"
+    if { ${opencl_version} >= 110 } {
+	gdb_test "print/d call_${type}3 (${var}3, ${var}3)" " = \\{2, 4, 6\\}"
+    }
+    gdb_test "print/d call_${type}4 (${var}4, ${var}4)" " = \\{2, 4, 6, 8\\}"
+    gdb_test "print/d call_${type}8 (${var}8, ${var}8)" " = \\{2, 4, 6, 8, 10, 12, 14, 16\\}"
+    gdb_test "print/d call_${type}16 (${var}16, ${var}16)" " = \\{2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32\\}"
 }
 
 call_test "char" "c"
@@ -81,11 +81,11 @@ call_test "uint" "ui"
 call_test "long" "l"
 call_test "ulong" "ul"
 if { ${have_cl_khr_fp16} } {
-  call_test "half" "h"
+    call_test "half" "h"
 }
 call_test "float" "f"
 if { ${have_cl_khr_fp64} } {
-  call_test "double" "d"
+    call_test "double" "d"
 }
 
 # Delete the OpenCL program source

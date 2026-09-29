@@ -42,5 +42,5 @@ gdb_continue_to_breakpoint "$bp_location"
 # with a Windows-style logical drive in the name.
 set nonexistent_file C:/does/not/exist.cc
 gdb_test "print '$nonexistent_file'::var" \
-	 ".*No symbol \"$nonexistent_file\" in current context.*" \
-	 "print var from \"$nonexistent_file\""
+    ".*No symbol \"$nonexistent_file\" in current context.*" \
+    "print var from \"$nonexistent_file\""

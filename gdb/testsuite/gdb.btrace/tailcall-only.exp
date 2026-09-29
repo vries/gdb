@@ -35,11 +35,11 @@ if {[info exists COMPILE]} {
     standard_testfile tailcall-only.c
     lappend opts debug optimize=-O2
 } elseif {[istarget "i?86-*-*"] || [istarget "x86_64-*-*"]} {
-	if {[is_amd64_regs_target]} {
-		standard_testfile x86_64-tailcall-only.S
-	} else {
-		standard_testfile i686-tailcall-only.S
-	}
+    if {[is_amd64_regs_target]} {
+	standard_testfile x86_64-tailcall-only.S
+    } else {
+	standard_testfile i686-tailcall-only.S
+    }
 } else {
     unsupported "target architecture not supported"
     return
@@ -66,11 +66,11 @@ gdb_test "info record" ".*"
 
 # show the branch trace with calls indented
 gdb_test "record function-call-history /c 1" [multi_line \
-  "1\tfoo" \
-  "2\t  foo_1" \
-  "3\t    bar" \
-  "4\t      bar_1"
-  ] "function-call-history"
+						  "1\tfoo" \
+						  "2\t  foo_1" \
+						  "3\t    bar" \
+						  "4\t      bar_1"
+					     ] "function-call-history"
 
 # We can step
 gdb_test "record goto begin" ".*foo.*"
@@ -81,13 +81,13 @@ gdb_test "stepi" ".*bar_1.*" "step into bar_1"
 # We can neither finish nor return.
 gdb_test "finish" "Cannot find the caller frame.*"
 gdb_test_multiple "return" "return" {
-  -re "Make .* return now.*y or n. $" {
-    send_gdb "y\n"
-    exp_continue
-  }
-  -re "Cannot find the caller frame.*$gdb_prompt $" {
-    pass "return"
-  }
+    -re "Make .* return now.*y or n. $" {
+	send_gdb "y\n"
+	exp_continue
+    }
+    -re "Cannot find the caller frame.*$gdb_prompt $" {
+	pass "return"
+    }
 }
 
 # But we can reverse-finish

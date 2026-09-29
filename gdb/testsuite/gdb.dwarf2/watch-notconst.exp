@@ -21,7 +21,7 @@ set test "watch-notconst"
 require dwarf2_support is_x86_like_target
 
 if { [prepare_for_testing "failed to prepare" "${test}" \
-      {watch-notconst.c watch-notconst2.S} {nodebug}] } {
+	  {watch-notconst.c watch-notconst2.S} {nodebug}] } {
     return
 }
 

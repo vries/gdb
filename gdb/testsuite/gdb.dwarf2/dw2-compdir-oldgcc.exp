@@ -22,14 +22,14 @@ set additional_flags [gdb_target_symbol_prefix_flags_asm]
 
 standard_testfile .S
 if {[prepare_for_testing "failed to prepare" $testfile $srcfile \
-	$additional_flags]} {
+	 $additional_flags]} {
     return
 }
 
 # Here should be GDB-computed "Compilation directory is".
 gdb_test "list gcc42" ".*"
 gdb_test "info source" "\r\nCurrent source file is dw2-compdir-oldgcc42.S\r\nCompilation directory is /dir/d\r\n.*" \
-	 "info source gcc42"
+    "info source gcc42"
 
 # Here should not be GDB-computed "Compilation directory is".
 gdb_test "list gcc43" ".*"

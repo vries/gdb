@@ -32,7 +32,7 @@ if {[test_compiler_info {gcc-[0-9]-*}]} {
 }
 
 if {[prepare_for_testing "failed to prepare" $testfile $srcfile \
-     [list debug c++ $additional_flags]]} {
+	 [list debug c++ $additional_flags]]} {
     return
 }
 

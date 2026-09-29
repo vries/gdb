@@ -87,10 +87,10 @@ gdb_test "print U" " = U"
 gdb_test "print (int) U" " = 200"
 gdb_test "ptype enum unmixed" \
     [multi_line \
-	 "type = enum unmixed {" \
-	 "    U_ZERO = 0," \
-	 "    U = 200" \
-	 "}"]
+    "type = enum unmixed {" \
+    "    U_ZERO = 0," \
+    "    U = 200" \
+    "}"]
 
 # gold/15021
 # With -fdebug-types-section, Gold's .gdb_index entry for ZERO refers to the

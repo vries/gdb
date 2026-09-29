@@ -49,16 +49,16 @@ proc_with_prefix test_break {} {
     # for general use elsewhere.
     send_gdb "delete breakpoints\n"
     gdb_expect {
-	 -re "Delete all breakpoints, watchpoints, tracepoints, and catchpoints.*$" {
-		send_gdb "y\n"
-		gdb_expect {
-		    -re "$::gdb_prompt $" {
-			fail "delete all breakpoints, watchpoints, tracepoints, and catchpoints when none (unexpected prompt)"
-		    }
-		    timeout	{ fail "delete all breakpoints, watchpoints, tracepoints, and catchpoints when none (timeout after unexpected prompt)" }
+	-re "Delete all breakpoints, watchpoints, tracepoints, and catchpoints.*$" {
+	    send_gdb "y\n"
+	    gdb_expect {
+		-re "$::gdb_prompt $" {
+		    fail "delete all breakpoints, watchpoints, tracepoints, and catchpoints when none (unexpected prompt)"
 		}
+		timeout	{ fail "delete all breakpoints, watchpoints, tracepoints, and catchpoints when none (timeout after unexpected prompt)" }
 	    }
-	 -re ".*$::gdb_prompt $"       { pass "delete all breakpoints, watchpoints, tracepoints, and catchpoints when none" }
+	}
+	-re ".*$::gdb_prompt $"       { pass "delete all breakpoints, watchpoints, tracepoints, and catchpoints when none" }
 	timeout	            { fail "delete all breakpoints, watchpoints, tracepoints, and catchpoints when none (timeout)" }
     }
 
@@ -114,14 +114,14 @@ proc_with_prefix test_break {} {
 
     gdb_test "info break" \
 	[multi_line "Num     Type\[ \]+Disp Enb Address\[ \]+What.*" \
-		    "$::decimal\[\t \]+breakpoint     keep y.* in [func main] at .*$::srcfile:$::main_line.*" \
-		    "$::decimal\[\t \]+breakpoint     keep y.* in [func marker2] at .*$::srcfile1:$::bp_location8.*" \
-		    "$::decimal\[\t \]+breakpoint     keep y.* in [func factorial] at .*$::srcfile:$::bp_location7.*" \
-		    "$::decimal\[\t \]+breakpoint     keep y.* in [func main] at .*$::srcfile:$::bp_location1.*" \
-		    "$::decimal\[\t \]+breakpoint     keep y.* in [func main] at .*$::srcfile:$::bp_location1.*" \
-		    "$::decimal\[\t \]+breakpoint     keep y.* in [func main] at .*$::srcfile:$::bp_location2.*" \
-		    "$::decimal\[\t \]+breakpoint     keep y.* in [func multi_line_if_conditional] at .*$::srcfile:$::bp_location3.*" \
-		    "$::decimal\[\t \]+breakpoint     keep y.* in [func multi_line_while_conditional] at .*$::srcfile:$::bp_location4"] \
+	     "$::decimal\[\t \]+breakpoint     keep y.* in [func main] at .*$::srcfile:$::main_line.*" \
+	     "$::decimal\[\t \]+breakpoint     keep y.* in [func marker2] at .*$::srcfile1:$::bp_location8.*" \
+	     "$::decimal\[\t \]+breakpoint     keep y.* in [func factorial] at .*$::srcfile:$::bp_location7.*" \
+	     "$::decimal\[\t \]+breakpoint     keep y.* in [func main] at .*$::srcfile:$::bp_location1.*" \
+	     "$::decimal\[\t \]+breakpoint     keep y.* in [func main] at .*$::srcfile:$::bp_location1.*" \
+	     "$::decimal\[\t \]+breakpoint     keep y.* in [func main] at .*$::srcfile:$::bp_location2.*" \
+	     "$::decimal\[\t \]+breakpoint     keep y.* in [func multi_line_if_conditional] at .*$::srcfile:$::bp_location3.*" \
+	     "$::decimal\[\t \]+breakpoint     keep y.* in [func multi_line_while_conditional] at .*$::srcfile:$::bp_location4"] \
 	"breakpoint info"
 
     #
@@ -356,33 +356,33 @@ proc_with_prefix test_break {} {
     set bp_marker1 [gdb_get_line_number "set breakpoint 15 here" $::srcfile1]
     gdb_test "list marker1" ".*"
     gdb_test "break $bp_marker1" "Breakpoint ${::decimal} at ${::hex}: file .*$::srcfile1, line ${bp_marker1}\\." \
-	     "break lineno"
+	"break lineno"
     gdb_test_no_output {delete $bpnum}
 
     #
     # run until the breakpoint at a line number
     #
     gdb_test continue "Continuing\\..*Breakpoint ${::decimal}, main \\(argc=.*, argv=.*, envp=.*\\) at .*$::srcfile:$::bp_location1.*$::bp_location1\[\t \]+printf.*factorial.*" \
-			    "run until breakpoint set at a line number"
+	"run until breakpoint set at a line number"
 
     #
     # Run until the breakpoint set in a function in a file
     #
     for {set i 6} {$i >= 1} {incr i -1} {
-	    gdb_test continue "Continuing\\..*Breakpoint ${::decimal}, factorial \\(value=$i\\) at .*$::srcfile:$::bp_location7.*$::bp_location7\[\t \]+.*if .value > 1. \{.*" \
-			    "run until file:function($i) breakpoint"
+	gdb_test continue "Continuing\\..*Breakpoint ${::decimal}, factorial \\(value=$i\\) at .*$::srcfile:$::bp_location7.*$::bp_location7\[\t \]+.*if .value > 1. \{.*" \
+	    "run until file:function($i) breakpoint"
     }
 
     #
     # Run until the breakpoint set at a quoted function
     #
     gdb_test continue "Continuing\\..*Breakpoint ${::decimal}, (${::hex} in )?marker2 \\(a=43\\) at .*$::srcfile1:$::bp_location8.*" \
-		    "run until quoted breakpoint"
+	"run until quoted breakpoint"
     #
     # run until the file:function breakpoint at a line number in a file
     #
     gdb_test continue "Continuing\\..*Breakpoint ${::decimal}, main \\(argc=.*, argv=.*, envp=.*\\) at .*$::srcfile:$::bp_location2.*$::bp_location2\[\t \]+argc = \\(argc == 12345\\);.*" \
-		    "run until file:linenum breakpoint"
+	"run until file:linenum breakpoint"
 
     # Test break at offset +1
     set bp_location10 [gdb_get_line_number "set breakpoint 10 here"]
@@ -419,7 +419,7 @@ proc_with_prefix test_tbreak {} {
 
     # test break at function in file
     gdb_test "tbreak $::srcfile:factorial" "Temporary breakpoint.*at.* file .*$::srcfile, line.*" \
-	    "Temporary breakpoint function in file"
+	"Temporary breakpoint function in file"
 
     # test break at line number
     gdb_test "tbreak $::bp_location1" \
@@ -438,12 +438,12 @@ proc_with_prefix test_tbreak {} {
     # check to see what breakpoints are set (temporary this time)
     gdb_test "info break" \
 	[multi_line "Num     Type.*Disp Enb Address.*What.*" \
-		    "$::decimal\[\t \]+breakpoint     del.*y.*in [func main] at .*$::srcfile:$::main_line.*" \
-		    "$::decimal\[\t \]+breakpoint     del.*y.*in [func factorial] at .*$::srcfile:$::bp_location7.*" \
-		    "$::decimal\[\t \]+breakpoint     del.*y.*in [func main] at .*$::srcfile:$::bp_location1.*" \
-		    "$::decimal\[\t \]+breakpoint     del.*y.*in [func main] at .*$::srcfile:$::bp_location6.*" \
-		    "$::decimal\[\t \]+breakpoint     del.*y.*in [func main] at .*$::srcfile:$::bp_location2.*" \
-		    "$::decimal\[\t \]+breakpoint     del.*y.*in [func main] at .*$::srcfile:$::bp_location11.*"] \
+	     "$::decimal\[\t \]+breakpoint     del.*y.*in [func main] at .*$::srcfile:$::main_line.*" \
+	     "$::decimal\[\t \]+breakpoint     del.*y.*in [func factorial] at .*$::srcfile:$::bp_location7.*" \
+	     "$::decimal\[\t \]+breakpoint     del.*y.*in [func main] at .*$::srcfile:$::bp_location1.*" \
+	     "$::decimal\[\t \]+breakpoint     del.*y.*in [func main] at .*$::srcfile:$::bp_location6.*" \
+	     "$::decimal\[\t \]+breakpoint     del.*y.*in [func main] at .*$::srcfile:$::bp_location2.*" \
+	     "$::decimal\[\t \]+breakpoint     del.*y.*in [func main] at .*$::srcfile:$::bp_location11.*"] \
 	"Temporary breakpoint info"
 }
 
@@ -698,11 +698,11 @@ proc_with_prefix test_finish_arguments {} {
 
     send_gdb "finish 123\n"
     gdb_expect {
-      -re "The \"finish\" command does not take any arguments.\r\n$::gdb_prompt $"\
-	      {pass "finish with arguments disallowed"}
-      -re "$::gdb_prompt $"\
-	      {fail "finish with arguments disallowed"}
-      timeout {fail "(timeout) finish with arguments disallowed"}
+	-re "The \"finish\" command does not take any arguments.\r\n$::gdb_prompt $"\
+	    {pass "finish with arguments disallowed"}
+	-re "$::gdb_prompt $"\
+	    {fail "finish with arguments disallowed"}
+	timeout {fail "(timeout) finish with arguments disallowed"}
     }
 
     # Verify that GDB responds gracefully to a request to "finish" from
@@ -789,14 +789,14 @@ proc_with_prefix test_next_with_recursion {} {
     # kind of knowledge that belongs in this file.
 
     gdb_test next "\[0-9\]*\[\t \]+return \\(value\\);.*" \
-	    "next over recursive call"
+	"next over recursive call"
 
     # OK, we should be back in the same stack frame we started from.
     # Do a backtrace just to confirm.
 
     gdb_test "backtrace" \
-	    "#0\[ \t\]+ factorial .value=120.*\r\n#1\[ \t\]+ \[0-9a-fx\]+ in factorial .value=6..*" \
-	    "backtrace from factorial(5.1)"
+	"#0\[ \t\]+ factorial .value=120.*\r\n#1\[ \t\]+ \[0-9a-fx\]+ in factorial .value=6..*" \
+	"backtrace from factorial(5.1)"
 
     if { ![target_info exists gdb,noresults] } {
 	gdb_continue_to_end "recursive next test"

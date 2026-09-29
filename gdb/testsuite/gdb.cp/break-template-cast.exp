@@ -26,4 +26,4 @@ if { [prepare_for_testing "failed to prepare" $testfile "$srcfile"\
 }
 
 gdb_test "break foo" \
-	   "Breakpoint $decimal at $hex: foo\\. \\(2 locations\\)"
+    "Breakpoint $decimal at $hex: foo\\. \\(2 locations\\)"

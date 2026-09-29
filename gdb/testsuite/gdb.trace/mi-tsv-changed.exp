@@ -216,7 +216,7 @@ proc test_upload_tsv { } {
     }
 }
 
- test_create_delete_modify_tsv
+test_create_delete_modify_tsv
 
 # Test target supports tracepoints or not.
 

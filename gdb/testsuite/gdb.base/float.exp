@@ -69,11 +69,11 @@ if {[is_aarch64_target]} {
 } elseif {[istarget "mips*-*-*"]} {
     gdb_test_multiple "info float" "info float" {
 	-re "fpu type: none / unused\r\n$gdb_prompt $" {
-	      pass "info float (without FPU)"
-	  }
+	    pass "info float (without FPU)"
+	}
 	-re "fpu type:.*cause.*mask.*flags.*round.*flush.*f0:.*flt:.*dbl:.*$gdb_prompt $" {
-	      pass "info float (with FPU)"
-	  }
+	    pass "info float (with FPU)"
+	}
     }
 } elseif {[istarget "nds32*-*-*"]} {
     gdb_test_multiple "info float" "info_float" {
@@ -99,10 +99,10 @@ if {[is_aarch64_target]} {
     # SH may or may not have an FPU
     gdb_test_multiple "info float" "info float" {
 	-re "fpul.*fr0.*fr1.*fr15.*$gdb_prompt $" {
-	      pass "info float (with FPU)"
-	  }
+	    pass "info float (with FPU)"
+	}
 	-re "No floating.point info available for this processor.*$gdb_prompt $" {
-	      pass "info float (without FPU)"
+	    pass "info float (without FPU)"
 	}
     }
 } elseif {[istarget "hppa*-*"]} {
@@ -117,13 +117,13 @@ if {[is_aarch64_target]} {
     # (supplied by GDB as a view into fcsr).
     gdb_test_multiple "info float" "info float" {
 	-re "ft0.*ft1.*ft11.*fflags.*frm.*fcsr.*$gdb_prompt $" {
-	      pass "info float (with FPU)"
-	  }
+	    pass "info float (with FPU)"
+	}
 	-re "ft0.*ft1.*ft11.*fcsr.*fflags.*frm.*$gdb_prompt $" {
-	      pass "info float (with FPU)"
-	  }
+	    pass "info float (with FPU)"
+	}
 	-re "No floating.point info available for this processor.*$gdb_prompt $" {
-	      pass "info float (without FPU)"
+	    pass "info float (without FPU)"
 	}
     }
 } elseif {[istarget "loongarch*-*-*"]} {

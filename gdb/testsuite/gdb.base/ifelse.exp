@@ -54,7 +54,7 @@ gdb_test_multiple "if 0\nend" $message {
 # will show itself (this works at time of writing).
 
 gdb_test "if 1\necho true\\n\nelse\necho false\\n\nend" "true" \
-	 "if true else false #1"
+    "if true else false #1"
 
 #    with true condition
 set message "if 1 .. else with empty body"
@@ -69,7 +69,7 @@ gdb_test_multiple "if 1\nelse\nend" $message {
 
 # dirty memory
 gdb_test "if 1\necho true\\n\nelse\necho false\\n\nend" "true" \
-	 "if true else false #2"
+    "if true else false #2"
 
 #    with false condition
 set message "if 0 .. else with empty body"
@@ -88,7 +88,7 @@ gdb_test_no_output "set confirm off" ""
 # If there is memory corruption then free will fail.
 # dirty memory
 gdb_test "if 1\necho true\\n\nelse\necho false\\n\nend" "true" \
-	 "if true else false #3"
+    "if true else false #3"
 # create
 gdb_test "define abc\nif 1\nelse\nend\nend" "" "create define with empty else"
 # call (note that condition is 1 so should pass)

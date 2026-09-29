@@ -49,6 +49,6 @@ gdb_continue_to_breakpoint "continue to second in-thread breakpoint"
 gdb_continue_to_breakpoint "continue to end breakpoint"
 
 gdb_test "python print(threadOneExit)" \
-	 ".*event type: thread-exited. global num: 2.*"
+    ".*event type: thread-exited. global num: 2.*"
 gdb_test "python print(threadTwoExit)" \
-	 ".*event type: thread-exited. global num: 3.*"
+    ".*event type: thread-exited. global num: 3.*"

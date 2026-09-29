@@ -38,87 +38,87 @@ if { [gdb_compile $srcdir/$subdir/$srcfile $binfile executable $additional_flags
 proc strace_remove_socket { action } {
     with_test_prefix "remove_socket_after_${action}" {
 
-    global executable
-    global gdb_prompt
-    global libipa
+	global executable
+	global gdb_prompt
+	global libipa
 
-    # Restart with a fresh gdb.
-    clean_restart $executable
-    gdb_load_shlib $libipa
-    if {![runto_main]} {
-	return -1
-    }
-
-    # List the markers in program.
-    gdb_test "info static-tracepoint-markers" \
-	".*ust/bar\[\t \]+n\[\t \]+.*ust/bar2\[\t \]+n\[\t \]+.*"
-
-    set pid ""
-    set test "collect pid"
-    gdb_test_multiple "info inferiors" $test {
-	-re "process (\[-0-9a-fx\]+) \[^\n\]*\n.*${gdb_prompt} $" {
-	    set pid $expect_out(1,string)
-	    pass $test
+	# Restart with a fresh gdb.
+	clean_restart $executable
+	gdb_load_shlib $libipa
+	if {![runto_main]} {
+	    return -1
 	}
-	-re ".*${gdb_prompt} $" {
+
+	# List the markers in program.
+	gdb_test "info static-tracepoint-markers" \
+	    ".*ust/bar\[\t \]+n\[\t \]+.*ust/bar2\[\t \]+n\[\t \]+.*"
+
+	set pid ""
+	set test "collect pid"
+	gdb_test_multiple "info inferiors" $test {
+	    -re "process (\[-0-9a-fx\]+) \[^\n\]*\n.*${gdb_prompt} $" {
+		set pid $expect_out(1,string)
+		pass $test
+	    }
+	    -re ".*${gdb_prompt} $" {
+		fail $test
+	    }
+	}
+
+	set test "socket file exists"
+	set socket_file "/tmp/gdb_ust${pid}"
+	set status [remote_exec target "sh -c { \[ -S $socket_file \] }"]
+
+	if { [lindex $status 0] == 0 } {
+	    pass $test
+	} else {
 	    fail $test
 	}
-    }
 
-    set test "socket file exists"
-    set socket_file "/tmp/gdb_ust${pid}"
-    set status [remote_exec target "sh -c { \[ -S $socket_file \] }"]
-
-    if { [lindex $status 0] == 0 } {
-	pass $test
-    } else {
-	fail $test
-    }
-
-    send_gdb "${action}\n"
-    gdb_expect {
-	-re "A debugging session is active.\r\n.*\r\nQuit anyway\\? \\(y or n\\) $" {
-	    send_gdb "y\n"
+	send_gdb "${action}\n"
+	gdb_expect {
+	    -re "A debugging session is active.\r\n.*\r\nQuit anyway\\? \\(y or n\\) $" {
+		send_gdb "y\n"
+	    }
+	    -re "Detaching .*, process .*$" {
+	    }
+	    -re "Continuing.*$" {
+	    }
 	}
-	-re "Detaching .*, process .*$" {
+
+	set exists 1
+
+	for {set i 1} {$i <= 5} {incr i} {
+	    set status [remote_exec target "sh -c { \[ -S $socket_file \] }"]
+	    if { [lindex $status 0] != 0 } {
+		set exists 0
+		break
+	    }
+	    sleep 1
 	}
-	-re "Continuing.*$" {
+
+	if { ![is_remote target] && ![string equal $action "detach"] } {
+	    setup_kfail gdb/14161 *-*-*
 	}
-    }
 
-    set exists 1
+	set test "socket file removed"
 
-    for {set i 1} {$i <= 5} {incr i} {
-	set status [remote_exec target "sh -c { \[ -S $socket_file \] }"]
-	if { [lindex $status 0] != 0 } {
-	    set exists 0
-	    break
+	if { $exists } {
+	    fail $test
+	    # Since $socket_file is a socket file instead of a regular file, we
+	    # can't use 'remote_file target delete $socket_file' here.
+	    remote_exec target "sh -c \"rm -r $socket_file\""
+	} else {
+	    pass $test
 	}
-	sleep 1
-    }
 
-    if { ![is_remote target] && ![string equal $action "detach"] } {
-	setup_kfail gdb/14161 *-*-*
-    }
-
-    set test "socket file removed"
-
-    if { $exists } {
-	fail $test
-	# Since $socket_file is a socket file instead of a regular file, we
-	# can't use 'remote_file target delete $socket_file' here.
-	remote_exec target "sh -c \"rm -r $socket_file\""
-    } else {
-	pass $test
-    }
-
-    if { [string equal $action "quit"] && [is_remote host] } {
-	global gdb_spawn_id
-	# unset gdb_spawn_id here to avoid sending command 'quit' to GDB
-	# later in default_gdb_exit.
-	unset gdb_spawn_id
-    }
-}}
+	if { [string equal $action "quit"] && [is_remote host] } {
+	    global gdb_spawn_id
+	    # unset gdb_spawn_id here to avoid sending command 'quit' to GDB
+	    # later in default_gdb_exit.
+	    unset gdb_spawn_id
+	}
+    }}
 
 proc strace_info_marker { } {
     with_test_prefix "info_marker" {

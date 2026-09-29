@@ -33,8 +33,8 @@ gdb_continue_to_breakpoint "Break here"
 gdb_test "ptype a_ptr->func ()" ".* = int"
 gdb_test "ptype a->func ()" ".* = int"
 gdb_test "p sizeof (a_ptr->func()) == sizeof (int)" ".* = true" \
-  "p sizeof (a_ptr->func())"
+    "p sizeof (a_ptr->func())"
 gdb_test "p sizeof (a->func()) == sizeof (int)" ".* = true" \
-  "p sizeof (a->func())"
+    "p sizeof (a->func())"
 gdb_test "p 1 && a->func()" ".* = true"
 gdb_test "p 0 || a->func()" ".* = true"

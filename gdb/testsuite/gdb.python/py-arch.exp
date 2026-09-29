@@ -38,13 +38,13 @@ gdb_py_test_silent_cmd "python frame = gdb.selected_frame()" "get frame" 0
 gdb_py_test_silent_cmd "python arch = frame.architecture()" "get arch" 0
 gdb_py_test_silent_cmd "python pc = frame.pc()" "get pc" 0
 gdb_py_test_silent_cmd "python insn_list1 = arch.disassemble(pc, pc, 1)" \
-  "disassemble" 0
+    "disassemble" 0
 gdb_py_test_silent_cmd "python insn_list2 = arch.disassemble(pc, pc)" \
-  "disassemble no count" 0
+    "disassemble no count" 0
 gdb_py_test_silent_cmd "python insn_list3 = arch.disassemble(pc, count=1)" \
-  "disassemble no end" 0
+    "disassemble no end" 0
 gdb_py_test_silent_cmd "python insn_list4 = arch.disassemble(gdb.Value(pc))" \
-  "disassemble no end no count" 0
+    "disassemble no end no count" 0
 
 gdb_test "python print (repr (arch))" \
     "<gdb.Architecture arch_name=.* printable_name=.*>" \
@@ -95,14 +95,14 @@ gdb_test "python arch.integer_type(95)" \
 foreach_with_prefix test_data { {None None} \
 				    {"\"blah\"" str} \
 				    {1 int} } {
-    set bad_sign [lindex $test_data 0]
-    set bad_type [lindex $test_data 1]
-    gdb_test "python arch.integer_type(8, $bad_sign)" \
-	[multi_line \
-	     "Python Exception <class 'TypeError'>: argument 2 must be bool, not $bad_type" \
-	     "Error occurred in Python: argument 2 must be bool, not $bad_type"] \
-	"check 'signed' argument can handle non-bool type $bad_type"
-}
+					set bad_sign [lindex $test_data 0]
+					set bad_type [lindex $test_data 1]
+					gdb_test "python arch.integer_type(8, $bad_sign)" \
+					    [multi_line \
+						 "Python Exception <class 'TypeError'>: argument 2 must be bool, not $bad_type" \
+						 "Error occurred in Python: argument 2 must be bool, not $bad_type"] \
+					    "check 'signed' argument can handle non-bool type $bad_type"
+				    }
 
 gdb_test "python print(arch.void_type())" \
     "void" \

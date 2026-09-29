@@ -57,9 +57,9 @@ gdb_gnu_strip_debug ${binsharedfile}
 # Build main program, but do not use `shlib=' since that would
 # automatically add -rpath for gcc.
 if  { [gdb_compile_pthreads \
-	"${srcdir}/${subdir}/${srcmainfile} ${binsharedfile}" \
-	"${binmainfile}" executable [list debug additional_flags=-std=c11]] \
-       != "" } {
+	   "${srcdir}/${subdir}/${srcmainfile} ${binsharedfile}" \
+	   "${binmainfile}" executable [list debug additional_flags=-std=c11]] \
+	  != "" } {
     untested "Couldn't compile test program"
     return
 }
@@ -72,25 +72,25 @@ if { [info exists ::env(LD_LIBRARY_PATH)] } {
 }
 
 foreach library_path [list $absdir [relative_filename [pwd] $absdir]] \
-	name { absolute relative } {
-    with_test_prefix $name {
+    name { absolute relative } {
+	with_test_prefix $name {
 
-	# Restart, but defer loading until after setting LD_LIBRARY_PATH.
-	clean_restart
-	gdb_test_no_output \
-	    "set env LD_LIBRARY_PATH=$ld_library_path:$library_path" \
-	    "set env LD_LIBRARY_PATH"
+	    # Restart, but defer loading until after setting LD_LIBRARY_PATH.
+	    clean_restart
+	    gdb_test_no_output \
+		"set env LD_LIBRARY_PATH=$ld_library_path:$library_path" \
+		"set env LD_LIBRARY_PATH"
 
-	gdb_load ${binmainfile}
+	    gdb_load ${binmainfile}
 
-	if {![runto_main]} {
-	    return
+	    if {![runto_main]} {
+		return
+	    }
+
+	    # Print a thread local variable from the shared library to be certain
+	    # that its symbols were loaded from the separate debuginfo file.
+	    gdb_test "print var" \
+		"\\\$1 = 42" \
+		"print TLS variable from a shared library with separate debug info file"
 	}
-
-	# Print a thread local variable from the shared library to be certain
-	# that its symbols were loaded from the separate debuginfo file.
-	gdb_test "print var" \
-		 "\\\$1 = 42" \
-		 "print TLS variable from a shared library with separate debug info file"
     }
-}

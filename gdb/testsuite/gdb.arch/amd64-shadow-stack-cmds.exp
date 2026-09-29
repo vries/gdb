@@ -43,7 +43,7 @@ save_vars { ::env(GLIBC_TUNABLES) } {
     append_environment GLIBC_TUNABLES "glibc.cpu.hwcaps" "SHSTK"
 
     if { [prepare_for_testing "failed to prepare" ${testfile} ${srcfile} \
-	  {debug additional_flags="-fcf-protection=return"}] } {
+	      {debug additional_flags="-fcf-protection=return"}] } {
 	return
     }
 
@@ -111,8 +111,8 @@ save_vars { ::env(GLIBC_TUNABLES) } {
 
     with_test_prefix "test return from current frame" {
 	gdb_test "return (int) 1" "#0.*call1.*" \
-	"Test shadow stack return from current frame" \
-	"Make.*return now\\? \\(y or n\\) " "y"
+	    "Test shadow stack return from current frame" \
+	    "Make.*return now\\? \\(y or n\\) " "y"
 
 	# Potential CET violations often only occur after resuming normal execution.
 	# Therefore, it is important to test normal program continuation after

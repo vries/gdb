@@ -51,14 +51,14 @@ proc_with_prefix check_x87_regs_around_init {} {
     # of the x87 set, it belongs with SSE/AVX, however we test it here
     # too, it should have its default value in both cases.
     foreach {regname regvalue} { "fctrl" "0x37f" \
-				 "fstat" "0x0" \
-				 "ftag" "0xffff" \
-				 "fiseg" "0x0" \
-				 "fioff" "0x0" \
-				 "foseg" "0x0" \
-				 "fooff" "0x0" \
-				 "fop" "0x0" \
-				 "mxcsr" "0x1f80"} {
+				     "fstat" "0x0" \
+				     "ftag" "0xffff" \
+				     "fiseg" "0x0" \
+				     "fioff" "0x0" \
+				     "foseg" "0x0" \
+				     "fooff" "0x0" \
+				     "fop" "0x0" \
+				     "mxcsr" "0x1f80"} {
 	gdb_test "p/x \$${regname}" " = ${regvalue}"  "check initial value of \$${regname}"
     }
 
@@ -73,14 +73,14 @@ proc_with_prefix check_x87_regs_around_init {} {
     # The x87 unit is now enabled, but the register values should be
     # unchanged.
     foreach {regname regvalue} { "fctrl" "0x37f" \
-				 "fstat" "0x0" \
-				 "ftag" "0xffff" \
-				 "fiseg" "0x0" \
-				 "fioff" "0x0" \
-				 "foseg" "0x0" \
-				 "fooff" "0x0" \
-				 "fop" "0x0" \
-				 "mxcsr" "0x1f80"} {
+				     "fstat" "0x0" \
+				     "ftag" "0xffff" \
+				     "fiseg" "0x0" \
+				     "fioff" "0x0" \
+				     "foseg" "0x0" \
+				     "fooff" "0x0" \
+				     "fop" "0x0" \
+				     "mxcsr" "0x1f80"} {
 	gdb_test "p/x \$${regname}" " = ${regvalue}"  "check post FWAIT value of \$${regname}"
     }
 
@@ -96,14 +96,14 @@ proc_with_prefix check_x87_regs_around_init {} {
 
     # Check new values of x87 control registers (and MXCSR).
     foreach {regname regvalue} [list "fctrl" "0x37f" \
-				     "fstat" "0x3800" \
-				     "ftag" "0x3fff" \
-				     "fiseg" "0x0" \
-				     "fioff" "($addr|0x0)" \
-				     "foseg" "0x0" \
-				     "fooff" "0x0" \
-				     "fop" "0x0" \
-				     "mxcsr" "0x1f80" ] {
+				    "fstat" "0x3800" \
+				    "ftag" "0x3fff" \
+				    "fiseg" "0x0" \
+				    "fioff" "($addr|0x0)" \
+				    "foseg" "0x0" \
+				    "fooff" "0x0" \
+				    "fop" "0x0" \
+				    "mxcsr" "0x1f80" ] {
 	gdb_test "p/x \$${regname}" " = ${regvalue}"  "check post FLD1 value of \$${regname}"
     }
 }

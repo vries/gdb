@@ -28,9 +28,9 @@ gdb_test_no_output "set listsize 10"
 
 gdb_test "list" \
     [multi_line \
-	"${decimal}\\s+" \
-	"${decimal}\\s+int" \
-	"${decimal}\\s+main\[^\n\r\]+" \
-	"${decimal}\\s+\\{ /\\* main prologue \\*/" \
-	"${fill}" \
-	"${fill}" ]
+	 "${decimal}\\s+" \
+	 "${decimal}\\s+int" \
+	 "${decimal}\\s+main\[^\n\r\]+" \
+	 "${decimal}\\s+\\{ /\\* main prologue \\*/" \
+	 "${fill}" \
+	 "${fill}" ]

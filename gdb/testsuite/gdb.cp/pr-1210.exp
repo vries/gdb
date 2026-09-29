@@ -36,21 +36,21 @@ if {![runto_main]} {
 gdb_test "next" ".*return 0;" "step past initialization"
 
 gdb_test_multiple "print *obj" "print *obj" {
-  -re "Cannot access memory.*$gdb_prompt $" {
-    fail "print *obj"
-  }
-  -re " = {<A> = {<No data fields>}, myB = {<A> = {<No data fields>}.*}}\r\n$gdb_prompt $" {
-    pass "print *obj"
-  }
+    -re "Cannot access memory.*$gdb_prompt $" {
+	fail "print *obj"
+    }
+    -re " = {<A> = {<No data fields>}, myB = {<A> = {<No data fields>}.*}}\r\n$gdb_prompt $" {
+	pass "print *obj"
+    }
 }
 
 gdb_test_multiple "print obj->myB" "print obj->myB" {
-  -re "Cannot access memory.*$gdb_prompt $" {
-    fail "print obj->myB"
-  }
-  -re " = {<A> = {<No data fields>}.*}\r\n$gdb_prompt $" {
-    pass "print obj->myB"
-  }
+    -re "Cannot access memory.*$gdb_prompt $" {
+	fail "print obj->myB"
+    }
+    -re " = {<A> = {<No data fields>}.*}\r\n$gdb_prompt $" {
+	pass "print obj->myB"
+    }
 }
 
 gdb_exit

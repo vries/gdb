@@ -112,7 +112,7 @@ if { [is_remote host] } {
 		gdb_test "" \
 		    "Breakpoint $decimal at $hex: file .*thefile.cc, line \[^\r\n\]*" \
 		    "set break at unique function name in disambiguated source file"
-		}
+	    }
 	}
 
 	# Check that using a non-existing source path does not confuse

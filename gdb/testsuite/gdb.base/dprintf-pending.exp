@@ -77,7 +77,7 @@ gdb_test \
 gdb_test "info break" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
 ${::decimal}\[\t \]+dprintf.*keep y.*PENDING.*pendfunc1.*" \
-"single pending dprintf info"
+    "single pending dprintf info"
 
 gdb_run_cmd
 

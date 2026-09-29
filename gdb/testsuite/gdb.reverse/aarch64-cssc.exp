@@ -35,7 +35,7 @@ require allow_aarch64_cssc_tests
 standard_testfile
 
 if { [prepare_for_testing "failed to prepare" ${testfile} ${srcfile} \
-	[list debug additional_flags=-march=armv8-a+cssc]] } {
+	  [list debug additional_flags=-march=armv8-a+cssc]] } {
     return
 }
 
@@ -58,7 +58,7 @@ proc test_single_asm { name } {
 	    "$insn: break before instruction sequence"
 	gdb_continue_to_breakpoint "$insn: about to execute instruction sequence" \
 	    [multi_line ".*/aarch64-cssc.c:${::decimal}" \
-		"${::decimal}\[ \t\]+__asm__ volatile \\(\"${insn} .*\".*"]
+		 "${::decimal}\[ \t\]+__asm__ volatile \\(\"${insn} .*\".*"]
 
 	# Depending on the compiler, the line number information may put GDB a few
 	# instructions before the beginning of the asm statement.
@@ -89,7 +89,7 @@ proc test_single_asm { name } {
 
 	gdb_continue_to_breakpoint "reversed execution of instruction sequence" \
 	    [multi_line ".*/aarch64-cssc.c:${::decimal}" \
-		"${::decimal}\[ \t\]+__asm__ volatile \\(\"${insn} .*\".*"]
+		 "${::decimal}\[ \t\]+__asm__ volatile \\(\"${insn} .*\".*"]
 
 	# Record the final register values.
 	foreach r $regs {
@@ -102,7 +102,7 @@ proc test_single_asm { name } {
 	}
 
 	gdb_assert [string compare [set x19_initial] [set x19_new]] \
-		"$insn: check x19 initial value versus x19 new value"
+	    "$insn: check x19 initial value versus x19 new value"
 
 	foreach v { x20 x21 } {
 	    gdb_assert ![string compare [set ${v}_initial] [set ${v}_new]] \
@@ -113,24 +113,24 @@ proc test_single_asm { name } {
 	gdb_test_no_output "set exec-direction forward"
 	gdb_test "record goto end" \
 	    [multi_line \
-		"Go forward to insn number ${::decimal}" \
-		"#0  main \\(\\) at .*/aarch64-cssc.c:${::decimal}" \
-		".*"]
+		 "Go forward to insn number ${::decimal}" \
+		 "#0  main \\(\\) at .*/aarch64-cssc.c:${::decimal}" \
+		 ".*"]
     }
 }
 
 set cases {
-	{ abs }
-	{ cnt }
-	{ ctz }
-	{ smax-1 }
-	{ smax-2 }
-	{ smin-1 }
-	{ smin-2 }
-	{ umax-1 }
-	{ umax-2 }
-	{ umin-1 }
-	{ umin-2 }
+    { abs }
+    { cnt }
+    { ctz }
+    { smax-1 }
+    { smax-2 }
+    { smin-1 }
+    { smin-2 }
+    { umax-1 }
+    { umax-2 }
+    { umin-1 }
+    { umin-2 }
 }
 
 foreach c $cases {

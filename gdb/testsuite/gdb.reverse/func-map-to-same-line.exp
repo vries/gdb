@@ -60,8 +60,8 @@ proc run_tests {} {
 	#   caller 2.
 
 	gdb_continue_to_breakpoint \
-	"stopped at command reverse-next test start location" \
-	".*$bp_start_reverse_test\r\n.*"
+	    "stopped at command reverse-next test start location" \
+	    ".*$bp_start_reverse_test\r\n.*"
 
 	# The reverse-next should step all the way back to the beginning of
 	# the line, i.e. at the beginning of the func1 call.
@@ -134,7 +134,7 @@ foreach_with_prefix column_info_flag {column-info no-column-info} {
     if {[prepare_for_testing "failed to prepare" ${testfile} ${srcfile} \
 	     $options]} {
 	return
-   }
+    }
 
     run_tests
 }

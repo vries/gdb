@@ -33,8 +33,8 @@ set target_binfile [gdb_remote_download target $binfile]
 # we're testing with an extended-remote board, therefore already
 # connected.
 with_test_prefix "preparation" {
-  gdb_test "record stop" ".*"
-  gdb_test "disconnect" ".*"
+    gdb_test "record stop" ".*"
+    gdb_test "disconnect" ".*"
 }
 
 # Start fresh gdbserver.
@@ -46,16 +46,16 @@ gdb_target_cmd $gdbserver_protocol $gdbserver_gdbport
 
 # Create a record, check, reconnect
 with_test_prefix "first" {
-  gdb_test_no_output "record btrace" "record btrace enable"
-  gdb_test "stepi 19" ".*"
+    gdb_test_no_output "record btrace" "record btrace enable"
+    gdb_test "stepi 19" ".*"
 
-  gdb_test "info record" [multi_line \
-    "Active record target: .*" \
-    "Recorded 19 instructions in .+ functions \\(. gaps\\) for thread 1 \\(Thread .*\\)."
-  ]
+    gdb_test "info record" [multi_line \
+				"Active record target: .*" \
+				"Recorded 19 instructions in .+ functions \\(. gaps\\) for thread 1 \\(Thread .*\\)."
+			   ]
 
-  gdb_test "disconnect" "Ending remote debugging."
-  gdb_target_cmd $gdbserver_protocol $gdbserver_gdbport
+    gdb_test "disconnect" "Ending remote debugging."
+    gdb_target_cmd $gdbserver_protocol $gdbserver_gdbport
 }
 
 # Test if we can access the recorded data from first connect.
@@ -64,18 +64,18 @@ with_test_prefix "first" {
 # "a number between 10 and 19", so we catch at least the case where
 # there are 0 instructions in the record.
 with_test_prefix "second" {
-  gdb_test "info record" [multi_line \
-    "Active record target: .*" \
-    "Recorded 1. instructions in .+ functions \\(. gaps\\) for thread 1 \\(Thread .*\\)."
-  ]
+    gdb_test "info record" [multi_line \
+				"Active record target: .*" \
+				"Recorded 1. instructions in .+ functions \\(. gaps\\) for thread 1 \\(Thread .*\\)."
+			   ]
 
-  gdb_test "record stop" "Process record is stopped and all execution logs are deleted."
+    gdb_test "record stop" "Process record is stopped and all execution logs are deleted."
 
-  gdb_test "disconnect" "Ending remote debugging."
-  gdb_target_cmd $gdbserver_protocol $gdbserver_gdbport
+    gdb_test "disconnect" "Ending remote debugging."
+    gdb_target_cmd $gdbserver_protocol $gdbserver_gdbport
 }
 
 # Test that recording is now off.
 with_test_prefix "third" {
-  gdb_test "info record" "No recording is currently active."
+    gdb_test "info record" "No recording is currently active."
 }

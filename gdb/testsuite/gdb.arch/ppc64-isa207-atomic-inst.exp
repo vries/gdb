@@ -26,7 +26,7 @@ require {istarget "powerpc*"} is_lp64_target
 standard_testfile  .c .S
 
 if { [prepare_for_testing "failed to prepare" $testfile "$srcfile $srcfile2" \
-      {debug quiet}] } {
+	  {debug quiet}] } {
     return
 }
 
@@ -46,13 +46,13 @@ proc do_test { displaced } {
     gdb_breakpoint "test_atomic_sequences"
 
     gdb_test_multiple "continue" "Continue until lbarx/stbcx start breakpoint" {
-      -re "$inferior_exited_re with code 01.\[\r\n\]+$gdb_prompt $" {
-	unsupported "POWER8/ISA 2.07 atomic instructions not supported."
-	return -1
-      }
-      -re "Continuing.*Breakpoint $decimal.*$gdb_prompt $" {
-	pass "continue until test_atomic_sequences function"
-      }
+	-re "$inferior_exited_re with code 01.\[\r\n\]+$gdb_prompt $" {
+	    unsupported "POWER8/ISA 2.07 atomic instructions not supported."
+	    return -1
+	}
+	-re "Continuing.*Breakpoint $decimal.*$gdb_prompt $" {
+	    pass "continue until test_atomic_sequences function"
+	}
     }
 
     set bp1 [gdb_get_line_number "lbarx" "$srcfile2"]

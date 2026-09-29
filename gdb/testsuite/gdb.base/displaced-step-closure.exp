@@ -36,4 +36,4 @@ gdb_test "stepi" ".*" "step-over breakpoint"
 # stepping buffer is.  With the bug, gdb will crash when we attempt to list
 # the PC that was used to displaced-step the previous instruction.
 gdb_test "disassemble _start" ".*End of assembler dump\." \
-	 "disassemble through displaced-step buffer"
+    "disassemble through displaced-step buffer"

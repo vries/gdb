@@ -154,7 +154,7 @@ with_test_prefix "check detach on non-checkpointed inferior" {
 with_test_prefix "check kill on non-checkpointed inferior" {
     start_2_inferiors_checkpoint_on_inf_2
     gdb_test "kill" "" "kill non-checkpointed inferior" \
-	     "Kill the program being debugged.*y or n. $" "y"
+	"Kill the program being debugged.*y or n. $" "y"
 }
 
 with_test_prefix "check restart 0 on non-checkpointed inferior" {
@@ -179,38 +179,38 @@ with_test_prefix "two inferiors with checkpoints" {
     with_test_prefix "one checkpoint" {
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		" +2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		" +2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 " +2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 " +2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
     with_test_prefix "two checkpoints" {
 	gdb_test "checkpoint" "$ckpt_re 1\\.1: fork returned pid $::decimal.*" \
-		 "checkpoint in inferior 1"
+	    "checkpoint in inferior 1"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"\\* 1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "\\* 1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     # Note: No switching is done here since checkpoint 0 is the active one.
     gdb_test "restart 0" "main.*?$hello_c.*?alarm \\(240\\);"
 
     gdb_test "restart 2.0" \
-	     "\\\[Switching to inferior 2.*?mailand.*?glob = 46;.*"
+	"\\\[Switching to inferior 2.*?mailand.*?glob = 46;.*"
     gdb_test "next" "\}"
 
     with_test_prefix "restart 1" {
 	gdb_test "restart 1" "^Switching to $proc_re.*?#0  main \\(\\) at.*?$goodbye_c.*mailand\\(\\);"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "info checkpoints twice in a row" {
@@ -220,25 +220,25 @@ with_test_prefix "two inferiors with checkpoints" {
 	# produce the same output.
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "restart 0" {
 	# Switch back to checkpoint 0; again, there should be no
 	# "Switching to inferior" message.
 	gdb_test "restart 0" \
-		 "^Switching to $proc_re.*?#0  mailand \\(\\) at.*?$goodbye_c.*\}"
+	    "^Switching to $proc_re.*?#0  mailand \\(\\) at.*?$goodbye_c.*\}"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"\\* 2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "\\* 2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     # Try switching to invalid checkpoints:
@@ -258,27 +258,27 @@ with_test_prefix "two inferiors with checkpoints" {
 	# Switch to checkpoint 1.1; this time, we should see a "Switching to
 	# inferior" message.
 	gdb_test "restart 1.1" \
-		 "\\\[Switching to inferior 1.*?main.*?$hello_c.*?alarm \\(240\\);"
+	    "\\\[Switching to inferior 1.*?main.*?$hello_c.*?alarm \\(240\\);"
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"\\* 1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "\\* 1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "restart 2.1" {
 	gdb_test "restart 2.1" \
-		 "Switching to inferior 2.*?#0  main \\(\\) at.*?$goodbye_c.*mailand\\(\\);"
+	    "Switching to inferior 2.*?#0  main \\(\\) at.*?$goodbye_c.*mailand\\(\\);"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "second checkpoint in inferior 2" {
@@ -286,12 +286,12 @@ with_test_prefix "two inferiors with checkpoints" {
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "third checkpoint in inferior 2" {
@@ -299,99 +299,99 @@ with_test_prefix "two inferiors with checkpoints" {
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.3 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.3 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "continue to exit in checkpoint 2.1" {
 	gdb_test "continue" \
-		 "Inferior 2 \\(process $decimal\\) exited normally.*?Switching to $proc_re.*?"
+	    "Inferior 2 \\(process $decimal\\) exited normally.*?Switching to $proc_re.*?"
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 2\\.3 y +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 2\\.3 y +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "continue to exit in checkpoint 2.3" {
 	gdb_test "continue" \
-		 "Inferior 2 \\(process $decimal\\) exited normally.*?Switching to process $decimal.*?"
+	    "Inferior 2 \\(process $decimal\\) exited normally.*?Switching to process $decimal.*?"
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "continue to exit in checkpoint 2.2" {
 	gdb_test "continue" \
-		 "Inferior 2 \\(process $decimal\\) exited normally.*?Switching to process $decimal.*?"
+	    "Inferior 2 \\(process $decimal\\) exited normally.*?Switching to process $decimal.*?"
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?"]
     }
 
     with_test_prefix "new checkpoints in inferior 2" {
 	gdb_test "checkpoint" "$ckpt_re 2.1: fork returned pid $::decimal.*" \
-		 "checkpoint 2.1"
+	    "checkpoint 2.1"
 
 	gdb_test "checkpoint" "$ckpt_re 2.2: fork returned pid $::decimal.*" \
-		 "checkpoint 2.2"
+	    "checkpoint 2.2"
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"\\* 2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "\\* 2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "delete checkpoint 2.0" {
 	gdb_test "delete checkpoint 2.0" \
-		 "Cannot delete active checkpoint" \
-		 "failed attempt to delete active checkpoint 2.0"
+	    "Cannot delete active checkpoint" \
+	    "failed attempt to delete active checkpoint 2.0"
 
 	gdb_test "restart 2.1" \
-		 "^Switching to process.*?#0  mailand \\(\\) at.*?$goodbye_c.*\}"
+	    "^Switching to process.*?#0  mailand \\(\\) at.*?$goodbye_c.*\}"
 
 	gdb_test "delete checkpoint 2.0" \
-		 "Killed process $::decimal"
+	    "Killed process $::decimal"
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "delete checkpoint 2.2" {
 	gdb_test "delete checkpoint 2.2" \
-		 "Killed process $::decimal"
+	    "Killed process $::decimal"
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?"]
     }
 
     with_test_prefix "new checkpoint in inferior 2" {
@@ -399,11 +399,11 @@ with_test_prefix "two inferiors with checkpoints" {
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"\\* 2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "\\* 2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "switch to inferior 1" {
@@ -411,49 +411,49 @@ with_test_prefix "two inferiors with checkpoints" {
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"\\* 1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "\\* 1\\.1 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "kill inferior 1" {
 	gdb_test "kill" "\\\[Inferior 1 \\(process $::decimal\\) killed\\\]" \
-		 "kill inferior 1" \
-		 "Kill the program being debugged.*y or n. $" "y"
+	    "kill inferior 1" \
+	    "Kill the program being debugged.*y or n. $" "y"
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "start inferior 1 again" {
 	gdb_test "checkpoint" "The program is not being run\\." \
-		 "checkpoint in non-running inferior"
+	    "checkpoint in non-running inferior"
 
 	gdb_test "start" "Starting program.*?hello.*?alarm \\(240\\);"
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "checkpoint 1.1" {
 	gdb_test "checkpoint" "$ckpt_re 1.1: fork returned pid $::decimal.*" \
-		 "second checkpoint in inferior 1"
+	    "second checkpoint in inferior 1"
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"\\* 1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "\\* 1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 }
 
@@ -462,20 +462,20 @@ with_test_prefix "three inferiors with checkpoints" {
 
     gdb_test "info checkpoints" \
 	[multi_line \
-	    "$checkpoints_header_re" \
-	    "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-	    "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+	     "$checkpoints_header_re" \
+	     "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+	     "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
 
     with_test_prefix "add third inferior" {
 	# Add a third inferior and exec into it.
 	gdb_test "add-inferior -exec $::binfile3" \
-		 "Added inferior 3.*" \
-		 "add inferior 3 with -exec $::exec3"
+	    "Added inferior 3.*" \
+	    "add inferior 3 with -exec $::exec3"
 
 	# Check that we have three inferiors.
 	gdb_test "info inferiors" \
-		 "Executable.*?\\* 1 .*?$::exec1.*? 2 .*?$::exec2.*? 3 .*?$::exec3.*?" \
-		 "check for three inferiors"
+	    "Executable.*?\\* 1 .*?$::exec1.*? 2 .*?$::exec2.*? 3 .*?$::exec3.*?" \
+	    "check for three inferiors"
 
 	# Switch to inferior 3.
 	gdb_test "inferior 3" \
@@ -492,11 +492,11 @@ with_test_prefix "three inferiors with checkpoints" {
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
-		"  3\\.1 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
+		 "  3\\.1 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
     }
 
     with_test_prefix "make checkpoint in inferior 1" {
@@ -506,27 +506,27 @@ with_test_prefix "three inferiors with checkpoints" {
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"\\* 1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
-		"  3\\.1 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
+		 "$checkpoints_header_re" \
+		 "\\* 1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
+		 "  3\\.1 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
     }
 
     with_test_prefix "restart 2.1" {
 	gdb_test "restart 2.1" \
-		 "Switching to inferior 2.*?#0  main \\(\\) at.*?$goodbye_c.*mailand\\(\\);"
+	    "Switching to inferior 2.*?#0  main \\(\\) at.*?$goodbye_c.*mailand\\(\\);"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
-		"  3\\.1 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
+		 "  3\\.1 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
     }
 
     with_test_prefix "next and make new checkpoint" {
@@ -534,114 +534,114 @@ with_test_prefix "three inferiors with checkpoints" {
 	gdb_test "checkpoint" "$ckpt_re 2\\.2: fork returned pid $::decimal.*"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
-		"  3\\.1 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
+		 "  3\\.1 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
     }
 
     with_test_prefix "switch to inferior 3 for upcoming kill" {
 	gdb_test "inferior 3" "Switching to inferior 3.*?alarm \\(30\\);"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
-		"  3\\.1 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
+		 "  3\\.1 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
     }
 
     with_test_prefix "kill inferior 3" {
 	gdb_test "kill" "\\\[Inferior 3 \\(process $::decimal\\) killed\\\]" \
-		 "kill inferior 3" \
-		 "Kill the program being debugged.*y or n. $" "y"
+	    "kill inferior 3" \
+	    "Kill the program being debugged.*y or n. $" "y"
 
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" ]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" ]
     }
 
     with_test_prefix "delete checkpoint 2.0" {
 	gdb_test "delete checkpoint 0" \
-		 "Inferior 3 has no checkpoints"
+	    "Inferior 3 has no checkpoints"
 	gdb_test "delete checkpoint 2.0" \
-		 "Killed process $::decimal"
+	    "Killed process $::decimal"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" ]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" ]
     }
 
     with_test_prefix "restart 2.2" {
 	gdb_test "restart 2.2" \
-		 "Switching to inferior 2.*?#0  main \\(\\) at.*?$goodbye_c.*foo\\(glob\\);"
+	    "Switching to inferior 2.*?#0  main \\(\\) at.*?$goodbye_c.*foo\\(glob\\);"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" ]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" ]
     }
 
     with_test_prefix "switch to non-running inferior 3" {
 	gdb_test "inferior 3" "\\\[Switching to inferior 3 \\\[<null>\\\] \\(.*?$::exec3\\)\\\]"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" ]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" ]
     }
 
     with_test_prefix "restart inferior 3 and make new checkpoints" {
 	gdb_test "start" "Starting program.*?hangout.*?alarm \\(30\\);"
 	gdb_test "checkpoint" \
-		 "$ckpt_re 3\\.1: fork returned pid $::decimal.*" \
-		 "checkpoint 3.1"
+	    "$ckpt_re 3\\.1: fork returned pid $::decimal.*" \
+	    "checkpoint 3.1"
 	gdb_test "checkpoint" \
-		 "$ckpt_re 3\\.2: fork returned pid $::decimal.*" \
-		 "checkpoint 3.2"
+	    "$ckpt_re 3\\.2: fork returned pid $::decimal.*" \
+	    "checkpoint 3.2"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
-		"  3\\.1 n +$proc_re +at $::hex, file.*?$hangout_c.*?" \
-		"  3\\.2 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
+		 "  3\\.1 n +$proc_re +at $::hex, file.*?$hangout_c.*?" \
+		 "  3\\.2 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
     }
 
     with_test_prefix "delete checkpoint 3.1" {
 	gdb_test "delete checkpoint 1" \
-		 "Killed process $::decimal"
+	    "Killed process $::decimal"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
-		"  3\\.2 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
+		 "  3\\.2 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
     }
 
     with_test_prefix "attempt to delete active checkpoint in non-current inferior" {
@@ -659,69 +659,69 @@ with_test_prefix "three inferiors with checkpoints" {
 	gdb_test "inferior 3" "Switching to inferior 3.*?alarm \\(30\\);"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.2 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
-		"  3\\.2 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.2 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
+		 "  3\\.2 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
 
 	# Check that deleting active checkpoints in other (non-current)
 	# inferiors is disallowed.
 	gdb_test "delete checkpoint 1.0" \
-		 "Cannot delete active checkpoint"
+	    "Cannot delete active checkpoint"
     }
 
     with_test_prefix "delete non-active checkpoint in non-current inferior" {
 	# But deleting non-active checkpoints, even in other inferiors,
 	# should work.
 	gdb_test "delete checkpoint 1.1" \
-		 "Killed process $::decimal"
+	    "Killed process $::decimal"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.2 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
-		"  3\\.2 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.2 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
+		 "  3\\.2 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
     }
 
     with_test_prefix "switch to inferior 1" {
 	gdb_test "inferior 1" "Switching to inferior 1.*?alarm \\(240\\);"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"\\* 1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.2 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
-		"  3\\.2 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
+		 "$checkpoints_header_re" \
+		 "\\* 1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.2 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
+		 "  3\\.2 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
     }
 
     with_test_prefix "checkpoint 1.3" {
 	gdb_test "checkpoint" "$ckpt_re 1\\.3: fork returned pid $::decimal.*" \
-		 "third checkpoint in inferior 1"
+	    "third checkpoint in inferior 1"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"\\* 1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.2 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.3 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
-		"  3\\.2 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
+		 "$checkpoints_header_re" \
+		 "\\* 1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.2 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.3 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.2 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  3\\.0 y +$proc_re +at $::hex, file.*?$hangout_c.*?" \
+		 "  3\\.2 n +$proc_re +at $::hex, file.*?$hangout_c.*?"]
     }
 
     with_test_prefix "attempt to remove active but not current inferior" {
 	gdb_test "x/i \$pc" "=> $::hex <main.*"
 	gdb_test "remove-inferior 3" \
-		 "warning: Can not remove active inferior 3\."
+	    "warning: Can not remove active inferior 3\."
     }
 }
 
@@ -730,30 +730,30 @@ with_test_prefix "background execution" {
     with_test_prefix "one checkpoint" {
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  2.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  2.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
     with_test_prefix "two checkpoints" {
 	gdb_test "checkpoint" "$ckpt_re 1\\.1: fork returned pid $::decimal.*" \
-		 "checkpoint in inferior 1"
+	    "checkpoint in inferior 1"
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"\\* 1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "\\* 1\\.0 y +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "background continue hello" {
 	gdb_test "continue &" "Continuing\."
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"\\* 1\\.0 y +$proc_re \\(running\\)" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "\\* 1\\.0 y +$proc_re \\(running\\)" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "fail to switch to inferior 2 w/ 1 in background" {
@@ -761,10 +761,10 @@ with_test_prefix "background execution" {
 	# Should be no change from earlier output.
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"\\* 1\\.0 y +$proc_re \\(running\\)" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "\\* 1\\.0 y +$proc_re \\(running\\)" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 
     with_test_prefix "switch to inferior 2" {
@@ -780,21 +780,21 @@ with_test_prefix "background execution" {
 	}
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"\\* 1\\.0 y +$proc_re +at $::hex.*" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "\\* 1\\.0 y +$proc_re +at $::hex.*" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 y +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "  2\\.1 n +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
 	gdb_test "restart 2.1" "Switching to inferior 2.*?goodbye.*?#0 +main .*?mailand\\(\\);.*"
     }
 
     with_test_prefix "after restart 2.1" {
 	gdb_test "info checkpoints" \
 	    [multi_line \
-		"$checkpoints_header_re" \
-		"  1\\.0 y +$proc_re +at $::hex.*" \
-		"  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
-		"  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
-		"\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
+		 "$checkpoints_header_re" \
+		 "  1\\.0 y +$proc_re +at $::hex.*" \
+		 "  1\\.1 n +$proc_re +at $::hex, file.*?$hello_c.*?" \
+		 "  2\\.0 n +$proc_re +at $::hex, file.*?$goodbye_c.*?" \
+		 "\\* 2\\.1 y +$proc_re +at $::hex, file.*?$goodbye_c.*?"]
     }
 }

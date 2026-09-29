@@ -28,7 +28,7 @@ if { ![istarget x86_64-*-* ] || ![is_lp64_target] } {
 standard_testfile amd64-pseudo-unwind.c amd64-pseudo-unwind-asm.S
 
 if { [prepare_for_testing "failed to prepare" ${testfile} \
-	"${srcfile} ${srcfile2}" {debug}] } {
+	  "${srcfile} ${srcfile2}" {debug}] } {
     return
 }
 

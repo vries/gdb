@@ -26,9 +26,9 @@ Dwarf::assemble $asm_file {
 
     cu {} {
 	DW_TAG_compile_unit {
-		DW_AT_language @DW_LANG_C
-		DW_AT_name     $srcfile
-		DW_AT_comp_dir /tmp
+	    DW_AT_language @DW_LANG_C
+	    DW_AT_name     $srcfile
+	    DW_AT_comp_dir /tmp
 	} {
 	    declare_labels integer_label uinteger_label
 
@@ -161,9 +161,9 @@ Dwarf::assemble $asm_file {
 
     cu {} {
 	DW_TAG_compile_unit {
-		DW_AT_language @DW_LANG_C_plus_plus
-		DW_AT_name	tmp.c
-		DW_AT_comp_dir /tmp
+	    DW_AT_language @DW_LANG_C_plus_plus
+	    DW_AT_name	tmp.c
+	    DW_AT_comp_dir /tmp
 	} {
 	    declare_labels integer_label forward
 
@@ -204,15 +204,15 @@ gdb_test "print sizeof(enum E)" " = 4"
 
 gdb_test "ptype enum EU" \
     [multi_line \
-	"type = enum EU {" \
-	"    TWO = 2" \
-	"}"] "ptype EU in enum C"
+	 "type = enum EU {" \
+	 "    TWO = 2" \
+	 "}"] "ptype EU in enum C"
 
 gdb_test "with lang c++ -- ptype enum EU" \
     [multi_line \
-	"type = enum EU : unsigned int {" \
-	"    TWO = 2" \
-	"}"] "ptype EU in C++"
+    "type = enum EU : unsigned int {" \
+    "    TWO = 2" \
+    "}"] "ptype EU in C++"
 
 gdb_test "with lang c++ -- p ns::val1" \
     " = ns::val1"
@@ -224,11 +224,11 @@ gdb_test "with lang c++ -- p ns::val1" \
 # enumerator (which reads the enumerator symbol) must agree.
 gdb_test "ptype enum ESIGNED" \
     [multi_line \
-	 "type = enum ESIGNED {" \
-	 "    S_NARROW = 128," \
-	 "    S_WIDE = 32768," \
-	 "    S_NEGATIVE = -10" \
-	 "}"]
+    "type = enum ESIGNED {" \
+    "    S_NARROW = 128," \
+    "    S_WIDE = 32768," \
+    "    S_NEGATIVE = -10" \
+    "}"]
 gdb_test "print S_NARROW" " = S_NARROW"
 gdb_test "print (int) S_NARROW" " = 128"
 gdb_test "print S_WIDE" " = S_WIDE"
@@ -238,10 +238,10 @@ gdb_test "print (int) S_NEGATIVE" " = -10"
 
 gdb_test "ptype enum EUNSIGNED" \
     [multi_line \
-	 "type = enum EUNSIGNED {" \
-	 "    U_NARROW = 128," \
-	 "    U_WIDE = 34944" \
-	 "}"]
+    "type = enum EUNSIGNED {" \
+    "    U_NARROW = 128," \
+    "    U_WIDE = 34944" \
+    "}"]
 gdb_test "print U_NARROW" " = U_NARROW"
 gdb_test "print (int) U_NARROW" " = 128"
 gdb_test "print U_WIDE" " = U_WIDE"
@@ -249,26 +249,26 @@ gdb_test "print (int) U_WIDE" " = 34944"
 
 gdb_test "ptype enum ESIGNEDPOS" \
     [multi_line \
-	 "type = enum ESIGNEDPOS {" \
-	 "    SP_MULTI = 3" \
-	 "}"]
+    "type = enum ESIGNEDPOS {" \
+    "    SP_MULTI = 3" \
+    "}"]
 gdb_test "print SP_MULTI" " = SP_MULTI"
 gdb_test "print (int) SP_MULTI" " = 3"
 
 gdb_test "ptype enum ENOTYPE" \
     [multi_line \
-	 "type = enum ENOTYPE {" \
-	 "    N_NARROW = 255" \
-	 "}"]
+    "type = enum ENOTYPE {" \
+    "    N_NARROW = 255" \
+    "}"]
 gdb_test "print N_NARROW" " = N_NARROW"
 gdb_test "print (int) N_NARROW" " = 255"
 
 gdb_test "ptype enum ENOTYPENEG" \
     [multi_line \
-	 "type = enum ENOTYPENEG {" \
-	 "    NN_NARROW = 255," \
-	 "    NN_NEGATIVE = -2" \
-	 "}"]
+    "type = enum ENOTYPENEG {" \
+    "    NN_NARROW = 255," \
+    "    NN_NEGATIVE = -2" \
+    "}"]
 gdb_test "print NN_NARROW" " = NN_NARROW"
 gdb_test "print (int) NN_NARROW" " = 255"
 gdb_test "print NN_NEGATIVE" " = NN_NEGATIVE"

@@ -23,7 +23,7 @@ standard_testfile
 # the "-Wl,-Ttext-segment" option compile the binary.
 
 if { [prepare_for_testing "failed to prepare" ${testfile} ${srcfile} \
-    [list debug text_segment=0xb0000000]] } {
+	  [list debug text_segment=0xb0000000]] } {
     return
 }
 

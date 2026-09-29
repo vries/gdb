@@ -58,9 +58,9 @@ gdb_test_multiple "p g_var_alias" "print alias of static variable" {
     }
     -re -wrap "has unknown type; cast it to its declared type" {
 	if { $old_clang } {
-	  xfail $gdb_test_name
+	    xfail $gdb_test_name
 	} else {
-	  fail $gdb_test_name
+	    fail $gdb_test_name
 	}
     }
 }
@@ -73,9 +73,9 @@ gdb_test_multiple "p g_def_var_alias" "print g_def_var_alias" {
     }
     -re -wrap "has unknown type; cast it to its declared type" {
 	if { $old_clang } {
-	  xfail $gdb_test_name
+	    xfail $gdb_test_name
 	} else {
-	  fail $gdb_test_name
+	    fail $gdb_test_name
 	}
     }
 }
@@ -85,9 +85,9 @@ gdb_test_multiple "p g_def_var_alias2" "print g_def_var_alias2" {
     }
     -re -wrap "has unknown type; cast it to its declared type" {
 	if { $old_clang } {
-	  xfail $gdb_test_name
+	    xfail $gdb_test_name
 	} else {
-	  fail $gdb_test_name
+	    fail $gdb_test_name
 	}
     }
 }

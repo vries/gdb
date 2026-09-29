@@ -35,21 +35,21 @@ runto_main
 
 gdb_test "break after_mc_barrier" \
     "Breakpoint 2 at .*: file .*${srcfile}, line .*" \
-	 "breakpoint on after_mc_barrier"
+    "breakpoint on after_mc_barrier"
 
 gdb_test "break do_something" \
     "Breakpoint 3 at .*: file .*${srcfile}, line .*" \
-	 "breakpoint on do_something"
+    "breakpoint on do_something"
 
 gdb_test "continue" \
-	"Breakpoint 2, after_mc_barrier .*" \
-	"run to after_mc_barrier"
+    "Breakpoint 2, after_mc_barrier .*" \
+    "run to after_mc_barrier"
 
 gdb_test_no_output "del 2" "delete after_mc_barrier breakpoint"
 
 gdb_test "continue" \
-	"Breakpoint 3, do_something .*" \
-	"run to do_something"
+    "Breakpoint 3, do_something .*" \
+    "run to do_something"
 
 # The test case has been constructed so that the current thread,
 # indicated by '*' in the "info threads" output, should be stopped in
@@ -63,52 +63,52 @@ gdb_test "continue" \
 # reported in the "Id" column.
 
 gdb_test "info threads"  \
-	[format {.*[\r\n]+\* +([0-9]+) +%s[^\r\n]* do_something \(n=\1\) at.*} $tdlabel_re]
+    [format {.*[\r\n]+\* +([0-9]+) +%s[^\r\n]* do_something \(n=\1\) at.*} $tdlabel_re]
 
 # Check for expected results when passing a valid thread handle to
 # thread_from_handle().
 
 gdb_test "python print(gdb.selected_inferior().thread_from_handle(gdb.parse_and_eval('thrs\[0\]')).num)" \
-	"1" "print thread id for thrs\[0\]"
+    "1" "print thread id for thrs\[0\]"
 
 gdb_test "python print(gdb.selected_inferior().thread_from_handle(gdb.parse_and_eval('thrs\[1\]')).num)" \
-	"2" "print thread id for thrs\[1\]"
+    "2" "print thread id for thrs\[1\]"
 
 gdb_test "python print(gdb.selected_inferior().thread_from_handle(gdb.parse_and_eval('thrs\[2\]')).num)" \
-	"3" "print thread id for thrs\[2\]"
+    "3" "print thread id for thrs\[2\]"
 
 # Objects which are of the correct size, but which are bogus thread
 # handles should return None.  For the first test (using thrs[3]), we
 # use 0.  For the second (thrs[4]), we use an unlikely bit pattern.
 
 gdb_test "python print(gdb.selected_inferior().thread_from_handle(gdb.parse_and_eval('thrs\[3\]')))" \
-	"None" "print thread for bogus handle thrs\[3\]"
+    "None" "print thread for bogus handle thrs\[3\]"
 
 gdb_test "python print(gdb.selected_inferior().thread_from_handle(gdb.parse_and_eval('thrs\[4\]')))" \
-	"None" "print thread for bogus handle thrs\[4\]"
+    "None" "print thread for bogus handle thrs\[4\]"
 
 # We should see an exception when passing an object of the wrong type.
 
 gdb_test "python print(gdb.selected_inferior().thread_from_handle(gdb.lookup_symbol('main')))" \
-	 ".*TypeError.*: Argument 'handle' must be a thread handle object.*" \
-	 "TypeError when passing a symbol object to thread_from_handle"
+    ".*TypeError.*: Argument 'handle' must be a thread handle object.*" \
+    "TypeError when passing a symbol object to thread_from_handle"
 
 # We should see an exception when passing too large of an object.
 
 gdb_test "python print(gdb.selected_inferior().thread_from_handle(gdb.parse_and_eval('thrs')))" \
-	 ".*Thread handle size mismatch.*" \
-	 "Pass overly large object to thread_from_handle"
+    ".*Thread handle size mismatch.*" \
+    "Pass overly large object to thread_from_handle"
 
 # We should see an exception when passing too small of an object.
 
 gdb_test "python print(gdb.selected_inferior().thread_from_handle(gdb.parse_and_eval('\"S\"')))" \
-	 ".*Thread handle size mismatch.*" \
-	 "Pass too small of an object to thread_from_handle"
+    ".*Thread handle size mismatch.*" \
+    "Pass too small of an object to thread_from_handle"
 
 # Test the thread_handle method
 
 gdb_py_test_silent_cmd "python tp=gdb.lookup_type('pthread_t')" \
-		       "Get pthread_t type" 0
+    "Get pthread_t type" 0
 gdb_py_test_silent_cmd "python inf=gdb.selected_inferior()" "Get inferior" 0
 
 foreach thrN {0 1 2} {
@@ -135,7 +135,7 @@ foreach thrN {0 1 2} {
 	# its constructor.
 
 	gdb_test "python print(gdb.Value(hand_bytes, tp) == hand)" \
-		 "True" \
-		 "verify that handles are the same"
+	    "True" \
+	    "verify that handles are the same"
     }
 }

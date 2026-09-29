@@ -32,10 +32,10 @@ if {![runto_main]} {
 gdb_breakpoint "[gdb_get_line_number "ldxr"]"
 
 gdb_test "continue" "Continuing.*Breakpoint $decimal.*" \
-  "Continue until breakpoint"
+    "Continue until breakpoint"
 
 gdb_test "next" ".*__asm __volatile.*" \
-  "Step through the ldxr/stxr sequence"
+    "Step through the ldxr/stxr sequence"
 
 gdb_test "next" ".*return dword.*" \
-  "Stepped through sequence through conditional branch"
+    "Stepped through sequence through conditional branch"

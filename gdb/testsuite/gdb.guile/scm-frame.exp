@@ -81,7 +81,7 @@ gdb_scm_test_silent_cmd "guile (define bframe (selected-frame))" \
 gdb_test "up" ".*" ""
 
 gdb_scm_test_silent_cmd "guile (define f1 (selected-frame))" \
-"get second frame"
+    "get second frame"
 gdb_scm_test_silent_cmd "guile (define f0 (frame-newer f1))" \
     "get first frame"
 
@@ -112,8 +112,8 @@ gdb_test "guile (print (format #f \"= ~A\" (eq? (frame-older f0) f1)))" \
 gdb_test "guile (print (format #f \"= ~A\" (eq? (frame-newer f1) f0)))" \
     "= #t" "test frame-newer"
 gdb_test "guile (print (frame-read-var f0 \"variable_which_surely_doesnt_exist\"))" \
-  "ERROR: .*: Out of range: variable not found: \"variable_which_surely_doesnt_exist\".*" \
-  "test frame-read-var - error"
+    "ERROR: .*: Out of range: variable not found: \"variable_which_surely_doesnt_exist\".*" \
+    "test frame-read-var - error"
 gdb_test "guile (print (format #f \"= ~A\" (frame-read-var f0 \"a\")))" \
     "= 1" "test frame-read-var - success"
 
@@ -122,11 +122,11 @@ gdb_test "guile (print (format #f \"= ~A\" (eq? (selected-frame) f1)))" \
 
 # Can read SP register.
 gdb_test "guile (print (equal? (frame-read-register (selected-frame) \"sp\") (parse-and-eval \"\$sp\")))" \
-  "= #t" "test frame-read-register of sp"
+    "= #t" "test frame-read-register of sp"
 
 # PC value obtained via read_register is as expected.
 gdb_test "guile (print (equal? (value->integer (frame-read-register f0 \"pc\")) (frame-pc f0)))" \
-  "= #t" "test frame-read-register of pc"
+    "= #t" "test frame-read-register of pc"
 
 # Test arch-specific register name.
 set pc ""

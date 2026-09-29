@@ -47,10 +47,10 @@ set jit_solib_srcfile ${srcdir}/${subdir}/${jit_solib_basename}.c
 proc compile_jit_dlmain {options} {
     global main_loader_srcfile main_loader_binfile main_loader_basename
     set options [concat $options debug \
-	additional_flags=-DJIT_DESCRIPTOR_LINKAGE=static]
+		     additional_flags=-DJIT_DESCRIPTOR_LINKAGE=static]
 
     if { [gdb_compile ${main_loader_srcfile} ${main_loader_binfile} \
-	    executable $options] != "" } {
+	      executable $options] != "" } {
 	untested "failed to compile ${main_loader_basename}.c as an executable"
 	return -1
     }
@@ -93,7 +93,7 @@ proc one_jit_test {solib_binfiles_target match_str} {
 	    "setting library name"
 
 	gdb_breakpoint [gdb_get_line_number "break here after-dlopen" \
-			$main_loader_srcfile]
+			    $main_loader_srcfile]
 	gdb_continue_to_breakpoint "break here after-dlopen"
 
 	set line [gdb_get_line_number {break here 0} $main_solib_srcfile]
@@ -135,8 +135,8 @@ proc one_jit_test {solib_binfiles_target match_str} {
 
 # Compile the main code (which loads the JIT objects) as a shared library.
 if { [compile_jit_elf_main_as_so $main_solib_srcfile $main_solib_binfile \
-	{additional_flags="-DMAIN=jit_dl_main" \
-	    additional_flags="-DJIT_DESCRIPTOR_LINKAGE=static"}] < 0 } {
+	  {additional_flags="-DMAIN=jit_dl_main" \
+	       additional_flags="-DJIT_DESCRIPTOR_LINKAGE=static"}] < 0 } {
     return
 }
 
@@ -150,7 +150,7 @@ if { [compile_jit_dlmain {shlib_load}] < 0 } {
 
 # Compile two shared libraries to use as JIT objects.
 set jit_solibs_target [compile_and_download_n_jit_so \
-		      $jit_solib_basename $jit_solib_srcfile 2]
+			   $jit_solib_basename $jit_solib_srcfile 2]
 if { $jit_solibs_target == -1 } {
     return
 }

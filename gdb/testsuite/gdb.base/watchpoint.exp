@@ -56,23 +56,23 @@ proc initialize {} {
     global srcfile
 
     if {[gdb_test "break marker1" "Breakpoint 1 at $hex: file .*$srcfile, line $decimal.*" "set breakpoint at marker1" ]} {
-      return 0
+	return 0
     }
 
 
     if {[gdb_test "break marker2" "Breakpoint 2 at $hex: file .*$srcfile, line $decimal.*" "set breakpoint at marker2" ]} {
-      return 0
+	return 0
     }
 
 
     if {[gdb_test "info break" "1\[ \]*breakpoint.*marker1.*\r\n2\[ \]*breakpoint.*marker2.*" "info break" ]} {
-      return 0
+	return 0
     }
 
     gdb_test "watch ival3" ".*\[Ww\]atchpoint 3: ival3.*" "set watchpoint on ival3"
 
     if {[gdb_test "info watch" "3\[ \]*.*watchpoint.*ival3" "watchpoint found in watchpoint/breakpoint table" ]} {
-      return 0
+	return 0
     }
 
 
@@ -81,7 +81,7 @@ proc initialize {} {
     # we get to the first marker function.
 
     if {[gdb_test_no_output "disable 3" "disable watchpoint" ]} {
-      return 0
+	return 0
     }
 
 
@@ -101,7 +101,7 @@ proc test_simple_watchpoint {} {
 
     if {[gdb_test_no_output "disable 3" \
 	     "disable watchpoint in test_simple_watchpoint" ]} {
-      return 0
+	return 0
     }
 
     # Run until we get to the first marker function.
@@ -122,7 +122,7 @@ proc test_simple_watchpoint {} {
     # After reaching the marker function, enable the watchpoint.
 
     if {[gdb_test_no_output "enable 3" "enable watchpoint" ]} {
-      return
+	return
     }
 
 
@@ -189,7 +189,7 @@ Continuing.*\[Ww\]atchpoint.*ival3.*Old value = -1.*New value = 0.*ival3 = count
     # Disable the watchpoint so we run at full speed until we exit.
 
     if {[gdb_test_no_output "disable 3" "watchpoint disabled" ]} {
-      return
+	return
     }
 
 
@@ -215,7 +215,7 @@ proc test_disabling_watchpoints {} {
 
     if {[gdb_test_no_output "disable 3" \
 	     "disable watchpoint in test_disabling_watchpoints" ]} {
-      return 0
+	return 0
     }
 
 
@@ -237,7 +237,7 @@ proc test_disabling_watchpoints {} {
     # After reaching the marker function, enable the watchpoint.
 
     if {[gdb_test_no_output "enable 3" "watchpoint enabled" ]} {
-      return
+	return
     }
 
 
@@ -253,7 +253,7 @@ proc test_disabling_watchpoints {} {
 
     if {[gdb_test_no_output "disable 3" \
 	     "disable watchpoint #2 in test_disabling_watchpoints" ]} {
-      return 0
+	return 0
     }
 
 
@@ -343,8 +343,8 @@ proc test_stepping {} {
 
 	# Check that the watchpoint is triggered during a step.
 	gdb_test "step" \
-		 "\[Ww\]atchpoint.*: ival2.*Old value = -1.*New value = 4.*ival3 = count; ival4 = count;" \
-		 "step over ival2 assignment"
+	    "\[Ww\]atchpoint.*: ival2.*Old value = -1.*New value = 4.*ival3 = count; ival4 = count;" \
+	    "step over ival2 assignment"
 
 	# Step again and check that correct statement is reached after
 	# hitting a watchpoint during a step.
@@ -507,11 +507,11 @@ proc test_complex_watchpoint {} {
 	    "^(?:Hardware w|W)atchpoint $::decimal: local_a . ival5" \
 	    "set partially local watch"
 	gdb_test "cont" "Continuing.*\[Ww\]atchpoint .*: local_a . ival5.*" \
-		 "trigger1 partially local watch"
+	    "trigger1 partially local watch"
 	gdb_test "cont" "Continuing.*\[Ww\]atchpoint .*: local_a . ival5.*" \
-		 "trigger2 partially local watch"
+	    "trigger2 partially local watch"
 	gdb_test "cont" "Continuing.*\[Ww\]atchpoint .* deleted because the program has left the block in.*which its expression is valid.*" \
-		 "self-delete partially local watch"
+	    "self-delete partially local watch"
 
 	# We should be in "func2" again now.  Test a watch of a
 	# static (non-stack-based) local.  Since this has scope
@@ -521,13 +521,13 @@ proc test_complex_watchpoint {} {
 	gdb_continue_to_breakpoint "func2 breakpoint here, third time"
 	gdb_test "watch static_b" \
 	    "^(?:Hardware w|W)atchpoint $::decimal: static_b" \
-		 "set static local watch"
+	    "set static local watch"
 	gdb_test "cont" "Continuing.*\[Ww\]atchpoint .*: static_b.*" \
-		 "trigger static local watch"
+	    "trigger static local watch"
 	gdb_test "cont" "Continuing.*marker6 \\(\\).*" \
-		 "continue after trigger static local watch"
+	    "continue after trigger static local watch"
 	gdb_test "info break" ".*watchpoint.*static_b.*" \
-		 "static local watch did not self-delete"
+	    "static local watch did not self-delete"
 
 	# We should be in "recurser" now.  Test a watch of a stack-
 	# based local.  Symbols mentioned in a watchpoint are bound
@@ -595,9 +595,9 @@ proc test_watchpoint_and_breakpoint {} {
 proc test_constant_watchpoint {} {
     gdb_test "watch 5" "Cannot watch constant value `5'." "number is constant"
     gdb_test "watch (int *)5" "Cannot watch constant value `\\(int \\*\\)5'." \
-    "number with cast is constant"
+	"number with cast is constant"
     gdb_test "watch marker1" "Cannot watch constant value `marker1'." \
-    "marker1 is constant"
+	"marker1 is constant"
     gdb_test "watch count + 6" ".*atchpoint ${::decimal}: count \\+ 6"
     gdb_test_no_output "delete \$bpnum" "delete watchpoint `count + 6'"
     gdb_test "watch 7 + count" \
@@ -855,7 +855,7 @@ proc test_no_hw_watchpoints {} {
 
     gdb_test "watch ival3 if  count > 1  thread 1 " \
 	"watch ival3 if  count > 1  thread 1 \r\nWatchpoint \[0-9\]*: ival3.*" \
-	 "set slow condition watch w/thread"
+	"set slow condition watch w/thread"
 
     gdb_test_no_output "delete \$bpnum" "delete watch w/condition and thread"
 

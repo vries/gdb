@@ -35,8 +35,8 @@ mi_runto_main
 check_mi_and_console_threads "at main"
 
 for {set i 0} {$i < 4} {incr i} {
-  mi_next "next, try $i"
-  check_mi_and_console_threads "try $i"
+    mi_next "next, try $i"
+    check_mi_and_console_threads "try $i"
 }
 
 mi_gdb_exit

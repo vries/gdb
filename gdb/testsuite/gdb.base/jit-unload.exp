@@ -23,19 +23,19 @@ set lib_testfile ${testfile}-lib
 set lib_binfile [standard_output_file $lib_testfile]
 
 if { [build_executable "build shlib" $lib_testfile $srcfile2 \
-	{debug shlib}] == -1 } {
+	  {debug shlib}] == -1 } {
     return
 }
 
 set lib_testfile_on_target [gdb_download_shlib $lib_binfile]
 
 set options [list \
-		debug \
-		shlib_load \
-		additional_flags=-DSHLIB_NAME=\"${lib_testfile_on_target}\"]
+		 debug \
+		 shlib_load \
+		 additional_flags=-DSHLIB_NAME=\"${lib_testfile_on_target}\"]
 
 if { [prepare_for_testing "build main file" $testfile $srcfile \
-	$options] == -1 } {
+	  $options] == -1 } {
     return
 }
 

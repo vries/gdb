@@ -177,23 +177,23 @@ proc check_end_markers { expected_symtab test_spec } {
 	set saw_line false
 	gdb_test_multiple "maint info line-table" \
 	    "check END marker at index $index in $expected_symtab" {
-	    -re "^symtab: \[^\r\n\]+/($::testfile-$::decimal.c) \\(\\(\[^\r\n\]+\r\n" {
-		set symtab $expect_out(1,string)
-		exp_continue
-	    }
-	    -re "^${index}\\s+END\\s+0x0*$addr\\s+$::hex\\s+Y\\s*\r\n" {
-		if { $symtab eq $expected_symtab } {
-		    set saw_line true
+		-re "^symtab: \[^\r\n\]+/($::testfile-$::decimal.c) \\(\\(\[^\r\n\]+\r\n" {
+		    set symtab $expect_out(1,string)
+		    exp_continue
 		}
-		exp_continue
+		-re "^${index}\\s+END\\s+0x0*$addr\\s+$::hex\\s+Y\\s*\r\n" {
+		    if { $symtab eq $expected_symtab } {
+			set saw_line true
+		    }
+		    exp_continue
+		}
+		-re "^$::gdb_prompt $" {
+		    gdb_assert $saw_line $gdb_test_name
+		}
+		-re "^\[^\r\n\]*\r\n" {
+		    exp_continue
+		}
 	    }
-	    -re "^$::gdb_prompt $" {
-		gdb_assert $saw_line $gdb_test_name
-	    }
-	    -re "^\[^\r\n\]*\r\n" {
-		exp_continue
-	    }
-	}
     }
 }
 

@@ -27,7 +27,7 @@ if { [prepare_for_testing "prepare" $testfile $srcfile {debug nowarnings}] != 0 
 }
 
 if {![runto known_types]} {
-   return
+    return
 }
 
 # Detect the size of the target's basic types.

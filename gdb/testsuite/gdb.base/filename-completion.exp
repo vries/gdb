@@ -77,10 +77,10 @@ proc setup_directory_tree {} {
 # entries in COMPLETION_LIST that don't have a trailing "/" before running
 # the 'complete' command test.
 proc test_gdb_complete_filename_multiple {
-  cmd_prefix completion_word add_completed_line completion_list
-  {start_quote_char ""} {end_quote_char ""} {max_completions false}
-  {testname ""}
-} {
+					  cmd_prefix completion_word add_completed_line completion_list
+					  {start_quote_char ""} {end_quote_char ""} {max_completions false}
+					  {testname ""}
+				      } {
     if { [readline_is_used] } {
 	test_gdb_complete_tab_multiple "$cmd_prefix$completion_word" \
 	    $add_completed_line $completion_list $max_completions $testname
@@ -382,10 +382,10 @@ proc run_quoting_and_escaping_tests { root } {
     # Test all the commands which allow quoting of filenames, and
     # which require whitespace to be escaped in unquoted filenames.
     set all_cmds { file exec-file symbol-file add-symbol-file \
-		      remove-symbol-file \
-		      "target core" "target exec" "target tfile" \
-		      "maint print c-tdesc" "save gdb-index"
-		      "save gdb-index -dwarf-5" "shell ls"}
+		       remove-symbol-file \
+		       "target core" "target exec" "target tfile" \
+		       "maint print c-tdesc" "save gdb-index"
+	"save gdb-index -dwarf-5" "shell ls"}
     if { [allow_compile_tests] } {
 	lappend all_cmds "compile file"
     }

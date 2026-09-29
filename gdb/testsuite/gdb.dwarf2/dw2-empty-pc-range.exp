@@ -26,11 +26,11 @@ if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" object {}] != "
 
 clean_restart $executable
 gdb_test "ptype emptyrange" {No symbol "emptyrange" in current context\.} \
-	 "empty range before CU load"
+    "empty range before CU load"
 
 # Force loading the CU
 gdb_test "ptype realrange" {type = void \(void\)} \
-	 "valid range after CU load"
+    "valid range after CU load"
 
 gdb_test "ptype emptyrange" {No symbol "emptyrange" in current context\.} \
-	 "empty range after CU load"
+    "empty range after CU load"

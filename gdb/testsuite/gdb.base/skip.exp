@@ -21,8 +21,8 @@ load_lib completion-support.exp
 standard_testfile
 
 if { [prepare_for_testing "failed to prepare" "skip" \
-			  {skip.c skip1.c } \
-			  {debug nowarnings}] } {
+	  {skip.c skip1.c } \
+	  {debug nowarnings}] } {
     return
 }
 
@@ -100,10 +100,10 @@ gdb_test "info skip 999" "No skiplist entries found with number 999."
 
 gdb_test "info skip" \
     [multi_line "Num\\s+Enb\\s+Glob\\s+File\\s+RE\\s+Function" \
-		"1\\s+y\\s+n\\s+.*$srcfile\\s+n\\s+<none>" \
-		"2\\s+y\\s+n\\s+<none>\\s+n\\s+main" \
-		"3\\s+y\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
-		"4\\s+y\\s+n\\s+<none>\\s+n\\s+baz"]
+	 "1\\s+y\\s+n\\s+.*$srcfile\\s+n\\s+<none>" \
+	 "2\\s+y\\s+n\\s+<none>\\s+n\\s+main" \
+	 "3\\s+y\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
+	 "4\\s+y\\s+n\\s+<none>\\s+n\\s+baz"]
 
 # Right now, we have an outstanding skiplist entry on both source
 # files, so when we step into the first line in main(), we should step
@@ -132,9 +132,9 @@ with_test_prefix "step after deleting 1" {
     # Check that entry 1 is missing from |info skip|
     gdb_test "info skip" \
 	[multi_line "Num\\s+Enb\\s+Glob\\s+File\\s+RE\\s+Function" \
-		    "2\\s+y\\s+n\\s+<none>\\s+n\\s+main" \
-		    "3\\s+y\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
-		    "4\\s+y\\s+n\\s+<none>\\s+n\\s+baz"] \
+	     "2\\s+y\\s+n\\s+<none>\\s+n\\s+main" \
+	     "3\\s+y\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
+	     "4\\s+y\\s+n\\s+<none>\\s+n\\s+baz"] \
 	"info skip (delete 1)"
 
     if {![runto_main]} {
@@ -209,17 +209,17 @@ with_test_prefix "admin" {
     gdb_test "skip disable"
     gdb_test "info skip" \
 	[multi_line "Num\\s+Enb\\s+Glob\\s+File\\s+RE\\s+Function" \
-		    "2\\s+n\\s+n\\s+<none>\\s+n\\s+main" \
-		    "3\\s+n\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
-		    "4\\s+n\\s+n\\s+<none>\\s+n\\s+baz"] \
+	     "2\\s+n\\s+n\\s+<none>\\s+n\\s+main" \
+	     "3\\s+n\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
+	     "4\\s+n\\s+n\\s+<none>\\s+n\\s+baz"] \
 	"info skip after disabling all"
 
     gdb_test "skip enable"
     gdb_test "info skip" \
 	[multi_line "Num\\s+Enb\\s+Glob\\s+File\\s+RE\\s+Function" \
-		    "2\\s+y\\s+n\\s+<none>\\s+n\\s+main" \
-		    "3\\s+y\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
-		    "4\\s+y\\s+n\\s+<none>\\s+n\\s+baz"] \
+	     "2\\s+y\\s+n\\s+<none>\\s+n\\s+main" \
+	     "3\\s+y\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
+	     "4\\s+y\\s+n\\s+<none>\\s+n\\s+baz"] \
 	"info skip after enabling all"
 
     gdb_test_no_output "save skip [standard_output_file skips]" \
@@ -228,44 +228,44 @@ with_test_prefix "admin" {
     gdb_test "disable skip"
     gdb_test "info skip" \
 	[multi_line "Num\\s+Enb\\s+Glob\\s+File\\s+RE\\s+Function" \
-		    "2\\s+n\\s+n\\s+<none>\\s+n\\s+main" \
-		    "3\\s+n\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
-		    "4\\s+n\\s+n\\s+<none>\\s+n\\s+baz"] \
+	     "2\\s+n\\s+n\\s+<none>\\s+n\\s+main" \
+	     "3\\s+n\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
+	     "4\\s+n\\s+n\\s+<none>\\s+n\\s+baz"] \
 	"info skip after 'disable skip'"
 
     gdb_test "enable skip"
     gdb_test "info skip" \
 	[multi_line "Num\\s+Enb\\s+Glob\\s+File\\s+RE\\s+Function" \
-		    "2\\s+y\\s+n\\s+<none>\\s+n\\s+main" \
-		    "3\\s+y\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
-		    "4\\s+y\\s+n\\s+<none>\\s+n\\s+baz"] \
+	     "2\\s+y\\s+n\\s+<none>\\s+n\\s+main" \
+	     "3\\s+y\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
+	     "4\\s+y\\s+n\\s+<none>\\s+n\\s+baz"] \
 	"info skip after 'enable skip'"
 
     gdb_test "skip disable 4 2-3"
     gdb_test "info skip" \
 	[multi_line "Num\\s+Enb\\s+Glob\\s+File\\s+RE\\s+Function" \
-		    "2\\s+n\\s+n\\s+<none>\\s+n\\s+main" \
-		    "3\\s+n\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
-		    "4\\s+n\\s+n\\s+<none>\\s+n\\s+baz"] \
+	     "2\\s+n\\s+n\\s+<none>\\s+n\\s+main" \
+	     "3\\s+n\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
+	     "4\\s+n\\s+n\\s+<none>\\s+n\\s+baz"] \
 	"info skip after disabling 4 2-3"
 
     gdb_test "skip enable 2-3"
     gdb_test "info skip" \
 	[multi_line "Num\\s+Enb\\s+Glob\\s+File\\s+RE\\s+Function" \
-		    "2\\s+y\\s+n\\s+<none>\\s+n\\s+main" \
-		    "3\\s+y\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
-		    "4\\s+n\\s+n\\s+<none>\\s+n\\s+baz"] \
+	     "2\\s+y\\s+n\\s+<none>\\s+n\\s+main" \
+	     "3\\s+y\\s+n\\s+$srcfile1\\s+n\\s+<none>" \
+	     "4\\s+n\\s+n\\s+<none>\\s+n\\s+baz"] \
 	"info skip after enabling 2-3"
 
     gdb_test "info skip 2-3" \
 	[multi_line "Num\\s+Enb\\s+Glob\\s+File\\s+RE\\s+Function" \
-		    "2\\s+y\\s+n\\s+<none>\\s+n\\s+main" \
-		    "3\\s+y\\s+n\\s+$srcfile1\\s+n\\s+<none>"]
+	     "2\\s+y\\s+n\\s+<none>\\s+n\\s+main" \
+	     "3\\s+y\\s+n\\s+$srcfile1\\s+n\\s+<none>"]
 
     gdb_test "skip delete 2 3"
     gdb_test "info skip" \
 	[multi_line "Num\\s+Enb\\s+Glob\\s+File\\s+RE\\s+Function" \
-		    "4\\s+n\\s+n\\s+<none>\\s+n\\s+baz"] \
+	     "4\\s+n\\s+n\\s+<none>\\s+n\\s+baz"] \
 	"info skip after deleting 2 3"
 
     gdb_test "delete skip"

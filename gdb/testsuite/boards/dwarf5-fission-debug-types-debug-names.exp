@@ -25,5 +25,5 @@ load_board_description "cc-with-tweaks"
 
 set_board_info debug_flags \
     [join { "-gdwarf-5" \
-	    "-gsplit-dwarf" \
-	    "-fdebug-types-section" }]
+		"-gsplit-dwarf" \
+		"-fdebug-types-section" }]

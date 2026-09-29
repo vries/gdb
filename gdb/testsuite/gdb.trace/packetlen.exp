@@ -47,15 +47,15 @@ if {![gdb_target_supports_trace]} {
 gdb_delete_tracepoints
 gdb_test "trace gdb_c_test" ".*" ""
 gdb_trace_setactions "setup collect actions" \
-	"" \
-	"collect parm\[0\], parm\[1\], parm\[2\], parm\[3\]" "^$" \
-	"collect parm\[4\], parm\[5\], parm\[6\], parm\[7\]" "^$" \
-	"collect p, local_reg, local_static, local_static_sizeof" "^$" \
-	"collect local_long, stack_ptr, end_of_stack" "^$" \
-	"collect gdb_char_test, gdb_short_test, gdb_long_test" "^$" \
-	"collect gdb_arr_test, gdb_struct1_test, gdb_struct2_test" "^$" \
-	"collect gdb_structp_test, gdb_structpp_test, gdb_union1_test" "^$" \
-	"end" ""
+    "" \
+    "collect parm\[0\], parm\[1\], parm\[2\], parm\[3\]" "^$" \
+    "collect parm\[4\], parm\[5\], parm\[6\], parm\[7\]" "^$" \
+    "collect p, local_reg, local_static, local_static_sizeof" "^$" \
+    "collect local_long, stack_ptr, end_of_stack" "^$" \
+    "collect gdb_char_test, gdb_short_test, gdb_long_test" "^$" \
+    "collect gdb_arr_test, gdb_struct1_test, gdb_struct2_test" "^$" \
+    "collect gdb_structp_test, gdb_structpp_test, gdb_union1_test" "^$" \
+    "end" ""
 
 gdb_test_no_output "tstart" "survive the long packet send"
 gdb_breakpoint "end" -qualified

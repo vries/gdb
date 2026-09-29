@@ -66,32 +66,32 @@ proc test_ldr_literal {} {
     global gdb_prompt
 
     gdb_test_multiple "break *test_ldr_literal" "" {
-       -re "Breakpoint.*at.* file .*$srcfile, line.*\r\n$gdb_prompt $" {
-	   pass $gdb_test_name
-       }
-       -re "No symbol.*\r\n$gdb_prompt $" {
-	   return 0
-       }
+	-re "Breakpoint.*at.* file .*$srcfile, line.*\r\n$gdb_prompt $" {
+	    pass $gdb_test_name
+	}
+	-re "No symbol.*\r\n$gdb_prompt $" {
+	    return 0
+	}
     }
 
     gdb_test "break *test_ldrsb_literal" \
-       "Breakpoint.*at.* file .*$srcfile, line.*" \
-       "break test_ldrsb_literal"
+	"Breakpoint.*at.* file .*$srcfile, line.*" \
+	"break test_ldrsb_literal"
     gdb_test "break *test_ldrsh_literal" \
-       "Breakpoint.*at.* file .*$srcfile, line.*" \
-       "break test_ldrsh_literal"
+	"Breakpoint.*at.* file .*$srcfile, line.*" \
+	"break test_ldrsh_literal"
     gdb_test "break *test_ldr_literal_end" \
-       "Breakpoint.*at.* file .*$srcfile, line.*" \
-       "break test_test_ldr_literal_end"
+	"Breakpoint.*at.* file .*$srcfile, line.*" \
+	"break test_test_ldr_literal_end"
 
     gdb_continue_to_breakpoint "continue to test_ldr_literal" \
-       ".*ldrh.*r0\,.*\[pc\].*"
+	".*ldrh.*r0\,.*\[pc\].*"
     gdb_continue_to_breakpoint "continue to test_ldrsb_literal" \
-       ".*ldrsb.*r0\,.*\[pc\].*"
+	".*ldrsb.*r0\,.*\[pc\].*"
     gdb_continue_to_breakpoint "continue to test_ldrsh_literal" \
-       ".*ldrsh.*r0\,.*\[pc\].*"
+	".*ldrsh.*r0\,.*\[pc\].*"
     gdb_continue_to_breakpoint "continue to test_ldr_literal_ret" \
-       ".*bx lr.*"
+	".*bx lr.*"
 }
 
 proc test_ldr_literal_16 {} {

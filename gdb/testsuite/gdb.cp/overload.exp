@@ -284,28 +284,28 @@ gdb_test_multiple "info func overloadfnarg" "list overloaded function with no ar
     -re ".*overloadfnarg\\(void\\).*$gdb_prompt $" {
 	# gcc 2
 	gdb_test "list foo::overloadfnarg(void)"\
-		".*int foo::overloadfnarg.*\\(void\\).*" \
-		"list overloaded function with no args"
+	    ".*int foo::overloadfnarg.*\\(void\\).*" \
+	    "list overloaded function with no args"
     }
     -re ".*overloadfnarg\\(\\).*$gdb_prompt $" {
 	# gcc 3
 	gdb_test "list foo::overloadfnarg()"\
-		".*int foo::overloadfnarg.*\\(void\\).*" \
-		"list overloaded function with no args"
+	    ".*int foo::overloadfnarg.*\\(void\\).*" \
+	    "list overloaded function with no args"
     }
 }
 
 gdb_test "list foo::overloadfnarg(int)" \
     "int foo::overloadfnarg.*\\(int arg\\).*" \
-   "list overloaded function with int arg"
+    "list overloaded function with int arg"
 
 gdb_test "list foo::overloadfnarg(int, int (*)(int))" \
-   "int foo::overloadfnarg.*\\(int arg, int \\(\\*foo\\) \\(int\\)\\).*" \
-   "list overloaded function with function ptr args"
+    "int foo::overloadfnarg.*\\(int arg, int \\(\\*foo\\) \\(int\\)\\).*" \
+    "list overloaded function with function ptr args"
 
 gdb_test "list \"foo::overloadfnarg(int, int (*)(int))\"" \
-   "int foo::overloadfnarg.*\\(int arg, int \\(\\*foo\\) \\(int\\)\\).*" \
-   "list overloaded function with function ptr args - quotes around argument"
+    "int foo::overloadfnarg.*\\(int arg, int \\(\\*foo\\) \\(int\\)\\).*" \
+    "list overloaded function with function ptr args - quotes around argument"
 
 # Test list with filename.
 

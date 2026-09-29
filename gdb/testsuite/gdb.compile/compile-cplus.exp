@@ -132,7 +132,7 @@ gdb_test_multiple $test $test {
 
 gdb_test "info sym $infcall_pc" "\r\n_gdb_expr.*" "info sym found"
 gdb_test "return" "\r\n#0  main .*" "return" \
-	 "Make _gdb_expr\\(__gdb_regs\\*\\) return now\\? \\(y or n\\) " "y"
+    "Make _gdb_expr\\(__gdb_regs\\*\\) return now\\? \\(y or n\\) " "y"
 gdb_test "info sym $infcall_pc" "\r\nNo symbol matches .*" "info sym not found"
 
 gdb_test_no_output "set unwind-on-signal on"
@@ -303,8 +303,8 @@ gdb_test "p globalvar" " = -75" "expect -75"
 
 setup_kfail compile/23585 *-*-*
 gdb_test_no_output \
-  "compile code int (*funcp) (int) = (int(*)(int))func_nodebug; globalvar = funcp (76);" \
-  "call func_nodebug indirectly"
+    "compile code int (*funcp) (int) = (int(*)(int))func_nodebug; globalvar = funcp (76);" \
+    "call func_nodebug indirectly"
 setup_kfail compile/23585 *-*-*
 gdb_test "p globalvar" " = -76" "expect -76"
 

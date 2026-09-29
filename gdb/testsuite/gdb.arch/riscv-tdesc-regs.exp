@@ -114,7 +114,7 @@ foreach rgroup {x_all all save restore general system csr} {
 	-re "^(\[^ \t\]+)\[ \t\]+\[^\r\n\]+\r\n" {
 	    set reg $expect_out(1,string)
 	    incr reg_counts($reg)
-	exp_continue
+	    exp_continue
 	}
 	-re "^$gdb_prompt $" {
 	    # Done.

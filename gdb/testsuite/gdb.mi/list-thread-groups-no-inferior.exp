@@ -42,5 +42,5 @@ gdb_test_multiple $test $test {
 # Verify that GDB is still alive.
 
 mi_gdb_test "-data-evaluate-expression 1" \
-	    ".*\\^done,value=\"1\"" \
-	    "GDB is still alive"
+    ".*\\^done,value=\"1\"" \
+    "GDB is still alive"

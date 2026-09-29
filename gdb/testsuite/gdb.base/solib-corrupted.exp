@@ -35,7 +35,7 @@ if {![runto_main]} {
 }
 
 set probes { init_start init_complete map_start reloc_complete unmap_start
-	     unmap_complete }
+    unmap_complete }
 set test "info probes"
 gdb_test_multiple $test $test {
     -re "^stap\[ \t\]+rtld\[ \t\]+(?:rtld_)?(\[a-z_\]+)\[ \t\]" {

@@ -44,8 +44,8 @@ proc test_one_sig {nextsig} {
 	gdb_test_multiple "continue" "get signal $thissig" {
 	    -wrap -re \
 		"Program received signal SIG$thissig.*handle_$thissig.*" {
-		fail "$gdb_test_name (wrong location)"
-	    }
+		    fail "$gdb_test_name (wrong location)"
+		}
 	    -wrap -re "Program received signal SIG$thissig.*" {
 		pass $gdb_test_name
 	    }
@@ -55,10 +55,10 @@ proc test_one_sig {nextsig} {
 	    }
 	    -wrap -re \
 		"Process record does not support instruction 0xfae64 at.*" {
-		kfail "gdb/25038" $gdb_test_name
-		set record_instruction_kfail 1
-		return
-	    }
+		    kfail "gdb/25038" $gdb_test_name
+		    set record_instruction_kfail 1
+		    return
+		}
 	}
     }
 

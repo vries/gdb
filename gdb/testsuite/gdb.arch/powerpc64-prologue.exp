@@ -29,7 +29,7 @@ if { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {}] !
 }
 
 if { [prepare_for_testing "failed to prepare" $testfile "$srcfile" \
-      {}] } {
+	  {}] } {
     return
 }
 
@@ -41,37 +41,37 @@ if {![runto_main]} {
 # Testcase for PIC prologue.
 gdb_breakpoint "gdb2029_marker"
 gdb_test "continue" "Breakpoint $decimal, $hex in gdb2029_marker \\(\\).*" \
-	"continue to PIC"
+    "continue to PIC"
 
 gdb_test "backtrace 10" \
-	"#0\[ \t\]*$hex in gdb2029_marker.*\r\n#1\[ \t\]*$hex in gdb2029.*\r\n#2\[ \t\]*$hex in main.*" \
-	"backtrace in PIC marker"
+    "#0\[ \t\]*$hex in gdb2029_marker.*\r\n#1\[ \t\]*$hex in gdb2029.*\r\n#2\[ \t\]*$hex in main.*" \
+    "backtrace in PIC marker"
 
 gdb_test "finish" ".*$hex in gdb2029 .*" "finish from PIC"
 
 gdb_test "backtrace 10" \
-	"#0\[ \t\]*$hex in gdb2029 .*\r\n#1\[ \t\]*$hex in main.*" \
-	"backtrace in PIC"
+    "#0\[ \t\]*$hex in gdb2029 .*\r\n#1\[ \t\]*$hex in main.*" \
+    "backtrace in PIC"
 
 gdb_test "info frame" \
-	".*Saved registers:.*r31 at.*pc at.*lr at.*" \
-	"saved registers in PIC"
+    ".*Saved registers:.*r31 at.*pc at.*lr at.*" \
+    "saved registers in PIC"
 
 # Testcase for scheduled prologue.
 gdb_breakpoint "optimized_1_marker"
 gdb_test "continue" "Breakpoint $decimal, $hex in optimized_1_marker \\(\\).*" \
-	"continue to optimized"
+    "continue to optimized"
 
 gdb_test "backtrace 10" \
-	"#0\[ \t\]*$hex in optimized_1_marker.*\r\n#1\[ \t\]*$hex in optimized_1.*\r\n#2\[ \t\]*$hex in main.*" \
-	"backtrace in optimized marker"
+    "#0\[ \t\]*$hex in optimized_1_marker.*\r\n#1\[ \t\]*$hex in optimized_1.*\r\n#2\[ \t\]*$hex in main.*" \
+    "backtrace in optimized marker"
 
 gdb_test "finish" ".*$hex in optimized_1 .*" "finish from optimized"
 
 gdb_test "backtrace 10" \
-	"#0\[ \t\]*$hex in optimized_1 .*\r\n#1\[ \t\]*$hex in main.*" \
-	"backtrace in optimized"
+    "#0\[ \t\]*$hex in optimized_1 .*\r\n#1\[ \t\]*$hex in main.*" \
+    "backtrace in optimized"
 
 gdb_test "info frame" \
-	".*Saved registers:.*r30 at.*pc at.*lr at.*" \
-	"saved registers in optimized"
+    ".*Saved registers:.*r30 at.*pc at.*lr at.*" \
+    "saved registers in optimized"

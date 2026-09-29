@@ -43,7 +43,7 @@ proc do_test {} {
 	    "Thread $::decimal hit Breakpoint $::decimal, $::hex in do_an_addition.*"
 
 	gdb_test "with debug displaced on -- stepi" \
-		"displaced_step_prepare_throw: prepared successfully.*$::hex in do_an_addition.*"
+	    "displaced_step_prepare_throw: prepared successfully.*$::hex in do_an_addition.*"
 
 	gdb_test "continue" \
 	    "Inferior 1 .* exited normally.*" \

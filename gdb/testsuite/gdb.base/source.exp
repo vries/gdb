@@ -57,10 +57,10 @@ gdb_test "source -v -s ./source-test.gdb" \
 # comes from the a command entered at the GDB prompt, and when
 # it comes from a script being sourced.
 gdb_test "source for-sure-nonexistent-file" \
-	 "for-sure-nonexistent-file: No such file or directory\."
+    "for-sure-nonexistent-file: No such file or directory\."
 
 gdb_test "source source-nofile.gdb" \
-	 "warning: for-sure-nonexistent-file: No such file or directory\.\[\r\n\]*source error not fatal"
+    "warning: for-sure-nonexistent-file: No such file or directory\.\[\r\n\]*source error not fatal"
 
 
 # Test commands that error out in sourced files, including in nested sourced
@@ -70,8 +70,8 @@ gdb_test "source source-nofile.gdb" \
 # to find source-error-1.gdb.
 gdb_test "source ${srcdir}/${subdir}/source-error.gdb" \
     [multi_line ".*source-error.gdb:20: Error in sourced command file:" \
-		"source-error-1.gdb:21: Error in sourced command file:" \
-		"Cannot access memory at address 0x0" ] \
+	 "source-error-1.gdb:21: Error in sourced command file:" \
+	 "Cannot access memory at address 0x0" ] \
     "script contains error"
 
 # There was a case where sourcing a script containing "interpreter-exec"

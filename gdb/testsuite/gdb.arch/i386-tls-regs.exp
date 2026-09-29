@@ -33,9 +33,9 @@ if {![istarget "i386-*-*"]} {
 #
 # If the following compiles then we are getting a 32-bit executable.
 if {![gdb_can_simple_compile is_lp64_target {
-	int dummy[sizeof (int) == 4
-		  && sizeof (void *) == 4
-		  && sizeof (long) == 4 ? 1 : -1];} \
+    int dummy[sizeof (int) == 4
+	      && sizeof (void *) == 4
+	      && sizeof (long) == 4 ? 1 : -1];} \
 	  object $options]} {
     unsupported "cannot compile 32-bit executable"
     return
@@ -167,8 +167,8 @@ proc load_core_and_test_tls_regs { corefile } {
 	"check TLS variable in thread 2"
 
     set all_same [expr {[lindex $tls_reg_vals_thr_1 0] == [lindex $tls_reg_vals_thr_2 0] \
-		      && [lindex $tls_reg_vals_thr_1 1] == [lindex $tls_reg_vals_thr_2 1] \
-		      && [lindex $tls_reg_vals_thr_1 2] == [lindex $tls_reg_vals_thr_2 2]}]
+			    && [lindex $tls_reg_vals_thr_1 1] == [lindex $tls_reg_vals_thr_2 1] \
+			    && [lindex $tls_reg_vals_thr_1 2] == [lindex $tls_reg_vals_thr_2 2]}]
     gdb_assert {!$all_same} \
 	"tls regs are different between threads"
 }

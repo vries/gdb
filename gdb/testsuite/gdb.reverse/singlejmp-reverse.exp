@@ -21,9 +21,9 @@ set executable ${testfile}
 if {[info exists COMPILE]} {
     # make check RUNTESTFLAGS="gdb.reverse/singlejmp-reverse.exp COMPILE=1"
     if { [build_executable_from_specs ${testfile}.exp $executable {} \
-				      ${testfile}.c {debug optimize=-O2} \
-				      ${testfile}-nodebug.c {optimize=-O2} \
-				      ] == -1 } {
+	      ${testfile}.c {debug optimize=-O2} \
+	      ${testfile}-nodebug.c {optimize=-O2} \
+	     ] == -1 } {
 	return
     }
 } else {

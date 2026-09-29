@@ -37,42 +37,42 @@ gdb_test_multiple "info register \$fpmr" "Test FPMR SRC1 E5M2" {
 	LSCALE=0 \
 	NSCALE=0 \
 	LSCALE2=0 \]" {
-	pass "FPMR SRC1 matches E5M2"
-    }
+	    pass "FPMR SRC1 matches E5M2"
+	}
 }
 
 set breakpoints \
     [list \
-	"SRC1" \
-	"SRC2" \
-	"DST" \
-	"OSM" \
-	"OSC" \
-	"LSCALE" \
-	"NSCALE" \
-	"LSCALE2"]
+	 "SRC1" \
+	 "SRC2" \
+	 "DST" \
+	 "OSM" \
+	 "OSC" \
+	 "LSCALE" \
+	 "NSCALE" \
+	 "LSCALE2"]
 
 set reg_values \
     [list \
-	".*\r\n.*\[ F8S1=E4M3 F8S2=E5M2 F8D=E5M2 OSM=Inf OSC=Inf/NaN LSCALE=0 NSCALE=0 LSCALE2=0 \]" \
-	".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E5M2 OSM=Inf OSC=Inf/NaN LSCALE=0 NSCALE=0 LSCALE2=0 \]" \
-	".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E4M3 OSM=Inf OSC=Inf/NaN LSCALE=0 NSCALE=0 LSCALE2=0 \]" \
-	".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E4M3 OSM=MaxNormal OSC=Inf/NaN LSCALE=0 NSCALE=0 LSCALE2=0 \]" \
-	".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E4M3 OSM=MaxNormal OSC=MaxNormal LSCALE=0 NSCALE=0 LSCALE2=0 \]" \
-	".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E4M3 OSM=MaxNormal OSC=MaxNormal LSCALE=127 NSCALE=0 LSCALE2=0 \]" \
-	".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E4M3 OSM=MaxNormal OSC=MaxNormal LSCALE=127 NSCALE=255 LSCALE2=0 \]" \
-	".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E4M3 OSM=MaxNormal OSC=MaxNormal LSCALE=127 NSCALE=255 LSCALE2=63 \]"]
+	 ".*\r\n.*\[ F8S1=E4M3 F8S2=E5M2 F8D=E5M2 OSM=Inf OSC=Inf/NaN LSCALE=0 NSCALE=0 LSCALE2=0 \]" \
+	 ".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E5M2 OSM=Inf OSC=Inf/NaN LSCALE=0 NSCALE=0 LSCALE2=0 \]" \
+	 ".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E4M3 OSM=Inf OSC=Inf/NaN LSCALE=0 NSCALE=0 LSCALE2=0 \]" \
+	 ".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E4M3 OSM=MaxNormal OSC=Inf/NaN LSCALE=0 NSCALE=0 LSCALE2=0 \]" \
+	 ".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E4M3 OSM=MaxNormal OSC=MaxNormal LSCALE=0 NSCALE=0 LSCALE2=0 \]" \
+	 ".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E4M3 OSM=MaxNormal OSC=MaxNormal LSCALE=127 NSCALE=0 LSCALE2=0 \]" \
+	 ".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E4M3 OSM=MaxNormal OSC=MaxNormal LSCALE=127 NSCALE=255 LSCALE2=0 \]" \
+	 ".*\r\n.*\[ F8S1=E4M3 F8S2=E4M3 F8D=E4M3 OSM=MaxNormal OSC=MaxNormal LSCALE=127 NSCALE=255 LSCALE2=63 \]"]
 
 set pass_messages \
     [list \
-	"FPMR SRC1 matches E4M3" \
-	"FPMR SRC2 matches E4M3" \
-	"FPMR DST matches E4M3" \
-	"FPMR OSM matches MaxNormal" \
-	"FPMR OSC matches MaxNormal" \
-	"FPMR LSCALE matches" \
-	"FPMR NSCALE matches" \
-	"FPMR LSCALE2 matches"]
+	 "FPMR SRC1 matches E4M3" \
+	 "FPMR SRC2 matches E4M3" \
+	 "FPMR DST matches E4M3" \
+	 "FPMR OSM matches MaxNormal" \
+	 "FPMR OSC matches MaxNormal" \
+	 "FPMR LSCALE matches" \
+	 "FPMR NSCALE matches" \
+	 "FPMR LSCALE2 matches"]
 
 for {set i 0} {$i < 8} {incr i} {
     set bp [lindex $breakpoints $i]
@@ -99,5 +99,5 @@ gdb_test_multiple "set \$fpmr=0x3f007f4008" "" {
 }
 
 gdb_test "set \$fpmr=0x1255C041" \
-	 "\\\[ F8S1=E4M3 F8S2=E5M2 F8D=E4M3 OSM=MaxNormal OSC=MaxNormal LSCALE=85 NSCALE=18 LSCALE2=0 \\\]" \
-	 "Write 32-bit value to 64-bit register FPMR"
+    "\\\[ F8S1=E4M3 F8S2=E5M2 F8D=E4M3 OSM=MaxNormal OSC=MaxNormal LSCALE=85 NSCALE=18 LSCALE2=0 \\\]" \
+    "Write 32-bit value to 64-bit register FPMR"

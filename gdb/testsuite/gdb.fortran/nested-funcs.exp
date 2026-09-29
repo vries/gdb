@@ -64,7 +64,7 @@ gdb_test "print local_int" "= 17" "print local_int in inner function"
 gdb_breakpoint [gdb_get_line_number "! BP_outer_2"]
 gdb_continue_to_breakpoint "! BP_outer_2" ".*! BP_outer_2"
 gdb_test "print local_int" "= 19" \
-  "print local_int in outer function, after sub_nested_inner"
+    "print local_int in outer function, after sub_nested_inner"
 
 # Test if we can set a breakpoint in public routine with the same name
 # as the internal

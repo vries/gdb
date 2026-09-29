@@ -131,7 +131,7 @@ proc_with_prefix do_test {} {
     # auto-answered on secondary UIs.
     with_spawn_id $gdb_main_spawn_id {
 	gdb_test "delete" "" "delete all breakpoints, watchpoints, tracepoints, and catchpoints on main console" \
-		 "Delete all breakpoints, watchpoints, tracepoints, and catchpoints. .y or n. $" "n"
+	    "Delete all breakpoints, watchpoints, tracepoints, and catchpoints. .y or n. $" "n"
     }
     with_spawn_id $extra_spawn_id {
 	# Check output in two stages in order to override
@@ -175,13 +175,13 @@ proc_with_prefix do_test_invalid_args {} {
 
     # Test bad terminal path.
     gdb_test "new-ui console /non/existent/path" \
-	     "opening terminal failed: No such file or directory\." \
-	     "new-ui with bad terminal path"
+	"opening terminal failed: No such file or directory\." \
+	"new-ui with bad terminal path"
 
     # Test bad interpreter name.
     gdb_test "new-ui bloop $extra_tty_name" \
-	     "Interpreter `bloop' unrecognized" \
-	     "new-ui with bad interpreter name"
+	"Interpreter `bloop' unrecognized" \
+	"new-ui with bad interpreter name"
 
     # Test that the TUI cannot be used for a new UI.
     if {[allow_tui_tests]} {

@@ -23,8 +23,8 @@ set testfile "am33"
 set srcfile ${srcdir}/${subdir}/${testfile}.s
 set binfile ${objdir}/${subdir}/${testfile}
 if  { [gdb_compile "${srcfile}" "${binfile}" object ""] != "" } {
-     untested "failed to compile"
-     return
+    untested "failed to compile"
+    return
 }
 
 proc call_tests { } {

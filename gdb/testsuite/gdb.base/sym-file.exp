@@ -37,7 +37,7 @@ set target_size TARGET_UNKNOWN
 if {[is_lp64_target]} {
     set target_size TARGET_LP64
 } elseif {[is_ilp32_target]} {
-   set target_size TARGET_ILP32
+    set target_size TARGET_ILP32
 } else {
     return
 }

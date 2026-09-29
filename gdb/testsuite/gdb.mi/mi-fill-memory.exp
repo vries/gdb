@@ -32,20 +32,20 @@ mi_runto_main
 mi_next_to "main" "" "mi-read-memory.c" "20" "next at main"
 
 mi_gdb_test "1-data-write-memory-bytes"\
-	"1\\\^error,msg=\"Usage: ADDR DATA \\\[COUNT\\\]\.\""\
-	"no arguments"
+    "1\\\^error,msg=\"Usage: ADDR DATA \\\[COUNT\\\]\.\""\
+    "no arguments"
 
 mi_gdb_test "2-data-write-memory-bytes 8"\
-	"2\\\^error,msg=\"Usage: ADDR DATA \\\[COUNT\\\]\.\""\
-	"one argument missing"
+    "2\\\^error,msg=\"Usage: ADDR DATA \\\[COUNT\\\]\.\""\
+    "one argument missing"
 
 mi_gdb_test "3-data-write-memory-bytes \$pc ab"\
-	"3\\\^done" \
-	"memory successfully written"
+    "3\\\^done" \
+    "memory successfully written"
 
 mi_gdb_test "4-data-write-memory-bytes \$pc ab 8"\
-	"4\\\^done" \
-	"memory successfully filled (8 bytes)"
+    "4\\\^done" \
+    "memory successfully filled (8 bytes)"
 
 mi_gdb_test "5-interpreter-exec console \"x \$pc\"" \
     ".*0xabababab.*" \

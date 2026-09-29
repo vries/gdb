@@ -78,7 +78,7 @@ proc prepare {lang} {
 # This can be "c" or "c++".
 #
 # Columns in the table represent:
-     # EXP                # whatis           # ptype           # language
+# EXP                # whatis           # ptype           # language
 set table {
     {"void_typedef"       "void"              "void"}
     {"void_typedef2"      "void_typedef"      "void"}

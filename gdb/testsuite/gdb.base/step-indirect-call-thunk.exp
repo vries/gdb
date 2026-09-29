@@ -23,7 +23,7 @@ if { [gcc_major_version] >= 8 } {
     append cflags " -fcf-protection=none"
 }
 if { [prepare_for_testing "failed to prepare" $testfile $srcfile \
-	[list debug "additional_flags=$cflags"]] } {
+	  [list debug "additional_flags=$cflags"]] } {
     return
 }
 

@@ -529,9 +529,9 @@ proc all_integer_computational_tests { } {
     global decimal
 
     set add_insns [list {add} {addl} {addo} {addc} {addco} \
-			{sh1add} {sh1addl} {sh1addo} \
-			{sh2add} {sh2addl} {sh2addo} \
-			{sh3add} {sh3addl} {sh3addo} ]
+		       {sh1add} {sh1addl} {sh1addo} \
+		       {sh2add} {sh2addl} {sh2addo} \
+		       {sh3add} {sh3addl} {sh3addo} ]
 
     foreach i $add_insns {
 	send_gdb "x/16i $i"; send_gdb "_tests\n"
@@ -560,7 +560,7 @@ proc all_integer_computational_tests { } {
     }
 
     set sub_insns [list {sub} {subo} {subb} {subbo} {subt} {subto} \
-			{ds} {comclr} ]
+		       {ds} {comclr} ]
 
     foreach i $sub_insns {
 	send_gdb "x/16i $i"; send_gdb "_tests\n"
@@ -726,9 +726,9 @@ proc all_integer_computational_tests { } {
 .*vshd,>= r4,r5,r6.*
 .*vshd,ev r4,r5,r6.*
 .*$gdb_prompt $" { pass "vshd tests" }
-	    -re "$gdb_prompt $" { fail "vshd tests" }
-	    timeout { fail "(timeout) "vshd tests" }
-	}
+	-re "$gdb_prompt $" { fail "vshd tests" }
+	timeout { fail "(timeout) "vshd tests" }
+    }
 
     send_gdb "x/8i shd_tests\n"
     gdb_expect {
@@ -742,9 +742,9 @@ proc all_integer_computational_tests { } {
 .*shd,>= r4,r5,5,r6.*
 .*shd,ev r4,r5,5,r6.*
 .*$gdb_prompt $" { pass "shd tests" }
-	    -re "$gdb_prompt $" { fail "shd tests" }
-	    timeout { fail "(timeout) "shd tests" }
-	}
+	-re "$gdb_prompt $" { fail "shd tests" }
+	timeout { fail "(timeout) "shd tests" }
+    }
 
     set extract_insns1 [list {extru} {extrs} {zdep} {dep}]
 

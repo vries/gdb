@@ -57,11 +57,11 @@ proc insert_breakpoint {function expected_location} {
     # itself, but rather at the address printed at the beginning of
     # the instruction).
     if {$address != ""} {
-       gdb_test "x /i $address" \
-		".*<$function\\+$expected_location>.*" \
-		"check $function breakpoint address"
+	gdb_test "x /i $address" \
+	    ".*<$function\\+$expected_location>.*" \
+	    "check $function breakpoint address"
     } else {
-       fail "unable to compute breakpoint address"
+	fail "unable to compute breakpoint address"
     }
 
 }

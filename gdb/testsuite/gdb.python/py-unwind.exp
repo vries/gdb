@@ -280,5 +280,5 @@ gdb_test_multiline "Sub-class gdb.UnwindInfo " \
 # Check we can't directly instantiate a gdb.UnwindInfo.
 gdb_test "python uw = gdb.UnwindInfo()" \
     [multi_line \
-     "TypeError.*: cannot create 'gdb\\.UnwindInfo' instances" \
-     "Error occurred in Python.*"]
+	 "TypeError.*: cannot create 'gdb\\.UnwindInfo' instances" \
+	 "Error occurred in Python.*"]

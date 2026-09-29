@@ -60,7 +60,7 @@ if { [skip_inline_frame_tests] } {
 
 gdb_breakpoint "bar"
 set bp_bar_num [get_integer_valueof "\$bpnum" "*UNKNOWN*" \
-		   "get number of bar breakpoint"]
+		    "get number of bar breakpoint"]
 
 set ok 0
 gdb_test_multiple "info breakpoints $bp_bar_num" "" {
@@ -82,7 +82,7 @@ if {!$ok} {
 
 gdb_breakpoint "foo"
 set bp_foo_num [get_integer_valueof "\$bpnum" "*UNKNOWN*" \
-		   "get number of foo breakpoint"]
+		    "get number of foo breakpoint"]
 
 gdb_test "continue" \
     "Breakpoint ${bp_bar_num}(?:\\.$decimal)?, bar .*" "continue to bar"

@@ -112,8 +112,8 @@ gdb_test "set var r := 2.56" " := 2\\.56"
 gdb_test "print r" " = 2\\.5(599.*|6|600.*)" "testing new r value"
 
 gdb_test "cont" \
-	 "Breakpoint .*:${bp_location2}.*" \
-	 "Going to second breakpoint"
+    "Breakpoint .*:${bp_location2}.*" \
+    "Going to second breakpoint"
 gdb_test "next" "r := cos\\(u\\);" "advance to 'r := cos(u)' line"
 gdb_test "print u" " = 3\\.14159.*" "test pi value"
 gdb_test "next" "s := sin\\(u\\);" "advance to 's := sin(u)' line"
@@ -123,26 +123,26 @@ gdb_test "next" "" "go past 's := sin(u)' line"
 set msg "Test sin(pi) is equal to 0"
 
 gdb_test_multiple "print s" $msg {
-	-re ".* = (0|-?\[0-9\]\\.\[0-9\]*\[eE\](-?\[0-9\]*))\[\r\n\]+$gdb_prompt $" {
-	  set value "$expect_out(1,string)"
-	  verbose "value is $value" 1
-	  if [info exists expect_out(2,string)] {
+    -re ".* = (0|-?\[0-9\]\\.\[0-9\]*\[eE\](-?\[0-9\]*))\[\r\n\]+$gdb_prompt $" {
+	set value "$expect_out(1,string)"
+	verbose "value is $value" 1
+	if [info exists expect_out(2,string)] {
 	    set expo $expect_out(2,string)
 	    verbose "expo found: $expo" 1
-	  } else {
+	} else {
 	    set expo "0"
 	    regsub  ".*\[eE\]" "$value" "" expo
-	  }
-	  regsub  "^-" "$expo" "" mexpo
-	  verbose "expo is $expo" 1
-	  verbose "mexpo is $mexpo" 1
-	  if { $value == 0 } {
-	    pass $msg
-	  } elseif {$mexpo > 8} {
-	    pass "$msg '$value' is close to zero"
-	  } else {
-	    fail "$msg '$value' too large"
-	  }
-	  verbose "Still here" 1
 	}
+	regsub  "^-" "$expo" "" mexpo
+	verbose "expo is $expo" 1
+	verbose "mexpo is $mexpo" 1
+	if { $value == 0 } {
+	    pass $msg
+	} elseif {$mexpo > 8} {
+	    pass "$msg '$value' is close to zero"
+	} else {
+	    fail "$msg '$value' too large"
+	}
+	verbose "Still here" 1
+    }
 }

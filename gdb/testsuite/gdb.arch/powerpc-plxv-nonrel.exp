@@ -23,7 +23,7 @@ set retval 0
 standard_testfile .s
 
 if { [prepare_for_testing "failed to prepare" $testfile "$srcfile" \
-      {debug quiet}] } {
+	  {debug quiet}] } {
     return
 }
 
@@ -31,7 +31,7 @@ gdb_test "set radix 0b10000"
 gdb_test "set debug displaced"
 
 if {![runto_main]} {
-      return
+    return
 }
 
 gdb_test "set debug displaced on"
@@ -39,37 +39,37 @@ gdb_test "set debug displaced on"
 # Proc to extract the uint128 hex value from the output of
 # a print vector statement.
 proc get_vector_hexadecimal_valueof { exp default {test ""} } {
-	set val "0x0000"
-	global gdb_prompt
-	if {$test == ""} {
-		set test "get vector_hexadecimal valueof \"${exp}\""
+    set val "0x0000"
+    global gdb_prompt
+    if {$test == ""} {
+	set test "get vector_hexadecimal valueof \"${exp}\""
+    }
+    gdb_test_multiple "print $${exp}.uint128" $test {
+	-re -wrap "${::valnum_re} = (0x\[0-9a-zA-Z\]+).*" {
+	    set val $expect_out(1,string)
+	    pass "$test"
 	}
-	gdb_test_multiple "print $${exp}.uint128" $test {
-		-re -wrap "${::valnum_re} = (0x\[0-9a-zA-Z\]+).*" {
-			set val $expect_out(1,string)
-				pass "$test"
-		}
-		-re -wrap ".*Illegal instruction.* $" {
-			fail "Illegal instruction on print."
-			set val 0xffff
-		}
+	-re -wrap ".*Illegal instruction.* $" {
+	    fail "Illegal instruction on print."
+	    set val 0xffff
 	}
-	return ${val}
+    }
+    return ${val}
 }
 
 # Proc to do a single-step, and ensure we gently handle
 # an illegal instruction situation.
 proc stepi_over_instruction { xyz } {
-	global gdb_prompt
-	gdb_test_multiple "stepi" "${xyz} " {
-		-re -wrap ".*Illegal instruction.*" {
-			fail "Illegal instruction on single step."
-		return
-		}
-		-re -wrap ".*" {
-		 pass "stepi ${xyz}"
-		}
+    global gdb_prompt
+    gdb_test_multiple "stepi" "${xyz} " {
+	-re -wrap ".*Illegal instruction.*" {
+	    fail "Illegal instruction on single step."
+	    return
 	}
+	-re -wrap ".*" {
+	    pass "stepi ${xyz}"
+	}
+    }
 }
 
 set check_pc [get_hexadecimal_valueof "\$pc" "default0"]

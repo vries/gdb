@@ -110,7 +110,7 @@ gdb_test_multiple $test $test {
 	pass $test
     }
     -re $result_line_2 {
-	 setup_xfail "*-*-*"
-	 fail $test
+	setup_xfail "*-*-*"
+	fail $test
     }
 }

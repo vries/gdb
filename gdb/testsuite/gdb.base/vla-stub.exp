@@ -15,7 +15,7 @@
 
 standard_testfile .c vla-stub-define.c
 if { [prepare_for_testing "failed to prepare for vla-stub.exp" \
-      ${testfile} [list ${srcfile} ${srcfile2}]] } {
+	  ${testfile} [list ${srcfile} ${srcfile2}]] } {
     return
 }
 

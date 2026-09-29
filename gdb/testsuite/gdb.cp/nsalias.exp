@@ -296,7 +296,7 @@ set the_dwarf [format {
 		DW_AT_byte_size 4 DW_FORM_sdata
 	    }
 
-%s
+	    %s
 	}
     }
 } $imports]

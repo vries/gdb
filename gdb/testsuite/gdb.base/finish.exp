@@ -26,9 +26,9 @@ proc finish_1 { type } {
     global gdb_prompt
 
     gdb_test "break ${type}_func" "Breakpoint \[0123456789\].*" \
-	    "set break on ${type}_func"
+	"set break on ${type}_func"
     gdb_test "continue" "Breakpoint.* ${type}_func.*" \
-	    "continue to ${type}_func"
+	"continue to ${type}_func"
     gdb_test_multiple "finish" "finish from ${type}_func" {
 	-re ".*Value returned is .* = 49 '1'\r\n$gdb_prompt $" {
 	    if { $type == "char" } {
@@ -54,9 +54,9 @@ proc finish_void { } {
     global gdb_prompt
 
     gdb_test "break void_func" "Breakpoint \[0123456789\].*" \
-	    "set break on void_func"
+	"set break on void_func"
     gdb_test "continue" "Breakpoint.* void_func.*" \
-	    "continue to void_func"
+	"continue to void_func"
     # Some architectures will have one or more instructions after the
     # call instruction which still is part of the call sequence, so we
     # must be prepared for a "finish" to show us the void_func call
@@ -81,8 +81,8 @@ proc finish_abbreviation { abbrev } {
     }
 
     gdb_test "$abbrev" \
-	     "Value returned is .* = 1" \
-	     "Testing the \"$abbrev\" abbreviation for \"finish\""
+	"Value returned is .* = 1" \
+	"Testing the \"$abbrev\" abbreviation for \"finish\""
 }
 
 # Test "set print finish off".

@@ -69,18 +69,18 @@ gdb_test_multiple "" "check for MIPS16 support in the processor" {
     -re "Breakpoint 1.*inmain .*$gdb_prompt $" {
 	gdb_test_multiple "finish" \
 	    "check for MIPS16 support in the processor" {
-	    -re "Value returned is ${::valnum_re} = 0\[^0-9\].*$gdb_prompt $" {
-		verbose "MIPS16 support check successful."
+		-re "Value returned is ${::valnum_re} = 0\[^0-9\].*$gdb_prompt $" {
+		    verbose "MIPS16 support check successful."
+		}
+		-re "$gdb_prompt $" {
+		    unsupported "no MIPS16 support in the processor."
+		    return
+		}
+		default {
+		    unsupported "no MIPS16 support in the processor."
+		    return
+		}
 	    }
-	    -re "$gdb_prompt $" {
-		unsupported "no MIPS16 support in the processor."
-		return
-	    }
-	    default {
-		unsupported "no MIPS16 support in the processor."
-		return
-	    }
-	}
     }
     -re "$gdb_prompt $" {
 	unsupported "no MIPS16 support in the processor."
@@ -101,13 +101,13 @@ set picflag ""
 
 set_src_and_obj mips16-thunks-inmain pic
 set options [list \
-    debug nowarnings additional_flags=-mips16 additional_flags=-fPIC]
+		 debug nowarnings additional_flags=-mips16 additional_flags=-fPIC]
 set objfiles ${objfile}
 gdb_compile ${srcfile} ${objfile} object ${options}
 
 set_src_and_obj mips16-thunks-main pic
 set options [list \
-    debug nowarnings additional_flags=-mips16 additional_flags=-fPIC]
+		 debug nowarnings additional_flags=-mips16 additional_flags=-fPIC]
 lappend objfiles ${objfile}
 gdb_compile ${srcfile} ${objfile} object ${options}
 
@@ -172,13 +172,13 @@ gdb_compile ${srcfile} ${objfile} object ${options}
 
 set_src_and_obj mips16-thunks-sinfrob
 set options [list \
-    debug nowarnings additional_flags=-mno-mips16 ${picflag}]
+		 debug nowarnings additional_flags=-mno-mips16 ${picflag}]
 lappend objfiles ${objfile}
 gdb_compile ${srcfile} ${objfile} object ${options}
 
 set_src_and_obj mips16-thunks-sinfrob16
 set options [list \
-    debug nowarnings additional_flags=-mips16 ${picflag}]
+		 debug nowarnings additional_flags=-mips16 ${picflag}]
 lappend objfiles ${objfile}
 gdb_compile ${srcfile} ${objfile} object ${options}
 

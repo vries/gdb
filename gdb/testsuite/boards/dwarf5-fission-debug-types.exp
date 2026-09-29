@@ -25,8 +25,8 @@ set_board_info compiler "[find_gcc]"
 
 set_board_info debug_flags \
     [join { "-gdwarf-5" \
-	    "-gsplit-dwarf" \
-	    "-fdebug-types-section" }]
+		"-gsplit-dwarf" \
+		"-fdebug-types-section" }]
 
 # This is needed otherwise dejagnu tries to rsh to host with the board name
 # as its hostname.

@@ -65,16 +65,16 @@ proc test_remote { remote host_is_target } {
     }
 
     with_test_prefix cleanup-build {
-	    # Note: we're not comparing with delete_ok, return value seems to be
-	    # different for build.
-	    set res [remote_file build delete $file]
-	    gdb_assert { [string equal $res ""] } \
-		"remove build copy"
+	# Note: we're not comparing with delete_ok, return value seems to be
+	# different for build.
+	set res [remote_file build delete $file]
+	gdb_assert { [string equal $res ""] } \
+	    "remove build copy"
 
-	    set res [remote_file build exists $file]
-	    gdb_assert { $res != $exists_ok } \
-		"build copy does not exist"
-	}
+	set res [remote_file build exists $file]
+	gdb_assert { $res != $exists_ok } \
+	    "build copy does not exist"
+    }
 
     with_test_prefix copy-from-remote {
 	set build_file [remote_upload $remote $file]

@@ -139,19 +139,19 @@ gdb_caching_proc allow_hip_tests {} {
     set targets [hcc_amdgpu_targets]
     set flags [list hip additional_flags=--offload-arch=[join $targets ","]]
     if {![gdb_simple_compile hipprobe {
-	    #include <hip/hip_runtime.h>
-	    __global__ void
-	    kern () {}
+	#include <hip/hip_runtime.h>
+	__global__ void
+	kern () {}
 
-	    int
-	    main ()
-	    {
-		kern<<<1, 1>>> ();
-		if (hipDeviceSynchronize () != hipSuccess)
-		  return -1;
-		return 0;
-	    }
-	} executable $flags]} {
+	int
+	main ()
+	{
+	    kern<<<1, 1>>> ();
+	    if (hipDeviceSynchronize () != hipSuccess)
+	    return -1;
+	    return 0;
+	}
+    } executable $flags]} {
 	return {0 "failed to compile hip program"}
     }
 

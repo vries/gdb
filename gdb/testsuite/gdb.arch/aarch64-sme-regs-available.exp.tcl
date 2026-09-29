@@ -131,18 +131,18 @@ proc check_regs { mode vl svl } {
 
     # Exercise reading/writing from/to SME2 registers.
     if {[is_sme2_available]} {
-      # The target supports SME2.
-      set zt_size 64
-      gdb_test "print sizeof \$zt0" " = $zt_size"
+	# The target supports SME2.
+	set zt_size 64
+	gdb_test "print sizeof \$zt0" " = $zt_size"
 
-      # Initially, when ZA is activated, ZT0 will be all zeroes.
-      set zt_pattern [string_to_regexp [1d_array_value_pattern 0 $zt_size]]
-      gdb_test "print \$zt0" " = $zt_pattern" "validate zeroed zt0"
+	# Initially, when ZA is activated, ZT0 will be all zeroes.
+	set zt_pattern [string_to_regexp [1d_array_value_pattern 0 $zt_size]]
+	gdb_test "print \$zt0" " = $zt_pattern" "validate zeroed zt0"
 
-      # Validate that writing to ZT0 does the right thing.
-      initialize_1d_array "\$zt0" 255 $zt_size
-      set zt_pattern [string_to_regexp [1d_array_value_pattern 255 $zt_size]]
-      gdb_test "print \$zt0" " = $zt_pattern" "read back from zt0"
+	# Validate that writing to ZT0 does the right thing.
+	initialize_1d_array "\$zt0" 255 $zt_size
+	set zt_pattern [string_to_regexp [1d_array_value_pattern 255 $zt_size]]
+	gdb_test "print \$zt0" " = $zt_pattern" "read back from zt0"
     }
 }
 

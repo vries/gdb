@@ -79,9 +79,9 @@ set srcfile ${testfile}.c
 set binfile ${objdir}/${subdir}/${testfile}
 
 if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable \
-       {debug nowarnings}] != "" } {
-     fail "compilation"
-     return
+	   {debug nowarnings}] != "" } {
+    fail "compilation"
+    return
 }
 
 pass "compilation"

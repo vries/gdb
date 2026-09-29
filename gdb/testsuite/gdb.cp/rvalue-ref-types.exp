@@ -21,7 +21,7 @@ require allow_cplus_tests
 standard_testfile .cc
 
 if {[prepare_for_testing $testfile.exp $testfile $srcfile \
-    {debug c++ additional_flags="-std=gnu++11"}]} {
+	 {debug c++ additional_flags="-std=gnu++11"}]} {
     return
 }
 
@@ -95,22 +95,22 @@ gdb_test "print rrUC" \
     "print value of rrUC"
 
 gdb_test "print rrS" "$decimal = \\(short( int)? &&\\) @$hex: -14" \
-		  "print value of rrS"
+    "print value of rrS"
 
 gdb_test "print rrUS" \
-	 "$decimal = \\(unsigned short( int)? &&\\) @$hex: 7" \
-	 "print value of rrUS"
+    "$decimal = \\(unsigned short( int)? &&\\) @$hex: 7" \
+    "print value of rrUS"
 
 gdb_test "print rrI" "$decimal = \\(int &&\\) @$hex: 102" \
-       "print value of rrI"
+    "print value of rrI"
 
 gdb_test "print rrUI" \
     "$decimal = \\(unsigned int &&\\) @$hex: 1002" \
-	"print value of rrUI"
+    "print value of rrUI"
 
 gdb_test "print rrL" \
-       "$decimal = \\(long( int)? &&\\) @$hex: -234" \
-	 "print value of rrL"
+    "$decimal = \\(long( int)? &&\\) @$hex: -234" \
+    "print value of rrL"
 
 gdb_test "print rrUL" \
     "$decimal = \\((unsigned long|long unsigned int)? &&\\) @$hex: 234" \

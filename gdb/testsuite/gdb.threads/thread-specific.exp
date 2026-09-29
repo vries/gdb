@@ -26,40 +26,40 @@ if {[gdb_compile_pthreads "${srcdir}/${subdir}/${srcfile}" "${binfile}" executab
 
 # Return a list of the valid thread IDs, with the initial thread first.
 proc get_thread_list { } {
-  global gdb_prompt
-  global expect_out
-  global tdlabel_re
+    global gdb_prompt
+    global expect_out
+    global tdlabel_re
 
-  set thr_list ""
+    set thr_list ""
 
-  gdb_test_multiple "info threads" "get threads list" {
-    -re "info threads\r\n" {
-      exp_continue
+    gdb_test_multiple "info threads" "get threads list" {
+	-re "info threads\r\n" {
+	    exp_continue
+	}
+	-re "New Thread \[^\n\]*\n" {
+	    exp_continue
+	}
+	-re "^ *Id *Target Id\[^\n\]*\n" {
+	    exp_continue
+	}
+	-re "^\\*  *(\[0-9\]*) *${tdlabel_re} \[^\n\]*main\[^\n\]*\n" {
+	    set thr_list "$expect_out(1,string) $thr_list"
+	    exp_continue
+	}
+	-re "^  *(\[0-9\]*) *${tdlabel_re} \[^\n\]*\n" {
+	    lappend thr_list $expect_out(1,string)
+	    exp_continue
+	}
+	-re ".*$gdb_prompt $" {
+	    if { [llength $thr_list] != 0 } {
+		pass "get threads list"
+	    } else {
+		fail "get threads list (no threads)"
+	    }
+	}
     }
-    -re "New Thread \[^\n\]*\n" {
-      exp_continue
-    }
-    -re "^ *Id *Target Id\[^\n\]*\n" {
-      exp_continue
-    }
-    -re "^\\*  *(\[0-9\]*) *${tdlabel_re} \[^\n\]*main\[^\n\]*\n" {
-      set thr_list "$expect_out(1,string) $thr_list"
-      exp_continue
-    }
-    -re "^  *(\[0-9\]*) *${tdlabel_re} \[^\n\]*\n" {
-      lappend thr_list $expect_out(1,string)
-      exp_continue
-    }
-    -re ".*$gdb_prompt $" {
-      if { [llength $thr_list] != 0 } {
-	pass "get threads list"
-      } else {
-	fail "get threads list (no threads)"
-      }
-    }
-  }
 
-  return $thr_list
+    return $thr_list
 }
 
 clean_restart ${::testfile}
@@ -89,26 +89,26 @@ gdb_test {print $_thread} ".* = [lindex $threads 0]" "thread var in main"
 gdb_test {print $_gthread} ".* = [lindex $threads 0]" "gthread var in main"
 
 gdb_test_multiple "break $line thread [lindex $threads 0]" \
-  "breakpoint $line main thread" {
-    -re "Breakpoint (\[0-9\]*) at.* file .*$srcfile, line.*$gdb_prompt $" {
-      set main_breakpoint $expect_out(1,string)
-      pass "breakpoint $line main thread"
+    "breakpoint $line main thread" {
+	-re "Breakpoint (\[0-9\]*) at.* file .*$srcfile, line.*$gdb_prompt $" {
+	    set main_breakpoint $expect_out(1,string)
+	    pass "breakpoint $line main thread"
+	}
     }
-}
 
 foreach thread [lrange $threads 1 end] {
-  gdb_breakpoint "$line thread $thread"
+    gdb_breakpoint "$line thread $thread"
 }
 
 set this_breakpoint -1
 gdb_test_multiple "continue" "continue to thread-specific breakpoint" {
-	-re "Breakpoint $main_breakpoint, .* at .*\r\n$gdb_prompt $" {
-	    fail "continue to thread-specific breakpoint (wrong breakpoint)"
-	}
-	-re "Breakpoint (\[0-9\]*), .* at .*\r\n$gdb_prompt $" {
-	    set this_breakpoint $expect_out(1,string)
-	    pass "continue to thread-specific breakpoint"
-	}
+    -re "Breakpoint $main_breakpoint, .* at .*\r\n$gdb_prompt $" {
+	fail "continue to thread-specific breakpoint (wrong breakpoint)"
+    }
+    -re "Breakpoint (\[0-9\]*), .* at .*\r\n$gdb_prompt $" {
+	set this_breakpoint $expect_out(1,string)
+	pass "continue to thread-specific breakpoint"
+    }
 }
 
 set this_thread -1

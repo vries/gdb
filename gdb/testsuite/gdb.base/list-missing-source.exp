@@ -22,11 +22,11 @@ standard_testfile
 set srcfile [standard_output_file list-missing-source.c]
 set fd [open "$srcfile" w]
 puts $fd {
-int
-main ()
-{
-  return 0;
-}
+    int
+    main ()
+    {
+	return 0;
+    }
 }
 close $fd
 set srcfile [remote_download host $srcfile]

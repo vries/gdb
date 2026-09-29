@@ -420,7 +420,7 @@ proc dap_check_log_file { {expected_exception_count 0} } {
 	verbose -log --  "--- DAP LOG END ---"
 	if { $expected_exception_count > 0 } {
 	    verbose -log -- [join [list "Expected $expected_exception_count" \
-					"exception(s), saw $exception_count"]]
+				       "exception(s), saw $exception_count"]]
 	}
 	fail "exceptions in log file"
     }

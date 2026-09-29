@@ -21,7 +21,7 @@ standard_testfile .cc
 require allow_cplus_tests
 
 if {[prepare_for_testing ${testfile}.exp $testfile $srcfile \
-    {debug c++ additional_flags="-std=gnu++11"}] } {
+	 {debug c++ additional_flags="-std=gnu++11"}] } {
     return
 }
 

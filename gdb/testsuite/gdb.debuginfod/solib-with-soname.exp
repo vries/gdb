@@ -61,8 +61,8 @@ set library_filename [standard_output_file "libfoo.so"]
 # libfoo_1.so.
 if {[build_executable "build libfoo_1.so" $library_filename \
 	 $srcfile \
-	      { debug shlib build-id \
-		    additional_flags=-DLIB_VERSION=1 }] == -1} {
+	 { debug shlib build-id \
+	       additional_flags=-DLIB_VERSION=1 }] == -1} {
     return
 }
 remote_exec build "mv ${library_filename} ${library_1_filename}"
@@ -70,8 +70,8 @@ remote_exec build "mv ${library_filename} ${library_1_filename}"
 # See the comment above, but this time we rename to libfoo_2.so.
 if {[build_executable "build libfoo_2.so" $library_filename \
 	 $srcfile \
-	      { debug shlib build-id \
-		    additional_flags=-DLIB_VERSION=2 }] == -1} {
+	 { debug shlib build-id \
+	       additional_flags=-DLIB_VERSION=2 }] == -1} {
     return
 }
 remote_exec build "mv ${library_filename} ${library_2_filename}"

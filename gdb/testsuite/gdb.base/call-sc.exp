@@ -181,8 +181,8 @@ proc test_scalar_returns { } {
 
     # Get into a call of fun
     gdb_test "advance fun" \
-	    "fun .*\[\r\n\]+\[0-9\].*return foo.*" \
-	    "advance to fun for return; ${tests}"
+	"fun .*\[\r\n\]+\[0-9\].*return foo.*" \
+	"advance to fun for return; ${tests}"
 
     # Check that the program invalidated the relevant global.
     gdb_test "p/c L" " = 90 'Z'" "zed L for return; ${tests}"
@@ -236,20 +236,20 @@ proc test_scalar_returns { } {
 
     set test "return foo; synchronize pc to main() for '${testfile}'"
     for {set loop_count 0} {$loop_count < 2} {incr loop_count} {
-      gdb_test_multiple "backtrace 1" $test {
-	-re "#0.*main \\(\\).*${gdb_prompt} $" {
-	  pass $test
-	  set loop_count 2
+	gdb_test_multiple "backtrace 1" $test {
+	    -re "#0.*main \\(\\).*${gdb_prompt} $" {
+		pass $test
+		set loop_count 2
+	    }
+	    -re "#0.*fun \\(\\).*${gdb_prompt} $" {
+		if {$loop_count < 1} {
+		    gdb_test "finish" ".*" ""
+		} else {
+		    fail $test
+		    set loop_count 2
+		}
+	    }
 	}
-	-re "#0.*fun \\(\\).*${gdb_prompt} $" {
-	  if {$loop_count < 1} {
-	    gdb_test "finish" ".*" ""
-	  } else {
-	    fail $test
-	    set loop_count 2
-	  }
-	}
-      }
     }
 
     # Check that the return-value is as expected.  At this stage we're
@@ -316,8 +316,8 @@ proc test_scalar_returns { } {
 
     # Get into "fun()".
     gdb_test "advance fun" \
-	    "fun .*\[\r\n\]+\[0-9\].*return foo.*" \
-	    "advance to fun for finish; ${tests}"
+	"fun .*\[\r\n\]+\[0-9\].*return foo.*" \
+	"advance to fun for finish; ${tests}"
 
     # Check that the program invalidated the relevant global.
     gdb_test "p/c L" " = 90 'Z'" "zed L for finish; ${tests}"

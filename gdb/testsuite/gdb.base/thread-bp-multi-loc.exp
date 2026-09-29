@@ -41,27 +41,27 @@ set saw_cond false
 set loc_count 0
 gdb_test_multiple "info breakpoints" \
     "check thread condition is displayed correctly" {
-    -re "\r\nNum\\s+\[^\r\n\]+\r\n" {
-	exp_continue
-    }
+	-re "\r\nNum\\s+\[^\r\n\]+\r\n" {
+	    exp_continue
+	}
 
-    -re "^$bp_number\\s+breakpoint\\s+keep\\s+y\\s+<MULTIPLE>\\s*\r\n" {
-	set saw_header true
-	exp_continue
-    }
+	-re "^$bp_number\\s+breakpoint\\s+keep\\s+y\\s+<MULTIPLE>\\s*\r\n" {
+	    set saw_header true
+	    exp_continue
+	}
 
-    -re "^\\s+stop only in thread 1\r\n" {
-	set saw_cond true
-	exp_continue
-    }
+	-re "^\\s+stop only in thread 1\r\n" {
+	    set saw_cond true
+	    exp_continue
+	}
 
-    -re "^$bp_number\\.\[123\]\\s+\[^\r\n\]+:${decimal}\r\n" {
-	incr loc_count
-	exp_continue
-    }
+	-re "^$bp_number\\.\[123\]\\s+\[^\r\n\]+:${decimal}\r\n" {
+	    incr loc_count
+	    exp_continue
+	}
 
-    -re "^$gdb_prompt $" {
-	gdb_assert { $saw_header && $saw_cond && $loc_count == 3} \
-	    $gdb_test_name
+	-re "^$gdb_prompt $" {
+	    gdb_assert { $saw_header && $saw_cond && $loc_count == 3} \
+		$gdb_test_name
+	}
     }
-}

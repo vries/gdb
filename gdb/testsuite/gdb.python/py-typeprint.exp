@@ -50,5 +50,5 @@ gdb_test "whatis bs" "string" "whatis with enabled printer"
 gdb_test "whatis s" "templ<string>"
 
 gdb_test "info type-printers" "Type printers for \[^\r\n\]*/py-typeprint:\r\n *other\r\n.*" \
-	 "info type-printers for other"
+    "info type-printers for other"
 gdb_test "whatis ovar" "type = Another"

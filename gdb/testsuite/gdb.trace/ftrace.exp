@@ -149,8 +149,8 @@ proc test_fast_tracepoints {} {
 	if { $fourgood } {
 
 	    gdb_trace_setactions "collect at four_byter: define actions" \
-	    "" \
-	    "collect globvar, anarg" "^$"
+		"" \
+		"collect globvar, anarg" "^$"
 	}
     }
 

@@ -130,7 +130,7 @@ proc stap_test {exec_name {args ""}} {
 	gdb_test_no_output "set breakpoint always-inserted on"
 	set semaphore_addr_var \
 	    [get_hexadecimal_valueof "&relocation_marker" "0"\
-		"get original address of relocation_marker"]
+		 "get original address of relocation_marker"]
     }
 
     if {![runto_main]} {
@@ -159,13 +159,13 @@ proc stap_test {exec_name {args ""}} {
 	    [get_hexadecimal_valueof "&relocation_marker" \
 		 "0" "get revised relocation_marker address"]
 	set relocation_base \
-	   [expr {$updated_semaphore_addr_var - $semaphore_addr_var}]
+	    [expr {$updated_semaphore_addr_var - $semaphore_addr_var}]
 	if {$relocation_base != 0} {
-	   # Checks that GDB doesn't mistakenly relocate and write to null
-	   # semaphore addresses.  If it were to relocate a zero-valued
-	   # semaphore address and increment the value at that address, we
-	   # would expect to see "\200ELF" here instead.
-	   gdb_test "p (*(char*) $relocation_base)@4" \
+	    # Checks that GDB doesn't mistakenly relocate and write to null
+	    # semaphore addresses.  If it were to relocate a zero-valued
+	    # semaphore address and increment the value at that address, we
+	    # would expect to see "\200ELF" here instead.
+	    gdb_test "p (*(char*) $relocation_base)@4" \
 		" = \"\\\\177ELF\"" \
 		"null semaphore relocation"
 	}
@@ -173,9 +173,9 @@ proc stap_test {exec_name {args ""}} {
 
     # Test probe arguments.
     gdb_test "print \$_probe_argc" " = 1" \
-    "print \$_probe_argc for probe user"
+	"print \$_probe_argc for probe user"
     gdb_test "print \$_probe_arg0 == x" " = 1" \
-    "check \$_probe_arg0 for probe user"
+	"check \$_probe_arg0 for probe user"
     gdb_test "print \$_probe_arg1" \
 	"Invalid probe argument 1 -- probe has 1 arguments available" \
 	"check \$_probe_arg1 for probe user"
@@ -188,35 +188,35 @@ proc stap_test {exec_name {args ""}} {
     # Reinit GDB, set a breakpoint on probe m4.
     delete_breakpoints
     if {[runto "-pstap test:m4"]} {
-      pass "run to -pstap test:m4"
+	pass "run to -pstap test:m4"
     } else {
-      fail "run to -pstap test:m4"
+	fail "run to -pstap test:m4"
     }
 
     # Testing probe arguments.
     gdb_test "print \$_probe_argc" " = 3" \
-    "print \$_probe_argc for probe m4"
+	"print \$_probe_argc for probe m4"
     gdb_test "print \$_probe_arg0" " = 42" \
-    "check \$_probe_arg0 for probe m4"
+	"check \$_probe_arg0 for probe m4"
     gdb_test "print (const char *) \$_probe_arg1" \
-    " = $hex .This is a test message.*" \
-    "check \$_probe_arg1 for probe m4"
+	" = $hex .This is a test message.*" \
+	"check \$_probe_arg1 for probe m4"
     gdb_test "print \$_probe_arg2 == v" " = 1" \
-    "check \$_probe_arg2 for probe m4"
+	"check \$_probe_arg2 for probe m4"
 
     # Reinit GDB, set a breakpoint on probe ps.
     delete_breakpoints
     if {[runto "-pstap test:ps"]} {
-      pass "run to -pstap test:ps"
+	pass "run to -pstap test:ps"
     } else {
-      fail "run to -pstap test:ps"
+	fail "run to -pstap test:ps"
     }
 
     gdb_test "print \$_probe_argc" " = 3" \
-    "print \$_probe_argc for probe ps"
+	"print \$_probe_argc for probe ps"
     gdb_test "print (const char *) \$_probe_arg1" \
-    " = $hex .This is another test message.*" \
-    "print \$_probe_arg1 for probe ps"
+	" = $hex .This is another test message.*" \
+	"print \$_probe_arg1 for probe ps"
 
     # Check the probe is using the xmm0 register.
     if {[check_for_usable_xmm0_probe $exec_name]} {
@@ -263,9 +263,9 @@ proc stap_test_no_debuginfo {exec_name {args ""}} {
 
     # Test probe arguments.
     gdb_test "print \$_probe_argc" " = 1" \
-    "print \$_probe_argc for probe user"
+	"print \$_probe_argc for probe user"
     gdb_test "print \$_probe_arg0 == 23" " = 1" \
-    "check \$_probe_arg0 for probe user"
+	"check \$_probe_arg0 for probe user"
     gdb_test "print \$_probe_arg1" \
 	"Invalid probe argument 1 -- probe has 1 arguments available" \
 	"check \$_probe_arg1 for probe user"
@@ -280,35 +280,35 @@ proc stap_test_no_debuginfo {exec_name {args ""}} {
     # Reinit GDB, set a breakpoint on probe m4.
     delete_breakpoints
     if {[runto "-pstap test:m4"]} {
-      pass "run to -pstap test:m4"
+	pass "run to -pstap test:m4"
     } else {
-      fail "run to -pstap test:m4"
+	fail "run to -pstap test:m4"
     }
 
     # Testing probe arguments.
     gdb_test "print \$_probe_argc" " = 3" \
-    "print \$_probe_argc for probe m4"
+	"print \$_probe_argc for probe m4"
     gdb_test "print \$_probe_arg0" " = 42" \
-    "check \$_probe_arg0 for probe m4"
+	"check \$_probe_arg0 for probe m4"
     gdb_test "print (const char *) \$_probe_arg1" \
-    " = $hex .This is a test message.*" \
-    "check \$_probe_arg1 for probe m4"
+	" = $hex .This is a test message.*" \
+	"check \$_probe_arg1 for probe m4"
     gdb_test "print \$_probe_arg2 == 0" " = 1" \
-    "check \$_probe_arg2 for probe m4"
+	"check \$_probe_arg2 for probe m4"
 
     # Reinit GDB, set a breakpoint on probe ps.
     delete_breakpoints
     if {[runto "-pstap test:ps"]} {
-      pass "run to -pstap test:ps"
+	pass "run to -pstap test:ps"
     } else {
-      fail "run to -pstap test:ps"
+	fail "run to -pstap test:ps"
     }
 
     gdb_test "print \$_probe_argc" " = 3" \
-    "print \$_probe_argc for probe ps"
+	"print \$_probe_argc for probe ps"
     gdb_test "print (const char *) \$_probe_arg1" \
-    " = $hex .This is another test message.*" \
-    "print \$_probe_arg1 for probe ps"
+	" = $hex .This is another test message.*" \
+	"print \$_probe_arg1 for probe ps"
 
     # Reinit GDB, set a breakpoint on probe ps.
     if { [gdb_count_probes stap test xmmreg] > 0 } {
@@ -331,7 +331,7 @@ proc stap_test_no_debuginfo {exec_name {args ""}} {
 with_test_prefix "without semaphore, not optimized" {
     if {[stap_test "stap-probe-nosem-noopt"] == -1} {
 	untested "stap probe test failed"
-	  return
+	return
     }
 
     foreach_with_prefix pie { "nopie" "pie" } {

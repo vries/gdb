@@ -35,14 +35,14 @@ if {![runto_main]} {
 # skip this test.
 gdb_test_multiple "maint set internal-error backtrace on" \
     "check backtrace is supported" {
-    -re "support for this feature is not compiled into GDB" {
-	untested "feature not supported"
-	return
+	-re "support for this feature is not compiled into GDB" {
+	    untested "feature not supported"
+	    return
+	}
+	-re "$gdb_prompt $" {
+	    pass $gdb_test_name
+	}
     }
-    -re "$gdb_prompt $" {
-	pass $gdb_test_name
-    }
-}
 
 # MODE should be either 'on' or 'off', while PROBLEM_TYPE should be
 # 'internal-error' or 'internal-warning'.  This proc sets the

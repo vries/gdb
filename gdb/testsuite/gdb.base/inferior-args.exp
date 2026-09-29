@@ -301,8 +301,8 @@ run_all_tests
 if {[target_info gdb_protocol] == "extended-remote"} {
     with_test_prefix "single-inferior-arg disabled" {
 	save_vars { GDBFLAGS } {
-	   append GDBFLAGS " -ex \"set remote single-inferior-argument-feature-packet off\""
-	   run_all_tests
-       }
+	    append GDBFLAGS " -ex \"set remote single-inferior-argument-feature-packet off\""
+	    run_all_tests
+	}
     }
 }

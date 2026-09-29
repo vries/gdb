@@ -22,7 +22,7 @@ standard_testfile start.c .c
 set binlibfile ${testfile}.x
 
 if { [gdb_compile "${srcdir}/${subdir}/${srcfile2}" \
-		  [standard_output_file ${binlibfile}] object {debug}] != "" } {
+	  [standard_output_file ${binlibfile}] object {debug}] != "" } {
     untested "failed to compile"
     return
 }

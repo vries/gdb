@@ -50,7 +50,7 @@ proc implptr_test_bar {} {
     global csrcfile
     set line [gdb_get_line_number "bar breakpoint" $csrcfile]
     gdb_test "break implptr.c:$line" "Breakpoint 2.*" \
-       "set bar breakpoint for implptr"
+	"set bar breakpoint for implptr"
     gdb_continue_to_breakpoint "continue to bar breakpoint for implptr"
     gdb_test "print j" " = \\(intp\\) <synthetic pointer>" "print j in implptr:bar"
     gdb_test {print sizeof (j[0])} " = 4" {print sizeof (j[0]) in implptr:bar}

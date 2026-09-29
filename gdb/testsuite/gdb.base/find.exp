@@ -165,8 +165,8 @@ gdb_test "find /w search_buf, +search_buf_size, 0x12345678" \
 if {[isnative]} {
     gdb_test_no_output "set *(int32_t*) &search_buf\[${CHUNK_SIZE}-1\] = 0xfdb97531" ""
     gdb_test "find /w search_buf, +search_buf_size, 0xfdb97531" \
-    "${hex_number}${one_pattern_found}" \
-    "find pattern straddling chunk boundary"
+	"${hex_number}${one_pattern_found}" \
+	"find pattern straddling chunk boundary"
 }
 
 # Check GDB buffer overflow.

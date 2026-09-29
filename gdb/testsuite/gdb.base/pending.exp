@@ -38,9 +38,9 @@ if { [gdb_compile_shlib $libsrc $lib_sl $lib_opts] != ""
 clean_restart
 
 gdb_test_multiple "break pendfunc1" "set pending breakpoint" {
-     -re ".*Make breakpoint pending.*y or \\\[n\\\]. $" {
-	    gdb_test "y" "Breakpoint.*pendfunc1.*pending." "set pending breakpoint, without symbols"
-     }
+    -re ".*Make breakpoint pending.*y or \\\[n\\\]. $" {
+	gdb_test "y" "Breakpoint.*pendfunc1.*pending." "set pending breakpoint, without symbols"
+    }
 }
 
 # Complete the condition (PR 15413).
@@ -49,7 +49,7 @@ gdb_test "complete condition " "condition 1"
 gdb_test "info break" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
 ${::decimal}\[\t \]+breakpoint     keep y.*PENDING.*pendfunc1.*" \
-"single pending breakpoint info, without symbols"
+    "single pending breakpoint info, without symbols"
 
 with_test_prefix "first load" {
     gdb_load ${binfile}
@@ -61,8 +61,8 @@ set pendfunc1_loc [gdb_get_line_number "y = x + 4" ${libfile}.c]
 gdb_run_cmd
 
 gdb_test "" \
-".*Breakpoint.*pendfunc1.*at.*pendshr.c:$pendfunc1_loc.*y = x \\+ 4.*" \
-"run to resolved breakpoint 1 (without symbols)"
+    ".*Breakpoint.*pendfunc1.*at.*pendshr.c:$pendfunc1_loc.*y = x \\+ 4.*" \
+    "run to resolved breakpoint 1 (without symbols)"
 
 clean_restart
 
@@ -76,15 +76,15 @@ with_test_prefix "second load" {
 #
 
 gdb_test_multiple "break pendfunc1" "set pending breakpoint" {
-     -re ".*Make breakpoint pending.*y or \\\[n\\\]. $" {
-	    gdb_test "y" "Breakpoint.*pendfunc1.*pending." "set pending breakpoint"
-     }
+    -re ".*Make breakpoint pending.*y or \\\[n\\\]. $" {
+	gdb_test "y" "Breakpoint.*pendfunc1.*pending." "set pending breakpoint"
+    }
 }
 
 gdb_test "info break" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
 ${::decimal}\[\t \]+breakpoint     keep y.*PENDING.*pendfunc1.*" \
-"single pending breakpoint info"
+    "single pending breakpoint info"
 
 #
 # Test breaking at existing function
@@ -100,7 +100,7 @@ gdb_test "info break" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
 ${::decimal}\[\t \]+breakpoint     keep y.*PENDING.*pendfunc1.*
 ${::decimal}\[\t \]+breakpoint     keep y.* in main at .*$srcfile:$mainline" \
-"pending plus real breakpoint info"
+    "pending plus real breakpoint info"
 
 
 #
@@ -123,7 +123,7 @@ gdb_test "info break" \
 ${::decimal}\[\t \]+breakpoint     keep y.*PENDING.*pendfunc1.*
 \[\t \]+stop only if k == 1.*
 ${::decimal}\[\t \]+breakpoint     keep y.* in main at .*$srcfile:$mainline" \
-"pending plus condition"
+    "pending plus condition"
 
 #
 # Disable pending breakpoint
@@ -136,7 +136,7 @@ gdb_test "info break" \
 ${::decimal}\[\t \]+breakpoint     keep n.*PENDING.*pendfunc1.*
 \[\t \]+stop only if k == 1.*
 ${::decimal}\[\t \]+breakpoint     keep y.* in main at .*$srcfile:$mainline" \
-"pending disabled"
+    "pending disabled"
 
 #
 # Add commands to pending breakpoint
@@ -150,7 +150,7 @@ ${::decimal}\[\t \]+breakpoint     keep n.*PENDING.*pendfunc1.*
 \[\t \]+stop only if k == 1.*
 \[\t \]+print k.*
 ${::decimal}\[\t \]+breakpoint     keep y.* in main at .*$srcfile:$mainline" \
-"pending disabled plus commands"
+    "pending disabled plus commands"
 
 #
 # Try a pending break for a line in a source file with a condition
@@ -158,10 +158,10 @@ ${::decimal}\[\t \]+breakpoint     keep y.* in main at .*$srcfile:$mainline" \
 
 set bp2_loc [gdb_get_line_number "y = x + 4" ${libfile}.c]
 gdb_test_multiple "break pendshr.c:$bp2_loc if x > 3" "set pending breakpoint 2" {
-     -re ".*Make breakpoint pending.*y or \\\[n\\\]. $" {
-	    gdb_test "y" "Breakpoint.*pendshr.c:$bp2_loc.*pending." \
-		"Set pending breakpoint 2"
-     }
+    -re ".*Make breakpoint pending.*y or \\\[n\\\]. $" {
+	gdb_test "y" "Breakpoint.*pendshr.c:$bp2_loc.*pending." \
+	    "Set pending breakpoint 2"
+    }
 }
 
 gdb_test "info break" \
@@ -172,7 +172,7 @@ ${::decimal}\[\t \]+breakpoint     keep n.*PENDING.*pendfunc1.*
 ${::decimal}\[\t \]+breakpoint     keep y.* in main at .*$srcfile:$mainline.*
 ${::decimal}\[\t \]+breakpoint     keep y.*PENDING.*pendshr.c:$bp2_loc.*
 \\s+stop only if x > 3.*" \
-"multiple pending breakpoints"
+    "multiple pending breakpoints"
 
 
 #
@@ -181,10 +181,10 @@ ${::decimal}\[\t \]+breakpoint     keep y.*PENDING.*pendshr.c:$bp2_loc.*
 
 set bp3_loc [gdb_get_line_number "printf" ${libfile}.c]
 gdb_test_multiple "break pendshr.c:$bp3_loc" "set pending breakpoint 3" {
-     -re ".*Make breakpoint pending.*y or \\\[n\\\]. $" {
-	    gdb_test "y" "Breakpoint.*pendshr.c:$bp3_loc.*pending." \
-		"Set pending breakpoint 3"
-     }
+    -re ".*Make breakpoint pending.*y or \\\[n\\\]. $" {
+	gdb_test "y" "Breakpoint.*pendshr.c:$bp3_loc.*pending." \
+	    "Set pending breakpoint 3"
+    }
 }
 
 gdb_test {ignore $bpnum 2} "Will ignore next 2 crossings of breakpoint .*" \
@@ -200,7 +200,7 @@ ${::decimal}\[\t \]+breakpoint     keep y.*PENDING.*pendshr.c:$bp2_loc.*
 \\s+stop only if x > 3.*
 ${::decimal}\[\t \]+breakpoint     keep y.*PENDING.*pendshr.c:$bp3_loc.*
 \\s+ignore next 2 hits.*" \
-"multiple pending breakpoints 2"
+    "multiple pending breakpoints 2"
 
 #
 # Run to main which should resolve a pending breakpoint
@@ -208,28 +208,28 @@ ${::decimal}\[\t \]+breakpoint     keep y.*PENDING.*pendshr.c:$bp3_loc.*
 
 gdb_run_cmd
 gdb_test "" \
-".*Breakpoint.*, main.*$mainline.*" \
-"running to main"
+    ".*Breakpoint.*, main.*$mainline.*" \
+    "running to main"
 
 #
 # Re-enable the first pending breakpoint which should resolve
 #
 
 gdb_test_no_output "enable 1" \
-"re-enabling pending breakpoint that can resolve instantly"
+    "re-enabling pending breakpoint that can resolve instantly"
 
 #
 # Continue to verify conditionals and commands for breakpoints are honored
 #
 
 gdb_test "continue" \
-".*Breakpoint.*pendfunc1.*at.*pendshr.c:$bp2_loc.*4;" \
-"continue to resolved breakpoint 2"
+    ".*Breakpoint.*pendfunc1.*at.*pendshr.c:$bp2_loc.*4;" \
+    "continue to resolved breakpoint 2"
 
 gdb_test "continue" \
-".*Breakpoint.*pendfunc1.*at.*pendshr.c:$bp2_loc.*
+    ".*Breakpoint.*pendfunc1.*at.*pendshr.c:$bp2_loc.*
 \\\$1 = 1" \
-"continue to resolved breakpoint 1"
+    "continue to resolved breakpoint 1"
 
 #
 # Disable the other two breakpoints, and continue to the one with
@@ -241,8 +241,8 @@ gdb_test "disable 7" "" "disable breakpoint 7"
 gdb_test "disable 5" "" "disable breakpoint 5"
 
 gdb_test "continue" \
-	 ".*Breakpoint.*pendfunc1.*\\\(x=3\\\) at.*pendshr.c:$bp3_loc.*printf.*;" \
-"continue to resolved breakpoint 3"
+    ".*Breakpoint.*pendfunc1.*\\\(x=3\\\) at.*pendshr.c:$bp3_loc.*printf.*;" \
+    "continue to resolved breakpoint 3"
 
 delete_breakpoints
 
@@ -252,10 +252,10 @@ gdb_breakpoint "main"
 # Set non-existent pending breakpoint
 #
 gdb_test_multiple "break imaginary" "set imaginary pending breakpoint" {
-     -re ".*Make breakpoint pending.*y or \\\[n\\\]. $" {
-	    gdb_test "y" "Breakpoint.*imaginary.*pending." \
-		"set imaginary pending breakpoint"
-     }
+    -re ".*Make breakpoint pending.*y or \\\[n\\\]. $" {
+	gdb_test "y" "Breakpoint.*imaginary.*pending." \
+	    "set imaginary pending breakpoint"
+    }
 }
 
 #
@@ -269,7 +269,7 @@ gdb_test "info break" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
 ${::decimal}\[\t \]+breakpoint     keep y.* in main at .*$srcfile:$mainline.*
 ${::decimal}\[\t \]+breakpoint     keep y.*PENDING.*imaginary.*" \
-"verify pending breakpoint after restart"
+    "verify pending breakpoint after restart"
 
 # Test GDB's parsing of pending breakpoint thread and condition.
 

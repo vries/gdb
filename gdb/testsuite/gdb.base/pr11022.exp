@@ -26,8 +26,8 @@ if {![runto_main]} {
 }
 
 gdb_test "break [gdb_get_line_number "break here"]" \
-	".*Breakpoint.* at .*" \
-	"set breakpoint"
+    ".*Breakpoint.* at .*" \
+    "set breakpoint"
 
 gdb_test "watch x" ".*Hardware watchpoint.*" "set watchpoint"
 gdb_test "continue" ".*break here.*" "breakpoint hit"

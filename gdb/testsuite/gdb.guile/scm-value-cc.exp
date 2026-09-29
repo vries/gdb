@@ -27,7 +27,7 @@ if {[prepare_for_testing "failed to prepare" $testfile $srcfile {debug c++}]} {
 }
 
 if {![gdb_guile_runto_main]} {
-   return
+    return
 }
 
 gdb_breakpoint [gdb_get_line_number "Break here."]

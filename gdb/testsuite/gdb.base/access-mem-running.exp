@@ -31,8 +31,8 @@ proc test { non_stop } {
     global decimal
 
     save_vars { GDBFLAGS } {
-      append GDBFLAGS " -ex \"set non-stop $non_stop\""
-      clean_restart $::testfile
+	append GDBFLAGS " -ex \"set non-stop $non_stop\""
+	clean_restart $::testfile
     }
 
     if {![runto_main]} {

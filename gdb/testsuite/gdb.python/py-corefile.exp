@@ -310,8 +310,8 @@ with_test_prefix "test mapped files data" {
 		set core_file_build_id $expect_out(2,string)
 		set file_name $expect_out(3,string)
 		lappend results [list $objfile_build_id \
-				      $core_file_build_id \
-				      $file_name]
+				     $core_file_build_id \
+				     $file_name]
 		exp_continue
 	    }
 	    -re "^$gdb_prompt " {

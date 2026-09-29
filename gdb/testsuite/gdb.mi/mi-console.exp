@@ -34,16 +34,16 @@ proc semihosted_string { string } {
 	    if {$char == "\\"} {
 		set char "\\\\\\\\"
 	    } elseif {$char == "\r"} {
-		  set char "\\\\r"
+		set char "\\\\r"
 	    } elseif {$char == "\n"} {
-		  set char "\\\\n"
+		set char "\\\\n"
 	    } elseif {$char == "\""} {
-		  set char "\\\\\""
+		set char "\\\\\""
 	    }
 	    lappend semihosted_list $leading_markers $char $trailing_markers
 	}
     }
-  return [join $semihosted_list ""]
+    return [join $semihosted_list ""]
 }
 
 standard_testfile
@@ -84,9 +84,9 @@ set output "($semihosted_output|$native_output)"
 
 # Next over the hello() call which will produce lots of output
 mi_gdb_test "220-exec-next" \
-	    "220\\^running(\r\n\\*running,thread-id=\"all\")?" \
-	    "Testing console output" \
-	    $output
+    "220\\^running(\r\n\\*running,thread-id=\"all\")?" \
+    "Testing console output" \
+    $output
 
 set line [gdb_get_line_number "after-hello"]
 mi_expect_stop "end-stepping-range" "main" "" ".*mi-console.c" $line "" \

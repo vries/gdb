@@ -27,11 +27,11 @@ if {[build_executable "failed to prepare" $testfile $srcfile {debug hip}]} {
 
 proc continue_to_watchpoint_hit { old_value new_value test } {
     set hit_re [multi_line \
-		   "hit Hardware watchpoint $::decimal:.*" \
-		   "" \
-		   "Old value = $old_value" \
-		   "New value = $new_value" \
-		   ".*"]
+		    "hit Hardware watchpoint $::decimal:.*" \
+		    "" \
+		    "Old value = $old_value" \
+		    "New value = $new_value" \
+		    ".*"]
 
     set ret false
     gdb_test_multiple "continue" "$test" {

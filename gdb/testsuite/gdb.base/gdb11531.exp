@@ -35,7 +35,7 @@ if { [prepare_for_testing "failed to prepare" $testfile $testfile.c {debug}] } {
 
 # Disable hardware watchpoints if necessary.
 if {!$allow_hw_watchpoint_tests_p} {
-   gdb_test_no_output "set can-use-hw-watchpoints 0" ""
+    gdb_test_no_output "set can-use-hw-watchpoints 0" ""
 }
 
 set line [gdb_get_line_number "Break here"]

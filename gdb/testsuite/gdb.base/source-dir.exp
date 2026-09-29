@@ -134,13 +134,13 @@ proc test_truncated_comp_dir {} {
     }
 
     gdb_test "info source" \
-    [multi_line \
-	 "Current source file is ${srcfile}" \
-	 "Compilation directory is \[^\n\r\]+" \
-	 "Source language is c." \
-	 "Producer is \[^\n\r\]+" \
-	 "Compiled with DWARF $decimal debugging format." \
-	 "Does not include preprocessor macro info." ] \
+	[multi_line \
+	     "Current source file is ${srcfile}" \
+	     "Compilation directory is \[^\n\r\]+" \
+	     "Source language is c." \
+	     "Producer is \[^\n\r\]+" \
+	     "Compiled with DWARF $decimal debugging format." \
+	     "Does not include preprocessor macro info." ] \
 	"info source before setting directory search list"
 
     gdb_test "dir $h_strip_dir" \
@@ -156,23 +156,23 @@ proc test_truncated_comp_dir {} {
 			 "4\[ \t\]+return 0;" \
 			 "5\[ \t\]+\\}" ]
 
-    set re [multi_line \
-		"Current source file is ${srcfile}" \
-		"Compilation directory is \[^\n\r\]+" \
-		"Located in (\[^\n\r\]+)" \
-		"Contains 5 lines." \
-		"Source language is c." \
-		"Producer is \[^\n\r\]+" \
-		"\[^\n\r\]+" \
-		"\[^\n\r\]+"]
-    set test "info source after setting directory search list"
-    gdb_test_multiple "info source" $test {
-	-re -wrap "$re" {
-	    set host_new_srcfile [host_file_normalize $new_srcfile]
-	    set host_location [host_file_sanitize $expect_out(1,string)]
-	    gdb_assert {$host_new_srcfile eq $host_location} $gdb_test_name
-	}
+set re [multi_line \
+	    "Current source file is ${srcfile}" \
+	    "Compilation directory is \[^\n\r\]+" \
+	    "Located in (\[^\n\r\]+)" \
+	    "Contains 5 lines." \
+	    "Source language is c." \
+	    "Producer is \[^\n\r\]+" \
+	    "\[^\n\r\]+" \
+	    "\[^\n\r\]+"]
+set test "info source after setting directory search list"
+gdb_test_multiple "info source" $test {
+    -re -wrap "$re" {
+	set host_new_srcfile [host_file_normalize $new_srcfile]
+	set host_location [host_file_sanitize $expect_out(1,string)]
+	gdb_assert {$host_new_srcfile eq $host_location} $gdb_test_name
     }
+}
 }
 
 proc test_change_search_directory_with_empty_dirname {} {

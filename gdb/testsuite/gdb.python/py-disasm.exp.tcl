@@ -51,7 +51,7 @@ if { $kind == "obj" } {
 set pyfile [gdb_remote_download host ${srcdir}/${subdir}/py-disasm.py]
 
 gdb_test "source ${pyfile}" "Python script imported" \
-	 "import python scripts"
+    "import python scripts"
 
 set line [gdb_get_line_number "Break here."]
 
@@ -173,7 +173,7 @@ set test_plans \
 	 [list "All_Text_Part_Styles" "${addr_pattern}p1p2p3p4p5p6p7p8p9p10\r\n.*"] \
 	 [list "ErrorCreatingTextPart_StringAndParts" \
 	      [make_exception_pattern "ValueError" \
-		  "Cannot use 'string' and 'parts' when creating gdb\\.disassembler\\.DisassemblerResult\\."]] \
+		   "Cannot use 'string' and 'parts' when creating gdb\\.disassembler\\.DisassemblerResult\\."]] \
 	 [list "Build_Result_Using_All_Parts" \
 	      "${addr_pattern}fake\treg, ${curr_pc_pattern}(?: <\[^>\]+>)?, 123\r\n.*"] \
 	]
@@ -301,19 +301,19 @@ with_test_prefix "Bad DisassembleInfo creation" {
 with_test_prefix "check inheritance" {
     foreach_with_prefix type {gdb.disassembler.DisassemblerResult \
 				  gdb.disassembler.DisassemblerPart
-				  gdb.disassembler.DisassemblerTextPart \
+	gdb.disassembler.DisassemblerTextPart \
 				  gdb.disassembler.DisassemblerAddressPart} {
-	set type_ptn [string_to_regexp $type]
-	gdb_test_multiline "Sub-class a breakpoint" \
-	    "python" "" \
-	    "class InvalidResultType($type):" "" \
-	    "   def __init__(self):" "" \
-	    "     pass" "" \
-	    "end" \
-	    [multi_line \
-		 "TypeError.*: type '${type_ptn}' is not an acceptable base type" \
-		 "Error occurred in Python.*"]
-    }
+				      set type_ptn [string_to_regexp $type]
+				      gdb_test_multiline "Sub-class a breakpoint" \
+					  "python" "" \
+					  "class InvalidResultType($type):" "" \
+					  "   def __init__(self):" "" \
+					  "     pass" "" \
+					  "end" \
+					  [multi_line \
+					       "TypeError.*: type '${type_ptn}' is not an acceptable base type" \
+					       "Error occurred in Python.*"]
+				  }
 }
 
 
@@ -339,5 +339,5 @@ foreach type {DisassemblerTextPart DisassemblerAddressPart} {
 	[multi_line \
 	     "RuntimeError.*: Cannot create instances of gdb.disassembler.${type}\\." \
 	     "Error occurred in Python.*"] \
-	 "try to create an instance of ${type}"
+	"try to create an instance of ${type}"
 }

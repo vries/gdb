@@ -24,11 +24,11 @@ set asm_file [standard_output_file $srcfile2]
 Dwarf::assemble $asm_file {
     cu {} {
 	DW_TAG_compile_unit {
-		DW_AT_language @DW_LANG_Ada95
-		DW_AT_name     foo.adb
-		DW_AT_comp_dir /tmp
-		MACRO_AT_range {main}
-	    } {
+	    DW_AT_language @DW_LANG_Ada95
+	    DW_AT_name     foo.adb
+	    DW_AT_comp_dir /tmp
+	    MACRO_AT_range {main}
+	} {
 	    declare_labels boolean_label typedef_label array_label enum_label
 
 	    boolean_label: DW_TAG_base_type {
@@ -82,4 +82,4 @@ if { [prepare_for_testing "failed to prepare" ${testfile} \
 gdb_test_no_output "set language ada"
 
 gdb_test "ptype pck.table" \
-	 "type = array \\(enum_000 \\.\\. enum_128\\) of boolean"
+    "type = array \\(enum_000 \\.\\. enum_128\\) of boolean"

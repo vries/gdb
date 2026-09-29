@@ -52,8 +52,8 @@ with_test_prefix "replay" {
 with_test_prefix "live" {
     gdb_test "record stop" "Process record is stopped.*fun4\.4.*"
     gdb_test "info program" [multi_line \
-      "Program stopped at $hex\." \
-      "Type \"info stack\" or \"info registers\" for more information\."]
+				 "Program stopped at $hex\." \
+				 "Type \"info stack\" or \"info registers\" for more information\."]
     gdb_test "reverse-next" "Reverse execution is not currently supported.*"
     gdb_test "step" ".*fun3\.2.*"
 }

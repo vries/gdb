@@ -225,10 +225,10 @@ proc_with_prefix test_corefile {} {
     set corefile [gdb_remote_download host $corefile]
 
     gdb_test "core-file $corefile" \
-	     "" \
-	     "loading_corefile" \
-	     "A program is being debugged already\\\.  Kill it\\\? \\\(y or n\\\) " \
-	     "y"
+	"" \
+	"loading_corefile" \
+	"A program is being debugged already\\\.  Kill it\\\? \\\(y or n\\\) " \
+	"y"
 
     do_full_test
 }
@@ -261,10 +261,10 @@ proc_with_prefix test_gcore {} {
     }
 
     gdb_test "core-file $gcore_host" \
-	     "" \
-	     "loading_corefile" \
-	     "A program is being debugged already\\\.  Kill it\\\? \\\(y or n\\\) " \
-	     "y"
+	"" \
+	"loading_corefile" \
+	"A program is being debugged already\\\.  Kill it\\\? \\\(y or n\\\) " \
+	"y"
 
     do_full_test
 }

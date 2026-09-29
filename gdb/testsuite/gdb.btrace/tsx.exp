@@ -32,24 +32,24 @@ gdb_test "next"
 
 # look at the instruction trace
 set begin_to_end [multi_line \
-    ".*" \
-    "\[0-9\]*\t\\?  ${::hex} <test\\+${::decimal}>:\txbegin\[^\\\r\\\n\]*" \
-    "\[0-9\]*\t\\?  ${::hex} <test\\+${::decimal}>:\tmov\[^\\\r\\\n\]*" \
-    "\[0-9\]*\t   ${::hex} <test\\+${::decimal}>:\txend\[^\\\r\\\n\]*" \
-    ]
+		      ".*" \
+		      "\[0-9\]*\t\\?  ${::hex} <test\\+${::decimal}>:\txbegin\[^\\\r\\\n\]*" \
+		      "\[0-9\]*\t\\?  ${::hex} <test\\+${::decimal}>:\tmov\[^\\\r\\\n\]*" \
+		      "\[0-9\]*\t   ${::hex} <test\\+${::decimal}>:\txend\[^\\\r\\\n\]*" \
+		     ]
 set abort_1 [multi_line \
-    ".*" \
-    "\[0-9\]*\t\\?  ${::hex} <test\\+${::decimal}>:\txbegin\[^\\\r\\\n\]*" \
-    "\[0-9\]*\t   ${::hex} <test\\+${::decimal}>:\tmov\[^\\\r\\\n\]*" \
-    "\[0-9\]*\t   ${::hex} <test\\+${::decimal}>:\tret\[^\\\r\\\n\]*" \
-    ]
+		 ".*" \
+		 "\[0-9\]*\t\\?  ${::hex} <test\\+${::decimal}>:\txbegin\[^\\\r\\\n\]*" \
+		 "\[0-9\]*\t   ${::hex} <test\\+${::decimal}>:\tmov\[^\\\r\\\n\]*" \
+		 "\[0-9\]*\t   ${::hex} <test\\+${::decimal}>:\tret\[^\\\r\\\n\]*" \
+		]
 set abort_2 [multi_line \
-    ".*" \
-    "\[0-9\]*\t\\?  ${::hex} <test\\+${::decimal}>:\txbegin\[^\\\r\\\n\]*" \
-    "\[0-9\]*\t\\?  ${::hex} <test\\+${::decimal}>:\tmov\[^\\\r\\\n\]*" \
-    "\[0-9\]*\t   ${::hex} <test\\+${::decimal}>:\tmov\[^\\\r\\\n\]*" \
-    "\[0-9\]*\t   ${::hex} <test\\+${::decimal}>:\tret\[^\\\r\\\n\]*" \
-    ]
+		 ".*" \
+		 "\[0-9\]*\t\\?  ${::hex} <test\\+${::decimal}>:\txbegin\[^\\\r\\\n\]*" \
+		 "\[0-9\]*\t\\?  ${::hex} <test\\+${::decimal}>:\tmov\[^\\\r\\\n\]*" \
+		 "\[0-9\]*\t   ${::hex} <test\\+${::decimal}>:\tmov\[^\\\r\\\n\]*" \
+		 "\[0-9\]*\t   ${::hex} <test\\+${::decimal}>:\tret\[^\\\r\\\n\]*" \
+		]
 set abort_3 \
     [multi_line \
 	 "$decimal\t   $hex <main\\+$decimal>:\t\[^\\\r\\\n\]*" \

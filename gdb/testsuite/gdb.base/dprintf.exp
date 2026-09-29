@@ -41,12 +41,12 @@ delete_breakpoints
 gdb_breakpoint "main"
 
 gdb_test "dprintf foo,\"At foo entry\\n\"" \
-  "Dprintf .*"
+    "Dprintf .*"
 
 gdb_test "ignore \$bpnum 1" ".*Will ignore next crossing of breakpoint.*"
 
 gdb_test "dprintf $dp_location1,\"arg=%d, g=%d\\n\", arg, g" \
-  "Dprintf .*"
+    "Dprintf .*"
 
 gdb_test_sequence "info breakpoints" "dprintf info 1" {
     "\[\r\n\]Num     Type           Disp Enb Address +What"
@@ -58,7 +58,7 @@ gdb_test_sequence "info breakpoints" "dprintf info 1" {
 }
 
 gdb_test "break $bp_location1" \
-  "Breakpoint .*"
+    "Breakpoint .*"
 
 gdb_run_cmd
 

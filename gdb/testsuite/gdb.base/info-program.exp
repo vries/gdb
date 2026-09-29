@@ -126,7 +126,7 @@ foreach_with_prefix threads {st mt} {
     }
 
     if { [build_executable "failed to prepare $threads" \
-	    ${testfile}-${threads} ${srcfile} $opts] } {
+	      ${testfile}-${threads} ${srcfile} $opts] } {
 	continue
     }
 

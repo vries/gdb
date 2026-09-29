@@ -52,7 +52,7 @@ proc clean_reattach {} {
     gdb_load $main_binfile
 
     if { ![gdb_attach $testpid \
-	      -pattern "main.*at .*$::main_basename.c:.*"] } {
+	       -pattern "main.*at .*$::main_basename.c:.*"] } {
 	return 0
     }
 
@@ -136,7 +136,7 @@ proc one_jit_test {jit_solibs_target match_str reattach} {
 
 # Compile two shared libraries to use as JIT objects.
 set jit_solibs_target [compile_and_download_n_jit_so \
-		      $jit_solib_basename $jit_solib_srcfile 2]
+			   $jit_solib_basename $jit_solib_srcfile 2]
 if { $jit_solibs_target == -1 } {
     return
 }
@@ -152,7 +152,7 @@ if { [compile_jit_main ${main_srcfile} ${main_binfile} {}] == 0 } {
 # specific interesting points.
 if {[can_spawn_for_attach]} {
     if { [compile_jit_main ${main_srcfile} "${main_binfile}-attach" \
-	    {additional_flags=-DATTACH=1}] == 0 } {
+	      {additional_flags=-DATTACH=1}] == 0 } {
 	with_test_prefix attach {
 	    one_jit_test $jit_solibs_target "${hex}  jit_function_0001\[\r\n\]+${hex}  jit_function_0002" 1
 	}

@@ -21,7 +21,7 @@ standard_testfile .s
 set objfile [standard_output_file ${testfile}.o]
 
 if { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${objfile}" object {}] \
-     != "" } {
+	 != "" } {
     return
 }
 

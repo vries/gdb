@@ -66,7 +66,7 @@ proc test_demangling_core {tester test result} {
     global current_demangling_style
 
     if {! [regexp {^([^ ]+): (.+)$} $test dummy style name]} {
-      error "bad test name passed to test_demangling"
+	error "bad test name passed to test_demangling"
     }
 
     if {[string compare $style $current_demangling_style]} {

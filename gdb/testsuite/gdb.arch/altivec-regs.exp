@@ -59,9 +59,9 @@ gdb_test "set print frame-arguments all"
 
 # set all the registers integer portions to 1
 for {set i 0} {$i < 32} {incr i 1} {
-	for {set j 0} {$j < 4} {incr j 1} {
-	   gdb_test "set \$vr$i.v4_int32\[$j\] = 1" "" "set reg vr$i.v4si.f\[$j\]"
-	}
+    for {set j 0} {$j < 4} {incr j 1} {
+	gdb_test "set \$vr$i.v4_int32\[$j\] = 1" "" "set reg vr$i.v4si.f\[$j\]"
+    }
 }
 
 gdb_test "set \$vscr = 1" "" ""
@@ -78,9 +78,9 @@ set endianness [get_endianness]
 # b) the register read (below) also works.
 
 if {$endianness == "big"} {
-set vector_register ".uint128 = 0x1000000010000000100000001, v4_float = .0x1, 0x1, 0x1, 0x1., v4_int32 = .0x1, 0x1, 0x1, 0x1., v8_int16 = .0x0, 0x1, 0x0, 0x1, 0x0, 0x1, 0x0, 0x1., v16_int8 = .0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x1.."
+    set vector_register ".uint128 = 0x1000000010000000100000001, v4_float = .0x1, 0x1, 0x1, 0x1., v4_int32 = .0x1, 0x1, 0x1, 0x1., v8_int16 = .0x0, 0x1, 0x0, 0x1, 0x0, 0x1, 0x0, 0x1., v16_int8 = .0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x1.."
 } else {
-set vector_register ".uint128 = 0x1000000010000000100000001, v4_float = .0x1, 0x1, 0x1, 0x1., v4_int32 = .0x1, 0x1, 0x1, 0x1., v8_int16 = .0x1, 0x0, 0x1, 0x0, 0x1, 0x0, 0x1, 0x0., v16_int8 = .0x1, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0.."
+    set vector_register ".uint128 = 0x1000000010000000100000001, v4_float = .0x1, 0x1, 0x1, 0x1., v4_int32 = .0x1, 0x1, 0x1, 0x1., v8_int16 = .0x1, 0x0, 0x1, 0x0, 0x1, 0x0, 0x1, 0x0., v16_int8 = .0x1, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0, 0x1, 0x0, 0x0, 0x0.."
 }
 
 for {set i 0} {$i < 32} {incr i 1} {
@@ -122,55 +122,55 @@ send_gdb "info vector\n"
 gdb_expect_list "info vector" ".*$gdb_prompt $" $pattern_list
 
 gdb_test "break vector_fun" \
- "Breakpoint $decimal at.*altivec-regs.c, line ${::decimal}\\." \
- "set breakpoint at vector_fun"
+    "Breakpoint $decimal at.*altivec-regs.c, line ${::decimal}\\." \
+    "set breakpoint at vector_fun"
 
 # Actually it is nuch easier to see these results printed in hex.
 gdb_test "set output-radix 16" \
-  "Output radix now set to decimal 16, hex 10, octal 20." \
-  "set output radix to hex"
+    "Output radix now set to decimal 16, hex 10, octal 20." \
+    "set output radix to hex"
 
 gdb_test "continue" \
-  "Breakpoint $decimal, vector_fun .a=.0xfefefefe, 0xfefefefe, 0xfefefefe, 0xfefefefe., b=.0x1010101, 0x1010101, 0x1010101, 0x1010101.*altivec-regs.c.*vec_splat_u8.2..;" \
-  "continue to vector_fun"
+    "Breakpoint $decimal, vector_fun .a=.0xfefefefe, 0xfefefefe, 0xfefefefe, 0xfefefefe., b=.0x1010101, 0x1010101, 0x1010101, 0x1010101.*altivec-regs.c.*vec_splat_u8.2..;" \
+    "continue to vector_fun"
 
 # Do a next over the assignment to vector 'a'.
 gdb_test "next" ".*b = \\(\\(vector unsigned int\\) vec_splat_u8\\(3\\)\\);" \
-  "next (1)"
+    "next (1)"
 
 # Do a next over the assignment to vector 'b'.
 gdb_test "next" "c = vec_add \\(a, b\\);" \
-  "next (2)"
+    "next (2)"
 
 # Now 'a' should be '0x02020202...' and 'b' should be '0x03030303...'
 gdb_test "print/x a" \
-  ".*= .0x2020202, 0x2020202, 0x2020202, 0x2020202." \
-  "print vector parameter a"
+    ".*= .0x2020202, 0x2020202, 0x2020202, 0x2020202." \
+    "print vector parameter a"
 
 gdb_test "print/x b" \
-  ".*= .0x3030303, 0x3030303, 0x3030303, 0x3030303." \
-  "print vector parameter b"
+    ".*= .0x3030303, 0x3030303, 0x3030303, 0x3030303." \
+    "print vector parameter b"
 
 # If we do an 'up' now, and print 'x' and 'y' we should see the values they
 # have in main, not the values they have in vector_fun.
 gdb_test "up" ".1.*main \\(\\) at.*altivec-regs.c.*z = vector_fun \\(x, y\\);" \
-  "up to main"
+    "up to main"
 
 gdb_test "print/x x" \
-  ".*= .0xfefefefe, 0xfefefefe, 0xfefefefe, 0xfefefefe." \
-  "print vector x"
+    ".*= .0xfefefefe, 0xfefefefe, 0xfefefefe, 0xfefefefe." \
+    "print vector x"
 
 gdb_test "print/x y" \
-  ".*= .0x1010101, 0x1010101, 0x1010101, 0x1010101." \
-  "print vector y"
+    ".*= .0x1010101, 0x1010101, 0x1010101, 0x1010101." \
+    "print vector y"
 
 # now go back to vector_func and do a finish, to see if we can print the return
 # value correctly.
 
 gdb_test "down" \
-  ".0  vector_fun \\(a=.0x2020202, 0x2020202, 0x2020202, 0x2020202., b=.0x3030303, 0x3030303, 0x3030303, 0x3030303.\\) at.*altivec-regs.c.*c = vec_add \\(a, b\\);" \
-  "down to vector_fun"
+    ".0  vector_fun \\(a=.0x2020202, 0x2020202, 0x2020202, 0x2020202., b=.0x3030303, 0x3030303, 0x3030303, 0x3030303.\\) at.*altivec-regs.c.*c = vec_add \\(a, b\\);" \
+    "down to vector_fun"
 
 gdb_test "finish" \
-  "Run till exit from .0  vector_fun \\(a=.0x2020202, 0x2020202, 0x2020202, 0x2020202., b=.0x3030303, 0x3030303, 0x3030303, 0x3030303.\\) at.*altivec-regs.c.*in main \\(\\) at.*altivec-regs.c.*z = vector_fun \\(x, y\\);.*Value returned is.*= .0x5050505, 0x5050505, 0x5050505, 0x5050505." \
-  "finish returned correct value"
+    "Run till exit from .0  vector_fun \\(a=.0x2020202, 0x2020202, 0x2020202, 0x2020202., b=.0x3030303, 0x3030303, 0x3030303, 0x3030303.\\) at.*altivec-regs.c.*in main \\(\\) at.*altivec-regs.c.*z = vector_fun \\(x, y\\);.*Value returned is.*= .0x5050505, 0x5050505, 0x5050505, 0x5050505." \
+    "finish returned correct value"

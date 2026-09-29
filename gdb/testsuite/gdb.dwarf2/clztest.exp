@@ -25,7 +25,7 @@ require dwarf2_support
 require is_x86_64_m64_target
 
 if { [prepare_for_testing "failed to prepare" "${test}" ${test}.S \
-      {nodebug nopie additional_flags=-nostdlib}] } {
+	  {nodebug nopie additional_flags=-nostdlib}] } {
     return
 }
 

@@ -25,7 +25,7 @@ if { [istarget "i\[34567\]86-*-linux*"] || [istarget "x86_64-*-linux*"] } {
     set syscall_insn "\[ \t\](int|syscall|sysenter)\[ \t\]*"
     set syscall_register "eax"
     array set syscall_number {fork "(56|120)" vfork "(58|190)" \
-      clone "(56|120)"}
+				  clone "(56|120)"}
 } elseif { [istarget "aarch64*-*-linux*"] || [istarget "arm*-*-linux*"] } {
     set syscall_insn "\[ \t\](swi|svc)\[ \t\]"
 
@@ -36,7 +36,7 @@ if { [istarget "i\[34567\]86-*-linux*"] || [istarget "x86_64-*-linux*"] } {
     }
 
     array set syscall_number {fork "(120|220)" vfork "(190|220)" \
-      clone "(120|220)"}
+				  clone "(120|220)"}
 } else {
     return
 }
@@ -54,8 +54,8 @@ proc_with_prefix check_pc_after_cross_syscall { displaced syscall syscall_insn_n
     }
 
     gdb_assert {$syscall_insn_next_addr != 0 \
-      && $syscall_insn_next_addr == $syscall_insn_next_addr_found \
-      && $curr_thread == 1} \
+		    && $syscall_insn_next_addr == $syscall_insn_next_addr_found \
+		    && $curr_thread == 1} \
 	"single step over $syscall final pc"
 }
 

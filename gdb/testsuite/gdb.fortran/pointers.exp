@@ -17,7 +17,7 @@ standard_testfile "pointers.f90"
 load_lib fortran.exp
 
 if {[prepare_for_testing ${testfile}.exp ${testfile} ${srcfile} \
-    {debug f90 quiet}]} {
+	 {debug f90 quiet}]} {
     return
 }
 
@@ -97,15 +97,15 @@ gdb_test "print arrayOfPtr(3)%p" "= \\(PTR TO -> \\( Type two \\)\\) 0x0" \
 
 gdb_test_multiple "print *(arrayOfPtr(3)%p)" \
     "print *(arrayOfPtr(3)%p), associated" {
-    # gfortran
-    -re -wrap "Cannot access memory at address 0x0" {
-	pass $gdb_test_name
+	# gfortran
+	-re -wrap "Cannot access memory at address 0x0" {
+	    pass $gdb_test_name
+	}
+	# ifx
+	-re -wrap "Location address is not set." {
+	    pass $gdb_test_name
+	}
     }
-    # ifx
-    -re -wrap "Location address is not set." {
-	pass $gdb_test_name
-    }
-}
 
 gdb_test "print cyclicp1" "= \\( i = 1, p = $hex\( <.*>\)? \\)"
 gdb_test "print cyclicp1%p" "= \\(PTR TO -> \\( Type typewithpointer \\)\\) $hex\( <.*>\)?"

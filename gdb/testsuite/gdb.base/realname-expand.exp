@@ -30,7 +30,7 @@ if { [file type $srcfilelink] != "link" } {
 }
 
 if { [gdb_compile "${srcdir}/${subdir}/${srcfile} ${srcfilelink}" "${binfile}" \
-		  executable {debug}] != "" } {
+	  executable {debug}] != "" } {
     untested "failed to compile"
     return
 }

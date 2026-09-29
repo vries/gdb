@@ -29,13 +29,13 @@ clean_restart $testfile
 
 # Check if the disassemble output is correct.
 gdb_test "x /i main+8" \
-	"$hex <main\\+8>:\[ \t\]+bx\[ \t\]+lr" \
-	"disassemble thumb instruction, 1st try"
+    "$hex <main\\+8>:\[ \t\]+bx\[ \t\]+lr" \
+    "disassemble thumb instruction, 1st try"
 
 # Reload the symbol file to trigger the bug.
 gdb_load ${binfile}
 
 # Check if the disassemble output is the same as above.
 gdb_test "x /i main+8" \
-	"$hex <main\\+8>:\[ \t\]+bx\[ \t\]+lr" \
-	"disassemble thumb instruction, 2nd try"
+    "$hex <main\\+8>:\[ \t\]+bx\[ \t\]+lr" \
+    "disassemble thumb instruction, 2nd try"

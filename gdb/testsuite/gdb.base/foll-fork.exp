@@ -41,26 +41,26 @@ proc setup {} {
 # fork-following is supported.  Return 1 if they are, else 0.
 
 proc_with_prefix check_fork_catchpoints {} {
-  global gdb_prompt
+    global gdb_prompt
 
-  if { ![setup] } {
-      return 0
-  }
-
-  # Verify that the system supports "catch fork".
-  gdb_test "catch fork" "Catchpoint \[0-9\]* \\(fork\\)" "insert first fork catchpoint"
-  set has_fork_catchpoints 0
-  gdb_test_multiple "continue" "continue to first fork catchpoint" {
-    -re ".*Your system does not support this type\r\nof catchpoint.*$gdb_prompt $" {
-      unsupported "continue to first fork catchpoint"
+    if { ![setup] } {
+	return 0
     }
-    -re ".*Catchpoint.*$gdb_prompt $" {
-      set has_fork_catchpoints 1
-      pass "continue to first fork catchpoint"
-    }
-  }
 
-  return $has_fork_catchpoints
+    # Verify that the system supports "catch fork".
+    gdb_test "catch fork" "Catchpoint \[0-9\]* \\(fork\\)" "insert first fork catchpoint"
+    set has_fork_catchpoints 0
+    gdb_test_multiple "continue" "continue to first fork catchpoint" {
+	-re ".*Your system does not support this type\r\nof catchpoint.*$gdb_prompt $" {
+	    unsupported "continue to first fork catchpoint"
+	}
+	-re ".*Catchpoint.*$gdb_prompt $" {
+	    set has_fork_catchpoints 1
+	    pass "continue to first fork catchpoint"
+	}
+    }
+
+    return $has_fork_catchpoints
 }
 
 # Test follow-fork to ensure that the correct process is followed, that
@@ -94,7 +94,7 @@ proc_with_prefix test_follow_fork { follow-fork-mode detach-on-fork cmd } {
     }
 
     gdb_test "show follow-fork" \
-    "Debugger response to a program call of fork or vfork is \"${follow-fork-mode}\"."
+	"Debugger response to a program call of fork or vfork is \"${follow-fork-mode}\"."
 
     # Set detach-on-fork mode if we aren't using the default.
     if {${detach-on-fork} == "default"} {
@@ -104,15 +104,15 @@ proc_with_prefix test_follow_fork { follow-fork-mode detach-on-fork cmd } {
     }
 
     gdb_test "show detach-on-fork" \
-	     "Whether gdb will detach.* fork is ${detach-on-fork}."
+	"Whether gdb will detach.* fork is ${detach-on-fork}."
 
     # Set a breakpoint after the fork if we aren't single-stepping
     # past the fork.
     if {$cmd == "continue"} {
 	set bp_after_fork [gdb_get_line_number "set breakpoint here"]
 	gdb_test "break ${srcfile}:$bp_after_fork" \
-		 "Breakpoint.*, line $bp_after_fork.*" \
-		 "set breakpoint after fork"
+	    "Breakpoint.*, line $bp_after_fork.*" \
+	    "set breakpoint after fork"
     }
 
     # Set up the output we expect to see after we run.
@@ -368,9 +368,9 @@ proc_with_prefix tcatch_fork_parent_follow {} {
 	"Catchpoint \[0-9\]* \\(fork\\)$reading_in_symbols_re" \
 	"explicit parent follow, set tcatch fork"
 
-# ??rehrauer: I don't yet know how to get the id of the tcatch
-# via this script, so that I can add a -do list to it.  For now,
-# do the follow stuff after the catch happens.
+    # ??rehrauer: I don't yet know how to get the id of the tcatch
+    # via this script, so that I can add a -do list to it.  For now,
+    # do the follow stuff after the catch happens.
 
     gdb_test "continue" \
 	"Catchpoint \[0-9\]* \\(forked process \[0-9\]*\\),.*" \

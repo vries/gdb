@@ -20,7 +20,7 @@ require allow_avx512fp16_tests
 standard_testfile
 
 if { [prepare_for_testing "failed to prepare" ${testfile} ${srcfile} \
-     {debug additional_flags="-mavx512fp16"}] } {
+	  {debug additional_flags="-mavx512fp16"}] } {
     return
 }
 

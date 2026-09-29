@@ -93,13 +93,13 @@ gdb_test_multiple "list $gdb_recursion_test_baseline, +12" "" {
 	if { ($testline1 == 0) || ($testline2 == 0) || ($testline3 == 0) || ($testline4 == 0) || ($testline5 == 0) || ($testline6 == 0) } {
 	    untested "unexpected testline values"
 	    set return_me 1
-all tests in this module will fail."
+	    all tests in this module will fail."
 	}
     }
     default {
-	    untested "couldn't match pattern"
-	    set return_me 1
-all tests in this module will fail."
+	untested "couldn't match pattern"
+	set return_me 1
+	all tests in this module will fail."
     }
 }
 
@@ -126,31 +126,31 @@ set tdp5 [gdb_gettpnum $testline5]
 set tdp6 [gdb_gettpnum $testline6]
 
 if {    $tdp1 <= 0 || $tdp2 <= 0 || $tdp3 <= 0 || \
-	$tdp4 <= 0 || $tdp5 <= 0 || $tdp6 <= 0 } then {
+	    $tdp4 <= 0 || $tdp5 <= 0 || $tdp6 <= 0 } then {
     fail "setting tracepoints failed"
     return
 }
 
 gdb_trace_setactions "9.x: setup TP to collect regs" \
-	"$tdp2" \
-	"collect \$regs" "^$"
+    "$tdp2" \
+    "collect \$regs" "^$"
 
 
 gdb_trace_setactions "9.x: setup TP to collect args" \
-	"$tdp3" \
-	"collect \$args" "^$"
+    "$tdp3" \
+    "collect \$args" "^$"
 
 gdb_trace_setactions "9.x: setup TP to collect locals" \
-	"$tdp4" \
-	"collect \$locs" "^$"
+    "$tdp4" \
+    "collect \$locs" "^$"
 
 gdb_trace_setactions "9.x: setup TP to collect stack memory" \
-	"$tdp5" \
-	"collect \$$fpreg, \*\(void \*\*\) \$$spreg @ 64" "^$"
+    "$tdp5" \
+    "collect \$$fpreg, \*\(void \*\*\) \$$spreg @ 64" "^$"
 
 gdb_trace_setactions "9.x: setup TP to collect expressions" \
-	"$tdp6" \
-	"collect gdb_char_test, gdb_short_test, gdb_long_test" "^$"
+    "$tdp6" \
+    "collect gdb_char_test, gdb_short_test, gdb_long_test" "^$"
 
 gdb_test "tstart" ".*" ""
 
@@ -167,7 +167,7 @@ gdb_tfind_test "9.1: init: make sure not debugging any trace frame" \
 # 9.3 help tdump
 
 gdb_test "help tdump" "Print everything collected at the current.*" \
-	"9.3: help tdump"
+    "9.3: help tdump"
 
 # Check the collected trace data from different sources, such as live
 # inferior and tfile.
@@ -274,7 +274,7 @@ proc use_collected_data { data_source } {
 	}
 
 	#gdb_test "print \$trace_file" "\"$srcdir/$subdir/$srcfile\"" \
-	    #   "11.4: test \$trace_file"
+	#   "11.4: test \$trace_file"
 
 	#
 	# 12.x test report generation using arbitrary GDB commands, loops etc.

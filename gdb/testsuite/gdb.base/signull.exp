@@ -105,10 +105,10 @@ proc test_segv { name tag bt_from_segv bt_from_keeper } {
 
 test_segv "data read" data_read \
     {#0 .* bowler .*#1  .* main .*} \
-    {#0 .* keeper .*#1  .* handler .*#2 .* bowler .*#3  .* main .*}
-test_segv "data write" data_write \
-    {#0 .* bowler .*#1  .* main .*} \
-    {#0 .* keeper .*#1  .* handler .*#2 .* bowler .*#3  .* main .*}
-test_segv code $function_pointer \
-    {#0 .* 0x0+ .*#1 .* bowler .*#2  .* main .*} \
-    {#0 .* keeper .*#1  .* handler .*#2 .* 0x0+ .*#3 .* bowler .*#4 .* main .*}
+	 {#0 .* keeper .*#1  .* handler .*#2 .* bowler .*#3  .* main .*}
+	     test_segv "data write" data_write \
+		 {#0 .* bowler .*#1  .* main .*} \
+		      {#0 .* keeper .*#1  .* handler .*#2 .* bowler .*#3  .* main .*}
+			  test_segv code $function_pointer \
+			      {#0 .* 0x0+ .*#1 .* bowler .*#2  .* main .*} \
+				   {#0 .* keeper .*#1  .* handler .*#2 .* 0x0+ .*#3 .* bowler .*#4 .* main .*}

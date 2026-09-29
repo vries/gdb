@@ -633,875 +633,875 @@ namespace eval GenPerfTest {
 	    puts $f "static_function_$i (void)"
 	    puts $f "{"
 	    puts $f "}"
+    }
+}
+
+# ID is "" for the binary, and a unique symbol prefix for each SO.
+
+proc _write_extern_functions { self_var f run_nr id cu_nr } {
+    upvar 1 $self_var self
+    set nr_extern_functions [_get_param $self(nr_extern_functions) $run_nr]
+    for { set i 0 } { $i < $nr_extern_functions } { incr i } {
+	puts $f ""
+	puts $f "void"
+	puts $f "${id}function_${cu_nr}_$i (void)"
+	puts $f "{"
+	puts $f "}"
+}
+}
+
+proc _get_class_spec { spec name } {
+    foreach { key value } $spec {
+	if { $key == $name } {
+	    return $value
 	}
     }
+    switch $name {
+	count {
+	    return $GenPerfTest::DEFAULT_CLASS_COUNT
+	}
+	nr_members {
+	    return $GenPerfTest::DEFAULT_CLASS_NR_MEMBERS
+	}
+	nr_static_members {
+	    return $GenPerfTest::DEFAULT_CLASS_NR_STATIC_MEMBERS
+	}
+	nr_methods {
+	    return $GenPerfTest::DEFAULT_CLASS_NR_METHODS
+	}
+	nr_inline_methods {
+	    return $GenPerfTest::DEFAULT_CLASS_NR_INLINE_METHODS
+	}
+	nr_static_methods {
+	    return $GenPerfTest::DEFAULT_CLASS_NR_STATIC_METHODS
+	}
+	nr_static_inline_methods {
+	    return $GenPerfTest::DEFAULT_CLASS_NR_STATIC_INLINE_METHODS
+	}
+	default {
+	    error "required class-spec not present: $name"
+	}
+    }
+}
 
-    # ID is "" for the binary, and a unique symbol prefix for each SO.
+# SO_NR is the shlib number or "" for the binary.
+# CU_NR is either the compilation unit number or "main".
+# NAME is the "name" field from the class spec, which is
+# { ns0 ns1 ... nsN class_name }.
+# C is the iteration number, from the "count" field from the class spec.
 
-    proc _write_extern_functions { self_var f run_nr id cu_nr } {
-	upvar 1 $self_var self
-	set nr_extern_functions [_get_param $self(nr_extern_functions) $run_nr]
-	for { set i 0 } { $i < $nr_extern_functions } { incr i } {
+proc _make_class_name { so_nr cu_nr name c } {
+    set class_name [lindex $name [expr {[llength $name] - 1}]]
+    if { "$so_nr" != "" } {
+	set prefix "shlib${so_nr}_"
+    } else {
+	set prefix ""
+    }
+    return "${prefix}cu_${cu_nr}_${class_name}_${c}"
+}
+
+proc _make_namespace_name { name } {
+    if { "$name" == "anonymous" } {
+	return ""
+    }
+    return $name
+}
+
+proc _write_class_definitions { self_var f static run_nr so_nr cu_nr } {
+    upvar 1 $self_var self
+    set class_specs [_get_param $self(class_specs) $run_nr]
+    foreach spec $class_specs {
+	set count [_get_class_spec $spec count]
+	set name [_get_class_spec $spec name]
+	set nr_members [_get_class_spec $spec nr_members]
+	set nr_static_members [_get_class_spec $spec nr_static_members]
+	set nr_methods [_get_class_spec $spec nr_methods]
+	set nr_static_methods [_get_class_spec $spec nr_static_methods]
+	set depth [expr {[llength $name] - 1}]
+	for { set c 0 } { $c < $count } { incr c } {
 	    puts $f ""
-	    puts $f "void"
-	    puts $f "${id}function_${cu_nr}_$i (void)"
-	    puts $f "{"
-	    puts $f "}"
+	    for { set i 0 } { $i < $depth } { incr i } {
+		puts $f "namespace [_make_namespace_name [lindex $name $i]]"
+		puts $f "\{"
+		puts $f ""
+	    }
+	    set class_name [_make_class_name $so_nr $cu_nr $name $c]
+	    puts $f "class $class_name"
+	    puts $f "\{"
+	    puts $f " public:"
+	    for { set i 0 } { $i < $nr_members } { incr i } {
+		puts $f "  int member_$i;"
+	    }
+	    for { set i 0 } { $i < $nr_static_members } { incr i } {
+		# Rather than parameterize the number of const/non-const
+		# members, and their types, we keep it simple for now.
+		if { $i % 2 == 0 } {
+		    puts $f "  static const int static_member_$i = $i;"
+		} else {
+		    puts $f "  static int static_member_$i;"
+		}
+	    }
+	    for { set i 0 } { $i < $nr_methods } { incr i } {
+		puts $f "  void method_$i (void);"
+	    }
+	    for { set i 0 } { $i < $nr_static_methods } { incr i } {
+		puts $f "  static void static_method_$i (void);"
+	    }
+	    _write_inline_methods self $f $so_nr $cu_nr $spec $c
+	    _write_static_inline_methods self $f $so_nr $cu_nr $spec $c
+	    puts $f "\};"
+	    for { set i [expr {$depth - 1}] } { $i >= 0 } { incr i -1 } {
+		puts $f ""
+		puts $f "\} // [lindex $name $i]"
+	    }
+	}
+    }
+}
+
+proc _write_inline_methods { self_var f so_nr cu_nr spec c } {
+    upvar 1 $self_var self
+    set name [_get_class_spec $spec name]
+    set nr_inline_methods [_get_class_spec $spec nr_inline_methods]
+    for { set i 0 } { $i < $nr_inline_methods } { incr i } {
+	puts $f "  void inline_method_$i (void) { }"
+    }
+}
+
+proc _write_static_inline_methods { self_var f so_nr cu_nr spec c } {
+    upvar 1 $self_var self
+    set name [_get_class_spec $spec name]
+    set nr_static_inline_methods [_get_class_spec $spec nr_static_inline_methods]
+    for { set i 0 } { $i < $nr_static_inline_methods } { incr i } {
+	puts $f "  static void static_inline_method_$i (void) { }"
+    }
+}
+
+proc _write_class_implementations { self_var f static run_nr so_nr cu_nr } {
+    upvar 1 $self_var self
+    set class_specs [_get_param $self(class_specs) $run_nr]
+    foreach spec $class_specs {
+	set count [_get_class_spec $spec count]
+	set name [_get_class_spec $spec name]
+	set depth [expr {[llength $name] - 1}]
+	for { set c 0 } { $c < $count } { incr c } {
+	    for { set i 0 } { $i < $depth } { incr i } {
+		puts $f ""
+		puts $f "namespace [_make_namespace_name [lindex $name $i]]"
+		puts $f "\{"
+	    }
+	    _write_static_members self $f $so_nr $cu_nr $spec $c
+	    _write_methods self $f $so_nr $cu_nr $spec $c
+	    _write_static_methods self $f $so_nr $cu_nr $spec $c
+	    for { set i [expr {$depth - 1}] } { $i >= 0 } { incr i -1 } {
+		puts $f ""
+		puts $f "\} // [lindex $name $i]"
+	    }
+	}
+    }
+}
+
+proc _write_static_members { self_var f so_nr cu_nr spec c } {
+    upvar 1 $self_var self
+    set name [_get_class_spec $spec name]
+    set nr_static_members [_get_class_spec $spec nr_static_members]
+    set class_name [_make_class_name $so_nr $cu_nr $name $c]
+    puts $f ""
+    # Rather than parameterize the number of const/non-const
+    # members, and their types, we keep it simple for now.
+    for { set i 0 } { $i < $nr_static_members } { incr i } {
+	if { $i % 2 == 0 } {
+	    # Static const members are initialized inline.
+	} else {
+	    puts $f "int ${class_name}::static_member_$i = $i;"
+	}
+    }
+}
+
+proc _write_methods { self_var f so_nr cu_nr spec c } {
+    upvar 1 $self_var self
+    set name [_get_class_spec $spec name]
+    set nr_methods [_get_class_spec $spec nr_methods]
+    set class_name [_make_class_name $so_nr $cu_nr $name $c]
+    for { set i 0 } { $i < $nr_methods } { incr i } {
+	puts $f ""
+	puts $f "void"
+	puts $f "${class_name}::method_$i (void)"
+	puts $f "{"
+	puts $f "}"
+}
+}
+
+proc _write_static_methods { self_var f so_nr cu_nr spec c } {
+    upvar 1 $self_var self
+    set name [_get_class_spec $spec name]
+    set nr_static_methods [_get_class_spec $spec nr_static_methods]
+    set class_name [_make_class_name $so_nr $cu_nr $name $c]
+    for { set i 0 } { $i < $nr_static_methods } { incr i } {
+	puts $f ""
+	puts $f "void"
+	puts $f "${class_name}::static_method_$i (void)"
+	puts $f "{"
+	puts $f "}"
+    }
+}
+
+proc _gen_compunit_header { self_var static run_nr so_nr cu_nr } {
+    upvar 1 $self_var self
+    set header_file [_make_header_name self $static $run_nr $so_nr $cu_nr]
+    set f [_create_file self $header_file]
+    _write_intro self $f
+    set header_macro [_make_header_macro "HEADER_CU" $cu_nr]
+    puts $f ""
+    puts $f "#ifndef $header_macro"
+    puts $f "#define $header_macro"
+    if {[_classes_enabled_p self $run_nr]} {
+	_write_class_definitions self $f $static $run_nr $so_nr $cu_nr
+    }
+    puts $f ""
+    puts $f "#endif // $header_macro"
+    close $f
+    return $header_file
+}
+
+proc _gen_binary_compunit_source { self_var static run_nr cu_nr } {
+    upvar 1 $self_var self
+    set source_file [_make_source_name self $static $run_nr "" $cu_nr]
+    set f [_create_file self $source_file]
+    _write_intro self $f
+    _write_includes self $f [_get_param $self(binary_extra_headers) $run_nr]
+    set header_file [_make_header_basename self $static $run_nr "" $cu_nr]
+    puts $f "#include \"$header_file\""
+    _write_static_globals self $f $run_nr
+    _write_extern_globals self $f $run_nr "" $cu_nr
+    _write_static_functions self $f $run_nr
+    _write_extern_functions self $f $run_nr "" $cu_nr
+    if {[_classes_enabled_p self $run_nr]} {
+	_write_class_implementations self $f $static $run_nr "" $cu_nr
+    }
+    close $f
+    return $source_file
+}
+
+# Generate the sources for the pieces of the binary.
+# The result is a list of source file names and accompanying object file
+# names.  The pieces are split across workers.
+# E.g., with 10 workers the result for worker 0 is
+# { { source0 header0 object0 } { source10 header10 object10 } ... }
+
+proc _gen_binary_source { self_var worker_nr static run_nr } {
+    upvar 1 $self_var self
+    verbose -log "GenPerfTest::_gen_binary_source worker $worker_nr run $run_nr, started [timestamp -format %c]"
+    set nr_compunits [_get_param $self(nr_compunits) $run_nr]
+    global PERF_TEST_COMPILE_PARALLELISM
+    set nr_workers $PERF_TEST_COMPILE_PARALLELISM
+    set result {}
+    for { set cu_nr $worker_nr } { $cu_nr < $nr_compunits } { incr cu_nr $nr_workers } {
+	set header_file [_gen_compunit_header self $static $run_nr "" $cu_nr]
+	set source_file [_gen_binary_compunit_source self $static $run_nr $cu_nr]
+	set object_file [_make_binary_object_name self $static $run_nr $cu_nr]
+	lappend result [list $source_file $header_file $object_file]
+    }
+    verbose -log "GenPerfTest::_gen_binary_source worker $worker_nr run $run_nr, done [timestamp -format %c]"
+    return $result
+}
+
+proc _gen_shlib_compunit_source { self_var static run_nr so_nr cu_nr } {
+    upvar 1 $self_var self
+    set source_file [_make_source_name self $static $run_nr $so_nr $cu_nr]
+    set f [_create_file self $source_file]
+    _write_intro self $f
+    _write_includes self $f [_get_param $self(gen_shlib_extra_headers) $run_nr]
+    set header_file [_make_header_basename self $static $run_nr $so_nr $cu_nr]
+    puts $f "#include \"$header_file\""
+    _write_static_globals self $f $run_nr
+    _write_extern_globals self $f $run_nr "shlib${so_nr}_" $cu_nr
+    _write_static_functions self $f $run_nr
+    _write_extern_functions self $f $run_nr "shlib${so_nr}_" $cu_nr
+    if {[_classes_enabled_p self $run_nr]} {
+	_write_class_implementations self $f $static $run_nr $so_nr $cu_nr
+    }
+    close $f
+    return $source_file
+}
+
+# CU_NAME is a name from gen_shlib_extra_sources or tail_shlib_sources.
+
+proc _make_shlib_common_source_name { self_var static run_nr so_nr cu_name } {
+    upvar 1 $self_var self
+    if { !$static } {
+	set run_name [_get_param $self(run_names) $run_nr]
+	set source_name "${run_name}-lib${so_nr}-${cu_name}"
+    } else {
+	set source_name "lib${so_nr}-${cu_name}"
+    }
+    return "[_make_object_dir_name self $static $run_nr]/[_convert_spaces $source_name]"
+}
+
+# N.B. gdb_compile_shlib doesn't support parallel builds of shlibs from
+# common sources: the .o file path will be the same across all shlibs.
+# gen_shlib_extra_sources may be common across all shlibs but they're each
+# compiled with -DSHLIB=$SHLIB so we need different .o files for each
+# shlib, and therefore we need different source files for each shlib.
+# If this turns out to be too cumbersome we can augment gdb_compile_shlib.
+
+proc _gen_shlib_common_source { self_var static run_nr so_nr source_name } {
+    upvar 1 $self_var self
+    global srcdir
+    set source_file [_make_shlib_common_source_name self $static $run_nr $so_nr $source_name]
+    file copy -force "$srcdir/gdb.perf/$source_name" ${source_file}
+    return $source_file
+}
+
+# Generate the sources for a shared library.
+# The result is a list of source and header file names.
+# E.g., { { source0 source1 ... common0 ... } { header0 header1 ... } }
+
+proc _gen_shlib_source { self_var static run_nr so_nr } {
+    upvar 1 $self_var self
+    verbose -log "GenPerfTest::_gen_shlib_source run $run_nr so $so_nr, started [timestamp -format %c]"
+    set headers {}
+    set sources {}
+    set nr_compunits [_get_param $self(nr_compunits) $run_nr]
+    for { set cu_nr 0 } { $cu_nr < $nr_compunits } { incr cu_nr } {
+	lappend headers [_gen_compunit_header self $static $run_nr $so_nr $cu_nr]
+	lappend sources [_gen_shlib_compunit_source self $static $run_nr $so_nr $cu_nr]
+    }
+    foreach source_name [_get_param $self(gen_shlib_extra_sources) $run_nr] {
+	lappend sources [_gen_shlib_common_source self $static $run_nr $so_nr $source_name]
+    }
+    verbose -log "GenPerfTest::_gen_shlib_source run $run_nr so $so_nr, done [timestamp -format %c]"
+    return [list $sources $headers]
+}
+
+# Write Tcl array ARRAY_NAME to F.
+
+proc _write_tcl_array { self_var f array_name } {
+    upvar 1 $self_var self
+    if { "$array_name" != "$self_var" } {
+	global $array_name
+    }
+    puts $f "== $array_name =="
+    foreach { name value } [array get $array_name] {
+	puts $f "$name: $value"
+    }
+}
+
+# Write global Tcl state used for compilation to F.
+# If anything changes we want to recompile.
+
+proc _write_tcl_state { self_var f dest } {
+    upvar 1 $self_var self
+
+    # TODO(dje): gdb_default_target_compile references a lot of global
+    # state.  Can we capture it all?  For now these are the important ones.
+
+    set vars { CC_FOR_TARGET CXX_FOR_TARGET CFLAGS_FOR_TARGET }
+    foreach v $vars {
+	global $v
+	if {[info exists $v]} {
+	    set value [subst $$v]
+	    puts $f "$v: $value"
 	}
     }
 
-    proc _get_class_spec { spec name } {
-	foreach { key value } $spec {
-	    if { $key == $name } {
-		return $value
+    puts $f ""
+    _write_tcl_array self $f target_info
+    puts $f ""
+    _write_tcl_array self $f board_info
+}
+
+# Write all sideband non-file inputs, as well as OPTIONS to INPUTS_FILE.
+# If anything changes we want to recompile.
+
+proc _write_inputs_file { self_var dest inputs_file options } {
+    upvar 1 $self_var self
+    global env
+    set f [open $inputs_file "w"]
+    _write_tcl_array self $f self
+    puts $f ""
+    puts $f "options: $options"
+    puts $f "PATH: [getenv PATH]"
+    puts $f ""
+    _write_tcl_state self $f $dest
+    close $f
+}
+
+# Generate the sha1sum of all the inputs.
+# The result is a list of { error_code text }.
+# Upon success error_code is zero and text is the sha1sum.
+# Otherwise, error_code is non_zero and text is the error message.
+
+proc _gen_sha1sum_for_inputs { source_files header_files inputs } {
+    global srcdir subdir CAT_PROGRAM SHA1SUM_PROGRAM
+    set header_paths ""
+    foreach f $header_files {
+	switch -glob -- $f {
+	    "<*>" {
+		# skip
 	    }
-	}
-	switch $name {
-	    count {
-		return $GenPerfTest::DEFAULT_CLASS_COUNT
-	    }
-	    nr_members {
-		return $GenPerfTest::DEFAULT_CLASS_NR_MEMBERS
-	    }
-	    nr_static_members {
-		return $GenPerfTest::DEFAULT_CLASS_NR_STATIC_MEMBERS
-	    }
-	    nr_methods {
-		return $GenPerfTest::DEFAULT_CLASS_NR_METHODS
-	    }
-	    nr_inline_methods {
-		return $GenPerfTest::DEFAULT_CLASS_NR_INLINE_METHODS
-	    }
-	    nr_static_methods {
-		return $GenPerfTest::DEFAULT_CLASS_NR_STATIC_METHODS
-	    }
-	    nr_static_inline_methods {
-		return $GenPerfTest::DEFAULT_CLASS_NR_STATIC_INLINE_METHODS
+	    "*gdb.perf/outputs/*" {
+		# in build tree
+		append header_paths " $f"
 	    }
 	    default {
-		error "required class-spec not present: $name"
+		append header_paths " $srcdir/$subdir/$f"
 	    }
 	}
     }
+    verbose -log "_gen_sha1sum_for_inputs: summing $source_files $header_paths $inputs"
+    set catch_result [catch {exec $CAT_PROGRAM $source_files $header_paths $inputs | $SHA1SUM_PROGRAM} output]
+    return [list $catch_result $output]
+}
 
-    # SO_NR is the shlib number or "" for the binary.
-    # CU_NR is either the compilation unit number or "main".
-    # NAME is the "name" field from the class spec, which is
-    # { ns0 ns1 ... nsN class_name }.
-    # C is the iteration number, from the "count" field from the class spec.
+# Return the contents of TEXT_FILE.
+# It is assumed TEXT_FILE exists and is readable.
+# This is used for reading files containing sha1sums, the
+# last newline is removed.
 
-    proc _make_class_name { so_nr cu_nr name c } {
-	set class_name [lindex $name [expr {[llength $name] - 1}]]
-	if { "$so_nr" != "" } {
-	    set prefix "shlib${so_nr}_"
-	} else {
-	    set prefix ""
-	}
-	return "${prefix}cu_${cu_nr}_${class_name}_${c}"
+proc _read_file { text_file } {
+    set f [open $text_file "r"]
+    set result [read -nonewline $f]
+    close $f
+    return $result
+}
+
+# Write TEXT to TEXT_FILE.
+# It is assumed TEXT_FILE can be opened/created and written to.
+
+proc _write_file { text_file text } {
+    set f [open $text_file "w"]
+    puts $f $text
+    close $f
+}
+
+# Wrapper on gdb_compile* that computes sha1sums of inputs to decide
+# whether the compile is needed.
+# The result is the result of gdb_compile*: "" == success, otherwise
+# a compilation error occurred and the output is an error message.
+# This doesn't take all inputs into account, just the useful ones.
+# As an extension (or simplification) on gdb_compile*, if TYPE is
+# shlib then call gdb_compile_shlib, otherwise call gdb_compile.
+# Other possibilities *could* be handled this way, e.g., pthreads.  TBD.
+
+proc _perftest_compile { self_var source_files header_files dest type options } {
+    upvar 1 $self_var self
+    verbose -log "_perftest_compile $source_files $header_files $dest $type $options"
+    # To keep things simple, we put all non-file inputs into a file and
+    # then cat all input files through sha1sum.
+    set sha1sum_file ${dest}.sha1sum
+    set sha1new_file ${dest}.sha1new
+    set inputs_file ${dest}.inputs
+    global srcdir subdir
+    set all_options $options
+    lappend all_options "incdir=$srcdir/$subdir"
+    _write_inputs_file self $dest $inputs_file $all_options
+    set sha1sum [_gen_sha1sum_for_inputs $source_files $header_files $inputs_file]
+    if { [lindex $sha1sum 0] != 0 } {
+	return "sha1sum generation error: [lindex $sha1sum 1]"
     }
-
-    proc _make_namespace_name { name } {
-	if { "$name" == "anonymous" } {
+    set sha1sum [lindex $sha1sum 1]
+    if {![file exists $dest]} {
+	file delete $sha1sum_file
+    }
+    if {[file exists $sha1sum_file]} {
+	set last_sha1sum [_read_file $sha1sum_file]
+	verbose -log "last: $last_sha1sum, new: $sha1sum"
+	if { $sha1sum == $last_sha1sum } {
+	    verbose -log "using existing build for $dest"
 	    return ""
 	}
-	return $name
     }
+    # No such luck, we need to compile.
+    file delete $sha1sum_file
+    if { $type == "shlib" } {
+	set result [gdb_compile_shlib $source_files $dest $all_options]
+    } else {
+	set result [gdb_compile $source_files $dest $type $all_options]
+    }
+    if { $result == "" } {
+	_write_file $sha1sum_file $sha1sum
+	verbose -log "wrote sha1sum: $sha1sum"
+    }
+    return $result
+}
 
-    proc _write_class_definitions { self_var f static run_nr so_nr cu_nr } {
-	upvar 1 $self_var self
-	set class_specs [_get_param $self(class_specs) $run_nr]
-	foreach spec $class_specs {
-	    set count [_get_class_spec $spec count]
-	    set name [_get_class_spec $spec name]
-	    set nr_members [_get_class_spec $spec nr_members]
-	    set nr_static_members [_get_class_spec $spec nr_static_members]
-	    set nr_methods [_get_class_spec $spec nr_methods]
-	    set nr_static_methods [_get_class_spec $spec nr_static_methods]
-	    set depth [expr {[llength $name] - 1}]
-	    for { set c 0 } { $c < $count } { incr c } {
-		puts $f ""
-		for { set i 0 } { $i < $depth } { incr i } {
-		    puts $f "namespace [_make_namespace_name [lindex $name $i]]"
-		    puts $f "\{"
-		    puts $f ""
-		}
-		set class_name [_make_class_name $so_nr $cu_nr $name $c]
-		puts $f "class $class_name"
-		puts $f "\{"
-		puts $f " public:"
-		for { set i 0 } { $i < $nr_members } { incr i } {
-		    puts $f "  int member_$i;"
-		}
-		for { set i 0 } { $i < $nr_static_members } { incr i } {
-		    # Rather than parameterize the number of const/non-const
-		    # members, and their types, we keep it simple for now.
-		    if { $i % 2 == 0 } {
-			puts $f "  static const int static_member_$i = $i;"
-		    } else {
-			puts $f "  static int static_member_$i;"
-		    }
-		}
-		for { set i 0 } { $i < $nr_methods } { incr i } {
-		    puts $f "  void method_$i (void);"
-		}
-		for { set i 0 } { $i < $nr_static_methods } { incr i } {
-		    puts $f "  static void static_method_$i (void);"
-		}
-		_write_inline_methods self $f $so_nr $cu_nr $spec $c
-		_write_static_inline_methods self $f $so_nr $cu_nr $spec $c
-		puts $f "\};"
-		for { set i [expr {$depth - 1}] } { $i >= 0 } { incr i -1 } {
-		    puts $f ""
-		    puts $f "\} // [lindex $name $i]"
-		}
-	    }
+proc _compile_binary_pieces { self_var worker_nr static run_nr } {
+    upvar 1 $self_var self
+    set compile_options [_compile_options self]
+    set nr_compunits [_get_param $self(nr_compunits) $run_nr]
+    set extra_headers [_get_param $self(binary_extra_headers) $run_nr]
+    global PERF_TEST_COMPILE_PARALLELISM
+    set nr_workers $PERF_TEST_COMPILE_PARALLELISM
+    # Generate the source first so we can more easily measure how long that
+    # takes.  [It doesn't take hardly any time at all, relative to the time
+    # it takes to compile it, but this will provide numbers to show that.]
+    set todo_list [_gen_binary_source self $worker_nr $static $run_nr]
+    verbose -log "GenPerfTest::_compile_binary_pieces worker $worker_nr run $run_nr, started [timestamp -format %c]"
+    foreach elm $todo_list {
+	set source_file [lindex $elm 0]
+	set header_file [lindex $elm 1]
+	set object_file [lindex $elm 2]
+	set all_header_files $extra_headers
+	lappend all_header_files $header_file
+	set compile_result [_perftest_compile self $source_file $all_header_files $object_file object $compile_options]
+	if { $compile_result != "" } {
+	    verbose -log "GenPerfTest::_compile_binary_pieces worker $worker_nr run $run_nr, failed [timestamp -format %c]"
+	    verbose -log $compile_result
+	    return -1
 	}
     }
+    verbose -log "GenPerfTest::_compile_binary_pieces worker $worker_nr run $run_nr, done [timestamp -format %c]"
+    return 0
+}
 
-    proc _write_inline_methods { self_var f so_nr cu_nr spec c } {
-	upvar 1 $self_var self
-	set name [_get_class_spec $spec name]
-	set nr_inline_methods [_get_class_spec $spec nr_inline_methods]
-	for { set i 0 } { $i < $nr_inline_methods } { incr i } {
-	    puts $f "  void inline_method_$i (void) { }"
-	}
+# Helper function to compile the pieces of a shlib.
+# Note: gdb_compile_shlib{,_pthreads} don't support first building object
+# files and then building the shlib.  Therefore our hands are tied, and we
+# just build the shlib in one step.  This is less of a parallelization
+# problem if there are multiple shlibs: Each worker can build a different
+# shlib.  If this proves to be a problem in practice we can enhance
+# gdb_compile_shlib* then.
+
+proc _compile_shlib { self_var static run_nr so_nr } {
+    upvar 1 $self_var self
+    set files [_gen_shlib_source self $static $run_nr $so_nr]
+    set source_files [lindex $files 0]
+    set header_files [lindex $files 1]
+    set extra_headers [_get_param $self(gen_shlib_extra_headers) $run_nr]
+    set shlib_file [_make_shlib_name self $static $run_nr $so_nr]
+    set compile_options "[_compile_options self] additional_flags=-DSHLIB=$so_nr"
+    set all_header_files $header_files
+    append all_header_files $extra_headers
+    set compile_result [_perftest_compile self $source_files $all_header_files $shlib_file shlib $compile_options]
+    if { $compile_result != "" } {
+	verbose -log "_compile_shlib failed: $compile_result"
+	return -1
     }
+    return 0
+}
 
-    proc _write_static_inline_methods { self_var f so_nr cu_nr spec c } {
-	upvar 1 $self_var self
-	set name [_get_class_spec $spec name]
-	set nr_static_inline_methods [_get_class_spec $spec nr_static_inline_methods]
-	for { set i 0 } { $i < $nr_static_inline_methods } { incr i } {
-	    puts $f "  static void static_inline_method_$i (void) { }"
-	}
+proc _gen_tail_shlib_source { self_var static run_nr } {
+    upvar 1 $self_var self
+    verbose -log "GenPerfTest::_gen_tail_shlib_source run $run_nr"
+    set source_files [_get_param $self(tail_shlib_sources) $run_nr]
+    if { [llength $source_files] == 0 } {
+	return ""
     }
-
-    proc _write_class_implementations { self_var f static run_nr so_nr cu_nr } {
-	upvar 1 $self_var self
-	set class_specs [_get_param $self(class_specs) $run_nr]
-	foreach spec $class_specs {
-	    set count [_get_class_spec $spec count]
-	    set name [_get_class_spec $spec name]
-	    set depth [expr {[llength $name] - 1}]
-	    for { set c 0 } { $c < $count } { incr c } {
-		for { set i 0 } { $i < $depth } { incr i } {
-		    puts $f ""
-		    puts $f "namespace [_make_namespace_name [lindex $name $i]]"
-		    puts $f "\{"
-		}
-		_write_static_members self $f $so_nr $cu_nr $spec $c
-		_write_methods self $f $so_nr $cu_nr $spec $c
-		_write_static_methods self $f $so_nr $cu_nr $spec $c
-		for { set i [expr {$depth - 1}] } { $i >= 0 } { incr i -1 } {
-		    puts $f ""
-		    puts $f "\} // [lindex $name $i]"
-		}
-	    }
-	}
+    set result ""
+    foreach source_name $source_files {
+	lappend result [_gen_shlib_common_source self $static $run_nr tail $source_name]
     }
+    return $result
+}
 
-    proc _write_static_members { self_var f so_nr cu_nr spec c } {
-	upvar 1 $self_var self
-	set name [_get_class_spec $spec name]
-	set nr_static_members [_get_class_spec $spec nr_static_members]
-	set class_name [_make_class_name $so_nr $cu_nr $name $c]
-	puts $f ""
-	# Rather than parameterize the number of const/non-const
-	# members, and their types, we keep it simple for now.
-	for { set i 0 } { $i < $nr_static_members } { incr i } {
-	    if { $i % 2 == 0 } {
-		# Static const members are initialized inline.
-	    } else {
-		puts $f "int ${class_name}::static_member_$i = $i;"
-	    }
-	}
+proc _make_tail_shlib_name { self_var static run_nr } {
+    upvar 1 $self_var self
+    set source_files [_get_param $self(tail_shlib_sources) $run_nr]
+    if { [llength $source_files] == 0 } {
+	return ""
     }
+    return [_make_shlib_name self $static $run_nr "tail"]
+}
 
-    proc _write_methods { self_var f so_nr cu_nr spec c } {
-	upvar 1 $self_var self
-	set name [_get_class_spec $spec name]
-	set nr_methods [_get_class_spec $spec nr_methods]
-	set class_name [_make_class_name $so_nr $cu_nr $name $c]
-	for { set i 0 } { $i < $nr_methods } { incr i } {
-	    puts $f ""
-	    puts $f "void"
-	    puts $f "${class_name}::method_$i (void)"
-	    puts $f "{"
-	    puts $f "}"
-	}
+# Helper function to compile the tail shlib, if it's specified.
+
+proc _compile_tail_shlib { self_var static run_nr } {
+    upvar 1 $self_var self
+    set source_files [_gen_tail_shlib_source self $static $run_nr]
+    if { [llength $source_files] == 0 } {
+	return 0
     }
-
-    proc _write_static_methods { self_var f so_nr cu_nr spec c } {
-	upvar 1 $self_var self
-	set name [_get_class_spec $spec name]
-	set nr_static_methods [_get_class_spec $spec nr_static_methods]
-	set class_name [_make_class_name $so_nr $cu_nr $name $c]
-	for { set i 0 } { $i < $nr_static_methods } { incr i } {
-	    puts $f ""
-	    puts $f "void"
-	    puts $f "${class_name}::static_method_$i (void)"
-	    puts $f "{"
-	    puts $f "}"
-	}
+    set header_files [_get_param $self(tail_shlib_headers) $run_nr]
+    set shlib_file [_make_tail_shlib_name self $static $run_nr]
+    set compile_options [_compile_options self]
+    set compile_result [_perftest_compile self $source_files $header_files $shlib_file shlib $compile_options]
+    if { $compile_result != "" } {
+	verbose -log "_compile_tail_shlib failed: $compile_result"
+	return -1
     }
+    verbose -log "_compile_tail_shlib failed: succeeded"
+    return 0
+}
 
-    proc _gen_compunit_header { self_var static run_nr so_nr cu_nr } {
-	upvar 1 $self_var self
-	set header_file [_make_header_name self $static $run_nr $so_nr $cu_nr]
-	set f [_create_file self $header_file]
-	_write_intro self $f
-	set header_macro [_make_header_macro "HEADER_CU" $cu_nr]
-	puts $f ""
-	puts $f "#ifndef $header_macro"
-	puts $f "#define $header_macro"
-	if {[_classes_enabled_p self $run_nr]} {
-	    _write_class_definitions self $f $static $run_nr $so_nr $cu_nr
-	}
-	puts $f ""
-	puts $f "#endif // $header_macro"
-	close $f
-	return $header_file
-    }
+# Compile the pieces of the binary and possible shlibs for the test.
+# The result is 0 for success, -1 for failure.
 
-    proc _gen_binary_compunit_source { self_var static run_nr cu_nr } {
-	upvar 1 $self_var self
-	set source_file [_make_source_name self $static $run_nr "" $cu_nr]
-	set f [_create_file self $source_file]
-	_write_intro self $f
-	_write_includes self $f [_get_param $self(binary_extra_headers) $run_nr]
-	set header_file [_make_header_basename self $static $run_nr "" $cu_nr]
-	puts $f "#include \"$header_file\""
-	_write_static_globals self $f $run_nr
-	_write_extern_globals self $f $run_nr "" $cu_nr
-	_write_static_functions self $f $run_nr
-	_write_extern_functions self $f $run_nr "" $cu_nr
-	if {[_classes_enabled_p self $run_nr]} {
-	    _write_class_implementations self $f $static $run_nr "" $cu_nr
-	}
-	close $f
-	return $source_file
-    }
-
-    # Generate the sources for the pieces of the binary.
-    # The result is a list of source file names and accompanying object file
-    # names.  The pieces are split across workers.
-    # E.g., with 10 workers the result for worker 0 is
-    # { { source0 header0 object0 } { source10 header10 object10 } ... }
-
-    proc _gen_binary_source { self_var worker_nr static run_nr } {
-	upvar 1 $self_var self
-	verbose -log "GenPerfTest::_gen_binary_source worker $worker_nr run $run_nr, started [timestamp -format %c]"
-	set nr_compunits [_get_param $self(nr_compunits) $run_nr]
-	global PERF_TEST_COMPILE_PARALLELISM
-	set nr_workers $PERF_TEST_COMPILE_PARALLELISM
-	set result {}
-	for { set cu_nr $worker_nr } { $cu_nr < $nr_compunits } { incr cu_nr $nr_workers } {
-	    set header_file [_gen_compunit_header self $static $run_nr "" $cu_nr]
-	    set source_file [_gen_binary_compunit_source self $static $run_nr $cu_nr]
-	    set object_file [_make_binary_object_name self $static $run_nr $cu_nr]
-	    lappend result [list $source_file $header_file $object_file]
-	}
-	verbose -log "GenPerfTest::_gen_binary_source worker $worker_nr run $run_nr, done [timestamp -format %c]"
-	return $result
-    }
-
-    proc _gen_shlib_compunit_source { self_var static run_nr so_nr cu_nr } {
-	upvar 1 $self_var self
-	set source_file [_make_source_name self $static $run_nr $so_nr $cu_nr]
-	set f [_create_file self $source_file]
-	_write_intro self $f
-	_write_includes self $f [_get_param $self(gen_shlib_extra_headers) $run_nr]
-	set header_file [_make_header_basename self $static $run_nr $so_nr $cu_nr]
-	puts $f "#include \"$header_file\""
-	_write_static_globals self $f $run_nr
-	_write_extern_globals self $f $run_nr "shlib${so_nr}_" $cu_nr
-	_write_static_functions self $f $run_nr
-	_write_extern_functions self $f $run_nr "shlib${so_nr}_" $cu_nr
-	if {[_classes_enabled_p self $run_nr]} {
-	    _write_class_implementations self $f $static $run_nr $so_nr $cu_nr
-	}
-	close $f
-	return $source_file
-    }
-
-    # CU_NAME is a name from gen_shlib_extra_sources or tail_shlib_sources.
-
-    proc _make_shlib_common_source_name { self_var static run_nr so_nr cu_name } {
-	upvar 1 $self_var self
-	if { !$static } {
-	    set run_name [_get_param $self(run_names) $run_nr]
-	    set source_name "${run_name}-lib${so_nr}-${cu_name}"
-	} else {
-	    set source_name "lib${so_nr}-${cu_name}"
-	}
-	return "[_make_object_dir_name self $static $run_nr]/[_convert_spaces $source_name]"
-    }
-
-    # N.B. gdb_compile_shlib doesn't support parallel builds of shlibs from
-    # common sources: the .o file path will be the same across all shlibs.
-    # gen_shlib_extra_sources may be common across all shlibs but they're each
-    # compiled with -DSHLIB=$SHLIB so we need different .o files for each
-    # shlib, and therefore we need different source files for each shlib.
-    # If this turns out to be too cumbersome we can augment gdb_compile_shlib.
-
-    proc _gen_shlib_common_source { self_var static run_nr so_nr source_name } {
-	upvar 1 $self_var self
-	global srcdir
-	set source_file [_make_shlib_common_source_name self $static $run_nr $so_nr $source_name]
-	file copy -force "$srcdir/gdb.perf/$source_name" ${source_file}
-	return $source_file
-    }
-
-    # Generate the sources for a shared library.
-    # The result is a list of source and header file names.
-    # E.g., { { source0 source1 ... common0 ... } { header0 header1 ... } }
-
-    proc _gen_shlib_source { self_var static run_nr so_nr } {
-	upvar 1 $self_var self
-	verbose -log "GenPerfTest::_gen_shlib_source run $run_nr so $so_nr, started [timestamp -format %c]"
-	set headers {}
-	set sources {}
-	set nr_compunits [_get_param $self(nr_compunits) $run_nr]
-	for { set cu_nr 0 } { $cu_nr < $nr_compunits } { incr cu_nr } {
-	    lappend headers [_gen_compunit_header self $static $run_nr $so_nr $cu_nr]
-	    lappend sources [_gen_shlib_compunit_source self $static $run_nr $so_nr $cu_nr]
-	}
-	foreach source_name [_get_param $self(gen_shlib_extra_sources) $run_nr] {
-	    lappend sources [_gen_shlib_common_source self $static $run_nr $so_nr $source_name]
-	}
-	verbose -log "GenPerfTest::_gen_shlib_source run $run_nr so $so_nr, done [timestamp -format %c]"
-	return [list $sources $headers]
-    }
-
-    # Write Tcl array ARRAY_NAME to F.
-
-    proc _write_tcl_array { self_var f array_name } {
-	upvar 1 $self_var self
-	if { "$array_name" != "$self_var" } {
-	    global $array_name
-	}
-	puts $f "== $array_name =="
-	foreach { name value } [array get $array_name] {
-	    puts $f "$name: $value"
-	}
-    }
-
-    # Write global Tcl state used for compilation to F.
-    # If anything changes we want to recompile.
-
-    proc _write_tcl_state { self_var f dest } {
-	upvar 1 $self_var self
-
-	# TODO(dje): gdb_default_target_compile references a lot of global
-	# state.  Can we capture it all?  For now these are the important ones.
-
-	set vars { CC_FOR_TARGET CXX_FOR_TARGET CFLAGS_FOR_TARGET }
-	foreach v $vars {
-	    global $v
-	    if {[info exists $v]} {
-		set value [subst $$v]
-		puts $f "$v: $value"
-	    }
-	}
-
-	puts $f ""
-	_write_tcl_array self $f target_info
-	puts $f ""
-	_write_tcl_array self $f board_info
-    }
-
-    # Write all sideband non-file inputs, as well as OPTIONS to INPUTS_FILE.
-    # If anything changes we want to recompile.
-
-    proc _write_inputs_file { self_var dest inputs_file options } {
-	upvar 1 $self_var self
-	global env
-	set f [open $inputs_file "w"]
-	_write_tcl_array self $f self
-	puts $f ""
-	puts $f "options: $options"
-	puts $f "PATH: [getenv PATH]"
-	puts $f ""
-	_write_tcl_state self $f $dest
-	close $f
-    }
-
-    # Generate the sha1sum of all the inputs.
-    # The result is a list of { error_code text }.
-    # Upon success error_code is zero and text is the sha1sum.
-    # Otherwise, error_code is non_zero and text is the error message.
-
-    proc _gen_sha1sum_for_inputs { source_files header_files inputs } {
-	global srcdir subdir CAT_PROGRAM SHA1SUM_PROGRAM
-	set header_paths ""
-	foreach f $header_files {
-	    switch -glob -- $f {
-		"<*>" {
-		    # skip
-		}
-		"*gdb.perf/outputs/*" {
-		    # in build tree
-		    append header_paths " $f"
-		}
-		default {
-		    append header_paths " $srcdir/$subdir/$f"
-		}
-	    }
-	}
-	verbose -log "_gen_sha1sum_for_inputs: summing $source_files $header_paths $inputs"
-	set catch_result [catch {exec $CAT_PROGRAM $source_files $header_paths $inputs | $SHA1SUM_PROGRAM} output]
-	return [list $catch_result $output]
-    }
-
-    # Return the contents of TEXT_FILE.
-    # It is assumed TEXT_FILE exists and is readable.
-    # This is used for reading files containing sha1sums, the
-    # last newline is removed.
-
-    proc _read_file { text_file } {
-	set f [open $text_file "r"]
-	set result [read -nonewline $f]
-	close $f
-	return $result
-    }
-
-    # Write TEXT to TEXT_FILE.
-    # It is assumed TEXT_FILE can be opened/created and written to.
-
-    proc _write_file { text_file text } {
-	set f [open $text_file "w"]
-	puts $f $text
-	close $f
-    }
-
-    # Wrapper on gdb_compile* that computes sha1sums of inputs to decide
-    # whether the compile is needed.
-    # The result is the result of gdb_compile*: "" == success, otherwise
-    # a compilation error occurred and the output is an error message.
-    # This doesn't take all inputs into account, just the useful ones.
-    # As an extension (or simplification) on gdb_compile*, if TYPE is
-    # shlib then call gdb_compile_shlib, otherwise call gdb_compile.
-    # Other possibilities *could* be handled this way, e.g., pthreads.  TBD.
-
-    proc _perftest_compile { self_var source_files header_files dest type options } {
-	upvar 1 $self_var self
-	verbose -log "_perftest_compile $source_files $header_files $dest $type $options"
-	# To keep things simple, we put all non-file inputs into a file and
-	# then cat all input files through sha1sum.
-	set sha1sum_file ${dest}.sha1sum
-	set sha1new_file ${dest}.sha1new
-	set inputs_file ${dest}.inputs
-	global srcdir subdir
-	set all_options $options
-	lappend all_options "incdir=$srcdir/$subdir"
-	_write_inputs_file self $dest $inputs_file $all_options
-	set sha1sum [_gen_sha1sum_for_inputs $source_files $header_files $inputs_file]
-	if { [lindex $sha1sum 0] != 0 } {
-	    return "sha1sum generation error: [lindex $sha1sum 1]"
-	}
-	set sha1sum [lindex $sha1sum 1]
-	if {![file exists $dest]} {
-	    file delete $sha1sum_file
-	}
-	if {[file exists $sha1sum_file]} {
-	    set last_sha1sum [_read_file $sha1sum_file]
-	    verbose -log "last: $last_sha1sum, new: $sha1sum"
-	    if { $sha1sum == $last_sha1sum } {
-		verbose -log "using existing build for $dest"
-		return ""
-	    }
-	}
-	# No such luck, we need to compile.
-	file delete $sha1sum_file
-	if { $type == "shlib" } {
-	    set result [gdb_compile_shlib $source_files $dest $all_options]
-	} else {
-	    set result [gdb_compile $source_files $dest $type $all_options]
-	}
-	if { $result == "" } {
-	    _write_file $sha1sum_file $sha1sum
-	    verbose -log "wrote sha1sum: $sha1sum"
-	}
-	return $result
-    }
-
-    proc _compile_binary_pieces { self_var worker_nr static run_nr } {
-	upvar 1 $self_var self
-	set compile_options [_compile_options self]
-	set nr_compunits [_get_param $self(nr_compunits) $run_nr]
-	set extra_headers [_get_param $self(binary_extra_headers) $run_nr]
-	global PERF_TEST_COMPILE_PARALLELISM
-	set nr_workers $PERF_TEST_COMPILE_PARALLELISM
-	# Generate the source first so we can more easily measure how long that
-	# takes.  [It doesn't take hardly any time at all, relative to the time
-	# it takes to compile it, but this will provide numbers to show that.]
-	set todo_list [_gen_binary_source self $worker_nr $static $run_nr]
-	verbose -log "GenPerfTest::_compile_binary_pieces worker $worker_nr run $run_nr, started [timestamp -format %c]"
-	foreach elm $todo_list {
-	    set source_file [lindex $elm 0]
-	    set header_file [lindex $elm 1]
-	    set object_file [lindex $elm 2]
-	    set all_header_files $extra_headers
-	    lappend all_header_files $header_file
-	    set compile_result [_perftest_compile self $source_file $all_header_files $object_file object $compile_options]
-	    if { $compile_result != "" } {
-		verbose -log "GenPerfTest::_compile_binary_pieces worker $worker_nr run $run_nr, failed [timestamp -format %c]"
-		verbose -log $compile_result
+proc _compile_pieces { self_var worker_nr } {
+    upvar 1 $self_var self
+    global PERF_TEST_COMPILE_PARALLELISM
+    set nr_workers $PERF_TEST_COMPILE_PARALLELISM
+    set nr_runs [llength $self(run_names)]
+    set static [_static_object_files_p self]
+    verbose -log "_compile_pieces: static flag: $static"
+    file mkdir "[file dirname $self(binfile)]/pieces"
+    if {$static} {
+	# All the generated pieces look the same (run over run) so just
+	# build all the shlibs of the last run (which is the largest).
+	set last_run [expr {$nr_runs - 1}]
+	set nr_gen_shlibs [_get_param $self(nr_gen_shlibs) $last_run]
+	set object_dir [_make_object_dir_name self $static ignored]
+	file mkdir $object_dir
+	for { set so_nr $worker_nr } { $so_nr < $nr_gen_shlibs } { incr so_nr $nr_workers } {
+	    if { [_compile_shlib self $static $last_run $so_nr] < 0 } {
 		return -1
 	    }
 	}
-	verbose -log "GenPerfTest::_compile_binary_pieces worker $worker_nr run $run_nr, done [timestamp -format %c]"
-	return 0
-    }
-
-    # Helper function to compile the pieces of a shlib.
-    # Note: gdb_compile_shlib{,_pthreads} don't support first building object
-    # files and then building the shlib.  Therefore our hands are tied, and we
-    # just build the shlib in one step.  This is less of a parallelization
-    # problem if there are multiple shlibs: Each worker can build a different
-    # shlib.  If this proves to be a problem in practice we can enhance
-    # gdb_compile_shlib* then.
-
-    proc _compile_shlib { self_var static run_nr so_nr } {
-	upvar 1 $self_var self
-	set files [_gen_shlib_source self $static $run_nr $so_nr]
-	set source_files [lindex $files 0]
-	set header_files [lindex $files 1]
-	set extra_headers [_get_param $self(gen_shlib_extra_headers) $run_nr]
-	set shlib_file [_make_shlib_name self $static $run_nr $so_nr]
-	set compile_options "[_compile_options self] additional_flags=-DSHLIB=$so_nr"
-	set all_header_files $header_files
-	append all_header_files $extra_headers
-	set compile_result [_perftest_compile self $source_files $all_header_files $shlib_file shlib $compile_options]
-	if { $compile_result != "" } {
-	    verbose -log "_compile_shlib failed: $compile_result"
+	# We don't shard building of tail-shlib, so only build it once.
+	if { $worker_nr == 0 } {
+	    if { [_compile_tail_shlib self $static $last_run] < 0 } {
+		return -1
+	    }
+	}
+	if { [_compile_binary_pieces self $worker_nr $static $last_run] < 0 } {
 	    return -1
 	}
-	return 0
-    }
-
-    proc _gen_tail_shlib_source { self_var static run_nr } {
-	upvar 1 $self_var self
-	verbose -log "GenPerfTest::_gen_tail_shlib_source run $run_nr"
-	set source_files [_get_param $self(tail_shlib_sources) $run_nr]
-	if { [llength $source_files] == 0 } {
-	    return ""
-	}
-	set result ""
-	foreach source_name $source_files {
-	    lappend result [_gen_shlib_common_source self $static $run_nr tail $source_name]
-	}
-	return $result
-    }
-
-    proc _make_tail_shlib_name { self_var static run_nr } {
-	upvar 1 $self_var self
-	set source_files [_get_param $self(tail_shlib_sources) $run_nr]
-	if { [llength $source_files] == 0 } {
-	    return ""
-	}
-	return [_make_shlib_name self $static $run_nr "tail"]
-    }
-
-    # Helper function to compile the tail shlib, if it's specified.
-
-    proc _compile_tail_shlib { self_var static run_nr } {
-	upvar 1 $self_var self
-	set source_files [_gen_tail_shlib_source self $static $run_nr]
-	if { [llength $source_files] == 0 } {
-	    return 0
-	}
-	set header_files [_get_param $self(tail_shlib_headers) $run_nr]
-	set shlib_file [_make_tail_shlib_name self $static $run_nr]
-	set compile_options [_compile_options self]
-	set compile_result [_perftest_compile self $source_files $header_files $shlib_file shlib $compile_options]
-	if { $compile_result != "" } {
-	    verbose -log "_compile_tail_shlib failed: $compile_result"
-	    return -1
-	}
-	verbose -log "_compile_tail_shlib failed: succeeded"
-	return 0
-    }
-
-    # Compile the pieces of the binary and possible shlibs for the test.
-    # The result is 0 for success, -1 for failure.
-
-    proc _compile_pieces { self_var worker_nr } {
-	upvar 1 $self_var self
-	global PERF_TEST_COMPILE_PARALLELISM
-	set nr_workers $PERF_TEST_COMPILE_PARALLELISM
-	set nr_runs [llength $self(run_names)]
-	set static [_static_object_files_p self]
-	verbose -log "_compile_pieces: static flag: $static"
-	file mkdir "[file dirname $self(binfile)]/pieces"
-	if {$static} {
-	    # All the generated pieces look the same (run over run) so just
-	    # build all the shlibs of the last run (which is the largest).
-	    set last_run [expr {$nr_runs - 1}]
-	    set nr_gen_shlibs [_get_param $self(nr_gen_shlibs) $last_run]
-	    set object_dir [_make_object_dir_name self $static ignored]
+    } else {
+	for { set run_nr 0 } { $run_nr < $nr_runs } { incr run_nr } {
+	    set nr_gen_shlibs [_get_param $self(nr_gen_shlibs) $run_nr]
+	    set object_dir [_make_object_dir_name self $static $run_nr]
 	    file mkdir $object_dir
 	    for { set so_nr $worker_nr } { $so_nr < $nr_gen_shlibs } { incr so_nr $nr_workers } {
-		if { [_compile_shlib self $static $last_run $so_nr] < 0 } {
+		if { [_compile_shlib self $static $run_nr $so_nr] < 0 } {
 		    return -1
 		}
 	    }
 	    # We don't shard building of tail-shlib, so only build it once.
 	    if { $worker_nr == 0 } {
-		if { [_compile_tail_shlib self $static $last_run] < 0 } {
+		if { [_compile_tail_shlib self $static $run_nr] < 0 } {
 		    return -1
 		}
 	    }
-	    if { [_compile_binary_pieces self $worker_nr $static $last_run] < 0 } {
-		return -1
-	    }
-	} else {
-	    for { set run_nr 0 } { $run_nr < $nr_runs } { incr run_nr } {
-		set nr_gen_shlibs [_get_param $self(nr_gen_shlibs) $run_nr]
-		set object_dir [_make_object_dir_name self $static $run_nr]
-		file mkdir $object_dir
-		for { set so_nr $worker_nr } { $so_nr < $nr_gen_shlibs } { incr so_nr $nr_workers } {
-		    if { [_compile_shlib self $static $run_nr $so_nr] < 0 } {
-			return -1
-		    }
-		}
-		# We don't shard building of tail-shlib, so only build it once.
-		if { $worker_nr == 0 } {
-		    if { [_compile_tail_shlib self $static $run_nr] < 0 } {
-			return -1
-		    }
-		}
-		if { [_compile_binary_pieces self $worker_nr $static $run_nr] < 0 } {
-		    return -1
-		}
-	    }
-	}
-	return 0
-    }
-
-    # Main function invoked by each worker.
-    # This builds all the things that are possible to build in parallel,
-    # sharded up among all the workers.
-
-    proc compile_pieces { self_var worker_nr } {
-	upvar 1 $self_var self
-	verbose -log "GenPerfTest::compile_pieces worker $worker_nr, started [timestamp -format %c]"
-	verbose -log "self: [array get self]"
-	_verify_testcase self
-	if { [_compile_pieces self $worker_nr] < 0 } {
-	    verbose -log "GenPerfTest::compile_pieces worker $worker_nr, failed [timestamp -format %c]"
-	    return -1
-	}
-	verbose -log "GenPerfTest::compile_pieces worker $worker_nr, done [timestamp -format %c]"
-	return 0
-    }
-
-    proc _make_shlib_options { self_var static run_nr } {
-	upvar 1 $self_var self
-	set nr_gen_shlibs [_get_param $self(nr_gen_shlibs) $run_nr]
-	set result ""
-	for { set i 0 } { $i < $nr_gen_shlibs } { incr i } {
-	    lappend result "shlib=[_make_shlib_name self $static $run_nr $i]"
-	}
-	set tail_shlib_name [_make_tail_shlib_name self $static $run_nr]
-	if { "$tail_shlib_name" != "" } {
-	    lappend result "shlib=$tail_shlib_name"
-	}
-	return $result
-    }
-
-    proc _compile_binary { self_var static run_nr } {
-	upvar 1 $self_var self
-	set input_files [_make_binary_input_file_names self $static $run_nr]
-	set extra_headers [_get_param $self(binary_extra_headers) $run_nr]
-	set binary_file [_make_binary_name self $run_nr]
-	set compile_options [_compile_options self]
-	set shlib_options [_make_shlib_options self $static $run_nr]
-	if { [llength $shlib_options] > 0 } {
-	    append compile_options " " $shlib_options
-	}
-	set compile_result [_perftest_compile self $input_files $extra_headers $binary_file executable $compile_options]
-	if { $compile_result != "" } {
-	    verbose -log "_compile_binary failed: $compile_result"
-	    return -1
-	}
-	return 0
-    }
-
-    # Helper function for compile.
-    # The result is 0 for success, -1 for failure.
-
-    proc _compile { self_var } {
-	upvar 1 $self_var self
-	set nr_runs [llength $self(run_names)]
-	set static [_static_object_files_p self]
-	verbose -log "_compile: static flag: $static"
-	for { set run_nr 0 } { $run_nr < $nr_runs } { incr run_nr } {
-	    if { [_compile_binary self $static $run_nr] < 0 } {
+	    if { [_compile_binary_pieces self $worker_nr $static $run_nr] < 0 } {
 		return -1
 	    }
 	}
-	return 0
     }
+    return 0
+}
 
-    # Main function to compile the test program.
-    # It is assumed all the pieces of the binary (all the .o's, except those
-    # from test-supplied sources) have already been built with compile_pieces.
-    # There's no need to compile any shlibs here, as compile_pieces will have
-    # already built them too.
-    # The result is 0 for success, -1 for failure.
+# Main function invoked by each worker.
+# This builds all the things that are possible to build in parallel,
+# sharded up among all the workers.
 
-    proc compile { self_var } {
-	upvar 1 $self_var self
-	verbose -log "GenPerfTest::compile, started [timestamp -format %c]"
-	verbose -log "self: [array get self]"
-	_verify_testcase self
-	if { [_compile self] < 0 } {
-	    verbose -log "GenPerfTest::compile, failed [timestamp -format %c]"
+proc compile_pieces { self_var worker_nr } {
+    upvar 1 $self_var self
+    verbose -log "GenPerfTest::compile_pieces worker $worker_nr, started [timestamp -format %c]"
+    verbose -log "self: [array get self]"
+    _verify_testcase self
+    if { [_compile_pieces self $worker_nr] < 0 } {
+	verbose -log "GenPerfTest::compile_pieces worker $worker_nr, failed [timestamp -format %c]"
+	return -1
+    }
+    verbose -log "GenPerfTest::compile_pieces worker $worker_nr, done [timestamp -format %c]"
+    return 0
+}
+
+proc _make_shlib_options { self_var static run_nr } {
+    upvar 1 $self_var self
+    set nr_gen_shlibs [_get_param $self(nr_gen_shlibs) $run_nr]
+    set result ""
+    for { set i 0 } { $i < $nr_gen_shlibs } { incr i } {
+	lappend result "shlib=[_make_shlib_name self $static $run_nr $i]"
+    }
+    set tail_shlib_name [_make_tail_shlib_name self $static $run_nr]
+    if { "$tail_shlib_name" != "" } {
+	lappend result "shlib=$tail_shlib_name"
+    }
+    return $result
+}
+
+proc _compile_binary { self_var static run_nr } {
+    upvar 1 $self_var self
+    set input_files [_make_binary_input_file_names self $static $run_nr]
+    set extra_headers [_get_param $self(binary_extra_headers) $run_nr]
+    set binary_file [_make_binary_name self $run_nr]
+    set compile_options [_compile_options self]
+    set shlib_options [_make_shlib_options self $static $run_nr]
+    if { [llength $shlib_options] > 0 } {
+	append compile_options " " $shlib_options
+    }
+    set compile_result [_perftest_compile self $input_files $extra_headers $binary_file executable $compile_options]
+    if { $compile_result != "" } {
+	verbose -log "_compile_binary failed: $compile_result"
+	return -1
+    }
+    return 0
+}
+
+# Helper function for compile.
+# The result is 0 for success, -1 for failure.
+
+proc _compile { self_var } {
+    upvar 1 $self_var self
+    set nr_runs [llength $self(run_names)]
+    set static [_static_object_files_p self]
+    verbose -log "_compile: static flag: $static"
+    for { set run_nr 0 } { $run_nr < $nr_runs } { incr run_nr } {
+	if { [_compile_binary self $static $run_nr] < 0 } {
 	    return -1
 	}
-	verbose -log "GenPerfTest::compile, done [timestamp -format %c]"
-	return 0
     }
+    return 0
+}
 
-    # Main function for running a test.
-    # It is assumed that the test program has already been built.
+# Main function to compile the test program.
+# It is assumed all the pieces of the binary (all the .o's, except those
+# from test-supplied sources) have already been built with compile_pieces.
+# There's no need to compile any shlibs here, as compile_pieces will have
+# already built them too.
+# The result is 0 for success, -1 for failure.
 
-    proc run { builder_exp_file_name make_config_thunk_name py_file_name test_class_name } {
-	verbose -log "GenPerfTest::run, started [timestamp -format %c]"
-	verbose -log "GenPerfTest::run, $builder_exp_file_name $make_config_thunk_name $py_file_name $test_class_name"
+proc compile { self_var } {
+    upvar 1 $self_var self
+    verbose -log "GenPerfTest::compile, started [timestamp -format %c]"
+    verbose -log "self: [array get self]"
+    _verify_testcase self
+    if { [_compile self] < 0 } {
+	verbose -log "GenPerfTest::compile, failed [timestamp -format %c]"
+	return -1
+    }
+    verbose -log "GenPerfTest::compile, done [timestamp -format %c]"
+    return 0
+}
 
-	set testprog [file rootname $builder_exp_file_name]
+# Main function for running a test.
+# It is assumed that the test program has already been built.
 
-	# This variable is required by perftest.exp.
-	# This isn't the name of the test program, it's the name of the .py
-	# test.  The harness assumes they are the same, which is not the case
-	# here.
-	global testfile
-	set testfile [file rootname $py_file_name]
+proc run { builder_exp_file_name make_config_thunk_name py_file_name test_class_name } {
+    verbose -log "GenPerfTest::run, started [timestamp -format %c]"
+    verbose -log "GenPerfTest::run, $builder_exp_file_name $make_config_thunk_name $py_file_name $test_class_name"
 
-	GenPerfTest::load_test_description $builder_exp_file_name
+    set testprog [file rootname $builder_exp_file_name]
 
-	array set testcase [$make_config_thunk_name]
+    # This variable is required by perftest.exp.
+    # This isn't the name of the test program, it's the name of the .py
+    # test.  The harness assumes they are the same, which is not the case
+    # here.
+    global testfile
+    set testfile [file rootname $py_file_name]
 
-	PerfTest::assemble {
-	    # Compilation is handled elsewhere.
-	    return 0
-	} {
-	    clean_restart
-	    return 0
-	} {
-	    global gdb_prompt
-	    gdb_test_multiple "python ${test_class_name}('$testprog:$testfile', [tcl_string_list_to_python_list $testcase(run_names)], '$testcase(binfile)').run()" "run test" {
-		-re "Error while executing Python code.\[\r\n\]+$gdb_prompt $" {
-		    return -1
-		}
-		-re "\[\r\n\]+$gdb_prompt $" {
-		}
+    GenPerfTest::load_test_description $builder_exp_file_name
+
+    array set testcase [$make_config_thunk_name]
+
+    PerfTest::assemble {
+	# Compilation is handled elsewhere.
+	return 0
+    } {
+	clean_restart
+	return 0
+    } {
+	global gdb_prompt
+	gdb_test_multiple "python ${test_class_name}('$testprog:$testfile', [tcl_string_list_to_python_list $testcase(run_names)], '$testcase(binfile)').run()" "run test" {
+	    -re "Error while executing Python code.\[\r\n\]+$gdb_prompt $" {
+		return -1
 	    }
-	    return 0
+	    -re "\[\r\n\]+$gdb_prompt $" {
+	    }
 	}
-	verbose -log "GenPerfTest::run, done [timestamp -format %c]"
 	return 0
     }
+    verbose -log "GenPerfTest::run, done [timestamp -format %c]"
+    return 0
+}
 
-    # This function is invoked by the testcase builder scripts
-    # (e.g., gmonster[12].exp).
-    # It is not invoked by the testcase runner scripts
-    # (e.g., gmonster[12]-*.exp).
+# This function is invoked by the testcase builder scripts
+# (e.g., gmonster[12].exp).
+# It is not invoked by the testcase runner scripts
+# (e.g., gmonster[12]-*.exp).
 
-    proc standard_compile_driver { exp_file_name make_config_thunk_name } {
-	global GDB_PERFTEST_MODE GDB_PERFTEST_SUBMODE
-	if {![info exists GDB_PERFTEST_SUBMODE]} {
-	    # Probably a plain "make check-perf", nothing to do.
+proc standard_compile_driver { exp_file_name make_config_thunk_name } {
+    global GDB_PERFTEST_MODE GDB_PERFTEST_SUBMODE
+    if {![info exists GDB_PERFTEST_SUBMODE]} {
+	# Probably a plain "make check-perf", nothing to do.
+	# Give the user a reason why we're not running this test.
+	verbose -log "Test must be compiled/run in separate steps."
+	return 0
+    }
+    switch -glob -- "$GDB_PERFTEST_MODE/$GDB_PERFTEST_SUBMODE" {
+	compile/gen-workers {
+	    if { [GenPerfTest::gen_worker_files $exp_file_name] < 0 } {
+		fail $GDB_PERFTEST_MODE
+		return -1
+	    }
+	    pass $GDB_PERFTEST_MODE
+	}
+	compile/build-pieces {
+	    array set testcase [$make_config_thunk_name]
+	    global PROGRAM_NAME WORKER_NR
+	    if { [GenPerfTest::compile_pieces testcase $WORKER_NR] < 0 } {
+		fail $GDB_PERFTEST_MODE
+		# This gdb.log lives in a different place, help the user
+		# find it.
+		set output_dir "gdb.perf/outputs"
+		send_user "check ${output_dir}/${PROGRAM_NAME}/${PROGRAM_NAME}-${WORKER_NR}/gdb.log\n"
+		return -1
+	    }
+	    pass $GDB_PERFTEST_MODE
+	}
+	compile/final {
+	    array set testcase [$make_config_thunk_name]
+	    if { [GenPerfTest::compile testcase] < 0 } {
+		fail $GDB_PERFTEST_MODE
+		return -1
+	    }
+	    pass $GDB_PERFTEST_MODE
+	}
+	run/* - both/* {
+	    # Since the builder script is a .exp file living in gdb.perf
+	    # we can get here (dejagnu will find this file for a default
+	    # "make check-perf").  We can also get here when
+	    # standard_run_driver loads the builder .exp file.
+	}
+	default {
+	    error "Bad value for GDB_PERFTEST_MODE/GDB_PERFTEST_SUBMODE: $GDB_PERFTEST_MODE/$GDB_PERFTEST_SUBMODE"
+	}
+    }
+    return 0
+}
+
+# This function is invoked by the testcase runner scripts
+# (e.g., gmonster[12]-*.exp).
+# It is not invoked by the testcase builder scripts
+# (e.g., gmonster[12].exp).
+#
+# These tests are built separately with
+# "make build-perf" and run with
+# "make check-perf GDB_PERFTEST_MODE=run".
+# Eventually we can support GDB_PERFTEST_MODE=both, but for now we don't.
+
+proc standard_run_driver { builder_exp_file_name make_config_thunk_name py_file_name test_class_name } {
+    global GDB_PERFTEST_MODE
+    # First step is to compile the test.
+    switch $GDB_PERFTEST_MODE {
+	compile - both {
+	    # Here is where we'd add code to support a plain
+	    # "make check-perf".
+	}
+	run {
+	}
+	default {
+	    error "Bad value for GDB_PERFTEST_MODE: $GDB_PERFTEST_MODE"
+	}
+    }
+    # Now run the test.
+    switch $GDB_PERFTEST_MODE {
+	compile {
+	}
+	both {
 	    # Give the user a reason why we're not running this test.
 	    verbose -log "Test must be compiled/run in separate steps."
-	    return 0
 	}
-	switch -glob -- "$GDB_PERFTEST_MODE/$GDB_PERFTEST_SUBMODE" {
-	    compile/gen-workers {
-		if { [GenPerfTest::gen_worker_files $exp_file_name] < 0 } {
-		    fail $GDB_PERFTEST_MODE
-		    return -1
-		}
-		pass $GDB_PERFTEST_MODE
+	run {
+	    if { [GenPerfTest::run $builder_exp_file_name $make_config_thunk_name $py_file_name $test_class_name] < 0 } {
+		fail $GDB_PERFTEST_MODE
+		return -1
 	    }
-	    compile/build-pieces {
-		array set testcase [$make_config_thunk_name]
-		global PROGRAM_NAME WORKER_NR
-		if { [GenPerfTest::compile_pieces testcase $WORKER_NR] < 0 } {
-		    fail $GDB_PERFTEST_MODE
-		    # This gdb.log lives in a different place, help the user
-		    # find it.
-		    set output_dir "gdb.perf/outputs"
-		    send_user "check ${output_dir}/${PROGRAM_NAME}/${PROGRAM_NAME}-${WORKER_NR}/gdb.log\n"
-		    return -1
-		}
-		pass $GDB_PERFTEST_MODE
-	    }
-	    compile/final {
-		array set testcase [$make_config_thunk_name]
-		if { [GenPerfTest::compile testcase] < 0 } {
-		    fail $GDB_PERFTEST_MODE
-		    return -1
-		}
-		pass $GDB_PERFTEST_MODE
-	    }
-	    run/* - both/* {
-		# Since the builder script is a .exp file living in gdb.perf
-		# we can get here (dejagnu will find this file for a default
-		# "make check-perf").  We can also get here when
-		# standard_run_driver loads the builder .exp file.
-	    }
-	    default {
-		error "Bad value for GDB_PERFTEST_MODE/GDB_PERFTEST_SUBMODE: $GDB_PERFTEST_MODE/$GDB_PERFTEST_SUBMODE"
-	    }
+	    pass $GDB_PERFTEST_MODE
 	}
-	return 0
     }
-
-    # This function is invoked by the testcase runner scripts
-    # (e.g., gmonster[12]-*.exp).
-    # It is not invoked by the testcase builder scripts
-    # (e.g., gmonster[12].exp).
-    #
-    # These tests are built separately with
-    # "make build-perf" and run with
-    # "make check-perf GDB_PERFTEST_MODE=run".
-    # Eventually we can support GDB_PERFTEST_MODE=both, but for now we don't.
-
-    proc standard_run_driver { builder_exp_file_name make_config_thunk_name py_file_name test_class_name } {
-	global GDB_PERFTEST_MODE
-	# First step is to compile the test.
-	switch $GDB_PERFTEST_MODE {
-	    compile - both {
-		# Here is where we'd add code to support a plain
-		# "make check-perf".
-	    }
-	    run {
-	    }
-	    default {
-		error "Bad value for GDB_PERFTEST_MODE: $GDB_PERFTEST_MODE"
-	    }
-	}
-	# Now run the test.
-	switch $GDB_PERFTEST_MODE {
-	    compile {
-	    }
-	    both {
-		# Give the user a reason why we're not running this test.
-		verbose -log "Test must be compiled/run in separate steps."
-	    }
-	    run {
-		if { [GenPerfTest::run $builder_exp_file_name $make_config_thunk_name $py_file_name $test_class_name] < 0 } {
-		    fail $GDB_PERFTEST_MODE
-		    return -1
-		}
-		pass $GDB_PERFTEST_MODE
-	    }
-	}
-	return 0
-    }
+    return 0
+}
 }
 
 if {![info exists PERF_TEST_COMPILE_PARALLELISM]} {

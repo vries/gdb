@@ -95,7 +95,7 @@ proc start_structs_test { types } {
     }
     append foo_t "\[\r\n \]+\}"
     gdb_test "ptype foo[llength ${types}]" "${foo_t}" \
-	    "ptype foo[llength ${types}]; ${testfile}"
+	"ptype foo[llength ${types}]; ${testfile}"
 }
 
 # The expected value for fun${n}, L${n} and foo${n}.  First element is
@@ -152,25 +152,25 @@ proc any { n } {
     global anychar_re
     set ac $anychar_re
     return [lindex [list \
-	"{}" \
-	"{a = ${ac}}" \
-	"{a = ${ac}, b = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}, l = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}, l = ${ac}, m = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}, l = ${ac}, m = ${ac}, n = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}, l = ${ac}, m = ${ac}, n = ${ac}, o = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}, l = ${ac}, m = ${ac}, n = ${ac}, o = ${ac}, p = ${ac}}" \
-	"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}, l = ${ac}, m = ${ac}, n = ${ac}, o = ${ac}, p = ${ac}, q = ${ac}}" \
-    ] $n]
+			"{}" \
+			"{a = ${ac}}" \
+			"{a = ${ac}, b = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}, l = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}, l = ${ac}, m = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}, l = ${ac}, m = ${ac}, n = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}, l = ${ac}, m = ${ac}, n = ${ac}, o = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}, l = ${ac}, m = ${ac}, n = ${ac}, o = ${ac}, p = ${ac}}" \
+			"{a = ${ac}, b = ${ac}, c = ${ac}, d = ${ac}, e = ${ac}, f = ${ac}, g = ${ac}, h = ${ac}, i = ${ac}, j = ${ac}, k = ${ac}, l = ${ac}, m = ${ac}, n = ${ac}, o = ${ac}, p = ${ac}, q = ${ac}}" \
+		       ] $n]
 }
 
 # Given N (0..25), return the corresponding alphabetic letter in lower
@@ -284,8 +284,8 @@ proc test_struct_returns { n } {
 
     # Get into a call of fun${n}
     gdb_test "advance fun${n}" \
-	    "fun${n} .*\[\r\n\]+\[0-9\].*return foo${n}.*" \
-	    "advance to fun<n> for return; ${tests}"
+	"fun${n} .*\[\r\n\]+\[0-9\].*return foo${n}.*" \
+	"advance to fun<n> for return; ${tests}"
 
     # Check that the program invalidated the relevant global.
     gdb_test "p/c L${n}" " = [zed $n]" "zed L<n> for return; ${tests}"
@@ -397,8 +397,8 @@ proc test_struct_returns { n } {
 
     # Get into "fun${n}()".
     gdb_test "advance fun${n}" \
-	    "fun${n} .*\[\r\n\]+\[0-9\].*return foo${n}.*" \
-	    "advance to fun<n> for finish; ${tests}"
+	"fun${n} .*\[\r\n\]+\[0-9\].*return foo${n}.*" \
+	"advance to fun<n> for finish; ${tests}"
 
     # Check that the program invalidated the relevant global.
     gdb_test "p/c L${n}" " = [zed $n]" "zed L<n> for finish; ${tests}"

@@ -119,7 +119,7 @@ proc_with_prefix test_set_unset_env {} {
 	}
 
 	test_num_test_vars 2 "two TEST_GDB var"
-   }
+    }
 
     # Fourth test with one TEST_GDB_VAR left, after one was removed
     # with unset command.

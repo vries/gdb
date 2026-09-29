@@ -64,12 +64,12 @@ proc do_test { test_name lines_version DW_AT_name main_file_idx directories
 
 		cu {} {
 		    DW_TAG_compile_unit {
-			    DW_AT_producer "My C Compiler"
-			    DW_AT_language @DW_LANG_C11
-			    DW_AT_name $::DW_AT_name
-			    DW_AT_comp_dir $comp_dir
-			    DW_AT_stmt_list $Llines DW_FORM_sec_offset
-			    DW_AT_macros $cu_macros DW_FORM_sec_offset
+			DW_AT_producer "My C Compiler"
+			DW_AT_language @DW_LANG_C11
+			DW_AT_name $::DW_AT_name
+			DW_AT_comp_dir $comp_dir
+			DW_AT_stmt_list $Llines DW_FORM_sec_offset
+			DW_AT_macros $cu_macros DW_FORM_sec_offset
 		    } {
 			declare_labels int_type
 
@@ -126,8 +126,8 @@ proc do_test { test_name lines_version DW_AT_name main_file_idx directories
 			define 0 "ONE 1"
 			define_strp 0 "THREE 3"
 			start_file 0 $::main_file_idx
-			    # A macro defined at line 1 of the main file.
-			    define 1 "TWO 2"
+			# A macro defined at line 1 of the main file.
+			define 1 "TWO 2"
 			end_file
 		    }
 		}

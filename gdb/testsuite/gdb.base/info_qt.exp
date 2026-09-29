@@ -43,17 +43,17 @@ with_test_prefix "info functions nameregexp" {
 	"info functions info_fun"
 	"info functions -- info_fun"
 	"info functions ^info_fun" } {
-	    gdb_test $cmd \
-		[multi_line \
-		     "All functions matching regular expression \".*info_fun.*\":" \
-		     "" \
-		     "File .*info_qt.c:" \
-		     "${number}:	void info_fun1\\\(void\\\);" \
-		     "${number}:	int info_fun2\\\(char\\\);" \
-		     "${number}:	int info_fun2bis\\\(char\\\);" \
-		     "${number}:	entier info_fun2xxx\\\(char, int, int\\\);" \
-		     "${number}:	entier info_fun2yyy\\\(char, int, int\\\);" \
-		    ]
+	gdb_test $cmd \
+	    [multi_line \
+		 "All functions matching regular expression \".*info_fun.*\":" \
+		 "" \
+		 "File .*info_qt.c:" \
+		 "${number}:	void info_fun1\\\(void\\\);" \
+		 "${number}:	int info_fun2\\\(char\\\);" \
+		 "${number}:	int info_fun2bis\\\(char\\\);" \
+		 "${number}:	entier info_fun2xxx\\\(char, int, int\\\);" \
+		 "${number}:	entier info_fun2yyy\\\(char, int, int\\\);" \
+		]
     }
 }
 
@@ -61,25 +61,25 @@ with_test_prefix "info functions nameregexp quiet" {
     foreach cmd {
 	"info functions -q info_fun"
 	"info functions -q -- info_fun" } {
-	    gdb_test $cmd \
-		[multi_line \
-		     "" \
-		     "File .*info_qt.c:" \
-		     "${number}:	void info_fun1\\\(void\\\);" \
-		     "${number}:	int info_fun2\\\(char\\\);" \
-		     "${number}:	int info_fun2bis\\\(char\\\);" \
-		     "${number}:	entier info_fun2xxx\\\(char, int, int\\\);" \
-		     "${number}:	entier info_fun2yyy\\\(char, int, int\\\);" \
-		    ]
-	}
+	gdb_test $cmd \
+	    [multi_line \
+		 "" \
+		 "File .*info_qt.c:" \
+		 "${number}:	void info_fun1\\\(void\\\);" \
+		 "${number}:	int info_fun2\\\(char\\\);" \
+		 "${number}:	int info_fun2bis\\\(char\\\);" \
+		 "${number}:	entier info_fun2xxx\\\(char, int, int\\\);" \
+		 "${number}:	entier info_fun2yyy\\\(char, int, int\\\);" \
+		]
+    }
 }
 
 with_test_prefix "info functions nameregexp quiet no match" {
     foreach cmd {
 	"info functions -q nowaythiscanmatch"
 	"info functions -q -- -q" } {
-	    gdb_test_no_output $cmd
-	}
+	gdb_test_no_output $cmd
+    }
 }
 
 with_test_prefix "info functions typeregexp nameregexp" {
@@ -88,14 +88,14 @@ with_test_prefix "info functions typeregexp nameregexp" {
 	"info functions -q -t 'entier (' -- info_fun"
 	"info functions -q -t '(char, int, int)' -- info_fun"
 	"info functions -q -t 'entier (char, int, int)' -- info_fun" } {
-	    gdb_test $cmd \
-		[multi_line \
-		     "" \
-		     "File .*info_qt.c:" \
-		     "${number}:	entier info_fun2xxx\\\(char, int, int\\\);" \
-		     "${number}:	entier info_fun2yyy\\\(char, int, int\\\);" \
-		    ]
-	}
+	gdb_test $cmd \
+	    [multi_line \
+		 "" \
+		 "File .*info_qt.c:" \
+		 "${number}:	entier info_fun2xxx\\\(char, int, int\\\);" \
+		 "${number}:	entier info_fun2yyy\\\(char, int, int\\\);" \
+		]
+    }
 }
 
 with_test_prefix "info functions typeregexp nameregexp no match" {
@@ -110,36 +110,36 @@ with_test_prefix "info variables nameregexp" {
 	"info variables info_qt"
 	"info variables -- info_qt"
 	"info variables ^info_qt" } {
-	    gdb_test $cmd \
-		[multi_line \
-		     "All variables matching regular expression \".*info_qt.*\":" \
-		     "" \
-		     "File .*info_qt.c:" \
-		     "${number}:	entier info_qt_ent;" \
-		     "${number}:	int info_qt_inc;" \
-		    ]
-	}
+	gdb_test $cmd \
+	    [multi_line \
+		 "All variables matching regular expression \".*info_qt.*\":" \
+		 "" \
+		 "File .*info_qt.c:" \
+		 "${number}:	entier info_qt_ent;" \
+		 "${number}:	int info_qt_inc;" \
+		]
+    }
 }
 
 with_test_prefix "info variables nameregexp quiet no match" {
     foreach cmd {
 	"info variables -q nowaythiscanmatch"
 	"info variables -q -- -q" } {
-	    gdb_test_no_output $cmd
-	}
+	gdb_test_no_output $cmd
+    }
 }
 
 with_test_prefix "info variables typeregexp nameregexp quiet" {
     foreach cmd {
 	"info variables -t entier -q info_qt"
 	"info variables -q -t entier -- info_qt" } {
-	    gdb_test $cmd \
-		[multi_line \
-		     "" \
-		     "File .*info_qt.c:" \
-		     "${number}:	entier info_qt_ent;" \
-		    ]
-	}
+	gdb_test $cmd \
+	    [multi_line \
+		 "" \
+		 "File .*info_qt.c:" \
+		 "${number}:	entier info_qt_ent;" \
+		]
+    }
 }
 
 with_test_prefix "info variables typeregexp nameregexp quiet no match" {
@@ -159,25 +159,25 @@ with_test_prefix "info args matching all args" {
 	"info args arg_"
 	"info args g"
 	"info args -- .*" } {
-	    gdb_test $cmd \
-		[multi_line \
-		     "arg_c = 100 'd'" \
-		     "arg_i = 3" \
-		     "arg_j = 4" \
-		    ]
-	}
+	gdb_test $cmd \
+	    [multi_line \
+		 "arg_c = 100 'd'" \
+		 "arg_i = 3" \
+		 "arg_j = 4" \
+		]
+    }
 }
 
 with_test_prefix "info args matching some args" {
     foreach cmd {
 	"info args -t int"
 	"info args arg_[ij]"} {
-	    gdb_test $cmd \
-		[multi_line \
-		     "arg_i = 3" \
-		     "arg_j = 4" \
-		    ]
-	}
+	gdb_test $cmd \
+	    [multi_line \
+		 "arg_i = 3" \
+		 "arg_j = 4" \
+		]
+    }
 }
 
 with_test_prefix "info args no match" {
@@ -196,13 +196,13 @@ with_test_prefix "info locals matching all locals" {
 	"info locals loc_arg_"
 	"info locals g"
 	"info locals -- .*" } {
-	    gdb_test $cmd \
-		[multi_line \
-		     "loc_arg_c = 100 'd'" \
-		     "loc_arg_i = 3" \
-		     "loc_arg_j = 4" \
-		    ]
-	}
+	gdb_test $cmd \
+	    [multi_line \
+		 "loc_arg_c = 100 'd'" \
+		 "loc_arg_i = 3" \
+		 "loc_arg_j = 4" \
+		]
+    }
 }
 
 with_test_prefix "info locals matching some locals" {
@@ -210,12 +210,12 @@ with_test_prefix "info locals matching some locals" {
 	"info locals -t int"
 	"info locals arg_[ij]"
 	"info locals loc_arg_[ij]"} {
-	    gdb_test $cmd \
-		[multi_line \
-		     "loc_arg_i = 3" \
-		     "loc_arg_j = 4" \
-		    ]
-	}
+	gdb_test $cmd \
+	    [multi_line \
+		 "loc_arg_i = 3" \
+		 "loc_arg_j = 4" \
+		]
+    }
 }
 
 with_test_prefix "info locals no match" {

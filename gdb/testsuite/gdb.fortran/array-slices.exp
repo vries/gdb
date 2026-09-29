@@ -247,7 +247,7 @@ proc run_test { repack } {
 	    # sizes when GDB's repacking setting matches the repacking
 	    # behavior we got from the compiler.
 	    if { ($addr_in_show < $start_addr || $addr_in_show >= $end_addr) \
-		 == ($repack == "on") } {
+		     == ($repack == "on") } {
 		gdb_assert {$size_in_show == $size_in_parent} \
 		    "check sizes match"
 	    } elseif { $repack == "off" } {

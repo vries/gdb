@@ -31,7 +31,7 @@ if { [build_executable "build shlib" $libobj $libsrc {debug shlib}] != 0 } {
 }
 
 if { [prepare_for_testing "prepare" $testfile $execsrc \
-	     [list debug shlib=${libobj}]] != 0 } {
+	  [list debug shlib=${libobj}]] != 0 } {
     return
 }
 
@@ -57,11 +57,11 @@ proc body { struct } {
 
     set name "opaque $struct type resolving"
     gdb_test_multiple "ptype pointer_${struct}_opaque" $name \
-    {
-	-re "libfield_opaque.*$gdb_prompt $"  {
-	    pass $name
+	{
+	    -re "libfield_opaque.*$gdb_prompt $"  {
+		pass $name
+	    }
 	}
-    }
 
 
     # <1><9e>: Abbrev Number: 2 (DW_TAG_structure_type)
@@ -72,14 +72,14 @@ proc body { struct } {
 
     set name "empty $struct type resolving"
     gdb_test_multiple "ptype pointer_${struct}_empty" $name \
-    {
-	-re "\\{\[ \t\r\n\]*<no data fields>\[ \t\r\n\]*\\}.*$gdb_prompt $"  {
-	    pass $name
+	{
+	    -re "\\{\[ \t\r\n\]*<no data fields>\[ \t\r\n\]*\\}.*$gdb_prompt $"  {
+		pass $name
+	    }
+	    -re "libfield_empty.*$gdb_prompt $"  {
+		fail $name
+	    }
 	}
-	-re "libfield_empty.*$gdb_prompt $"  {
-	    fail $name
-	}
-    }
 
 
     # <1><b0>: Abbrev Number: 3 (DW_TAG_structure_type)
@@ -97,14 +97,14 @@ proc body { struct } {
 
     set name "filled $struct type resolving"
     gdb_test_multiple "ptype pointer_${struct}_filled" $name \
-    {
-	-re "mainfield_filled.*$gdb_prompt $"  {
-	    pass $name
+	{
+	    -re "mainfield_filled.*$gdb_prompt $"  {
+		pass $name
+	    }
+	    -re "libfield_filled.*$gdb_prompt $"  {
+		fail $name
+	    }
 	}
-	-re "libfield_filled.*$gdb_prompt $"  {
-	    fail $name
-	}
-    }
 
 
 }

@@ -18,19 +18,19 @@
 
 proc dump_info {cmd {what ""}} {
 
-  if {$what == ""} {
-    set what $cmd
-  }
+    if {$what == ""} {
+	set what $cmd
+    }
 
-  set res [remote_exec target $cmd]
-  set status [lindex $res 0]
-  set output [lindex $res 1]
+    set res [remote_exec target $cmd]
+    set status [lindex $res 0]
+    set output [lindex $res 1]
 
-  if { $status == 0 } {
-    verbose -log "$what available, dumping:\n$output"
-  } else {
-    verbose -log "$what not available"
-  }
+    if { $status == 0 } {
+	verbose -log "$what available, dumping:\n$output"
+    } else {
+	verbose -log "$what not available"
+    }
 }
 
 dump_info "cat /proc/cpuinfo" "Cpuinfo"

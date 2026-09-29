@@ -42,19 +42,19 @@ close $fd
 
 # Make sure that the show trace-commands exists and the default is 'off'.
 gdb_test "show trace-commands" "State of GDB CLI command tracing is off\\." \
-	 "show trace-commands says off"
+    "show trace-commands says off"
 
 # Source the script with verbose mode.
 gdb_test_sequence "source -v $tracecommandsscript" "source -v" {
-  {[\r\n]\+echo in tracecommandsscript\\n}
-  {[\r\n]\+define func}
-  {[\r\n]\+if 1}
-  {[\r\n]\+\+if 2}
-  {[\r\n]\+\+\+if 3}
-  {[\r\n]\+\+\+\+if 4}
-  {[\r\n]\+\+\+\+\+echo deep\\n}
-  {[\r\n]\+\+\+\+\+func 999}
-  {[\r\n]\+\+\+\+\+\+echo in func 999\\n}
+    {[\r\n]\+echo in tracecommandsscript\\n}
+    {[\r\n]\+define func}
+    {[\r\n]\+if 1}
+    {[\r\n]\+\+if 2}
+    {[\r\n]\+\+\+if 3}
+    {[\r\n]\+\+\+\+if 4}
+    {[\r\n]\+\+\+\+\+echo deep\\n}
+    {[\r\n]\+\+\+\+\+func 999}
+    {[\r\n]\+\+\+\+\+\+echo in func 999\\n}
 }
 
 # Turn on command tracing.
@@ -63,7 +63,7 @@ gdb_test_no_output "set trace-commands" "set trace-commands"
 # Make sure show trace-commands now gives 'on'.
 gdb_test "show trace-commands" \
     {\+show trace-commands[\r\n]+State of GDB CLI command tracing is on\.} \
-	 "show trace-commands says on"
+    "show trace-commands says on"
 
 # Simple test
 gdb_test "echo hi\\n" {\+echo hi\\n[\r\n]+hi} "simple trace-commands test"
@@ -100,30 +100,30 @@ gdb_test $cmd $re "nested trace-commands test"
 # Function with source works
 gdb_test_sequence "define topfunc\nsource $tracecommandsscript\nend" \
     "define user command" {
-  {[\r\n]\+define topfunc}
-}
+	{[\r\n]\+define topfunc}
+    }
 gdb_test_sequence "topfunc" "nested trace-commands test with source" {
-  {[\r\n]\+topfunc}
-  {[\r\n]\+\+source .*/tracecommandsscript}
-  {[\r\n]\+\+echo in tracecommandsscript\\n}
-  {[\r\n]\+\+define func}
-  {[\r\n]\+\+if 1}
-  {[\r\n]\+\+\+if 2}
-  {[\r\n]\+\+\+\+if 3}
-  {[\r\n]\+\+\+\+\+if 4}
-  {[\r\n]\+\+\+\+\+\+echo deep\\n}
-  {[\r\n]\+\+\+\+\+\+func 999}
-  {[\r\n]\+\+\+\+\+\+\+echo in func 999\\n}
+    {[\r\n]\+topfunc}
+    {[\r\n]\+\+source .*/tracecommandsscript}
+    {[\r\n]\+\+echo in tracecommandsscript\\n}
+    {[\r\n]\+\+define func}
+    {[\r\n]\+\+if 1}
+    {[\r\n]\+\+\+if 2}
+    {[\r\n]\+\+\+\+if 3}
+    {[\r\n]\+\+\+\+\+if 4}
+    {[\r\n]\+\+\+\+\+\+echo deep\\n}
+    {[\r\n]\+\+\+\+\+\+func 999}
+    {[\r\n]\+\+\+\+\+\+\+echo in func 999\\n}
 }
 
 # Test nest depth resets properly on error
 set cmd "if 1\nif 2\nload\necho should not get here\\n\nend\nend"
 set strings {
-  {+if 1}
-  {++if 2}
-  {+++load}
-  {No executable file specified.}
-  {Use the "file" or "exec-file" command.}
+    {+if 1}
+    {++if 2}
+    {+++load}
+    {No executable file specified.}
+    {Use the "file" or "exec-file" command.}
 }
 set re {}
 foreach string $strings {
@@ -133,4 +133,4 @@ set re [join $re "\r\n(.*\r\n)?"]
 gdb_test $cmd $re "depth resets on error part 1"
 
 gdb_test "echo hi\\n" {[\r\n]\+echo hi\\n[\r\n]+hi} \
-	 "depth resets on error part 2"
+    "depth resets on error part 2"

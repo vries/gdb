@@ -44,23 +44,23 @@ proc cannot_resolve {meth} {
 # is an inferior function call, while the latter is a reference to the
 # function.
 
-     #SCOPE                             #PREFIX         #PRINT-SCOPE-QUOTED
-							#PRINT-SCOPE-UNQUOTED (opt)
+#SCOPE                             #PREFIX         #PRINT-SCOPE-QUOTED
+#PRINT-SCOPE-UNQUOTED (opt)
 set cxx_scopes_list {
     {"S::method()"			"S_M"		{= \{void \(S \* const\)\} $hex <S::method\(\)>}
-							{[cannot_resolve "S::method"]}}
+	{[cannot_resolve "S::method"]}}
 
     {"S::method() const"		"S_M_C"		{= \{void \(const S \* const\)\} $hex <S::method\(\) const>}
-							$syntax_re}
+	$syntax_re}
 
     {"S::method() volatile"		"S_M_V"		{= \{void \(volatile S \* const\)\} $hex <S::method\(\) volatile>}
-							$syntax_re}
+	$syntax_re}
 
     {"S::method() const volatile"	"S_M_CV"	{= \{void \(const volatile S \* const\)\} $hex <S::method\(\) const volatile>}
-							$syntax_re}
+	$syntax_re}
 
     {"S::method() volatile const"	"S_M_CV"	{= \{void \(const volatile S \* const\)\} $hex <S::method\(\) const volatile>}
-							$syntax_re}
+	$syntax_re}
 
     {"S::method(void)"			"S_M"		{= \{void \(S \* const\)\} $hex <S::method\(\)>}}
     {"S::method(void) const"		"S_M_C"		{= \{void \(const S \* const\)\} $hex <S::method\(\) const>}}
@@ -69,41 +69,41 @@ set cxx_scopes_list {
     {"S::method(void) volatile const"	"S_M_CV"	{= \{void \(const volatile S \* const\)\} $hex <S::method\(\) const volatile>}}
 
     {"S::static_method()"		"S_SM"		{= \{void \(void\)\} $hex <S::static_method\(\)>}
-							"void"}
+	"void"}
 
     {"S::static_method(void)"		"S_SM"		{= \{void \(void\)\} $hex <S::static_method\(\)>}}
 
     {"S::inline_method()"		"S_IM"		{= \{void \(S \* const\)\} $hex <S::inline_method\(\)>}
-							{[cannot_resolve "S::inline_method"]}}
+	{[cannot_resolve "S::inline_method"]}}
 
     {"S::inline_method(void)"		"S_IM"		{= \{void \(S \* const\)\} $hex <S::inline_method\(\)>}}
 
     {"S::static_inline_method()"	"S_SIM"		{= \{void \(void\)\} $hex <S::static_inline_method\(\)>}
-							"void"}
+	"void"}
 
     {"S::static_inline_method(void)"	"S_SIM"		{= \{void \(void\)\} $hex <S::static_inline_method\(\)>}}
 
     {"S2<int>::method()"		"S2_M"		{= \{void \(S2<int> \* const\)\} $hex <S2<int>::method\(\)>}
-							{[cannot_resolve "S2<int>::method"]}}
+	{[cannot_resolve "S2<int>::method"]}}
 
     {"S2<int>::static_method()"		"S2_SM"		{= \{void \(void\)\} $hex <S2<int>::static_method\(\)>}
-							"void"}
+	"void"}
 
     {"S2<int>::inline_method()"		"S2_IM"		{= \{void \(S2<int> \* const\)\} $hex <S2<int>::inline_method\(\)>}
-							{[cannot_resolve "S2<int>::inline_method"]}}
+	{[cannot_resolve "S2<int>::inline_method"]}}
 
     {"S2<int>::static_inline_method()"	"S2_SIM"	{= \{void \(void\)\} $hex <S2<int>::static_inline_method\(\)>}
-							"void"}
+	"void"}
 
     {"free_func"			"FF"		{= \{void \(void\)\} $hex <free_func\(\)>}}
 
     {"free_func()"			"FF"		{= \{void \(void\)\} $hex <free_func\(\)>}
-							"void"}
+	"void"}
 
     {"free_func(void)"			"FF"		{= \{void \(void\)\} $hex <free_func\(\)>}}
 
     {"free_inline_func()"		"FIF"		{= \{void \(void\)\} $hex <free_inline_func\(\)>}
-							"void"}
+	"void"}
 
     {"free_inline_func(void)"		"FIF"		{= \{void \(void\)\} $hex <free_inline_func\(\)>}}
 }
@@ -118,7 +118,7 @@ set c_scopes_list {
 # second column is a regex matching what printing the variable should
 # output.
 
-     #VAR               #PRINT
+#VAR               #PRINT
 set vars_list {
     {"s_var_int"	" = 4"}
     {"s_var_float"	" = 3.14.*"}

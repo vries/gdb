@@ -29,9 +29,9 @@ proc return_1 { type } {
     global gdb_prompt
 
     gdb_test "break ${type}_func" "Breakpoint \[0123456789\].*" \
-	    "set break on ${type}_func"
+	"set break on ${type}_func"
     gdb_test "continue" "Breakpoint.* ${type}_func.*" \
-	    "continue to ${type}_func"
+	"continue to ${type}_func"
 
     gdb_test_multiple "return testval.${type}_testval" \
 	"return from ${type}_func" {
@@ -48,18 +48,18 @@ proc return_1 { type } {
 	    }
 	}
     gdb_test "print ${type}_resultval == testval.${type}_testval" ".* = 1" \
-	    "${type} value returned successfully"
+	"${type} value returned successfully"
     gdb_test "print ${type}_resultval != ${type}_returnval" ".* = 1" \
-	    "validate result value not equal to program return value, ${type}"
+	"validate result value not equal to program return value, ${type}"
 }
 
 proc return_void { } {
     global gdb_prompt
 
     gdb_test "break void_func" "Breakpoint \[0123456789\].*" \
-	    "set break on void_func"
+	"set break on void_func"
     gdb_test "continue" "Breakpoint.* void_func.*" \
-	    "continue to void_func"
+	"continue to void_func"
 
     gdb_test_multiple "return" "return from void_func" {
 	-re "Make void_func return now.*y or n. $" {
@@ -75,7 +75,7 @@ proc return_void { } {
 	}
     }
     gdb_test "print void_test == 0" ".* = 1" \
-	    "void function returned successfully"
+	"void function returned successfully"
 }
 
 proc return2_tests { } {

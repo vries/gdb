@@ -77,10 +77,10 @@ proc check_tracing_enabled { thread } {
 	# We will consume the thread's current location as part of the
 	# "info record" output.
 	gdb_test "info record" [multi_line \
-	    "Active record target: record-btrace" \
-	    "Recording format: .*" \
-	    "Recorded ${::decimal} instructions \[^\\\r\\\n\]*" \
-	]
+				    "Active record target: record-btrace" \
+				    "Recording format: .*" \
+				    "Recorded ${::decimal} instructions \[^\\\r\\\n\]*" \
+				   ]
 
 	# Continue the thread again.
 	gdb_test "cont&" "Continuing\."

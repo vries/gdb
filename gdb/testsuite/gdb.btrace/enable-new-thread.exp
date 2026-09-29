@@ -42,10 +42,10 @@ proc check_thread_recorded { num } {
 	gdb_test "thread $num" "Switching to thread $num.*"
 
 	gdb_test "info record" [multi_line \
-	    "Active record target: record-btrace" \
-	    ".*" \
-	    "Recorded $decimal instructions in $decimal functions \[^\\\r\\\n\]*" \
-       ]
+				    "Active record target: record-btrace" \
+				    ".*" \
+				    "Recorded $decimal instructions in $decimal functions \[^\\\r\\\n\]*" \
+				   ]
     }
 }
 

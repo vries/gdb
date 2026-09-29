@@ -257,10 +257,10 @@ proc_with_prefix infrun_breakpoint_command_test {} {
     delete_breakpoints
     gdb_test "break factorial if value == 5" "Breakpoint.*at.*"
 
-# infrun_breakpoint_command_test - This test was broken into two parts
-# to get around a synchronization problem in expect.
-# part1: issue the gdb command "commands"
-# part2: send the list of commands
+    # infrun_breakpoint_command_test - This test was broken into two parts
+    # to get around a synchronization problem in expect.
+    # part1: issue the gdb command "commands"
+    # part2: send the list of commands
 
     set test "commands #1"
     gdb_test_multiple "commands" $test {
@@ -291,7 +291,7 @@ proc_with_prefix breakpoint_command_test {} {
 	"End with.*" \
 	"commands"
     gdb_test "continue" \
-	    "Breakpoint \[0-9\]*, factorial.*Now the value is 5"
+	"Breakpoint \[0-9\]*, factorial.*Now the value is 5"
     gdb_test "print value" " = 5"
 }
 
@@ -335,7 +335,7 @@ proc_with_prefix breakpoint_clear_command_test {} {
 	     "${any}in main${any}" \
 	    ] \
 	"print 1234321 command is not present anymore in the two breakpoints"
-    }
+}
 
 # Test a simple user defined command (with arguments)
 proc_with_prefix user_defined_command_test {} {
@@ -372,9 +372,9 @@ proc_with_prefix user_defined_command_test {} {
 	     "$valnum_re = 0xdeadbeef" \
 	     "$valnum_re = 0xfeedface"] \
 	"execute user-defined command"
-   gdb_test "show user mycommand" \
+    gdb_test "show user mycommand" \
 	"  while \\\$arg0.*set.*    if \\\(\\\$arg0.*p/x.*    else\[^\n\].*p/x.*    end\[^\n\].*  end\[^\n\].*" \
-	   "display user command"
+	"display user command"
 
     # Create and test a user-defined command with an empty body.
     gdb_test_multiple "define myemptycommand" "define myemptycommand" {
@@ -404,20 +404,20 @@ proc_with_prefix user_defined_command_case_sensitivity {} {
     # Define a first command with mixed case name.
     set test "define Homer-Simpson"
     gdb_test_multiple $test $test {
-	    -re "End with"  {
-		pass $test
-	    }
+	-re "End with"  {
+	    pass $test
 	}
+    }
 
     gdb_test "print 123\nend" "" "enter commands 1"
 
     # Define a second command, same name but different case.
     set test "define HomeR-SimpsoN"
     gdb_test_multiple $test $test {
-	    -re "End with"  {
-		pass $test
-	    }
+	-re "End with"  {
+	    pass $test
 	}
+    }
 
     gdb_test "print 456\nend" "" "enter commands 2"
 
@@ -622,7 +622,7 @@ proc_with_prefix watchpoint_command_test {} {
 	-re "Continuing.*\[Ww\]atchpoint $wp_id deleted because the program has left the block in.*which its expression is valid.*run.c:($lno_1|$lno_2).*$gdb_prompt $" {
 	    pass $test
 	}
-   }
+    }
 }
 
 proc_with_prefix test_command_prompt_position {} {
@@ -671,42 +671,42 @@ proc_with_prefix test_command_prompt_position {} {
 
 proc_with_prefix deprecated_command_test {} {
     gdb_test "maintenance deprecate blah" "Can't find command.*" \
-	  "tried to deprecate non-existing command"
+	"tried to deprecate non-existing command"
 
     gdb_test_no_output "maintenance deprecate p \"new_p\"" "maintenance deprecate p \"new_p\" /1/"
     gdb_test "p 5" \
-	    "Warning: 'p', an alias for the command 'print', is deprecated.*Use 'new_p'.*" \
-	    "p deprecated warning, with replacement"
+	"Warning: 'p', an alias for the command 'print', is deprecated.*Use 'new_p'.*" \
+	"p deprecated warning, with replacement"
     gdb_test "p 5" ".\[0-9\]* = 5.*" "deprecated warning goes away /1/"
 
     gdb_test_no_output "maintenance deprecate p \"new_p\"" "maintenance deprecate p \"new_p\" /2/"
     gdb_test_no_output "maintenance deprecate print \"new_print\""
     gdb_test "p 5" \
-	    "Warning: command 'print' \\(p\\) is deprecated.*Use 'new_print'.*" \
-	    "both alias and command are deprecated"
+	"Warning: command 'print' \\(p\\) is deprecated.*Use 'new_print'.*" \
+	"both alias and command are deprecated"
     gdb_test "p 5" ".\[0-9\]* = 5.*" "deprecated warning goes away /2/"
 
     gdb_test_no_output "maintenance deprecate set remote memory-read-packet-size \"srm\" " \
-	    "deprecate long command /1/"
+	"deprecate long command /1/"
     gdb_test "set remote memory-read-packet-size" \
-	    "Warning: command 'set remote memory-read-packet-size' is deprecated.*Use 'srm'.*" \
-	    "long command deprecated /1/"
+	"Warning: command 'set remote memory-read-packet-size' is deprecated.*Use 'srm'.*" \
+	"long command deprecated /1/"
 
     gdb_test_no_output "maintenance deprecate set remote memory-read-packet-size" \
-	    "deprecate long command /2/"
+	"deprecate long command /2/"
     gdb_test "set remote memory-read-packet-size" \
-	    "Warning: command 'set remote memory-read-packet-size' is deprecated.*No alternative known.*" \
-	    "long command deprecated with no alternative /2/"
+	"Warning: command 'set remote memory-read-packet-size' is deprecated.*No alternative known.*" \
+	"long command deprecated with no alternative /2/"
 
     gdb_test "maintenance deprecate" \
-	    "\"maintenance deprecate\".*" \
-	    "deprecate with no arguments"
+	"\"maintenance deprecate\".*" \
+	"deprecate with no arguments"
 
     # Test that an alias with a prefix still gives a warning.
     set file1 [standard_output_file xxx_yyy_cmd]
     set fd [open "$file1" w]
     puts $fd \
-"define set xxx_yyy
+	"define set xxx_yyy
 echo in command xxx_yyy\\n
 end
 
@@ -749,12 +749,12 @@ proc_with_prefix bp_deleted_in_command_test {} {
     # Create a breakpoint, and associate a command-list to it, with
     # one command that deletes this breakpoint.
     gdb_test "break factorial" \
-	     "Breakpoint ${::decimal} at .*: file .*run.c, line ${::decimal}\."
+	"Breakpoint ${::decimal} at .*: file .*run.c, line ${::decimal}\."
 
     gdb_test_multiple "commands" "begin commands" {
-      -re "Type commands for breakpoint.*>$" {
-	  pass "begin commands"
-      }
+	-re "Type commands for breakpoint.*>$" {
+	    pass "begin commands"
+	}
     }
     gdb_test_multiple "silent" "add silent command" {
 	-re ">$" {
@@ -768,10 +768,10 @@ proc_with_prefix bp_deleted_in_command_test {} {
     }
     gdb_test_multiple "printf \"factorial command-list executed\\n\"" \
 	"add printf command" {
-	-re ">$" {
-	    pass "add printf command"
+	    -re ">$" {
+		pass "add printf command"
+	    }
 	}
-    }
     gdb_test_multiple "cont" "add cont command" {
 	-re ">$" {
 	    pass "add cont command"
@@ -792,8 +792,8 @@ proc_with_prefix temporary_breakpoint_commands {} {
     # This test will verify that this commands list is executed when the
     # breakpoint is hit.
     gdb_test "tbreak factorial" \
-	    "Temporary breakpoint ${::decimal} at .*: file .*run.c, line ${::decimal}\." \
-	    "breakpoint"
+	"Temporary breakpoint ${::decimal} at .*: file .*run.c, line ${::decimal}\." \
+	"breakpoint"
 
     gdb_test_multiple "commands" \
 	"begin commands in bp_deleted_in_command_test" {
@@ -854,10 +854,10 @@ proc_with_prefix source_file_with_indented_comment {} {
 
     set fd [open "$file1" w]
     puts $fd \
-{define my_fun
-    #indented comment
-end
-echo Done!\n}
+	{define my_fun
+	    #indented comment
+	    end
+	    echo Done!\n}
     close $fd
 
     gdb_test "source $file1" "Done!" "source file"
@@ -872,13 +872,13 @@ proc_with_prefix recursive_source_test {} {
 
     set fd [open "$file1" w]
     puts $fd \
-"source $file2
+	"source $file2
 abcdef qwerty"
     close $fd
 
     set fd [open "$file2" w]
     puts $fd \
-"define abcdef
+	"define abcdef
   echo 1: <<<\$arg0>>>\\n
   source $file3
   echo 2: <<<\$arg0>>>\\n
@@ -887,7 +887,7 @@ end"
 
     set fd [open "$file3" w]
     puts $fd \
-"echo in file3\\n
+	"echo in file3\\n
 #################################################################"
     close $fd
 

@@ -27,9 +27,9 @@ proc test_osabi_none { arch void_ptr_size long_double_size } {
 }
 
 set infos { \
-    { "i386:x86-64" 8 16 } \
-    { "i386:x64-32" 4 16 } \
-    { "i386"        4 12 } }
+		{ "i386:x86-64" 8 16 } \
+		{ "i386:x64-32" 4 16 } \
+		{ "i386"        4 12 } }
 
 foreach info $infos {
     lassign $info arch void_ptr_size long_double_size

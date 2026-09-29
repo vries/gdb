@@ -72,11 +72,11 @@ proc test_branch_insn { test_name } {
     # Can't use {} to create a list of items, because variables will not be
     # evaluated inside the {}.
     gdb_test_sequence "mt print arc arc-instruction $pc" "" [list \
-	"length_with_limm = $length" \
-	"cc = $cc" \
-	"is_control_flow = 1" \
-	"has_delay_slot = $has_delay_slot" \
-	"branch_target = $target_address"]
+								 "length_with_limm = $length" \
+								 "cc = $cc" \
+								 "is_control_flow = 1" \
+								 "has_delay_slot = $has_delay_slot" \
+								 "branch_target = $target_address"]
 }
 
 set branch_test_list { }
@@ -113,10 +113,10 @@ lappend branch_test_list \
     bl_s25 bl_d_s25 bl_s_s13 \
     blcc_s21 blcc_d_s21
 lappend branch_test_list \
-     breq_nt_b_c_s9 breq_d_nt_b_c_s9 breq_t_b_c_s9 breq_d_t_b_c_s9 \
-     breq_nt_b_u6_s9 breq_d_nt_b_u6_s9 breq_t_b_u6_s9 breq_d_t_b_u6_s9 \
-     breq_nt_b_limm_s9 breq_t_b_limm_s9 breq_nt_limm_c_s9 breq_t_limm_c_s9 \
-     breq_nt_limm_u6_s9 breq_t_limm_u6_s9
+    breq_nt_b_c_s9 breq_d_nt_b_c_s9 breq_t_b_c_s9 breq_d_t_b_c_s9 \
+    breq_nt_b_u6_s9 breq_d_nt_b_u6_s9 breq_t_b_u6_s9 breq_d_t_b_u6_s9 \
+    breq_nt_b_limm_s9 breq_t_b_limm_s9 breq_nt_limm_c_s9 breq_t_limm_c_s9 \
+    breq_nt_limm_u6_s9 breq_t_limm_u6_s9
 # lappend branch_test_list jli_s_u10
 lappend branch_test_list leave_s
 lappend branch_test_list lpcc_u7

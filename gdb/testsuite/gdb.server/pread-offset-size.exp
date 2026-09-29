@@ -23,7 +23,7 @@ require allow_gdbserver_tests
 standard_testfile .S
 
 if { [prepare_for_testing ${testfile}.exp $testfile \
-	$srcfile {debug additional_flags=-nostdlib} ] } {
+	  $srcfile {debug additional_flags=-nostdlib} ] } {
     return
 }
 

@@ -33,5 +33,5 @@ gdb_test "continue" "Continuing.\r\n\r\nHardware read watchpoint ${::decimal}: w
 
 # Here should be no repeated notification of the read watchpoint.
 gdb_test "continue" \
-	 "Continuing\\.\[ \r\n\]+Breakpoint ${::decimal}, .*break-at-exit.*" \
-	 "continue to break-at-exit"
+    "Continuing\\.\[ \r\n\]+Breakpoint ${::decimal}, .*break-at-exit.*" \
+    "continue to break-at-exit"

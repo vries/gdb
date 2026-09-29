@@ -21,7 +21,7 @@
 standard_testfile
 
 if {[build_executable $testfile.exp $testfile \
-	$srcfile [list debug nowarnings] ] == -1} {
+	 $srcfile [list debug nowarnings] ] == -1} {
     untested $testfile.exp
     return
 }

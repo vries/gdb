@@ -70,23 +70,23 @@ gdb_test "define nextwhere" \
 
 send_gdb "define nextwhere\n"
 gdb_expect {
-  -re "Redefine command \"nextwhere\".*y or n. $"\
-	  {send_gdb "y\n"
-	   gdb_expect {
-	     -re "Type commands for definition of \"nextwhere\".\r\nEnd with a line saying just \"end\".\r\n>$"\
-		     {send_gdb "bt\nnext\nend\n"
-		      gdb_expect {
-			-re "$gdb_prompt $"\
+    -re "Redefine command \"nextwhere\".*y or n. $"\
+	{send_gdb "y\n"
+	    gdb_expect {
+		-re "Type commands for definition of \"nextwhere\".\r\nEnd with a line saying just \"end\".\r\n>$"\
+		    {send_gdb "bt\nnext\nend\n"
+			gdb_expect {
+			    -re "$gdb_prompt $"\
 				{pass "redefine user command: nextwhere"}
-			timeout {fail "(timeout) redefine user command: nextwhere"}
-		      }
-		     }
-	     timeout {fail "(timeout) redefine user command: nextwhere"}
-	   }
-	  }
-  -re "$gdb_prompt $"\
-	  {fail "redefine user command: nextwhere"}
-  timeout {fail "(timeout) redefine user command: nextwhere"}
+			    timeout {fail "(timeout) redefine user command: nextwhere"}
+			}
+		    }
+		timeout {fail "(timeout) redefine user command: nextwhere"}
+	    }
+	}
+    -re "$gdb_prompt $"\
+	{fail "redefine user command: nextwhere"}
+    timeout {fail "(timeout) redefine user command: nextwhere"}
 }
 
 # Verify that GDB gracefully handles an attempt to redefine the
@@ -161,48 +161,48 @@ gdb_test "dot.c" \
 # command in a user defined function.
 #
 gdb_test_multiple "define ifnospace" "define user command: ifnospace" \
-{
-  -re "Type commands for definition of \"ifnospace\".\r\nEnd with a line saying just \"end\".\r\n>$" \
     {
-      gdb_test_multiple "if(3<4)\nprint \"hi there\\n\"\nend\nend" "send body of ifnospace"  \
-	{
-	 -re "$gdb_prompt $"\
-		 {pass "define user command: ifnospace"}
-	}
+	-re "Type commands for definition of \"ifnospace\".\r\nEnd with a line saying just \"end\".\r\n>$" \
+	    {
+		gdb_test_multiple "if(3<4)\nprint \"hi there\\n\"\nend\nend" "send body of ifnospace"  \
+		    {
+			-re "$gdb_prompt $"\
+			    {pass "define user command: ifnospace"}
+		    }
+	    }
     }
-}
 
 gdb_test "ifnospace" ".*hi there.*" "test ifnospace is parsed correctly"
 
 # Verify that the command parser properly handles command abbreviations.
 with_test_prefix "command abbreviations in define" {
-  set test "define user command: breakmain"
-  gdb_test_multiple "define breakmain" "$test" {
-      -re "Type commands for definition of \"breakmain\".\r\nEnd with a line saying just \"end\".\r\n>$" {
-	  pass "$test"
-	  set test "send body of breakmain"
-	  gdb_test_multiple "break -q main\ncommand\necho\nend\nend" "$test"  {
-	      -re "$gdb_prompt $"\
-		  {pass "$test"}
-	  }
-      }
-  }
+    set test "define user command: breakmain"
+    gdb_test_multiple "define breakmain" "$test" {
+	-re "Type commands for definition of \"breakmain\".\r\nEnd with a line saying just \"end\".\r\n>$" {
+	    pass "$test"
+	    set test "send body of breakmain"
+	    gdb_test_multiple "break -q main\ncommand\necho\nend\nend" "$test"  {
+		-re "$gdb_prompt $"\
+		    {pass "$test"}
+	    }
+	}
+    }
 
-  gdb_test "breakmain" ".*Breakpoint .*" "run user command"
+    gdb_test "breakmain" ".*Breakpoint .*" "run user command"
 
-  # If GDB fails to interpret properly the abbrev "command", the last "end"
-  # will be missing.  Issue it to avoid a desync that would break the other
-  # tests in this file.
-  gdb_test "end" \
-    "This command cannot be used at the top level.*" \
-    "additional end command"
+    # If GDB fails to interpret properly the abbrev "command", the last "end"
+    # will be missing.  Issue it to avoid a desync that would break the other
+    # tests in this file.
+    gdb_test "end" \
+	"This command cannot be used at the top level.*" \
+	"additional end command"
 
-  gdb_test "info break \$bpnum" \
-    [multi_line \
-      "Num     Type\[ \]+Disp Enb Address\[ \]+What.*" \
-      "${::decimal}\[\t \]+breakpoint     keep y.* in main at .*" \
-      "\[\t \]+echo.*"] \
-    "info break shows echo command"
+    gdb_test "info break \$bpnum" \
+	[multi_line \
+	     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*" \
+	     "${::decimal}\[\t \]+breakpoint     keep y.* in main at .*" \
+	     "\[\t \]+echo.*"] \
+	"info break shows echo command"
 }
 
 
@@ -210,16 +210,16 @@ with_test_prefix "command abbreviations in define" {
 # command in a user defined function.
 #
 gdb_test_multiple "define whilenospace" "define user command: whilenospace" \
-{
-  -re "Type commands for definition of \"whilenospace\".\r\nEnd with a line saying just \"end\".\r\n>$" \
     {
-      gdb_test_multiple "set \$i=1\nwhile(\$i<2)\nset \$i=2\nprint \"hi there\\n\"\nend\nend" "send body of whilenospace" \
-	 {
-	   -re "$gdb_prompt $" \
-		   {pass "define user command: whilenospace"}
-	 }
+	-re "Type commands for definition of \"whilenospace\".\r\nEnd with a line saying just \"end\".\r\n>$" \
+	    {
+		gdb_test_multiple "set \$i=1\nwhile(\$i<2)\nset \$i=2\nprint \"hi there\\n\"\nend\nend" "send body of whilenospace" \
+		    {
+			-re "$gdb_prompt $" \
+			    {pass "define user command: whilenospace"}
+		    }
+	    }
     }
-}
 
 gdb_test "whilenospace" ".*hi there.*" "test whilenospace is parsed correctly"
 
@@ -258,25 +258,25 @@ gdb_test "define hook-bar" \
 
 send_gdb "define hook-bar\n"
 gdb_expect {
-  -re "warning: Your new `hook-bar' command does not hook any existing command.\r\nProceed.*y or n. $"\
-	  {send_gdb "y\n"
-	   gdb_expect {
-	     -re "Type commands for definition of \"hook-bar\".\r\nEnd with a line saying just \"end\".\r\n>$"\
-		     {send_gdb "nextwhere\nend\n"
-		      gdb_expect {
-			-re "$gdb_prompt $"\
+    -re "warning: Your new `hook-bar' command does not hook any existing command.\r\nProceed.*y or n. $"\
+	{send_gdb "y\n"
+	    gdb_expect {
+		-re "Type commands for definition of \"hook-bar\".\r\nEnd with a line saying just \"end\".\r\n>$"\
+		    {send_gdb "nextwhere\nend\n"
+			gdb_expect {
+			    -re "$gdb_prompt $"\
 				{pass "define hook undefined command: bar"}
-			timeout {fail "(timeout) define hook undefined command: bar"}
-		      }
-		     }
-	     -re "$gdb_prompt $"\
-		     {fail "define hook undefined command: bar"}
-	     timeout {fail "(timeout) define hook undefined command: bar"}
-	   }
-	  }
-  -re "$gdb_prompt $"\
-	  {fail "define hook undefined command: bar"}
-  timeout {fail "(timeout) define hook undefined command: bar"}
+			    timeout {fail "(timeout) define hook undefined command: bar"}
+			}
+		    }
+		-re "$gdb_prompt $"\
+		    {fail "define hook undefined command: bar"}
+		timeout {fail "(timeout) define hook undefined command: bar"}
+	    }
+	}
+    -re "$gdb_prompt $"\
+	{fail "define hook undefined command: bar"}
+    timeout {fail "(timeout) define hook undefined command: bar"}
 }
 
 # Test creation of an additional target subcommand.

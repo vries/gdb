@@ -354,33 +354,33 @@ proc mi_gdb_start { args } {
 proc mi_delete_breakpoints {} {
     global mi_gdb_prompt
 
-# FIXME: The mi operation won't accept a prompt back and will use the 'all' arg
+    # FIXME: The mi operation won't accept a prompt back and will use the 'all' arg
     send_gdb "102-break-delete\n"
     gdb_expect 30 {
-	 -re "Delete all breakpoints, watchpoints, tracepoints, and catchpoints.*y or n.*$" {
+	-re "Delete all breakpoints, watchpoints, tracepoints, and catchpoints.*y or n.*$" {
 	    send_gdb "y\n"
 	    exp_continue
-	 }
-	 -re "102-break-delete\r\n102\\\^done\r\n$mi_gdb_prompt$" {
-	     # This happens if there were no breakpoints
-	 }
-	 timeout { perror "Delete all breakpoints, watchpoints, tracepoints, and catchpoints in mi_delete_breakpoints (timeout)" ; return }
+	}
+	-re "102-break-delete\r\n102\\\^done\r\n$mi_gdb_prompt$" {
+	    # This happens if there were no breakpoints
+	}
+	timeout { perror "Delete all breakpoints, watchpoints, tracepoints, and catchpoints in mi_delete_breakpoints (timeout)" ; return }
     }
 
-# The correct output is not "No breakpoints, watchpoints, tracepoints, or catchpoints." but an
-# empty BreakpointTable. Also, a query is not acceptable with mi.
+    # The correct output is not "No breakpoints, watchpoints, tracepoints, or catchpoints." but an
+    # empty BreakpointTable. Also, a query is not acceptable with mi.
     send_gdb "103-break-list\n"
     gdb_expect 30 {
-	 -re "103-break-list\r\n103\\\^done,BreakpointTable=\{\}\r\n$mi_gdb_prompt$" {}
-	 -re "103-break-list\r\n103\\\^done,BreakpointTable=\{nr_rows=\".\",nr_cols=\".\",hdr=\\\[\{width=\".*\",alignment=\".*\",col_name=\"number\",colhdr=\"Num\"\}.*colhdr=\"Type\".*colhdr=\"Disp\".*colhdr=\"Enb\".*colhdr=\"Address\".*colhdr=\"What\".*\\\],body=\\\[\\\]\}\r\n$mi_gdb_prompt$" {}
-	 -re "103-break-list\r\n103\\\^doneNo breakpoints, watchpoints, tracepoints, or catchpoints.\r\n\r\n$mi_gdb_prompt$" {warning "Unexpected console text received"}
-	 -re "$mi_gdb_prompt$" { perror "Breakpoints not deleted" ; return }
-	 -re "Delete all breakpoints, watchpoints, tracepoints, and catchpoints.*or n.*$" {
+	-re "103-break-list\r\n103\\\^done,BreakpointTable=\{\}\r\n$mi_gdb_prompt$" {}
+	-re "103-break-list\r\n103\\\^done,BreakpointTable=\{nr_rows=\".\",nr_cols=\".\",hdr=\\\[\{width=\".*\",alignment=\".*\",col_name=\"number\",colhdr=\"Num\"\}.*colhdr=\"Type\".*colhdr=\"Disp\".*colhdr=\"Enb\".*colhdr=\"Address\".*colhdr=\"What\".*\\\],body=\\\[\\\]\}\r\n$mi_gdb_prompt$" {}
+	-re "103-break-list\r\n103\\\^doneNo breakpoints, watchpoints, tracepoints, or catchpoints.\r\n\r\n$mi_gdb_prompt$" {warning "Unexpected console text received"}
+	-re "$mi_gdb_prompt$" { perror "Breakpoints not deleted" ; return }
+	-re "Delete all breakpoints, watchpoints, tracepoints, and catchpoints.*or n.*$" {
 	    warning "Unexpected prompt for breakpoints deletion"
 	    send_gdb "y\n"
 	    exp_continue
 	}
-	 timeout { perror "-break-list (timeout)" ; return }
+	timeout { perror "-break-list (timeout)" ; return }
     }
 }
 
@@ -497,8 +497,8 @@ proc mi_gdb_file_cmd { arg } {
 	}
     }
 
-# FIXME: Several of these patterns are only acceptable for console
-# output.  Queries are an error for mi.
+    # FIXME: Several of these patterns are only acceptable for console
+    # output.  Queries are an error for mi.
     send_gdb "105-file-exec-and-symbols $arg\n"
     gdb_expect 120 {
 	-re "Reading symbols from.*$mi_gdb_prompt$" {
@@ -769,13 +769,13 @@ proc mi_gdb_test { args } {
     }
     verbose -log "Expecting: ^($string_regex\[\r\n\]+)?($pattern\[\r\n\]+$mi_gdb_prompt\[ \]*)"
     gdb_expect $tmt {
-	 -re "\\*\\*\\* DOSEXIT code.*" {
-	     if { $message != "" } {
-		 fail "$message"
-	     }
-	     return -1
-	 }
-	 -re "Ending remote debugging.*$mi_gdb_prompt\[ \]*$" {
+	-re "\\*\\*\\* DOSEXIT code.*" {
+	    if { $message != "" } {
+		fail "$message"
+	    }
+	    return -1
+	}
+	-re "Ending remote debugging.*$mi_gdb_prompt\[ \]*$" {
 	    if {![isnative]} {
 		warning "Can`t communicate to remote target."
 	    }
@@ -783,7 +783,7 @@ proc mi_gdb_test { args } {
 	    gdb_start
 	    set result -1
 	}
-	 -re "^($string_regex\[\r\n\]+)?($pattern\[\r\n\]+$mi_gdb_prompt\[ \]*)" {
+	-re "^($string_regex\[\r\n\]+)?($pattern\[\r\n\]+$mi_gdb_prompt\[ \]*)" {
 	    # At this point, $expect_out(1,string) is the MI input command.
 	    # and $expect_out(2,string) is the MI output command.
 	    # If $expect_out(1,string) is "", then there was no MI input command here.
@@ -801,21 +801,21 @@ proc mi_gdb_test { args } {
 	    }
 	    set result 0
 	}
-	 -re "(${question_string})$" {
+	-re "(${question_string})$" {
 	    send_gdb "$response_string\n"
 	    exp_continue
 	}
-	 -re "Undefined.* command:.*$mi_gdb_prompt\[ \]*$" {
+	-re "Undefined.* command:.*$mi_gdb_prompt\[ \]*$" {
 	    perror "Undefined command \"$command\"."
-	     fail "$message"
+	    fail "$message"
 	    set result 1
 	}
-	 -re "Ambiguous command.*$mi_gdb_prompt\[ \]*$" {
+	-re "Ambiguous command.*$mi_gdb_prompt\[ \]*$" {
 	    perror "\"$command\" is not a unique command name."
-	     fail "$message"
+	    fail "$message"
 	    set result 1
 	}
-	 -re "$inferior_exited_re with code ${::decimal}.*$mi_gdb_prompt\[ \]*$" {
+	-re "$inferior_exited_re with code ${::decimal}.*$mi_gdb_prompt\[ \]*$" {
 	    if {![string match "" $message]} {
 		set errmsg "$message (the program exited)"
 	    } else {
@@ -824,7 +824,7 @@ proc mi_gdb_test { args } {
 	    fail "$errmsg"
 	    return -1
 	}
-	 -re "The program is not being run.*$mi_gdb_prompt\[ \]*$" {
+	-re "The program is not being run.*$mi_gdb_prompt\[ \]*$" {
 	    if {![string match "" $message]} {
 		set errmsg "$message (the program is no longer running)"
 	    } else {
@@ -833,22 +833,22 @@ proc mi_gdb_test { args } {
 	    fail "$errmsg"
 	    return -1
 	}
-	 -re "(.*$mi_gdb_prompt\[ \]*)$" {
+	-re "(.*$mi_gdb_prompt\[ \]*)$" {
 	    if {![string match "" $message]} {
 		fail "$message (unexpected output)"
 	    }
 	    set result 1
 	}
-	 eof {
-	     perror "Process no longer exists"
-	     if { $message != "" } {
-		 fail "$message"
-	     }
-	     return -1
+	eof {
+	    perror "Process no longer exists"
+	    if { $message != "" } {
+		fail "$message"
+	    }
+	    return -1
 	}
-	 full_buffer {
+	full_buffer {
 	    perror "internal buffer is full."
-	     fail "$message"
+	    fail "$message"
 	}
 	timeout	{
 	    if {![string match "" $message]} {
@@ -1068,42 +1068,42 @@ proc mi_clean_restart {{executable ""} {flags {}}} {
 #                breakpoint.
 
 proc mi_runto_helper {func run_or_continue args} {
-  global mi_gdb_prompt expect_out
-  global hex decimal fullname_syntax
+    global mi_gdb_prompt expect_out
+    global hex decimal fullname_syntax
 
-  parse_args {{qualified} {pending}}
+    parse_args {{qualified} {pending}}
 
-  set test "mi runto $func"
-  if {$pending} {
-      set bp [mi_make_breakpoint_pending -type breakpoint -disp del]
-  } else {
-      set bp [mi_make_breakpoint -type breakpoint -disp del \
-		  -func $func\(\\\(.*\\\)\)?]
-  }
-  set extra_opts ""
-  set extra_output ""
-  if {$qualified} {
-      lappend extra_opts "--qualified"
-  }
-  if {$pending} {
-      lappend extra_opts "-f"
-      # MI prints "Function FUNC not defined", "No line NNN in current
-      # file.", etc. to the CLI stream.
-      set extra_output "&\"\[^\r\n\]+\"\r\n"
-  }
+    set test "mi runto $func"
+    if {$pending} {
+	set bp [mi_make_breakpoint_pending -type breakpoint -disp del]
+    } else {
+	set bp [mi_make_breakpoint -type breakpoint -disp del \
+		    -func $func\(\\\(.*\\\)\)?]
+    }
+    set extra_opts ""
+    set extra_output ""
+    if {$qualified} {
+	lappend extra_opts "--qualified"
+    }
+    if {$pending} {
+	lappend extra_opts "-f"
+	# MI prints "Function FUNC not defined", "No line NNN in current
+	# file.", etc. to the CLI stream.
+	set extra_output "&\"\[^\r\n\]+\"\r\n"
+    }
 
-  mi_gdb_test "200-break-insert [join $extra_opts " "] -t $func" "${extra_output}200\\^done,$bp" \
-      "breakpoint at $func"
+    mi_gdb_test "200-break-insert [join $extra_opts " "] -t $func" "${extra_output}200\\^done,$bp" \
+	"breakpoint at $func"
 
-  if {$run_or_continue == "run"} {
-      if { [mi_run_cmd] < 0 } {
-	  return -1
-      }
-  } else {
-      mi_send_resuming_command "exec-continue" "$test"
-  }
+    if {$run_or_continue == "run"} {
+	if { [mi_run_cmd] < 0 } {
+	    return -1
+	}
+    } else {
+	mi_send_resuming_command "exec-continue" "$test"
+    }
 
-  mi_expect_stop "breakpoint-hit" $func ".*" ".*" "${::decimal}" { "" "disp=\"del\"" } $test
+    mi_expect_stop "breakpoint-hit" $func ".*" ".*" "${::decimal}" { "" "disp=\"del\"" } $test
 }
 
 proc mi_runto {func args} {
@@ -1120,7 +1120,7 @@ proc mi_runto_main {} {
 # For return values, see mi_execute_to_helper
 
 proc mi_next { test } {
-  return [mi_next_to {.*} {.*} {.*} {.*} $test]
+    return [mi_next_to {.*} {.*} {.*} {.*} $test]
 }
 
 
@@ -1128,7 +1128,7 @@ proc mi_next { test } {
 # For return values, see mi_execute_to_helper
 
 proc mi_step { test } {
-  return [mi_step_to {.*} {.*} {.*} {.*} $test]
+    return [mi_step_to {.*} {.*} {.*} {.*} $test]
 }
 
 set async "unknown"
@@ -1282,9 +1282,9 @@ proc mi_expect_stop { reason func args file line extra test } {
     set r ""
     if { $reason != "" } {
 	if { [regexp "\"" $reason] } {
-	   set r "reason=$reason,"
+	    set r "reason=$reason,"
 	} else {
-	   set r "reason=\"$reason\","
+	    set r "reason=\"$reason\","
 	}
     }
 
@@ -1521,9 +1521,9 @@ proc mi_varobj_update_dynamic_helper {children} {
 	append crx "{"
 	append crx [mi_varobj_update_kv_helper $child]
 	append crx "}"
-    }
+}
 
-    return $crx
+return $crx
 }
 
 # Update a dynamic varobj named NAME.  CHILDREN is a list of children
@@ -1615,7 +1615,7 @@ proc mi_child_regexp {children add_child} {
 #
 proc mi_list_varobj_children { varname children testname } {
     mi_list_varobj_children_range $varname "" "" [llength $children] $children \
-      $testname
+	$testname
 }
 
 # Like mi_list_varobj_children, but sets a subrange.  NUMCHILDREN is
@@ -1645,7 +1645,7 @@ proc mi_list_varobj_children_range {varname from to numchildren children testnam
     verbose -log "Expecting: $expected"
 
     mi_gdb_test "-var-list-children $options $varname $from $to" \
-      $expected $testname
+	$expected $testname
 }
 
 # Verifies that variable object VARNAME has NUMBER children,
@@ -1657,7 +1657,7 @@ proc mi_list_array_varobj_children { varname number type testname } {
 # Same as mi_list_array_varobj_children, but allowing to pass a start index
 # for an array.
 proc mi_list_array_varobj_children_with_index { varname number start_index \
-  type testname } {
+						    type testname } {
     set t {}
     set index $start_index
     for {set i 0} {$i < $number} {incr i} {
@@ -1838,26 +1838,26 @@ proc_with_prefix mi_continue_to_line {location test} {
 # Wait until gdb prints the current line.
 proc mi_get_stop_line {} {
 
-  global mi_gdb_prompt
-  global async
+    global mi_gdb_prompt
+    global async
 
-  if {$async} {
-      set prompt_re ""
-  } else {
-      set prompt_re "$mi_gdb_prompt$"
-  }
+    if {$async} {
+	set prompt_re ""
+    } else {
+	set prompt_re "$mi_gdb_prompt$"
+    }
 
-  gdb_expect {
-      -re ".*line=\"(\[0-9\]*)\".*\r\n$prompt_re" {
-	  return $expect_out(1,string)
-      }
-      -re ".*$mi_gdb_prompt" {
-	  fail "wait for stop (unexpected output)"
-      }
-      timeout {
-	  fail "wait for stop (timeout)"
-      }
-  }
+    gdb_expect {
+	-re ".*line=\"(\[0-9\]*)\".*\r\n$prompt_re" {
+	    return $expect_out(1,string)
+	}
+	-re ".*$mi_gdb_prompt" {
+	    fail "wait for stop (unexpected output)"
+	}
+	timeout {
+	    fail "wait for stop (timeout)"
+	}
+    }
 }
 
 # Run a MI test embedded in comments in a C file.
@@ -1993,99 +1993,99 @@ proc get_mi_thread_list {name} {
 
 # Helper function for check_mi_and_console_threads.
 proc check_mi_and_console_threads_1 { name } {
-  global expect_out
+    global expect_out
 
-  mi_gdb_test "-thread-list-ids" \
-    {.*\^done,thread-ids={(thread-id="[0-9]+"(,)*)+},current-thread-id="[0-9]+",number-of-threads="[0-9]+"} \
-    "-thread-list-ids"
-  set mi_output {}
-  if {[info exists expect_out(buffer)]} {
-    set mi_output $expect_out(buffer)
-  }
-
-  # GDB will return a list of thread ids and some more info:
-  #
-  # (gdb)
-  # -interpreter-exec console "info threads"
-  # ~"  4 Thread 2051 (LWP 7734)  0x401166b1 in __libc_nanosleep () at __libc_nanosleep:-1"
-  # ~"  3 Thread 1026 (LWP 7733)   () at __libc_nanosleep:-1"
-  # ~"  2 Thread 2049 (LWP 7732)  0x401411f8 in __poll (fds=0x804bb24, nfds=1, timeout=2000) at ../sysdeps/unix/sysv/linux/poll.c:63"
-  # ~"* 1 Thread 1024 (LWP 7731)  main (argc=1, argv=0xbfffdd94) at ../../../src/gdb/testsuite/gdb.mi/pthreads.c:160"
-  # FIXME: kseitz/2002-09-05: Don't use the hack-cli method.
-  mi_gdb_test "info threads" \
-    {.*(~".*"[\r\n]*)+.*} \
-    "info threads"
-  set console_output {}
-  if {[info exists expect_out(buffer)]} {
-    set console_output $expect_out(buffer)
-  }
-
-  # Make a list of all known threads to console (gdb's thread IDs)
-  set console_thread_list {}
-  foreach line [split $console_output \n] {
-    if {[string index $line 0] == "~"} {
-      # This is a line from the console; trim off "~", " ", "*", and "\""
-      set line [string trim $line ~\ \"\*]
-      if {[scan $line "%d" id] == 1} {
-	lappend console_thread_list $id
-      }
+    mi_gdb_test "-thread-list-ids" \
+	{.*\^done,thread-ids={(thread-id="[0-9]+"(,)*)+},current-thread-id="[0-9]+",number-of-threads="[0-9]+"} \
+	"-thread-list-ids"
+    set mi_output {}
+    if {[info exists expect_out(buffer)]} {
+	set mi_output $expect_out(buffer)
     }
-  }
 
-  # Now find the result string from MI
-  set mi_result ""
-  foreach line [split $mi_output \n] {
-    if {[string range $line 0 4] == "^done"} {
-      set mi_result $line
+    # GDB will return a list of thread ids and some more info:
+    #
+    # (gdb)
+    # -interpreter-exec console "info threads"
+    # ~"  4 Thread 2051 (LWP 7734)  0x401166b1 in __libc_nanosleep () at __libc_nanosleep:-1"
+    # ~"  3 Thread 1026 (LWP 7733)   () at __libc_nanosleep:-1"
+    # ~"  2 Thread 2049 (LWP 7732)  0x401411f8 in __poll (fds=0x804bb24, nfds=1, timeout=2000) at ../sysdeps/unix/sysv/linux/poll.c:63"
+    # ~"* 1 Thread 1024 (LWP 7731)  main (argc=1, argv=0xbfffdd94) at ../../../src/gdb/testsuite/gdb.mi/pthreads.c:160"
+    # FIXME: kseitz/2002-09-05: Don't use the hack-cli method.
+    mi_gdb_test "info threads" \
+	{.*(~".*"[\r\n]*)+.*} \
+	"info threads"
+    set console_output {}
+    if {[info exists expect_out(buffer)]} {
+	set console_output $expect_out(buffer)
     }
-  }
-  if {$mi_result == ""} {
-    fail "finding MI result string"
-  } else {
-    pass "finding MI result string"
-  }
 
-  # Finally, extract the thread ids and compare them to the console
-  set num_mi_threads_str ""
-  if {![regexp {number-of-threads="[0-9]+"} $mi_result num_mi_threads_str]} {
-    fail "finding number of threads in MI output"
-  } else {
-    pass "finding number of threads in MI output"
+    # Make a list of all known threads to console (gdb's thread IDs)
+    set console_thread_list {}
+    foreach line [split $console_output \n] {
+	if {[string index $line 0] == "~"} {
+	    # This is a line from the console; trim off "~", " ", "*", and "\""
+	    set line [string trim $line ~\ \"\*]
+	    if {[scan $line "%d" id] == 1} {
+		lappend console_thread_list $id
+	    }
+	}
+    }
 
-    # Extract the number of threads from the MI result
-    if {![scan $num_mi_threads_str {number-of-threads="%d"} num_mi_threads]} {
-      fail "got number of threads from MI"
+    # Now find the result string from MI
+    set mi_result ""
+    foreach line [split $mi_output \n] {
+	if {[string range $line 0 4] == "^done"} {
+	    set mi_result $line
+	}
+    }
+    if {$mi_result == ""} {
+	fail "finding MI result string"
     } else {
-      pass "got number of threads from MI"
-
-      # Check if MI and console have same number of threads
-      if {$num_mi_threads != [llength $console_thread_list]} {
-	fail "console and MI have same number of threads"
-      } else {
-	pass "console and MI have same number of threads"
-
-	# Get MI thread list
-	set mi_thread_list [get_mi_thread_list $name]
-
-	# Check if MI and console have the same threads
-	set fails 0
-	foreach ct [lsort $console_thread_list] mt [lsort $mi_thread_list] {
-	  if {$ct != $mt} {
-	    incr fails
-	  }
-	}
-	if {$fails > 0} {
-	  fail "MI and console have same threads"
-
-	  # Send a list of failures to the log
-	  send_log "Console has thread ids: $console_thread_list\n"
-	  send_log "MI has thread ids: $mi_thread_list\n"
-	} else {
-	  pass "MI and console have same threads"
-	}
-      }
+	pass "finding MI result string"
     }
-  }
+
+    # Finally, extract the thread ids and compare them to the console
+    set num_mi_threads_str ""
+    if {![regexp {number-of-threads="[0-9]+"} $mi_result num_mi_threads_str]} {
+	fail "finding number of threads in MI output"
+    } else {
+	pass "finding number of threads in MI output"
+
+	# Extract the number of threads from the MI result
+	if {![scan $num_mi_threads_str {number-of-threads="%d"} num_mi_threads]} {
+	    fail "got number of threads from MI"
+	} else {
+	    pass "got number of threads from MI"
+
+	    # Check if MI and console have same number of threads
+	    if {$num_mi_threads != [llength $console_thread_list]} {
+		fail "console and MI have same number of threads"
+	    } else {
+		pass "console and MI have same number of threads"
+
+		# Get MI thread list
+		set mi_thread_list [get_mi_thread_list $name]
+
+		# Check if MI and console have the same threads
+		set fails 0
+		foreach ct [lsort $console_thread_list] mt [lsort $mi_thread_list] {
+		    if {$ct != $mt} {
+			incr fails
+		    }
+		}
+		if {$fails > 0} {
+		    fail "MI and console have same threads"
+
+		    # Send a list of failures to the log
+		    send_log "Console has thread ids: $console_thread_list\n"
+		    send_log "MI has thread ids: $mi_thread_list\n"
+		} else {
+		    pass "MI and console have same threads"
+		}
+	    }
+	}
+    }
 }
 
 # Check that MI and the console know of the same threads.
@@ -2265,258 +2265,258 @@ proc mi_get_features {} {
 # structures like linked lists.
 
 namespace eval ::varobj_tree {
-  # An index which is appended to root varobjs to ensure uniqueness.
-  variable _root_idx 0
+    # An index which is appended to root varobjs to ensure uniqueness.
+    variable _root_idx 0
 
-  # A procedure to help with debugging varobj trees.
-  # VARIABLE_NAME is the name of the variable to dump.
-  # CMD, if present, is the name of the callback to output the constructed
-  #   strings. By default, it uses expect's "send_log" command.
-  # TERM, if present, is a terminating character. By default it is the newline.
-  #
-  # To output to the terminal (not the expect log), use
-  # mi_varobj_tree_dump_variable my_variable puts ""
-
-  proc mi_varobj_tree_dump_variable {variable_name {cmd send_log} {term "\n"}} {
-    upvar #0 $variable_name varobj
-
-    # tclint-disable-next-line command-args
-    eval "$cmd \"VAR = $variable_name$term\""
-
-    # Explicitly encode the array indices, since outputting them
-    # in some logical order is better than what "array names" might
-    # return.
-    foreach idx {obj_name parent display_name type path_expr} {
-      # tclint-disable-next-line command-args
-      eval "$cmd \"\t$idx = $varobj($idx)$term\""
-    }
-
-    # Output children
-    set num [llength $varobj(children)]
-    # tclint-disable-next-line command-args
-    eval "$cmd \"\tnum_children = $num$term\""
-    if {$num > 0} {
-      # tclint-disable-next-line command-args
-      eval "$cmd \"\tchildren = $varobj(children)$term\""
-    }
-  }
-
-  # The default callback used by mi_walk_varobj_tree.  This callback
-  # simply checks all of VAR's children.  It specifically does not test
-  # path expressions, since that is very problematic.
-  #
-  # This procedure may be used in custom callbacks.
-  proc test_children_callback {variable_name} {
-    upvar #0 $variable_name varobj
-
-    if {[llength $varobj(children)] > 0} {
-      # Construct the list of children the way mi_list_varobj_children
-      # expects to get it:
-      # { {obj_name display_name num_children type} ... }
-      set children_list {}
-      foreach child $varobj(children) {
-	upvar #0 $child c
-	set clist [list [string_to_regexp $c(obj_name)] \
-		       [string_to_regexp $c(display_name)] \
-		       [llength $c(children)]]
-	if {[string length $c(type)] > 0} {
-	  lappend clist [string_to_regexp $c(type)]
-	}
-	lappend children_list $clist
-      }
-
-      mi_list_varobj_children $varobj(obj_name) $children_list \
-	  "VT: list children of $varobj(obj_name)"
-    }
-  }
-
-  # Set the properties of the varobj represented by
-  # PARENT_VARIABLE - the name of the parent's variable
-  # OBJNAME         - the MI object name of this variable
-  # DISP_NAME       - the display name of this variable
-  # TYPE            - the type of this variable
-  # PATH            - the path expression for this variable
-  # CHILDREN        - a list of the variable's children
-  proc create_varobj {parent_variable objname disp_name \
-			  type path children} {
-    upvar #0 $parent_variable parent
-
-    set var_name "root.$objname"
-    global $var_name
-    array set $var_name [list obj_name $objname]
-    array set $var_name [list display_name $disp_name]
-    array set $var_name [list type $type]
-    array set $var_name [list path_expr $path]
-    array set $var_name [list parent "$parent_variable"]
-    array set $var_name [list children \
-			     [get_tree_children $var_name $children]]
-    return $var_name
-  }
-
-  # Should VARIABLE be used in path expressions?  The CPLUS_FAKE_CHILD
-  # varobjs and anonymous structs/unions are not used for path expressions.
-  proc is_path_expr_parent {variable} {
-    upvar #0 $variable varobj
-
-    # If the varobj's type is "", it is a CPLUS_FAKE_CHILD.
-    # If the tail of the varobj's object name is "%d_anonymous",
-    # then it represents an anonymous struct or union.
-    if {[string length $varobj(type)] == 0 \
-	    || [regexp {[0-9]+_anonymous$} $varobj(obj_name)]} {
-      return false
-    }
-
-    return true
-  }
-
-  # Return the path expression for the variable named NAME in
-  # parent varobj whose variable name is given by PARENT_VARIABLE.
-  proc get_path_expr {parent_variable name type} {
-    upvar #0 $parent_variable parent
-    upvar #0 $parent_variable path_parent
-
-    # If TYPE is "", this is one of the CPLUS_FAKE_CHILD varobjs,
-    # which has no path expression.  Likewsise for anonymous structs
-    # and unions.
-    if {[string length $type] == 0 \
-	    || [string compare $type "anonymous"] == 0} {
-      return ""
-    }
-
-    # Find the path parent variable.
-    while {![is_path_expr_parent $parent_variable]} {
-      set parent_variable $path_parent(parent)
-      upvar #0 $parent_variable path_parent
-    }
-
-    # This is where things get difficult.  We do not actually know
-    # the real type for variables defined via typedefs, so we don't actually
-    # know whether the parent is a structure/union or not.
+    # A procedure to help with debugging varobj trees.
+    # VARIABLE_NAME is the name of the variable to dump.
+    # CMD, if present, is the name of the callback to output the constructed
+    #   strings. By default, it uses expect's "send_log" command.
+    # TERM, if present, is a terminating character. By default it is the newline.
     #
-    # So we assume everything that isn't a simple type is a compound type.
-    set stars ""
-    regexp {\*+} $parent(type) stars
-    set is_compound 1
-    if {[string index $name 0] == "*"} {
-      set is_compound 0
+    # To output to the terminal (not the expect log), use
+    # mi_varobj_tree_dump_variable my_variable puts ""
+
+    proc mi_varobj_tree_dump_variable {variable_name {cmd send_log} {term "\n"}} {
+	upvar #0 $variable_name varobj
+
+	# tclint-disable-next-line command-args
+	eval "$cmd \"VAR = $variable_name$term\""
+
+	# Explicitly encode the array indices, since outputting them
+	# in some logical order is better than what "array names" might
+	# return.
+	foreach idx {obj_name parent display_name type path_expr} {
+	    # tclint-disable-next-line command-args
+	    eval "$cmd \"\t$idx = $varobj($idx)$term\""
+	}
+
+	# Output children
+	set num [llength $varobj(children)]
+	# tclint-disable-next-line command-args
+	eval "$cmd \"\tnum_children = $num$term\""
+	if {$num > 0} {
+	    # tclint-disable-next-line command-args
+	    eval "$cmd \"\tchildren = $varobj(children)$term\""
+	}
     }
 
-    if {[string index $parent(type) end] == "\]"} {
-      # Parent is an array.
-      return "($path_parent(path_expr))\[$name\]"
-    } elseif {$is_compound} {
-      # Parent is a structure or union or a pointer to one.
-      if {[string length $stars]} {
-	set join "->"
-      } else {
-	set join "."
-      }
+    # The default callback used by mi_walk_varobj_tree.  This callback
+    # simply checks all of VAR's children.  It specifically does not test
+    # path expressions, since that is very problematic.
+    #
+    # This procedure may be used in custom callbacks.
+    proc test_children_callback {variable_name} {
+	upvar #0 $variable_name varobj
 
-      global root
+	if {[llength $varobj(children)] > 0} {
+	    # Construct the list of children the way mi_list_varobj_children
+	    # expects to get it:
+	    # { {obj_name display_name num_children type} ... }
+	    set children_list {}
+	    foreach child $varobj(children) {
+		upvar #0 $child c
+		set clist [list [string_to_regexp $c(obj_name)] \
+			       [string_to_regexp $c(display_name)] \
+			       [llength $c(children)]]
+		if {[string length $c(type)] > 0} {
+		    lappend clist [string_to_regexp $c(type)]
+		}
+		lappend children_list $clist
+	    }
 
-      # To make matters even more hideous, varobj.c has slightly different
-      # path expressions for C and C++.
-      set path_expr "($path_parent(path_expr))$join$name"
-      if {[string compare -nocase $root(language) "c"] == 0} {
-	return $path_expr
-      } else {
-	return "($path_expr)"
-      }
-    } else {
-      # Parent is a pointer.
-      return "*($path_parent(path_expr))"
+	    mi_list_varobj_children $varobj(obj_name) $children_list \
+		"VT: list children of $varobj(obj_name)"
+	}
     }
-  }
 
-  # Process the CHILDREN (a list of varobj_tree elements) of the variable
-  # given by PARENT_VARIABLE.  Returns a list of children variables.
-  proc get_tree_children {parent_variable children} {
-    upvar #0 $parent_variable parent
+    # Set the properties of the varobj represented by
+    # PARENT_VARIABLE - the name of the parent's variable
+    # OBJNAME         - the MI object name of this variable
+    # DISP_NAME       - the display name of this variable
+    # TYPE            - the type of this variable
+    # PATH            - the path expression for this variable
+    # CHILDREN        - a list of the variable's children
+    proc create_varobj {parent_variable objname disp_name \
+			    type path children} {
+	upvar #0 $parent_variable parent
 
-    set field_idx 0
-    set children_list {}
-    foreach {type name children} $children {
-      if {[string compare $parent_variable "root"] == 0} {
-	# Root variable
+	set var_name "root.$objname"
+	global $var_name
+	array set $var_name [list obj_name $objname]
+	array set $var_name [list display_name $disp_name]
+	array set $var_name [list type $type]
+	array set $var_name [list path_expr $path]
+	array set $var_name [list parent "$parent_variable"]
+	array set $var_name [list children \
+				 [get_tree_children $var_name $children]]
+	return $var_name
+    }
+
+    # Should VARIABLE be used in path expressions?  The CPLUS_FAKE_CHILD
+    # varobjs and anonymous structs/unions are not used for path expressions.
+    proc is_path_expr_parent {variable} {
+	upvar #0 $variable varobj
+
+	# If the varobj's type is "", it is a CPLUS_FAKE_CHILD.
+	# If the tail of the varobj's object name is "%d_anonymous",
+	# then it represents an anonymous struct or union.
+	if {[string length $varobj(type)] == 0 \
+		|| [regexp {[0-9]+_anonymous$} $varobj(obj_name)]} {
+	    return false
+	}
+
+	return true
+    }
+
+    # Return the path expression for the variable named NAME in
+    # parent varobj whose variable name is given by PARENT_VARIABLE.
+    proc get_path_expr {parent_variable name type} {
+	upvar #0 $parent_variable parent
+	upvar #0 $parent_variable path_parent
+
+	# If TYPE is "", this is one of the CPLUS_FAKE_CHILD varobjs,
+	# which has no path expression.  Likewsise for anonymous structs
+	# and unions.
+	if {[string length $type] == 0 \
+		|| [string compare $type "anonymous"] == 0} {
+	    return ""
+	}
+
+	# Find the path parent variable.
+	while {![is_path_expr_parent $parent_variable]} {
+	    set parent_variable $path_parent(parent)
+	    upvar #0 $parent_variable path_parent
+	}
+
+	# This is where things get difficult.  We do not actually know
+	# the real type for variables defined via typedefs, so we don't actually
+	# know whether the parent is a structure/union or not.
+	#
+	# So we assume everything that isn't a simple type is a compound type.
+	set stars ""
+	regexp {\*+} $parent(type) stars
+	set is_compound 1
+	if {[string index $name 0] == "*"} {
+	    set is_compound 0
+	}
+
+	if {[string index $parent(type) end] == "\]"} {
+	    # Parent is an array.
+	    return "($path_parent(path_expr))\[$name\]"
+	} elseif {$is_compound} {
+	    # Parent is a structure or union or a pointer to one.
+	    if {[string length $stars]} {
+		set join "->"
+	    } else {
+		set join "."
+	    }
+
+	    global root
+
+	    # To make matters even more hideous, varobj.c has slightly different
+	    # path expressions for C and C++.
+	    set path_expr "($path_parent(path_expr))$join$name"
+	    if {[string compare -nocase $root(language) "c"] == 0} {
+		return $path_expr
+	    } else {
+		return "($path_expr)"
+	    }
+	} else {
+	    # Parent is a pointer.
+	    return "*($path_parent(path_expr))"
+	}
+    }
+
+    # Process the CHILDREN (a list of varobj_tree elements) of the variable
+    # given by PARENT_VARIABLE.  Returns a list of children variables.
+    proc get_tree_children {parent_variable children} {
+	upvar #0 $parent_variable parent
+
+	set field_idx 0
+	set children_list {}
+	foreach {type name children} $children {
+	    if {[string compare $parent_variable "root"] == 0} {
+		# Root variable
+		variable _root_idx
+		incr _root_idx
+		set objname "$name$_root_idx"
+		set disp_name "$name"
+		set path_expr "$name"
+	    } elseif {[string compare $type "anonymous"] == 0} {
+		# Special case: anonymous types.  In this case, NAME will either be
+		# "struct" or "union".
+		set objname "$parent(obj_name).${field_idx}_anonymous"
+		set disp_name "<anonymous $name>"
+		set path_expr ""
+		set type "$name {...}"
+	    } else {
+		set objname "$parent(obj_name).$name"
+		set disp_name $name
+		set path_expr [get_path_expr $parent_variable $name $type]
+	    }
+
+	    lappend children_list [create_varobj $parent_variable $objname \
+				       $disp_name $type $path_expr $children]
+	    incr field_idx
+	}
+
+	return $children_list
+    }
+
+    # The main procedure to call the given CALLBACK on the elements of the
+    # given varobj TREE.  See detailed explanation above.
+    proc walk_tree {language tree callback} {
+	global root
 	variable _root_idx
-	incr _root_idx
-	set objname "$name$_root_idx"
-	set disp_name "$name"
-	set path_expr "$name"
-      } elseif {[string compare $type "anonymous"] == 0} {
-	# Special case: anonymous types.  In this case, NAME will either be
-	# "struct" or "union".
-	set objname "$parent(obj_name).${field_idx}_anonymous"
-	set disp_name "<anonymous $name>"
-	set path_expr ""
-	set type "$name {...}"
-      } else {
-	set objname "$parent(obj_name).$name"
-	set disp_name $name
-	set path_expr [get_path_expr $parent_variable $name $type]
-      }
 
-      lappend children_list [create_varobj $parent_variable $objname \
-				 $disp_name $type $path_expr $children]
-      incr field_idx
+	if {[llength $tree] < 3} {
+	    error "tree does not contain enough elements"
+	}
+
+	set _root_idx 0
+
+	# Create root node and process the tree.
+	array set root [list language $language]
+	array set root [list obj_name "root"]
+	array set root [list display_name "root"]
+	array set root [list type "root"]
+	array set root [list path_expr "root"]
+	array set root [list parent "root"]
+	array set root [list children [get_tree_children root $tree]]
+
+	# Walk the tree
+	set all_nodes $root(children); # a stack of nodes
+	while {[llength $all_nodes] > 0} {
+	    # "Pop" the name of the global variable containing this varobj's
+	    # information from the stack of nodes.
+	    set var_name [lindex $all_nodes 0]
+	    set all_nodes [lreplace $all_nodes 0 0]
+
+	    # Bring the global named in VAR_NAME into scope as the local variable
+	    # VAROBJ.
+	    upvar #0 $var_name varobj
+
+	    # Append any children of VAROBJ to the list of nodes to walk.
+	    if {[llength $varobj(children)] > 0} {
+		set all_nodes [concat $all_nodes $varobj(children)]
+	    }
+
+	    # If this is a root variable, create the variable object for it.
+	    if {[string compare $varobj(parent) "root"] == 0} {
+		mi_create_varobj $varobj(obj_name) $varobj(display_name) \
+		    "VT: create root varobj for $varobj(display_name)"
+	    }
+
+	    # Now call the callback for VAROBJ.
+	    uplevel #0 $callback $var_name
+	}
     }
-
-    return $children_list
-  }
-
-  # The main procedure to call the given CALLBACK on the elements of the
-  # given varobj TREE.  See detailed explanation above.
-  proc walk_tree {language tree callback} {
-    global root
-    variable _root_idx
-
-    if {[llength $tree] < 3} {
-      error "tree does not contain enough elements"
-    }
-
-    set _root_idx 0
-
-    # Create root node and process the tree.
-    array set root [list language $language]
-    array set root [list obj_name "root"]
-    array set root [list display_name "root"]
-    array set root [list type "root"]
-    array set root [list path_expr "root"]
-    array set root [list parent "root"]
-    array set root [list children [get_tree_children root $tree]]
-
-    # Walk the tree
-    set all_nodes $root(children); # a stack of nodes
-    while {[llength $all_nodes] > 0} {
-      # "Pop" the name of the global variable containing this varobj's
-      # information from the stack of nodes.
-      set var_name [lindex $all_nodes 0]
-      set all_nodes [lreplace $all_nodes 0 0]
-
-      # Bring the global named in VAR_NAME into scope as the local variable
-      # VAROBJ.
-      upvar #0 $var_name varobj
-
-      # Append any children of VAROBJ to the list of nodes to walk.
-      if {[llength $varobj(children)] > 0} {
-	set all_nodes [concat $all_nodes $varobj(children)]
-      }
-
-      # If this is a root variable, create the variable object for it.
-      if {[string compare $varobj(parent) "root"] == 0} {
-	mi_create_varobj $varobj(obj_name) $varobj(display_name) \
-	    "VT: create root varobj for $varobj(display_name)"
-      }
-
-      # Now call the callback for VAROBJ.
-      uplevel #0 $callback $var_name
-    }
-  }
 }
 
 # The default varobj tree callback, which simply tests -var-list-children.
 proc mi_varobj_tree_test_children_callback {variable} {
-  ::varobj_tree::test_children_callback $variable
+    ::varobj_tree::test_children_callback $variable
 }
 
 # Walk the variable object tree given by TREE, calling the specified
@@ -2524,7 +2524,7 @@ proc mi_varobj_tree_test_children_callback {variable} {
 proc mi_walk_varobj_tree {language tree \
 			      {callback \
 				   mi_varobj_tree_test_children_callback}} {
-  ::varobj_tree::walk_tree $language $tree $callback
+    ::varobj_tree::walk_tree $language $tree $callback
 }
 
 # Build a list of key-value pairs given by the list ATTR_LIST.  Flatten
@@ -2592,7 +2592,7 @@ proc mi_make_breakpoint_loc {args} {
 # Bits shared between mi_make_breakpoint and mi_make_breakpoint_multi.
 
 proc mi_make_breakpoint_1 {attr_list thread inferior cond evaluated-by \
-			   times ignore script original-location} {
+			       times ignore script original-location} {
     set result "bkpt=\\\{[mi_build_kv_pairs $attr_list]"
 
     # There are always exceptions.
@@ -2923,10 +2923,10 @@ proc mi_get_valueof { fmt exp default {test ""} } {
 
 proc foreach_mi_ui_mode { var_name body } {
     if {[gdb_debug_enabled]} {
-       # gdb debug doesn't work for separate-mi-tty.
-       set modes {"main"}
+	# gdb debug doesn't work for separate-mi-tty.
+	set modes {"main"}
     } else {
-       set modes {"main" "separate"}
+	set modes {"main" "separate"}
     }
 
     transparent_uplevel [subst_vars {

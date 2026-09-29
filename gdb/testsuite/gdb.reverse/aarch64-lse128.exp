@@ -36,7 +36,7 @@ standard_testfile
 require allow_aarch64_lse128_tests
 
 if {[prepare_for_testing "failed to prepare" ${testfile} ${srcfile} \
-	[list debug additional_flags=-march=armv8-a+lse128]]} {
+	 [list debug additional_flags=-march=armv8-a+lse128]]} {
     return
 }
 
@@ -57,7 +57,7 @@ proc test_single_asm {insn} {
 	    "$insn: break before instruction sequence"
 	gdb_continue_to_breakpoint "$insn: about to execute instruction sequence" \
 	    [multi_line ".*/aarch64-lse128.c:${::decimal}" \
-		"${::decimal}\[ \t\]+__asm__ volatile \\(\"${insn} .*\".*"]
+		 "${::decimal}\[ \t\]+__asm__ volatile \\(\"${insn} .*\".*"]
 
 	# Depending on the compiler, the line number information may put GDB a few
 	# instructions before the beginning of the asm statement.
@@ -88,7 +88,7 @@ proc test_single_asm {insn} {
 
 	gdb_continue_to_breakpoint "reversed execution of instruction sequence" \
 	    [multi_line ".*/aarch64-lse128.c:${::decimal}" \
-		"${::decimal}\[ \t\]+__asm__ volatile \\(\"${insn} .*\".*"]
+		 "${::decimal}\[ \t\]+__asm__ volatile \\(\"${insn} .*\".*"]
 
 	# Record the final memory and register values.
 	foreach r $regs {
@@ -100,35 +100,35 @@ proc test_single_asm {insn} {
 		"$insn: check $v initial value versus $v final value"
 	}
 	foreach v {x19 x20} {
-		gdb_assert [string compare [set ${v}_initial] [set ${v}_new]] \
+	    gdb_assert [string compare [set ${v}_initial] [set ${v}_new]] \
 		"$insn: check $v initial value versus $v new value"
 	}
 	gdb_assert ![string compare [set x21_initial] [set x21_new]] \
-	"$insn: check x21 initial value versus x21 new value"
+	    "$insn: check x21 initial value versus x21 new value"
 
 	# Restore forward execution and go to end of recording.
 	gdb_test_no_output "set exec-direction forward"
 	gdb_test "record goto end" \
 	    [multi_line \
-		"Go forward to insn number ${::decimal}" \
-		"#0  main \\(\\) at .*/aarch64-lse128.c:${::decimal}" \
-		".*"]
+		 "Go forward to insn number ${::decimal}" \
+		 "#0  main \\(\\) at .*/aarch64-lse128.c:${::decimal}" \
+		 ".*"]
     }
 }
 
 set cases {
-	{ ldclrp }
-	{ ldclrpa }
-	{ ldclrpal }
-	{ ldclrpl }
-	{ ldsetp }
-	{ ldsetpa }
-	{ ldsetpal }
-	{ ldsetpl }
-	{ swpp }
-	{ swppa }
-	{ swppal }
-	{ swppl }
+    { ldclrp }
+    { ldclrpa }
+    { ldclrpal }
+    { ldclrpl }
+    { ldsetp }
+    { ldsetpa }
+    { ldsetpal }
+    { ldsetpl }
+    { swpp }
+    { swppa }
+    { swppal }
+    { swppl }
 }
 
 foreach c $cases {

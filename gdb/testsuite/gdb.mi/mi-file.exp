@@ -48,8 +48,8 @@ proc test_file_list_exec_source_file {} {
     set line_default $line_main_prologue
 
     mi_gdb_test "111-file-list-exec-source-file" \
-	    "111\\\^done,line=\"$line_default\",file=\"${srcfilepath}\",fullname=\"$fullname_syntax${srcfile}\",macro-info=\"0\"" \
-	       "request path info of current source file (${srcfile})"
+	"111\\\^done,line=\"$line_default\",file=\"${srcfilepath}\",fullname=\"$fullname_syntax${srcfile}\",macro-info=\"0\"" \
+	"request path info of current source file (${srcfile})"
 }
 
 proc test_file_list_exec_source_files {} {
@@ -58,8 +58,8 @@ proc test_file_list_exec_source_files {} {
 
     # get the path and absolute path to the current executable
     mi_gdb_test "222-file-list-exec-source-files" \
-	    "222\\\^done,files=\\\[\{file=\".*${srcfile}\",fullname=\"$fullname_syntax${srcfile}\",debug-fully-read=\"\[^\"\]+\"\}.*]" \
-	      "Getting a list of source files."
+	"222\\\^done,files=\\\[\{file=\".*${srcfile}\",fullname=\"$fullname_syntax${srcfile}\",debug-fully-read=\"\[^\"\]+\"\}.*]" \
+	"Getting a list of source files."
 }
 
 test_file_list_exec_source_file

@@ -44,13 +44,13 @@ mi_next "step over \"foo = 0\""
 mi_create_varobj "fooPtr" "foo" "create fooPtr"
 
 mi_gdb_test "-var-list-children fooPtr" \
-  "(&\".*\"\r\n)*\\^done,numchild=\"3\",.*" \
-  "list children of fooPtr"
+    "(&\".*\"\r\n)*\\^done,numchild=\"3\",.*" \
+    "list children of fooPtr"
 
 foreach i [list x y z] {
-  mi_gdb_test "-var-list-children fooPtr.$i" \
-    "(&\".*\"\r\n)*\\^done,numchild=\"0\",has_more=\"0\"" \
-    "list children of fooPtr.$i"
+    mi_gdb_test "-var-list-children fooPtr.$i" \
+	"(&\".*\"\r\n)*\\^done,numchild=\"0\",has_more=\"0\"" \
+	"list children of fooPtr.$i"
 }
 
 mi_gdb_exit

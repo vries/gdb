@@ -31,12 +31,12 @@ set retval 0
 standard_testfile .s
 
 if { [prepare_for_testing "failed to prepare" $testfile "$srcfile" \
-      {debug quiet}] } {
+	  {debug quiet}] } {
     return
 }
 
 if {![runto_main]} {
-      return
+    return
 }
 
 set check_pc [get_hexadecimal_valueof "\$pc" "default0"]

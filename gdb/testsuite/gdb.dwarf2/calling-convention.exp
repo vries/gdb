@@ -82,16 +82,16 @@ gdb_breakpoint "foo"
 gdb_continue_to_breakpoint "foo"
 
 gdb_test "return 35" \
-       "Not confirmed" \
-       "return 35" \
-       [multi_line \
-	   "Function 'foo' does not follow the target calling convention\\." \
-	   "If you continue, setting the return value will probably lead to unpredictable behaviors\\." \
-	   "Make foo return now\\? \\(y or n\\) $"] \
-       "n"
+    "Not confirmed" \
+    "return 35" \
+    [multi_line \
+	 "Function 'foo' does not follow the target calling convention\\." \
+	 "If you continue, setting the return value will probably lead to unpredictable behaviors\\." \
+	 "Make foo return now\\? \\(y or n\\) $"] \
+    "n"
 
 gdb_test "finish" [multi_line \
-    "Run till exit from #0  $hex in foo \\(\\)" \
-    "warning: Function 'foo' does not follow the target calling convention, cannot determine its returned value\." \
-    "$hex in main \\(\\)" \
-    "Value returned has type: int. Cannot determine contents"]
+		       "Run till exit from #0  $hex in foo \\(\\)" \
+		       "warning: Function 'foo' does not follow the target calling convention, cannot determine its returned value\." \
+		       "$hex in main \\(\\)" \
+		       "Value returned has type: int. Cannot determine contents"]

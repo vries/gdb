@@ -41,7 +41,7 @@ proc test_stepi_nexti {} {
     set line [mi_execute_to "exec-step-instruction" "end-stepping-range" "main" "" \
 		  ".*basics.c" "${::decimal}" "" "step-instruction at main"]
     if { $line >= $line_main_body && $line <= $line_main_hello } {
-		pass "step-instruction at main, line check"
+	pass "step-instruction at main, line check"
     } else {
 	fail "step-instruction at main, line check"
     }

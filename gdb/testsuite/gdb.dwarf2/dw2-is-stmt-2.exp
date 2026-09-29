@@ -169,7 +169,7 @@ foreach entry $locs {
 	"step to $pattern"
 
     set pc [get_hexadecimal_valueof "\$pc" "NO-PC" \
-	       "read \$pc at $pattern"]
+		"read \$pc at $pattern"]
     set val [get_hexadecimal_valueof "&${label}" "INVALID"]
     gdb_assert { $pc == $val } \
 	"check pc at $pattern"

@@ -84,13 +84,13 @@ proc do_tests {force_internal_tls} {
 	set tlserr "The inferior has not yet allocated storage for thread-local variables.*"
 	foreach n {1 2 3 4} {
 	    gdb_test "print tls_lib${n}_tbss_1" \
-		     "0|${tlserr}"
+		"0|${tlserr}"
 	    gdb_test "print tls_lib${n}_tbss_2" \
-		     "0|${tlserr}"
+		"0|${tlserr}"
 	    gdb_test "print tls_lib${n}_tdata_1" \
-		     "96|${tlserr}"
+		"96|${tlserr}"
 	    gdb_test "print tls_lib${n}_tdata_2" \
-		     "97|${tlserr}"
+		"97|${tlserr}"
 	}
 	foreach n {10 11} {
 	    gdb_test "print tls_lib${n}_tbss_1" ".* = 0"
@@ -362,14 +362,14 @@ if { [gdb_compile_shlib $libsrc $lib11obj [list debug additional_flags=-DN=11]] 
 # gdb_compile_pthreads.
 
 if { [gdb_compile_pthreads "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable \
-			    [list debug shlib_load \
-				  shlib=${lib10obj} \
-				  shlib=${lib11obj} \
-				  additional_flags=-DOBJ1=\"${lib1obj}\" \
-				  additional_flags=-DOBJ2=\"${lib2obj}\" \
-				  additional_flags=-DOBJ3=\"${lib3obj}\" \
-				  additional_flags=-DOBJ4=\"${lib4obj}\" \
-								]] != "" } {
+	  [list debug shlib_load \
+	       shlib=${lib10obj} \
+	       shlib=${lib11obj} \
+	       additional_flags=-DOBJ1=\"${lib1obj}\" \
+	       additional_flags=-DOBJ2=\"${lib2obj}\" \
+	       additional_flags=-DOBJ3=\"${lib3obj}\" \
+	       additional_flags=-DOBJ4=\"${lib4obj}\" \
+	      ]] != "" } {
     untested "failed to compile"
 } else {
     foreach_with_prefix force_internal_tls $internal_tls_iters {

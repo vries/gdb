@@ -335,9 +335,9 @@ proc check_for_block_ranges_1 {} {
 		     "get address of foo end"]
 
     set main_4 [get_hexadecimal_valueof "&main_4" "*UNKNOWN*" \
-		     "get address of main_4 label"]
+		    "get address of main_4 label"]
     set main_7 [get_hexadecimal_valueof "&main_7" "*UNKNOWN*" \
-		     "get address of main_7 label"]
+		    "get address of main_7 label"]
 
     gdb_test "maintenance info blocks" \
 	[multi_line \
@@ -493,9 +493,9 @@ proc check_for_block_ranges_2 {} {
 		     "get address of foo end"]
 
     set main_4 [get_hexadecimal_valueof "&main_4" "*UNKNOWN*" \
-		     "get address of main_4 label"]
+		    "get address of main_4 label"]
     set main_7 [get_hexadecimal_valueof "&main_7" "*UNKNOWN*" \
-		     "get address of main_7 label"]
+		    "get address of main_7 label"]
 
     gdb_test "maintenance info blocks" \
 	[multi_line \

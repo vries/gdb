@@ -43,5 +43,5 @@ gdb_run_cmd
 gdb_test "" "Program received signal SIGTRAP.*" "run past gdb1435"
 
 gdb_test "backtrace 10" \
-	"#1\[ \t]*$hex in gdb1435.*\r\n#2\[ \t\]*$hex in main.*" \
-	"backtrace past gdb1435"
+    "#1\[ \t]*$hex in gdb1435.*\r\n#2\[ \t\]*$hex in main.*" \
+    "backtrace past gdb1435"

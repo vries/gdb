@@ -73,7 +73,7 @@ proc run_condition_test { stop_at_cond \
     gdb_breakpoint \
 	"${::srcfile}:${::cond_bp_line} if (${cond_func} ())"
     set cond_bp_num [get_integer_valueof "\$bpnum" "*UNKNOWN*" \
-			"get number for conditional breakpoint"]
+			 "get number for conditional breakpoint"]
 
     # And a breakpoint that we hit when the test is over, this one is
     # not conditional.

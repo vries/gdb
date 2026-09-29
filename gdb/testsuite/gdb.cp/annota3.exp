@@ -118,16 +118,16 @@ gdb_expect_list "continue to exit" "$gdb_prompt$" $el
 #
 send_gdb "delete\n"
 gdb_expect {
-  -re ".*Delete all breakpoints, watchpoints, tracepoints, and catchpoints. \\(y or n\\) \r\n\032\032query.*$" {
-	   send_gdb "y\n"
-	   gdb_expect {
-	     -re "\r\n\032\032post-query\r\n$gdb_prompt$" { pass "delete bps" }
-	     -re ".*$gdb_prompt$" { fail "delete bps" }
-	     timeout  { fail "delete bps (timeout)" }
-	 }
-     }
-  -re ".*$gdb_prompt$" { fail "delete bps" }
-  timeout  { fail "delete bps (timeout)" }
+    -re ".*Delete all breakpoints, watchpoints, tracepoints, and catchpoints. \\(y or n\\) \r\n\032\032query.*$" {
+	send_gdb "y\n"
+	gdb_expect {
+	    -re "\r\n\032\032post-query\r\n$gdb_prompt$" { pass "delete bps" }
+	    -re ".*$gdb_prompt$" { fail "delete bps" }
+	    timeout  { fail "delete bps (timeout)" }
+	}
+    }
+    -re ".*$gdb_prompt$" { fail "delete bps" }
+    timeout  { fail "delete bps (timeout)" }
 }
 
 #
@@ -164,7 +164,7 @@ send_gdb "watch a.x\n"
 gdb_expect_list "set watch on a.x" "$gdb_prompt$" {
     "\r\n\032\032post-prompt\r\n"
     ".*atchpoint 3: a.x\r\n" \
-}
+    }
 
 #
 # do a next, so that the watchpoint triggers. This will test:

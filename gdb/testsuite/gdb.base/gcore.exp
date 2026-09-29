@@ -30,10 +30,10 @@ if {![runto_main]} {
 }
 
 gdb_test "break terminal_func" "Breakpoint .* at .*${srcfile}, line .*" \
-	"set breakpoint at terminal_func"
+    "set breakpoint at terminal_func"
 
 gdb_test "continue" "Breakpoint .* terminal_func.*" \
-	"continue to terminal_func"
+    "continue to terminal_func"
 
 set print_prefix ".\[0123456789\]* = "
 
@@ -42,15 +42,15 @@ set pre_corefile_regs [capture_command_output "info registers" ""]
 set pre_corefile_allregs [capture_command_output "info all-reg" ""]
 set pre_corefile_sysregs [capture_command_output "info reg system" ""]
 set pre_corefile_static_array \
-	[capture_command_output "print static_array" "$print_prefix"]
+    [capture_command_output "print static_array" "$print_prefix"]
 set pre_corefile_uninit_array \
-	[capture_command_output "print un_initialized_array" "$print_prefix"]
+    [capture_command_output "print un_initialized_array" "$print_prefix"]
 set pre_corefile_heap_string \
-	[capture_command_output "print heap_string" "$print_prefix"]
+    [capture_command_output "print heap_string" "$print_prefix"]
 set pre_corefile_local_array \
-	[capture_command_output "print array_func::local_array" "$print_prefix"]
+    [capture_command_output "print array_func::local_array" "$print_prefix"]
 set pre_corefile_extern_array \
-	[capture_command_output "print extern_array" "$print_prefix"]
+    [capture_command_output "print extern_array" "$print_prefix"]
 
 set corefile [standard_output_file gcore.test]
 set core_supported [gdb_gcore_cmd "$corefile" "save a corefile"]
@@ -101,7 +101,7 @@ if {![string compare $pre_corefile_sysregs $post_corefile_sysregs]} {
 }
 
 set post_corefile_extern_array \
-	[capture_command_output "print extern_array" "$print_prefix"]
+    [capture_command_output "print extern_array" "$print_prefix"]
 if {![string compare $pre_corefile_extern_array $post_corefile_extern_array]} {
     pass "corefile restored extern array"
 } else {
@@ -109,7 +109,7 @@ if {![string compare $pre_corefile_extern_array $post_corefile_extern_array]} {
 }
 
 set post_corefile_static_array \
-	[capture_command_output "print static_array" "$print_prefix"]
+    [capture_command_output "print static_array" "$print_prefix"]
 if {![string compare $pre_corefile_static_array $post_corefile_static_array]} {
     pass "corefile restored static array"
 } else {
@@ -117,7 +117,7 @@ if {![string compare $pre_corefile_static_array $post_corefile_static_array]} {
 }
 
 set post_corefile_uninit_array \
-	[capture_command_output "print un_initialized_array" "$print_prefix"]
+    [capture_command_output "print un_initialized_array" "$print_prefix"]
 if {![string compare $pre_corefile_uninit_array $post_corefile_uninit_array]} {
     pass "corefile restored un-initialized array"
 } else {
@@ -125,7 +125,7 @@ if {![string compare $pre_corefile_uninit_array $post_corefile_uninit_array]} {
 }
 
 set post_corefile_heap_string \
-	[capture_command_output "print heap_string" "$print_prefix"]
+    [capture_command_output "print heap_string" "$print_prefix"]
 if {![string compare $pre_corefile_heap_string $post_corefile_heap_string]} {
     pass "corefile restored heap array"
 } else {
@@ -133,7 +133,7 @@ if {![string compare $pre_corefile_heap_string $post_corefile_heap_string]} {
 }
 
 set post_corefile_local_array \
-	[capture_command_output "print array_func::local_array" "$print_prefix"]
+    [capture_command_output "print array_func::local_array" "$print_prefix"]
 if {![string compare $pre_corefile_local_array $post_corefile_local_array]} {
     pass "corefile restored stack array"
 } else {

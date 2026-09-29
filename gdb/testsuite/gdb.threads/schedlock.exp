@@ -60,21 +60,21 @@ proc get_args { description } {
 }
 
 proc stop_process { description } {
-  global gdb_prompt
+    global gdb_prompt
 
-  # For this to work we must be sure to consume the "Continuing."
-  # message first, or GDB's signal handler may not be in place.
-  after 1000 {send_gdb "\003"}
-  gdb_expect {
-    -re "Thread .* received signal SIGINT.*$gdb_prompt $"
-      {
-	pass $description
-      }
-    timeout
-      {
-	fail "$description (timeout)"
-      }
-  }
+    # For this to work we must be sure to consume the "Continuing."
+    # message first, or GDB's signal handler may not be in place.
+    after 1000 {send_gdb "\003"}
+    gdb_expect {
+	-re "Thread .* received signal SIGINT.*$gdb_prompt $"
+	{
+	    pass $description
+	}
+	timeout
+	{
+	    fail "$description (timeout)"
+	}
+    }
 }
 
 proc get_current_thread { description } {
@@ -183,14 +183,14 @@ set cont_args [get_args "after initial"]
 
 set bad 0
 for {set i 0} {$i < $NUM} {incr i} {
-  if {[lindex $start_args $i] == [lindex $cont_args $i]} {
-    incr bad
-  }
+    if {[lindex $start_args $i] == [lindex $cont_args $i]} {
+	incr bad
+    }
 }
 if { $bad == 0 } {
-  pass "all threads alive"
+    pass "all threads alive"
 } else {
-  fail "all threads alive ($bad/$NUM did not run)"
+    fail "all threads alive ($bad/$NUM did not run)"
 }
 
 # Compare the previous thread and args with the current thread and
@@ -236,7 +236,7 @@ proc check_result { cmd before_thread before_args locked } {
 		} elseif {[llength $after_args] <= $i} {
 		    fail "$test (no arg #$i)"
 		} elseif {[lindex $before_args $i] \
-			  == [lindex $after_args $i] - 10} {
+			      == [lindex $after_args $i] - 10} {
 		    pass "$test"
 		} else {
 		    fail "$test (wrong amount)"

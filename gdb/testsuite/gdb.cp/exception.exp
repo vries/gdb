@@ -65,9 +65,9 @@ gdb_test_multiple "info breakpoints" $name {
 	pass $name
     }
     -re ".*$gdb_prompt $"
-      {
+    {
 	fail $name
-      }
+    }
 }
 
 gdb_test "tbreak -q main" "Temporary breakpoint 4.*" \
@@ -92,10 +92,10 @@ gdb_test_multiple "info breakpoints" $name {
 	pass $name
     }
     -re ".*$gdb_prompt $"
-      {
+    {
 	send_user "\n---\n$expect_out(buffer)\n---\n"
 	fail $name
-      }
+    }
 }
 
 gdb_test "break catcher" "Breakpoint ${::decimal} at.*"

@@ -50,10 +50,10 @@ gdb_continue_to_end "breakpoint first time through"
 sleep 2
 if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable {debug additional_flags=-DVARIABLE=var2}] != "" } {
 
-# Complication: Since GDB generally holds an open file descriptor on the
-# executable at this point, there are some systems in which the
-# re-compilation will fail. In such cases, we'll consider the test
-# (vacuously) passed providing that re-running it succeeds as before.
+    # Complication: Since GDB generally holds an open file descriptor on the
+    # executable at this point, there are some systems in which the
+    # re-compilation will fail. In such cases, we'll consider the test
+    # (vacuously) passed providing that re-running it succeeds as before.
 
     gdb_run_cmd
     expect_to_stop_here "after re-compile fails"

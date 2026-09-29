@@ -61,69 +61,69 @@ proc run_test { filename } {
 		 "\\s+int ${type}_1;" \
 		 "\\s+int ${type}_2;" \
 		 "}"]
+}
+
+# There are two different versions of woof_t.  For now, when using
+# `ptype` GDB will just display the first one it finds, which could
+# legitimately be either.
+set woof_int_re [multi_line \
+		     "type = struct woof_t {" \
+		     "\\s+int woof_t_1;" \
+		     "\\s+int woof_t_2;" \
+		     "}"]
+set woof_double_re [multi_line \
+			"type = struct woof_t {" \
+			"\\s+double woof_t_3;" \
+			"\\s+double woof_t_4;" \
+			"}"]
+clean_restart $filename
+gdb_test_multiple "ptype woof_t" "" {
+    -re -wrap $woof_int_re {
+	pass $gdb_test_name
     }
-
-    # There are two different versions of woof_t.  For now, when using
-    # `ptype` GDB will just display the first one it finds, which could
-    # legitimately be either.
-    set woof_int_re [multi_line \
-			 "type = struct woof_t {" \
-			 "\\s+int woof_t_1;" \
-			 "\\s+int woof_t_2;" \
-			 "}"]
-    set woof_double_re [multi_line \
-			    "type = struct woof_t {" \
-			    "\\s+double woof_t_3;" \
-			    "\\s+double woof_t_4;" \
-			    "}"]
-    clean_restart $filename
-    gdb_test_multiple "ptype woof_t" "" {
-	-re -wrap $woof_int_re {
-	    pass $gdb_test_name
-	}
-	-re -wrap $woof_double_re {
-	    pass $gdb_test_name
-	}
-    }
-
-    # Check for declarations and definitions of some types.
-    check_info_types $filename foo_t $::srcfile2 "typedef struct foo_t"
-    check_info_types $filename foo_t $::srcfile4 "typedef struct foo_t foo_t;"
-    check_info_types $filename bar_t $::srcfile3 "typedef struct bar_t"
-    check_info_types $filename bar_t $::srcfile4 "typedef struct bar_t bar_t;"
-    check_info_types $filename baz_t $::srcfile4 "typedef struct baz_t"
-    check_info_types $filename baz_t $::srcfile4 "\} baz_t;"
-    check_info_types $filename woof_t $::srcfile2 "typedef struct woof_t"
-    check_info_types $filename woof_t $::srcfile3 "typedef struct woof_t"
-
-    # Use Python to look for type symbols.
-    if { [allow_python_tests] } {
-	foreach_with_prefix type { foo_t bar_t baz_t } {
-	    clean_restart $filename
-	    gdb_test_no_output "source $::pyfile" "import python scripts"
-	    gdb_test "py-show-type $type" \
-		[multi_line \
-		     "Looking for type '$type':" \
-		     "  Found 3 type symbols" \
-		     "    1: struct $type \\{ int ${type}_1; int ${type}_2; \\}" \
-		     "    2: struct $type \\{ int ${type}_1; int ${type}_2; \\}" \
-		     "    3: struct $type \\{ int ${type}_1; int ${type}_2; \\}"]
-	}
-
-	clean_restart $filename
-	gdb_test_no_output "source $::pyfile" "import python scripts"
-	gdb_test "py-show-type woof_t" \
-	    [multi_line \
-		 "Looking for type 'woof_t':" \
-		 "  Found 2 type symbols" \
-		 "    1: struct woof_t \\{ (?:int|double) woof_t_(?:1|3); (?:int|double) woof_t_(?:2|4); \\}" \
-		 "    2: struct woof_t \\{ (?:int|double) woof_t_(?:1|3); (?:int|double) woof_t_(?:2|4); \\}"]
-
+    -re -wrap $woof_double_re {
+	pass $gdb_test_name
     }
 }
 
+# Check for declarations and definitions of some types.
+check_info_types $filename foo_t $::srcfile2 "typedef struct foo_t"
+check_info_types $filename foo_t $::srcfile4 "typedef struct foo_t foo_t;"
+check_info_types $filename bar_t $::srcfile3 "typedef struct bar_t"
+check_info_types $filename bar_t $::srcfile4 "typedef struct bar_t bar_t;"
+check_info_types $filename baz_t $::srcfile4 "typedef struct baz_t"
+check_info_types $filename baz_t $::srcfile4 "\} baz_t;"
+check_info_types $filename woof_t $::srcfile2 "typedef struct woof_t"
+check_info_types $filename woof_t $::srcfile3 "typedef struct woof_t"
+
+# Use Python to look for type symbols.
+if { [allow_python_tests] } {
+    foreach_with_prefix type { foo_t bar_t baz_t } {
+	clean_restart $filename
+	gdb_test_no_output "source $::pyfile" "import python scripts"
+	gdb_test "py-show-type $type" \
+	    [multi_line \
+		 "Looking for type '$type':" \
+		 "  Found 3 type symbols" \
+		 "    1: struct $type \\{ int ${type}_1; int ${type}_2; \\}" \
+		 "    2: struct $type \\{ int ${type}_1; int ${type}_2; \\}" \
+		 "    3: struct $type \\{ int ${type}_1; int ${type}_2; \\}"]
+    }
+
+    clean_restart $filename
+    gdb_test_no_output "source $::pyfile" "import python scripts"
+    gdb_test "py-show-type woof_t" \
+	[multi_line \
+	     "Looking for type 'woof_t':" \
+	     "  Found 2 type symbols" \
+	     "    1: struct woof_t \\{ (?:int|double) woof_t_(?:1|3); (?:int|double) woof_t_(?:2|4); \\}" \
+	     "    2: struct woof_t \\{ (?:int|double) woof_t_(?:1|3); (?:int|double) woof_t_(?:2|4); \\}"]
+
+}
+}
+
 with_test_prefix "no index" {
-    run_test $testfile
+run_test $testfile
 }
 
 # The previous call to 'run_test' will have left GDB active.  Check if

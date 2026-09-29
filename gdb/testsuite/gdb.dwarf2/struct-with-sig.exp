@@ -109,9 +109,9 @@ set struct_s_i_re \
 	 "}"]
 set struct_s_j_re \
     [multi_line \
-	 "type = struct s {" \
-	 "    int j;" \
-	 "}"]
+    "type = struct s {" \
+    "    int j;" \
+    "}"]
 
 if {![runto_main]} {
     return

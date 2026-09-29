@@ -18,7 +18,7 @@ require is_aarch32_target
 standard_testfile
 
 if { [prepare_for_testing "failed to prepare" ${testfile} ${srcfile} \
-    [list debug]] } {
+	  [list debug]] } {
     return
 }
 

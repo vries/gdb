@@ -31,15 +31,15 @@ set binfile_lib [standard_output_file "${libname}.so"]
 
 # Compile library.
 if { [gdb_compile_shlib ${srcdir}/${subdir}/${srcfile_lib} ${binfile_lib} \
-      {debug c++}] != "" } {
+	  {debug c++}] != "" } {
     return
 }
 
 # Compile main program.
 if { [gdb_compile ${srcdir}/${subdir}/${srcfile} \
-      ${binfile} \
-      executable \
-      [list debug c++ shlib=$binfile_lib]] != "" } {
+	  ${binfile} \
+	  executable \
+	  [list debug c++ shlib=$binfile_lib]] != "" } {
     return
 }
 

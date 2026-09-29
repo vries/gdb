@@ -76,23 +76,23 @@ proc test_input_radix { iradix iradixhex iradixoctal } {
 }
 
 test_input_radix 2 "2" "2"
-    test_one_input 2  "4"   "Invalid number \"4\"\\."
-    test_one_input 2  "-2"  "Invalid number \"2\"\\."
+test_one_input 2  "4"   "Invalid number \"4\"\\."
+test_one_input 2  "-2"  "Invalid number \"2\"\\."
 
 test_input_radix 3 "3" "3"
-    test_one_input 3  "2"   "2"
-    test_one_input 3  "20"  "6"
-    test_one_input 3  "3"   "Invalid number \"3\"\\."
-    test_one_input 2  "30"  "Invalid number \"30\"\\."
+test_one_input 3  "2"   "2"
+test_one_input 3  "20"  "6"
+test_one_input 3  "3"   "Invalid number \"3\"\\."
+test_one_input 2  "30"  "Invalid number \"30\"\\."
 
 test_input_radix 8 "8" "10"
-    test_one_input 8  "20"  "16"
-    test_one_input 8  "-20" "-16"
-    test_one_input 8  "8"   "Invalid number \"8\"."
-    test_one_input 8  "-9"  "Invalid number \"9\"."
+test_one_input 8  "20"  "16"
+test_one_input 8  "-20" "-16"
+test_one_input 8  "8"   "Invalid number \"8\"."
+test_one_input 8  "-9"  "Invalid number \"9\"."
 
 test_input_radix 10 "a" "12"
-    test_one_input 10 "-12"  "-12"
+test_one_input 10 "-12"  "-12"
 
 test_input_radix 16 "10" "20"
 
@@ -124,30 +124,30 @@ proc test_output_radix { oradix oradixhex oradixoctal } {
 }
 
 test_output_radix 8 "8" "10"
-    test_one_output 8  "010"        "010"
-    test_one_output 8  "0xf"        "17"
-    test_one_output 8  "10"         "12"
-    test_one_output 8  "100"        "144"
-    setup_kfail "gdb/1715" *-*-*
-    test_one_output 8  "20."        "24"
-    test_one_output 8  "(int) 20."  "24"
+test_one_output 8  "010"        "010"
+test_one_output 8  "0xf"        "17"
+test_one_output 8  "10"         "12"
+test_one_output 8  "100"        "144"
+setup_kfail "gdb/1715" *-*-*
+test_one_output 8  "20."        "24"
+test_one_output 8  "(int) 20."  "24"
 
 test_output_radix 10 "a" "12"
-    test_one_output 10 "010"        "8"
-    test_one_output 10 "0xf"        "15"
-    test_one_output 10 "10"         "10"
-    test_one_output 10 "100"        "100"
-    test_one_output 10 "20."        "20"
-    test_one_output 10 "(int) 20."  "20"
+test_one_output 10 "010"        "8"
+test_one_output 10 "0xf"        "15"
+test_one_output 10 "10"         "10"
+test_one_output 10 "100"        "100"
+test_one_output 10 "20."        "20"
+test_one_output 10 "(int) 20."  "20"
 
 test_output_radix 16 "10" "20"
-    test_one_output 16 "010"        "8"
-    test_one_output 16 "0xf"        "f"
-    test_one_output 16 "10"         "a"
-    test_one_output 16 "100"        "64"
-    setup_kfail "gdb/1715" *-*-*
-    test_one_output 16 "20."        "14"
-    test_one_output 16 "(int) 20."  "14"
+test_one_output 16 "010"        "8"
+test_one_output 16 "0xf"        "f"
+test_one_output 16 "10"         "a"
+test_one_output 16 "100"        "64"
+setup_kfail "gdb/1715" *-*-*
+test_one_output 16 "20."        "14"
+test_one_output 16 "(int) 20."  "14"
 
 # Test rejecting invalid input radices and unsupported output radices
 # really rejects the radices, instead of just claiming so (PR 7536).

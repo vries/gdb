@@ -32,7 +32,7 @@ gdb_breakpoint [gdb_get_line_number "mmap (p, len"]
 gdb_continue_to_breakpoint "mmap"
 
 gdb_test "eval \"watch *(int *)%p == 0\",p" \
-	 "Hardware watchpoint $decimal: .*"
+    "Hardware watchpoint $decimal: .*"
 
 gdb_test "continue" \
-	 "Old value = <unreadable>.*New value = 0.*"
+    "Old value = <unreadable>.*New value = 0.*"

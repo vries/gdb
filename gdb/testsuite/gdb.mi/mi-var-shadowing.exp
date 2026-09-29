@@ -99,15 +99,15 @@ mi_gdb_test  \
 mi_execute_to "exec-continue" "breakpoint-hit" ".*" ".*" ".*" "${bp_line3}"  \
     { "" "disp=\"keep\"" } "continue to second level"
 mi_gdb_test "-stack-list-locals 0"  \
-     "\\^done,locals=\\\[name=\"val1\",name=\"val2\",name=\"val3\",name=\"a\",name=\"val1\",name=\"val2\"\\\]"  \
+    "\\^done,locals=\\\[name=\"val1\",name=\"val2\",name=\"val3\",name=\"a\",name=\"val1\",name=\"val2\"\\\]"  \
     "-stack-list-locals 0 at second level"
 mi_gdb_test "-stack-list-variables 0"  \
-     "\\^done,variables=\\\[{name=\"val1\",filename=\"$filename\",fullname=\"$fullname\",line=\"$val1_d2\"},{name=\"val2\",filename=\"$filename\",fullname=\"$fullname\",line=\"$val2_d2\"},{name=\"val3\"},{name=\"a\"},{name=\"val1\",filename=\"$filename\",fullname=\"$fullname\",line=\"$val1_d1\",shadowed=\"true\"\},{name=\"val2\",filename=\"$filename\",fullname=\"$fullname\",line=\"$val2_d1\",shadowed=\"true\"\}\\\]"  \
+    "\\^done,variables=\\\[{name=\"val1\",filename=\"$filename\",fullname=\"$fullname\",line=\"$val1_d2\"},{name=\"val2\",filename=\"$filename\",fullname=\"$fullname\",line=\"$val2_d2\"},{name=\"val3\"},{name=\"a\"},{name=\"val1\",filename=\"$filename\",fullname=\"$fullname\",line=\"$val1_d1\",shadowed=\"true\"\},{name=\"val2\",filename=\"$filename\",fullname=\"$fullname\",line=\"$val2_d1\",shadowed=\"true\"\}\\\]"  \
     "-stack-list-variables 0 at second level"
 mi_gdb_test "-stack-list-locals 2" "${stack_test3_regx}"  \
-     "-stack-list-locals 2 at second level"
+    "-stack-list-locals 2 at second level"
 mi_gdb_test "-stack-list-variables 2" "${stack_test3_regx}"  \
-     "-stack-list-variables 2 at second level"
+    "-stack-list-variables 2 at second level"
 
 mi_gdb_test  \
     "-break-insert --source ${srcfile} --line ${bp_line4}"  \

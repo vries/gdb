@@ -61,12 +61,12 @@ proc_with_prefix run_cond_hits_breakpoint_test { async_p non_stop_p } {
     # Setup the conditional breakpoint and record its number.
     gdb_breakpoint "${::srcfile}:${::bp_1_line} if (func_bp ())"
     set bp_1_num [get_integer_valueof "\$bpnum" "*UNKNOWN*" \
-		     "get number of first breakpoint"]
+		      "get number of first breakpoint"]
 
     # Setup a breakpoint inside func_bp.
     gdb_breakpoint "${::srcfile}:${::bp_2_line}"
     set bp_2_num [get_integer_valueof "\$bpnum" "*UNKNOWN*" \
-		     "get number of second breakpoint"]
+		      "get number of second breakpoint"]
 
     gdb_test "continue" \
 	[multi_line \
@@ -125,7 +125,7 @@ proc_with_prefix run_cond_hits_segfault_test { async_p non_stop_p } {
     # Setup the conditional breakpoint and record its number.
     gdb_breakpoint "${::srcfile}:${::bp_1_line} if (func_segfault ())"
     set bp_1_num [get_integer_valueof "\$bpnum" "*UNKNOWN*" \
-		     "get number of first breakpoint"]
+		      "get number of first breakpoint"]
 
     gdb_test "continue" \
 	[multi_line \

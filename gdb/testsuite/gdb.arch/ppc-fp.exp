@@ -43,13 +43,13 @@ gdb_expect { -re ".*$gdb_prompt $" {} }
 
 # First, verify if FPSCR exists and is all zeroes.
 gdb_test_multiple "print \$fpscr" "FPSCR exists" {
-  -re " = 0\[\r\n\]+$gdb_prompt $" { pass "FPSCR is all zeroes" }
+    -re " = 0\[\r\n\]+$gdb_prompt $" { pass "FPSCR is all zeroes" }
 
-  -re " = void\[\r\n\]+$gdb_prompt $" {
-    # There's no FPSCR.  Skip this testcase.
-    verbose "Skipping powerpc floating point register tests."
-    return
-  }
+    -re " = void\[\r\n\]+$gdb_prompt $" {
+	# There's no FPSCR.  Skip this testcase.
+	verbose "Skipping powerpc floating point register tests."
+	return
+    }
 }
 
 # Step over invalid operation.

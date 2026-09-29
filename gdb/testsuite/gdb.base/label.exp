@@ -29,23 +29,23 @@ if {![runto_main]} {
 }
 
 gdb_test "break -q here" \
-  "Breakpoint.*at.*" \
-  "breakpoint here"
+    "Breakpoint.*at.*" \
+    "breakpoint here"
 
 gdb_test "break -q main:there" \
-  "Breakpoint.*at.*" \
-  "breakpoint there"
+    "Breakpoint.*at.*" \
+    "breakpoint there"
 
 gdb_test "cont" \
-  "Breakpoint 3,.*" \
-  "continue to 'there'"
+    "Breakpoint 3,.*" \
+    "continue to 'there'"
 
 gdb_test "cont" \
-  "Breakpoint 2,.*" \
-  "continue to 'here'"
+    "Breakpoint 2,.*" \
+    "continue to 'here'"
 
 rerun_to_main
 
 gdb_test "cont" \
-  "Breakpoint 3,.*" \
-  "continue to 'there' after re-run"
+    "Breakpoint 3,.*" \
+    "continue to 'there' after re-run"

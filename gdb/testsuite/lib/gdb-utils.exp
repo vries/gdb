@@ -57,7 +57,7 @@ proc string_list_to_regexp { args } {
     set result ""
     foreach arg $args {
 	set arg [string_to_regexp $arg]
-       append result $arg
+	append result $arg
     }
     return $result
 }

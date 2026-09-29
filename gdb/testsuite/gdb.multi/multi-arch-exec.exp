@@ -146,29 +146,29 @@ proc build_executables { first_arch } {
 }
 
 proc do_test { first_arch mode selected_thread } {
-	global bkptno_numopt_re
-	set from_exec "$first_arch-multi-arch-exec"
+    global bkptno_numopt_re
+    set from_exec "$first_arch-multi-arch-exec"
 
-	clean_restart ${from_exec}
-	if {![runto all_started]} {
-	    return -1
-	}
+    clean_restart ${from_exec}
+    if {![runto all_started]} {
+	return -1
+    }
 
-	# Delete the breakpoint at 'all_started' otherwise GDB may
-	# switch context back to thread 1 to step over the breakpoint.
-	delete_breakpoints
+    # Delete the breakpoint at 'all_started' otherwise GDB may
+    # switch context back to thread 1 to step over the breakpoint.
+    delete_breakpoints
 
-	# A location for this breakpoint should be found in the new
-	# post-exec image too.
-	gdb_breakpoint main
+    # A location for this breakpoint should be found in the new
+    # post-exec image too.
+    gdb_breakpoint main
 
-	gdb_test "thread $selected_thread" "Switching to thread $selected_thread .*"
+    gdb_test "thread $selected_thread" "Switching to thread $selected_thread .*"
 
-	gdb_test_no_output "set follow-exec-mode $mode"
+    gdb_test_no_output "set follow-exec-mode $mode"
 
-	# Test that GDB updates the target description / arch successfully
-	# after the exec.
-	gdb_test "continue" "Breakpoint $bkptno_numopt_re, main.*" "continue across exec that changes architecture"
+    # Test that GDB updates the target description / arch successfully
+    # after the exec.
+    gdb_test "continue" "Breakpoint $bkptno_numopt_re, main.*" "continue across exec that changes architecture"
 }
 
 # Test both arch1=>arch2 and arch2=>arch1.

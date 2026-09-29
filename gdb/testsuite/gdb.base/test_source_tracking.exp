@@ -33,10 +33,10 @@ gdb_breakpoint ${srcfile}:$lineno
 # multi-line output (gdb_test's -wrap prevents matching across newlines).
 gdb_test_multiple "maint info source-tracking-context 1" \
     "breakpoint line is correctly marked in captured context" {
-    -re "> \[0-9\]+ \[^\r\n\]*BPLastLine\[^\r\n\]*\r\n$gdb_prompt $" {
-	pass $gdb_test_name
+	-re "> \[0-9\]+ \[^\r\n\]*BPLastLine\[^\r\n\]*\r\n$gdb_prompt $" {
+	    pass $gdb_test_name
+	}
+	-re "$gdb_prompt $" {
+	    fail $gdb_test_name
+	}
     }
-    -re "$gdb_prompt $" {
-	fail $gdb_test_name
-    }
-}

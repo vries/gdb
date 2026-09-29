@@ -220,7 +220,7 @@ proc test_empty_history_filename { } {
 	    # Now restart GDB with GDBHISTFILE set to indicate don't
 	    # load any history file, check none was loaded.
 	    save_vars { env(GDBHISTFILE) } {
-	    setenv GDBHISTFILE ""
+		setenv GDBHISTFILE ""
 		gdb_exit
 		gdb_start
 		check_history $common_history

@@ -255,8 +255,8 @@ proc do_test {suffix} {
 	    -re "Breakpoint \\d+, foo \\(\\).*foo prologue.*${gdb_prompt}" {
 		pass $test
 		gdb_test "step" \
-			 "foo bar call .*" \
-			 "step to call of bar after landing on prologue"
+		    "foo bar call .*" \
+		    "step to call of bar after landing on prologue"
 	    }
 	    -re "Breakpoint \\d+, foo \\(\\).*foo bar call.*${gdb_prompt}" {
 		pass $test
@@ -279,13 +279,13 @@ proc do_test {suffix} {
 
     # Disassembly of foo should have multiple address ranges.
     gdb_test_sequence "disassemble foo" "" [list \
-	"Dump of assembler code for function foo:" \
-	"Address range $hex to $hex:" \
-	"   $hex <\\+0>:" \
-	"Address range $hex to $hex:" \
-	"   $hex <(.+?)>:" \
-	"End of assembler dump\\." \
-    ]
+						"Dump of assembler code for function foo:" \
+						"Address range $hex to $hex:" \
+						"   $hex <\\+0>:" \
+						"Address range $hex to $hex:" \
+						"   $hex <(.+?)>:" \
+						"End of assembler dump\\." \
+					       ]
 
     set foo_cold_addr -1
     set test "x/i foo_cold"
@@ -370,16 +370,16 @@ proc do_test {suffix} {
 	}
 
 	gdb_test "step" \
-		 "foo \\(\\).*bar \\(\\);.*foo bar call.*" \
-		 "step into foo from main"
+	    "foo \\(\\).*bar \\(\\);.*foo bar call.*" \
+	    "step into foo from main"
 
 	gdb_test "step" \
-		 "bar \\(\\).*\}.* bar end.*" \
-		 "step into bar from foo"
+	    "bar \\(\\).*\}.* bar end.*" \
+	    "step into bar from foo"
 
 	gdb_test "step" \
-		 "foo(_label2)? \\(\\).*foo_cold \\(\\);.*foo foo_cold call.*" \
-		 "step out of bar to foo"
+	    "foo(_label2)? \\(\\).*foo_cold \\(\\);.*foo foo_cold call.*" \
+	    "step out of bar to foo"
 
 	# Tests in the "enable_foo_cold_stepping" section, below, did
 	# not work prior to July, 2019.  They had been disabled via
@@ -415,8 +415,8 @@ proc do_test {suffix} {
 		-re "foo(_low)? \\(\\).*\{.*foo_cold prologue.*${gdb_prompt}" {
 		    pass $test
 		    gdb_test "step" \
-			     "foo \\(\\).*baz \\(\\);.*foo_cold baz call.*" \
-			     "step to baz call in foo_cold"
+			"foo \\(\\).*baz \\(\\);.*foo_cold baz call.*" \
+			"step to baz call in foo_cold"
 
 		}
 		-re "foo(_cold)? \\(\\).*baz \\(\\);.*foo_cold baz call.*${gdb_prompt}" {
@@ -425,25 +425,25 @@ proc do_test {suffix} {
 	    }
 
 	    gdb_test "step" \
-		     "baz \\(\\).*\}.*baz end.*" \
-		     "step into baz from foo_cold"
+		"baz \\(\\).*\}.*baz end.*" \
+		"step into baz from foo_cold"
 
 	    gdb_test "step" \
-		     "foo(?:_low(?:_label2)?)? \\(\\).*\}.*foo_cold end.*" \
-		     "step out of baz to foo_cold"
+		"foo(?:_low(?:_label2)?)? \\(\\).*\}.*foo_cold end.*" \
+		"step out of baz to foo_cold"
 
 	    gdb_test "step" \
-		     "foo(?:_label3)? \\(\\).*\}.*foo end.*" \
-		     "step out of foo_cold to foo"
+		"foo(?:_label3)? \\(\\).*\}.*foo end.*" \
+		"step out of foo_cold to foo"
 	} else {
 	    gdb_test "next" \
-		     ".*foo end.*" \
-		     "next over foo_cold call"
+		".*foo end.*" \
+		"next over foo_cold call"
 	}
 
 	gdb_test "step" \
-		 "main(?:_label2)? \\(\\).*" \
-		 "step out of foo to main"
+	    "main(?:_label2)? \\(\\).*" \
+	    "step out of foo to main"
     }
 }
 

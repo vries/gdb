@@ -28,10 +28,10 @@ if {[prepare_for_testing_full "failed to prepare" \
 
 set test "info sources should contain only one reference to file1.txt"
 gdb_test_multiple "info sources" "$test" {
-  -re "file1\\.txt.*file1\\.txt.*$gdb_prompt $" {
-      fail "$test (file1.txt seen more than once)"
-  }
-  -re "file1\\.txt.*$gdb_prompt $" {
-      pass "$test"
-  }
+    -re "file1\\.txt.*file1\\.txt.*$gdb_prompt $" {
+	fail "$test (file1.txt seen more than once)"
+    }
+    -re "file1\\.txt.*$gdb_prompt $" {
+	pass "$test"
+    }
 }

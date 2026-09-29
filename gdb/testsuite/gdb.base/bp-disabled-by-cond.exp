@@ -69,7 +69,7 @@ proc run_test { hit_cond } {
 
     gdb_breakpoint $::srcfile:$::cond_bp_line
     set cond_bp_num [get_integer_valueof "\$bpnum" "*UNKNOWN*" \
-			"get number of conditional b/p"]
+			 "get number of conditional b/p"]
 
     if { $hit_cond } {
 	set lib_global_val 0

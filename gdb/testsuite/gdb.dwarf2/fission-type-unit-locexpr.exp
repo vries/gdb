@@ -63,24 +63,24 @@ Dwarf::assemble $asm_file {
 		DW_AT_byte_size 4 DW_FORM_data1
 	    } {
 		DW_TAG_member {
-			DW_AT_name field
-			DW_AT_type 0xCAFE1 DW_FORM_ref_sig8
+		    DW_AT_name field
+		    DW_AT_type 0xCAFE1 DW_FORM_ref_sig8
 
-			# This is the expression that is going to be evaluated
-			# by printing the variable.
-			DW_AT_data_member_location {
-			    # In order to coax GDB to actually run this
-			    # expression in the evaluator, it needs to contain
-			    # something that will make decode_locdesc unable
-			    # to reduce it to a constant.  That's what these 3
-			    # operations (which are ultimately a no-op) are for.
-			    # Note that there is an implicit
-			    # DW_OP_push_object_address done before the
-			    # expression is evaluated.
-			    DW_OP_dup
-			    DW_OP_deref_size 1
-			    DW_OP_drop
-			} SPECIAL_expr
+		    # This is the expression that is going to be evaluated
+		    # by printing the variable.
+		    DW_AT_data_member_location {
+			# In order to coax GDB to actually run this
+			# expression in the evaluator, it needs to contain
+			# something that will make decode_locdesc unable
+			# to reduce it to a constant.  That's what these 3
+			# operations (which are ultimately a no-op) are for.
+			# Note that there is an implicit
+			# DW_OP_push_object_address done before the
+			# expression is evaluated.
+			DW_OP_dup
+			DW_OP_deref_size 1
+			DW_OP_drop
+		    } SPECIAL_expr
 		}
 	    }
 	}

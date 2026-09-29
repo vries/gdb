@@ -52,11 +52,11 @@ if { ![runto_main] } {
 foreach probe_name [list "foo" "bar" "foo_prefix" "bar_prefix"] \
     probe_val [list "42" "42" "42" "42"] \
     probe_reg_val [list "\$rsp" "\$rbp - 8" "\$rsp" "\$rbp - 8"] {
-    with_test_prefix $probe_name {
-	goto_probe $probe_name
-	test_probe_value $probe_val $probe_reg_val
+	with_test_prefix $probe_name {
+	    goto_probe $probe_name
+	    test_probe_value $probe_val $probe_reg_val
+	}
     }
-}
 
 # Testing normal probes, with several prefixes.
 
@@ -69,11 +69,11 @@ foreach bit [list 8 16 32 64] {
 
 foreach probe_name $normal_probes_names \
     probe_val [list 8 -8 16 -16 32 -32 64 -64] {
-    with_test_prefix $probe_name {
-	goto_probe $probe_name
-	test_probe_value_without_reg $probe_val
+	with_test_prefix $probe_name {
+	    goto_probe $probe_name
+	    test_probe_value_without_reg $probe_val
+	}
     }
-}
 
 # Testing the fail probes.
 

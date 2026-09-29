@@ -29,34 +29,34 @@ set expfile $testfile.exp
 
 # make check-perf RUNTESTFLAGS='template-breakpoints.exp EXPANSION_DEPTH=40'
 if {![info exists EXPANSION_DEPTH]} {
-	set EXPANSION_DEPTH 40
+    set EXPANSION_DEPTH 40
 }
 
 PerfTest::assemble {
-	global EXPANSION_DEPTH
-	global srcdir subdir srcfile
+    global EXPANSION_DEPTH
+    global srcdir subdir srcfile
 
-	set compile_flags {c++ debug}
-	lappend compile_flags "additional_flags=-DEXPANSION_DEPTH=${EXPANSION_DEPTH}"
+    set compile_flags {c++ debug}
+    lappend compile_flags "additional_flags=-DEXPANSION_DEPTH=${EXPANSION_DEPTH}"
 
-	if { [gdb_compile "$srcdir/$subdir/$srcfile" ${binfile} executable $compile_flags] != ""} {
-		return
-	}
+    if { [gdb_compile "$srcdir/$subdir/$srcfile" ${binfile} executable $compile_flags] != ""} {
+	return
+    }
 
-	return 0
+    return 0
 } {
-	global binfile
+    global binfile
 
-	clean_restart $::testfile
+    clean_restart $::testfile
 
-	if ![runto_main] {
-		return
-	}
+    if ![runto_main] {
+	return
+    }
 
-	return 0
+    return 0
 } {
 
-	gdb_test_python_run "TemplateBreakpoints()"
+    gdb_test_python_run "TemplateBreakpoints()"
 
-	return 0
+    return 0
 }

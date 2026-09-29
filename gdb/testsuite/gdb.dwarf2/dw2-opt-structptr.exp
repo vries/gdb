@@ -51,7 +51,7 @@ proc build_test_program {} {
 		DW_AT_comp_dir /tmp
 	    } {
 		declare_labels int_label struct_label pointer_label \
-			       array_label
+		    array_label
 
 		int_label: DW_TAG_base_type {
 		    DW_AT_byte_size 4 DW_FORM_sdata

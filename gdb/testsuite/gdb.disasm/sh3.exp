@@ -22,8 +22,8 @@ set testfile "sh3"
 set srcfile ${srcdir}/${subdir}/${testfile}.s
 set binfile ${objdir}/${subdir}/${testfile}
 if  { [gdb_compile "${srcfile}" "${binfile}" executable ""] != "" } {
-     untested "failed to compile"
-     return
+    untested "failed to compile"
+    return
 }
 
 proc all_fp_move_and_load_tests { } {

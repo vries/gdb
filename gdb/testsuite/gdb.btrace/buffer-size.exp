@@ -35,8 +35,8 @@ gdb_test "show record btrace pt buffer-size" "The record/replay pt buffer size i
 
 gdb_test_no_output "record btrace"
 gdb_test "info record" [multi_line \
-  "Active record target: record-btrace" \
-  "Recording format: \[^\\\r\\\n\]*" \
-  "Buffer size: 4kB\." \
-  "Recorded 0 instructions in 0 functions \\\(0 gaps\\\) for \[^\\\r\\\n\]*" \
-  ]
+			    "Active record target: record-btrace" \
+			    "Recording format: \[^\\\r\\\n\]*" \
+			    "Buffer size: 4kB\." \
+			    "Recorded 0 instructions in 0 functions \\\(0 gaps\\\) for \[^\\\r\\\n\]*" \
+			   ]

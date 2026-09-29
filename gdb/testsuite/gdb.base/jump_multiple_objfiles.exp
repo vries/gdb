@@ -21,7 +21,7 @@ standard_testfile .c -foo.c .h
 
 
 if { [prepare_for_testing "failed to prepare" $testfile \
-      [list ${srcfile} ${srcfile2}]] } {
+	  [list ${srcfile} ${srcfile2}]] } {
     return
 }
 
@@ -49,6 +49,6 @@ gdb_continue_to_breakpoint "bar_first_line" \
 # target line is in two different object files.  After jump, we will hit
 # the breakpoint at the last line of bar.
 gdb_test "jump ${bar_middle_line}"  [multi_line \
-    "Continuing at ($hex).*" \
-    "Breakpoint ${decimal}.* at .*${srcfile3}:${bar_last_line}.*"] \
+					 "Continuing at ($hex).*" \
+					 "Breakpoint ${decimal}.* at .*${srcfile3}:${bar_last_line}.*"] \
     "Jump within the objectfile"

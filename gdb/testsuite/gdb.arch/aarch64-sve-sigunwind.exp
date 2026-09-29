@@ -52,7 +52,7 @@ if { [prepare_for_testing "failed to prepare" ${testfile} ${srcfile} \
 # We want SIGUSR1 to be delivered normally.
 gdb_test "handle SIGUSR1 nostop" \
     [multi_line {Signal        Stop	Print	Pass to program	Description} \
-		{SIGUSR1       No	Yes	Yes		User defined signal 1}] \
+	 {SIGUSR1       No	Yes	Yes		User defined signal 1}] \
     "don't stop for SIGUSR1"
 
 set linespec ${srcfile}:[gdb_get_line_number "Break here."]
@@ -85,7 +85,7 @@ gdb_test "print \$ffr" ". = \\{(255, ){[expr {$second_vl/8 - 1}]}255\\}" \
 
 gdb_test "frame function main" \
     [multi_line "#$decimal  $hex in main \[^\r\n\]+" \
-		"$decimal\[ \t\]+kill \\(getpid \\(\\), SIGUSR1\\);"]
+	 "$decimal\[ \t\]+kill \\(getpid \\(\\), SIGUSR1\\);"]
 
 gdb_test "print \$vg" ". = $first_vg" "vg was correctly unwound"
 

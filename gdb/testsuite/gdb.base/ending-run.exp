@@ -34,8 +34,8 @@ remote_exec build "rm -f core"
 
 set break1_line [gdb_get_line_number "-break1-"]
 gdb_test "b ending-run.c:$break1_line" \
-	"Breakpoint 1 at ${::hex}.*" \
-	"b ending-run.c:$break1_line, one"
+    "Breakpoint 1 at ${::hex}.*" \
+    "b ending-run.c:$break1_line, one"
 
 # Set up to go to the next-to-last line of the program
 #
@@ -62,7 +62,7 @@ gdb_test_multiple "i b" "cleared bp at stopped line" {
 #
 gdb_test "b ending-run.c:$break1_line" "Breakpoint 3 at ${::hex}.*" "b ending-run.c:$break1_line, two"
 gdb_test "cle ending-run.c:$break1_line" \
-	"Deleted breakpoint 3 " "Cleared 2 by line"
+    "Deleted breakpoint 3 " "Cleared 2 by line"
 
 gdb_test_multiple "info line ending-run.c:$break1_line" "" {
     -re ".*address (0x\[0-9a-fA-F]*).*$gdb_prompt $" {

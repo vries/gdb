@@ -27,19 +27,19 @@ set binfile_lib [standard_output_file ${libname}.so]
 
 # Compile the C shared library.
 if {[gdb_compile_shlib ${srcfile_lib} ${binfile_lib} \
-	{debug}] != ""} {
-  untested "failed to compile C shared library"
-  return
+	 {debug}] != ""} {
+    untested "failed to compile C shared library"
+    return
 }
 
 # Compile the Fortran main program with the C shared library.
 if {[prepare_for_testing "failed to prepare" $testfile \
-	${srcfile} [list debug f90 shlib=${binfile_lib}]]} {
-  return
+	 ${srcfile} [list debug f90 shlib=${binfile_lib}]]} {
+    return
 }
 
 if {![fortran_runto_main]} {
-  return
+    return
 }
 
 set bp_loc [gdb_get_line_number "break-here"]

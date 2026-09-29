@@ -145,10 +145,10 @@ gdb_test "add-symbol-file ${binfile} 0 -s .whatever" \
 
 # Load the object file.
 gdb_test "add-symbol-file ${binfile} 0" \
-	"Reading symbols from .*${testfile}\\.o\\.\\.\\.(|\r\nUsing host libthread_db library .*libthread_db.so.*\\.)" \
-	"add-symbol-file ${testfile}.o 0" \
-	"add symbol table from file \".*${testfile}\\.o\" at\[ \t\r\n\]+\.text_addr = 0x0\[\r\n\]+\\(y or n\\) " \
-	"y"
+    "Reading symbols from .*${testfile}\\.o\\.\\.\\.(|\r\nUsing host libthread_db library .*libthread_db.so.*\\.)" \
+    "add-symbol-file ${testfile}.o 0" \
+    "add symbol table from file \".*${testfile}\\.o\" at\[ \t\r\n\]+\.text_addr = 0x0\[\r\n\]+\\(y or n\\) " \
+    "y"
 
 with_test_prefix "print addresses, static vars" {
     # Print the addresses of static variables.
@@ -158,9 +158,9 @@ with_test_prefix "print addresses, static vars" {
 
 # Make sure they have different addresses.
 if { "${static_foo_addr}" == "${static_bar_addr}" } {
-  fail "static variables have different addresses"
+    fail "static variables have different addresses"
 } else {
-  pass "static variables have different addresses"
+    pass "static variables have different addresses"
 }
 
 with_test_prefix "print addresses, global vars" {
@@ -171,9 +171,9 @@ with_test_prefix "print addresses, global vars" {
 
 # Make sure they have different addresses.
 if { "${global_foo_addr}" == "${global_bar_addr}" } {
-  fail "global variables have different addresses"
+    fail "global variables have different addresses"
 } else {
-  pass "global variables have different addresses"
+    pass "global variables have different addresses"
 }
 
 with_test_prefix "print addresses, functions" {
@@ -184,9 +184,9 @@ with_test_prefix "print addresses, functions" {
 
 # Make sure they have different addresses.
 if { "${function_foo_addr}" == "${function_bar_addr}" } {
-  fail "functions have different addresses"
+    fail "functions have different addresses"
 } else {
-  pass "functions have different addresses"
+    pass "functions have different addresses"
 }
 
 # Now use a variable as an offset to add-symbol-file, and check that
@@ -198,19 +198,19 @@ gdb_test_no_output "set \$offset = 0x10000"
 
 # Load the object file.
 gdb_test "add-symbol-file ${binfile} \$offset" \
-	"Reading symbols from .*${testfile}\\.o\\.\\.\\.(|\r\nUsing host libthread_db library .*libthread_db.so.*\\.)" \
-	"add-symbol-file ${testfile}.o \$offset" \
-	"add symbol table from file \".*${testfile}\\.o\" at\[ \t\r\n\]+\.text_addr = 0x10000\[\r\n\]+\\(y or n\\) " \
-	"y"
+    "Reading symbols from .*${testfile}\\.o\\.\\.\\.(|\r\nUsing host libthread_db library .*libthread_db.so.*\\.)" \
+    "add-symbol-file ${testfile}.o \$offset" \
+    "add symbol table from file \".*${testfile}\\.o\" at\[ \t\r\n\]+\.text_addr = 0x10000\[\r\n\]+\\(y or n\\) " \
+    "y"
 
 # Print the addresses of functions.
 set new_function_foo_addr [get_var_address function_foo]
 
 # Make sure they have different addresses.
 if { "${function_foo_addr}" == "${new_function_foo_addr}" } {
-  fail "function foo has a different address"
+    fail "function foo has a different address"
 } else {
-  pass "function foo has a different address"
+    pass "function foo has a different address"
 }
 
 # Load the object using symbol-file with an offset and check that

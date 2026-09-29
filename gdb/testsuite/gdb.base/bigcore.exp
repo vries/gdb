@@ -188,15 +188,15 @@ proc test {dumper} {
 	set core_ok 0
 	gdb_test_multiple "print \$bytes_allocated < $core_size" \
 	    "check core size" {
-	    -re " = 1\r\n$gdb_prompt $" {
-		pass "check core size"
-		set core_ok 1
+		-re " = 1\r\n$gdb_prompt $" {
+		    pass "check core size"
+		    set core_ok 1
+		}
+		-re " = 0\r\n$gdb_prompt $" {
+		    pass "check core size"
+		    set core_ok 0
+		}
 	    }
-	    -re " = 0\r\n$gdb_prompt $" {
-		pass "check core size"
-		set core_ok 0
-	    }
-	}
     } {
 	# Probably failed due to the TCL build having problems with
 	# very large values.  Since GDB uses a 64-bit off_t (when

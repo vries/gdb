@@ -23,19 +23,19 @@ set srcfile aix-sighandle.c
 set binfile aix-sighandle
 
 gdb_test "break sig_handle_aix" \
-     "Breakpoint.1.at.*:.file.*$srcfile,.line.22." \
-     "breakpoint sig_handle_aix"
+    "Breakpoint.1.at.*:.file.*$srcfile,.line.22." \
+    "breakpoint sig_handle_aix"
 gdb_test "run" \
-  "Starting.program:.*$binfile.*\r\nProgram.received.signal.SIGSEGV,.*\r\n.*.in.foo.*.at.*$srcfile:29.*" \
-  "run to breakpoint sig_handle_aix"
+    "Starting.program:.*$binfile.*\r\nProgram.received.signal.SIGSEGV,.*\r\n.*.in.foo.*.at.*$srcfile:29.*" \
+    "run to breakpoint sig_handle_aix"
 
 gdb_test "continue" \
-  "Continuing.*Breakpoint.1,.sig_handle_aix..signo=11..at.*$srcfile:22.*" \
-  "continue to breakpoint sig_handle_aix"
+    "Continuing.*Breakpoint.1,.sig_handle_aix..signo=11..at.*$srcfile:22.*" \
+    "continue to breakpoint sig_handle_aix"
 
 gdb_test_sequence "backtrace" "backtrace for sighandle" {
-  "\[\r\n\]+#0 .* sig_handle_aix \\(signo=11\\) at "
-  "\[\r\n\]+#1 .* .signal.handler.called."
-  "\[\r\n\]+#2 .* foo \\(\\) at "
-  "\[\r\n\]+#3 .* main \\(\\) at "
+    "\[\r\n\]+#0 .* sig_handle_aix \\(signo=11\\) at "
+    "\[\r\n\]+#1 .* .signal.handler.called."
+    "\[\r\n\]+#2 .* foo \\(\\) at "
+    "\[\r\n\]+#3 .* main \\(\\) at "
 }

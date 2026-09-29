@@ -47,7 +47,7 @@ if {![runto_main]} {
 }
 
 gdb_test "python print(gdb.selected_frame().function().symtab.fullname())" \
-	"py-linetable-empty.c" "Test main has symtab"
+    "py-linetable-empty.c" "Test main has symtab"
 
 # Get the linetable for main's symbol table. This is empty as we didn't include
 # a linetable in the debug info.
@@ -55,18 +55,18 @@ gdb_py_test_silent_cmd "python lt = gdb.selected_frame().function().symtab.linet
     "get linetable" 0
 
 gdb_test "python print(lt.is_valid())" "True" \
-	"Test linetable is valid"
+    "Test linetable is valid"
 
 gdb_test "python print(lt.line(1))" "None" \
-	"Test line() returns None"
+    "Test line() returns None"
 
 gdb_test "python print(lt.has_line(1))" \
-	"RuntimeError.*: Linetable information not found in symbol table.*" \
-	"Test has_line() throws exception"
+    "RuntimeError.*: Linetable information not found in symbol table.*" \
+    "Test has_line() throws exception"
 
 gdb_test "python print(lt.source_lines())" \
-	"RuntimeError.*: Linetable information not found in symbol table.*" \
-	"Test source_lines() throws exception"
+    "RuntimeError.*: Linetable information not found in symbol table.*" \
+    "Test source_lines() throws exception"
 
 gdb_test "python print(list(lt))" "\\\[\\\]" \
-	"Test iterating over linetable"
+    "Test iterating over linetable"

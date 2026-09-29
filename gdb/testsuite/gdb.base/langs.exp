@@ -34,13 +34,13 @@ set timeout 10
 set gcc_compiled [is_c_compiler_gcc]
 
 gdb_test_multiple "b -qualified langs0" "break on nonexistent function" {
-	-re "Function \"langs0\" not defined\..*Make breakpoint pending on future shared library load.*y or .n.. $" {
+    -re "Function \"langs0\" not defined\..*Make breakpoint pending on future shared library load.*y or .n.. $" {
 
-		gdb_test "n" "" "break on nonexistent function"
-	}
-	-re "Breakpoint .* (deferred).*$gdb_prompt $" {
-		pass "break on nonexistent function"
-	}
+	gdb_test "n" "" "break on nonexistent function"
+    }
+    -re "Breakpoint .* (deferred).*$gdb_prompt $" {
+	pass "break on nonexistent function"
+    }
 }
 
 # TODO: Since there variables are now constants, we can cleanup the test,

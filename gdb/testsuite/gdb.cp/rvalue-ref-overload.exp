@@ -25,7 +25,7 @@ load_lib "cp-support.exp"
 standard_testfile .cc
 
 if {[prepare_for_testing $testfile.exp $testfile $srcfile \
-    {debug c++ additional_flags="-std=gnu++11"}]} {
+	 {debug c++ additional_flags="-std=gnu++11"}]} {
     return
 }
 

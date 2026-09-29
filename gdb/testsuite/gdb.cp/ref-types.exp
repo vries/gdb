@@ -233,11 +233,11 @@ gdb_test_multiple "print rUS" "print value of rUS" {
 }
 
 gdb_test "print rI" ".\[0-9\]* = \\(int &\\) @$hex: 102" \
-	"print value of rI"
+    "print value of rI"
 
 gdb_test "print rUI" \
     ".\[0-9\]* = \\(unsigned int &\\) @$hex: 1002" \
-	"print value of rUI"
+    "print value of rUI"
 
 gdb_test_multiple "print rL" "print value of rL" {
     -re ".\[0-9\]* = \\(long &\\) @$hex: -234.*$gdb_prompt $" {

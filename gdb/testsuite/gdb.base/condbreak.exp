@@ -111,7 +111,7 @@ rerun_to_main
 # run until the breakpoint at a line number
 #
 gdb_test "continue" "Continuing\\..*Breakpoint ${::decimal}, main \\(argc=.*, argv=.*, envp=.*\\) at .*$srcfile:$bp_location1.*$bp_location1\[\t \]+printf.*factorial.*" \
-			"run until breakpoint set at a line number"
+    "run until breakpoint set at a line number"
 
 #
 # run until the breakpoint at marker1

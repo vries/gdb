@@ -29,7 +29,7 @@ with_ansi_styling_terminal {
 }
 
 if {![runto_main]} {
-   return
+    return
 }
 
 # A new command 'py-disasm' which takes an address and disassembles 10

@@ -54,26 +54,26 @@ proc setup_gdb {} {
 # fork-following is supported.  Return 1 if they are, else 0.
 
 proc_with_prefix check_fork_catchpoints {} {
-  global gdb_prompt
+    global gdb_prompt
 
-  if { ![setup_gdb] } {
-      return false
-  }
-
-  # Verify that the system supports "catch fork".
-  gdb_test "catch fork" "Catchpoint \[0-9\]* \\(fork\\)" "insert first fork catchpoint"
-  set has_fork_catchpoints false
-  gdb_test_multiple "continue" "continue to first fork catchpoint" {
-    -re ".*Your system does not support this type\r\nof catchpoint.*$gdb_prompt $" {
-      unsupported "continue to first fork catchpoint"
+    if { ![setup_gdb] } {
+	return false
     }
-    -re ".*Catchpoint.*$gdb_prompt $" {
-      set has_fork_catchpoints true
-      pass "continue to first fork catchpoint"
-    }
-  }
 
-  return $has_fork_catchpoints
+    # Verify that the system supports "catch fork".
+    gdb_test "catch fork" "Catchpoint \[0-9\]* \\(fork\\)" "insert first fork catchpoint"
+    set has_fork_catchpoints false
+    gdb_test_multiple "continue" "continue to first fork catchpoint" {
+	-re ".*Your system does not support this type\r\nof catchpoint.*$gdb_prompt $" {
+	    unsupported "continue to first fork catchpoint"
+	}
+	-re ".*Catchpoint.*$gdb_prompt $" {
+	    set has_fork_catchpoints true
+	    pass "continue to first fork catchpoint"
+	}
+    }
+
+    return $has_fork_catchpoints
 }
 
 proc_with_prefix test_catch_syscall {follow-fork-mode detach-on-fork} {

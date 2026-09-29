@@ -73,10 +73,10 @@ proc dprintf_detach_test { breakpoint_always_inserted dprintf_style disconnected
 	set is_gdbserver [target_is_gdbserver]
 
 	if { $is_gdbserver == 1 } {
-		setup_kfail "*-*-*" "server/17302"
+	    setup_kfail "*-*-*" "server/17302"
 	} else {
-		# Give some time for the ex-inferior to run and hopefully not crash.
-		sleep 1
+	    # Give some time for the ex-inferior to run and hopefully not crash.
+	    sleep 1
 	}
 
 	gdb_test "attach $inferior_pid" "Attaching to program: $escapedbinfile, process $inferior_pid.*Reading symbols from.*" "$test"

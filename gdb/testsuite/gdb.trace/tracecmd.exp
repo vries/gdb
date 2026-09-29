@@ -55,43 +55,43 @@ test_class_help "tracepoints" {
 # 1.1 trace source line
 gdb_delete_tracepoints
 gdb_test "trace $srcfile:$testline2" \
-	"Tracepoint $decimal at $hex: file.*$srcfile, line $testline2." \
-	"1.1a: set tracepoint at sourceline"
+    "Tracepoint $decimal at $hex: file.*$srcfile, line $testline2." \
+    "1.1a: set tracepoint at sourceline"
 gdb_test "info trace" "in gdb_recursion_test.*$srcfile:$testline2.
 \[\t \]+not installed on target" \
-	"1.1b: trace sourcefile:line"
+    "1.1b: trace sourcefile:line"
 
 # 1.2 trace invalid source line
 gdb_delete_tracepoints
 gdb_test_no_output "set breakpoint pending off"
 gdb_test "trace $srcfile:99999" \
-	"No compiled code for line 99999 in file \".*$srcfile\"\\." \
-	"1.2a: trace invalid line in sourcefile"
+    "No compiled code for line 99999 in file \".*$srcfile\"\\." \
+    "1.2a: trace invalid line in sourcefile"
 gdb_test "info trace" "No tracepoints.*" \
-	"1.2b: reject invalid line in srcfile"
+    "1.2b: reject invalid line in srcfile"
 
 # 1.3 trace line in invalid source file
 gdb_delete_tracepoints
 gdb_test "trace NoSuChFiLe.c:1" "No source file named NoSuChFiLe.c." \
-	"1.3a: trace invalid source file"
+    "1.3a: trace invalid source file"
 gdb_test "info trace" "No tracepoints.*" \
-	"1.3b: reject invalid srcfile"
+    "1.3b: reject invalid srcfile"
 
 # 1.4 trace function by name
 gdb_delete_tracepoints
 gdb_test "trace gdb_recursion_test" \
-	"Tracepoint $decimal at $hex: file.*$srcfile, line $testline1." \
-	"1.4a: trace function by name"
+    "Tracepoint $decimal at $hex: file.*$srcfile, line $testline1." \
+    "1.4a: trace function by name"
 gdb_test "info trace" "in gdb_recursion_test.*$srcfile:$testline1.
 \[\t \]+not installed on target" \
-	"1.4b: trace function by name"
+    "1.4b: trace function by name"
 
 # 1.5 trace non-existent function
 gdb_delete_tracepoints
 gdb_test "trace NoSuChFuNc" "Function \"NoSuChFuNc\" not defined." \
-	"1.5a: trace invalid function"
+    "1.5a: trace invalid function"
 gdb_test "info trace" "No tracepoints.*" \
-	"1.5b: reject invalid srcfile"
+    "1.5b: reject invalid srcfile"
 
 # 1.6 trace at a specific address
 #     Collect the address of "gdb_asm_test", and use that.
@@ -103,10 +103,10 @@ gdb_test_multiple "print gdb_asm_test" "" {
 
 gdb_delete_tracepoints
 gdb_test "trace \*0x$asm_test_addr" \
-	"Tracepoint $decimal at .*$asm_test_addr.*" \
-	"1.6a: trace at specific address"
+    "Tracepoint $decimal at .*$asm_test_addr.*" \
+    "1.6a: trace at specific address"
 gdb_test "info trace" "$asm_test_addr.*gdb_asm_test.*" \
-	"1.6b: verify trace at specific address"
+    "1.6b: verify trace at specific address"
 
 # 1.7 trace at function's exact address
 #     Collect the address of the function for comparison
@@ -118,30 +118,30 @@ gdb_test_multiple "print gdb_recursion_test" "" {
 
 gdb_delete_tracepoints
 gdb_test "trace \*gdb_recursion_test" \
-	"Tracepoint $decimal at .*$c_test_addr.*" \
-	"1.7a: trace at function label (before prologue)"
+    "Tracepoint $decimal at .*$c_test_addr.*" \
+    "1.7a: trace at function label (before prologue)"
 gdb_test "info trace" "$c_test_addr.*in gdb_recursion_test.*:$baseline.
 \[\t \]+not installed on target" \
-	"1.7b: verify trace at specific address"
+    "1.7b: verify trace at specific address"
 
 # 1.8 trace at invalid address
 # no address is invalid
 
 # 1.9 trace no arguments
 gdb_test "trace" "No default breakpoint address now." \
-	"1.9: trace <no arguments>"
+    "1.9: trace <no arguments>"
 
 # 1.10 there's no 1.10.
 
 # 1.11 tracepoint conditions
 gdb_delete_tracepoints
 gdb_test "trace gdb_recursion_test if q1 > 0" \
-	"Tracepoint $decimal at $hex: file.*$srcfile, line $testline1." \
-	"1.11a: conditional tracepoint"
+    "Tracepoint $decimal at $hex: file.*$srcfile, line $testline1." \
+    "1.11a: conditional tracepoint"
 gdb_test "info trace" "in gdb_recursion_test.*$srcfile:$testline1.
 \[\t \]+trace only if q1 > 0.
 \[\t \]+not installed on target" \
-	"1.11b: verify conditional tracepoint"
+    "1.11b: verify conditional tracepoint"
 
 # 1.12 set tracepoint in prologue
 # [see tfind.exp]

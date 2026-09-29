@@ -232,22 +232,22 @@ gdb_test "backtrace 1" "\n#${::decimal}  arg0_128 \\(arg0=1.2, arg1=2.2, arg2=3.
 gdb_test "finish" " = 1.2" "correct _Decimal128 return value from called function."
 
 gdb_test "call decimal_dec128_align (double_val1, dec128_val2, double_val3, double_val4, double_val5, double_val6, double_val7, double_val8, double_val9, double_val10, double_val11, double_val12, double_val13, double_val14)" " = 1" \
-  "Call function with mixed decimal float arguments TEST."
+    "Call function with mixed decimal float arguments TEST."
 
 gdb_test "call decimal_mixed (dec32_val1, dec64_val1, dec128_val1)" " = 1" \
-  "Call function with mixed decimal float arguments."
+    "Call function with mixed decimal float arguments."
 
 gdb_test "call decimal_many_args_dec32 (dec32_val1, dec32_val2, dec32_val3, dec32_val4, dec32_val5, dec32_val6, dec32_val7, dec32_val8, dec32_val9, dec32_val10, dec32_val11, dec32_val12, dec32_val13, dec32_val14, dec32_val15, dec32_val16)" " = 1" \
-  "Call function with many _Decimal32 arguments."
+    "Call function with many _Decimal32 arguments."
 
 gdb_test "call decimal_many_args_dec64 (dec64_val1, dec64_val2, dec64_val3, dec64_val4, dec64_val5, dec64_val6, dec64_val7, dec64_val8, dec64_val9, dec64_val10, dec64_val11, dec64_val12, dec64_val13, dec64_val14, dec64_val15, dec64_val16)" " = 1" \
-  "Call function with many _Decimal64 arguments."
+    "Call function with many _Decimal64 arguments."
 
 gdb_test "call decimal_many_args_dec128 (dec128_val1, dec128_val2, dec128_val3, dec128_val4, dec128_val5, dec128_val6, dec128_val7, dec128_val8, dec128_val9, dec128_val10, dec128_val11, dec128_val12, dec128_val13, dec128_val14, dec128_val15, dec128_val16)" " = 1" \
-  "Call function with many _Decimal128 arguments."
+    "Call function with many _Decimal128 arguments."
 
 gdb_test "call decimal_many_args_mixed (dec32_val1, dec32_val2, dec32_val3, dec64_val4, dec64_val5, dec64_val6, dec64_val7, dec128_val8, dec128_val9, dec128_val10, dec32_val11, dec64_val12, dec32_val13, dec64_val14, dec128_val15)" " = 1" \
-  "Call function with many mixed decimal float arguments."
+    "Call function with many mixed decimal float arguments."
 
 # The following tests are intended to verify that gdb can handle DFP types
 # correctly in struct.
@@ -338,7 +338,7 @@ gdb_test "print ds.int4 = 7.3dl" " = 7"
 # - What "ptype" should print.
 
 # Columns in the sublists represent:
-     # to/whatis   # ptype
+# to/whatis   # ptype
 foreach elem {
     {"_Decimal32"  "_Decimal32"}
     {"_Decimal64"  "_Decimal64"}
@@ -362,7 +362,7 @@ foreach elem {
 # - whatis/ptype of typedef-of-typedef type names.
 
 # Columns in the sublists represent:
-    # Type name    # whatis      # ptype
+# Type name    # whatis      # ptype
 foreach elem {
     {"v_d32_t"     "d32_t"       "_Decimal32"}
     {"v_d64_t"     "d64_t"       "_Decimal64"}

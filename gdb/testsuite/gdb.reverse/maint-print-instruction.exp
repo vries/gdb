@@ -39,7 +39,7 @@ proc test_print { has_history level test_name } {
 	    gdb_assert !$has_history $test_name
 	}
 
-    -re -wrap ".*changed.*" {
+	-re -wrap ".*changed.*" {
 	    gdb_assert $has_history $test_name
 	}
     }

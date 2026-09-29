@@ -30,5 +30,5 @@ save_vars { GDBFLAGS } {
 }
 
 gdb_test "show remotetimeout" \
-	"Timeout limit to wait for target to respond is 42\." \
-	"correct remotetimeout printed"
+    "Timeout limit to wait for target to respond is 42\." \
+    "correct remotetimeout printed"

@@ -319,14 +319,14 @@ proc test_gdb_complete_unique_re { input_line complete_line_re {append_char " "}
     # speeds up testing if necessary.
 
     set test_result [test_gdb_complete_cmd_unique $input_line\
-		$expected_output_re $testname]
+			 $expected_output_re $testname]
     if { $test_result != 1 } {
 	return $test_result
     }
 
     if { [readline_is_used] } {
 	set test_result [test_gdb_complete_tab_unique $input_line \
-		$complete_line_re $append_char_re $testname]
+			     $complete_line_re $append_char_re $testname]
     }
     return $test_result
 }
@@ -346,12 +346,12 @@ proc test_gdb_complete_unique { input_line complete_line {append_char " "} {max_
 # to hit the max-completions limit.
 
 proc test_gdb_complete_multiple {
-  cmd_prefix completion_word add_completed_line completion_list
-  {start_quote_char ""} {end_quote_char ""} {max_completions false}
-  {testname ""}
-} {
+				 cmd_prefix completion_word add_completed_line completion_list
+				 {start_quote_char ""} {end_quote_char ""} {max_completions false}
+				 {testname ""}
+			     } {
     if { [readline_is_used] } {
-      test_gdb_complete_tab_multiple "$cmd_prefix$completion_word" $add_completed_line $completion_list $max_completions $testname
+	test_gdb_complete_tab_multiple "$cmd_prefix$completion_word" $add_completed_line $completion_list $max_completions $testname
     }
     test_gdb_complete_cmd_multiple $cmd_prefix $completion_word $completion_list $start_quote_char $end_quote_char $max_completions $testname
 }

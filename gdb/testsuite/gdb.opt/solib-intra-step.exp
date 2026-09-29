@@ -30,15 +30,15 @@ set bin_flags [list debug shlib=${binfile_lib}]
 
 if { [gdb_compile_shlib ${srcfile_lib} ${binfile_lib} $lib_flags] != ""
      || [gdb_compile ${srcfile} ${binfile} executable $bin_flags] != "" } {
-  untested "failed to compile"
-  return
+    untested "failed to compile"
+    return
 }
 
 clean_restart ${::testfile}
 gdb_load_shlib $binfile_lib
 
 if {![runto_main]} {
-  return 0
+    return 0
 }
 
 set test "first-hit"
@@ -91,7 +91,7 @@ gdb_test_multiple "step" $test {
 }
 
 if {![runto_main]} {
-  return 0
+    return 0
 }
 
 gdb_breakpoint "shlib_second"

@@ -59,8 +59,8 @@ gdb_test "break tf" \
 # continue to tf() breakpoint #2
 #
 gdb_test "continue" \
-     ".*Breakpoint 2,.*tf.*at.*$srcfile:.*" \
-     "continue to tf"
+    ".*Breakpoint 2,.*tf.*at.*$srcfile:.*" \
+    "continue to tf"
 
 #
 # backtrace from thread function.

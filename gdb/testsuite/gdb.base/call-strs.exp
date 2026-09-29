@@ -126,7 +126,7 @@ if {![gdb_skip_stdio_test "call str_func(a,b,c,d,e,f,g)"]} {
 if {![gdb_skip_stdio_test "print str_func(s,s,s,s,s,s,s,s)"]} {
     gdb_test_stdio "print str_func(s,s,s,s,s,s,s)" \
 	"first string arg is: test string\[ \t\r\n\]+second string arg is: test string\[ \t\r\n\]+third string arg is: test string\[ \t\r\n\]+fourth string arg is: test string\[ \t\r\n\]+fifth string arg is: test string\[ \t\r\n\]+sixth string arg is: test string\[ \t\r\n\]+seventh string arg is: test string\[ \t\r\n\]+" \
-    "\"test stringtest stringtest stringtest stringtest stringtest stringtest string\".*"
+	"\"test stringtest stringtest stringtest stringtest stringtest stringtest string\".*"
 }
 
 #call str_func(s,s,s,s,s,s,s)

@@ -41,7 +41,7 @@ with_cwd $srcdir/${subdir}/base/two {
 }
 
 if { [gdb_compile "$srcdir/${subdir}/$srcfile $objfile1 $objfile2" \
-		  $binfile executable $opts] != "" } {
+	  $binfile executable $opts] != "" } {
     return
 }
 

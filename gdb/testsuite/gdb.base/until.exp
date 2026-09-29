@@ -33,8 +33,8 @@ if {![runto_main]} {
 # sugar for "tbreak <location>; continue".)
 #
 gdb_test "until $bp_location1" \
-	"main .* at .*:$bp_location1.*" \
-	"until line number"
+    "main .* at .*:$bp_location1.*" \
+    "until line number"
 
 # Verify that a malformed "advance" is gracefully caught.
 #
@@ -54,8 +54,8 @@ delete_breakpoints
 # frame.
 #
 gdb_test "until $bp_location19" \
-	"factorial.*value=720.*at.*${srcfile}:$bp_location19.*return \\(value\\).*" \
-	"until factorial, recursive function"
+    "factorial.*value=720.*at.*${srcfile}:$bp_location19.*return \\(value\\).*" \
+    "until factorial, recursive function"
 
 # Run to a function called by main
 #
@@ -70,5 +70,5 @@ delete_breakpoints
 # stop at main, the caller, where we put the 'guard' breakpoint.
 #
 gdb_test "until marker3" \
-	"($hex in |)main.*argc.*argv.*envp.*at.*${srcfile}:($bp_location20.*marker2 \\(43\\)|$bp_location21.*marker3 \\(.stack., .trace.\\)).*" \
-	"until func, not called by current frame"
+    "($hex in |)main.*argc.*argv.*envp.*at.*${srcfile}:($bp_location20.*marker2 \\(43\\)|$bp_location21.*marker3 \\(.stack., .trace.\\)).*" \
+    "until func, not called by current frame"

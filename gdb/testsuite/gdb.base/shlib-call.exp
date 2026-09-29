@@ -116,8 +116,8 @@ gdb_test "break shr2" \
     "breakpoint function shr2"
 
 gdb_test "continue" \
-	"Continuing\\..*Breakpoint ${decimal}, shr2 \\(.*\\) at.*shr2\\.c:${decimal}.*shr2-return \\*\\/" \
-	"run until breakpoint set at a function"
+    "Continuing\\..*Breakpoint ${decimal}, shr2 \\(.*\\) at.*shr2\\.c:${decimal}.*shr2-return \\*\\/" \
+    "run until breakpoint set at a function"
 
 
 #print shr1(1)

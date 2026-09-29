@@ -41,83 +41,83 @@ with_test_prefix "basics" {
 	     "  c = 3" \
 	     "}"]
 
-    # Define an alias of frame apply all with some default args.
-    gdb_test_no_output "alias frame apply tout = frame apply all -past-entry -past-main" \
-	"alias frame apply tout"
-    gdb_test "help frame apply tout" \
-	"frame apply all, frame apply tout\r\n  alias frame apply tout = frame apply all -past-entry -past-main\r\n.*"
+# Define an alias of frame apply all with some default args.
+gdb_test_no_output "alias frame apply tout = frame apply all -past-entry -past-main" \
+    "alias frame apply tout"
+gdb_test "help frame apply tout" \
+    "frame apply all, frame apply tout\r\n  alias frame apply tout = frame apply all -past-entry -past-main\r\n.*"
 
-    # Show all aliases.
-    gdb_test "help aliases" \
-	[multi_line  \
-	     "User-defined aliases of other commands." \
-	     "" \
-	     "List of commands:" \
-	     "" \
-	     "PP -- Print value of expression EXP." \
-	     "  alias PP = print -pretty --" \
-	     "frame apply tout -- Apply a command to all frames." \
-	     "  alias frame apply tout = frame apply all -past-entry -past-main" \
-	     ".*" ] \
-	"help aliases"
+# Show all aliases.
+gdb_test "help aliases" \
+    [multi_line  \
+	 "User-defined aliases of other commands." \
+	 "" \
+	 "List of commands:" \
+	 "" \
+	 "PP -- Print value of expression EXP." \
+	 "  alias PP = print -pretty --" \
+	 "frame apply tout -- Apply a command to all frames." \
+	 "  alias frame apply tout = frame apply all -past-entry -past-main" \
+	 ".*" ] \
+    "help aliases"
 }
 
 # Check errors.
 with_test_prefix "errors" {
-    # Try an unknown root setting.
-    gdb_test "alias wrong = xxxx yyyy -someoption" \
-	"Undefined command: \"xxxx\".  Try \"help\"\\."
+# Try an unknown root setting.
+gdb_test "alias wrong = xxxx yyyy -someoption" \
+    "Undefined command: \"xxxx\".  Try \"help\"\\."
 
-    # Try ambiguous command.
-    gdb_test "alias wrong = a" \
-	"Ambiguous command \"a\":.*" "ambiguous a"
-    gdb_test "alias wrong = frame a" \
-	"Ambiguous frame command \"a\":.*" "ambiguous frame a"
+# Try ambiguous command.
+gdb_test "alias wrong = a" \
+    "Ambiguous command \"a\":.*" "ambiguous a"
+gdb_test "alias wrong = frame a" \
+    "Ambiguous frame command \"a\":.*" "ambiguous frame a"
 }
 
 
 # Check completion.
 with_test_prefix "completion" {
-    test_gdb_complete_unique \
-	"alias set pri" \
-	"alias set print"
+test_gdb_complete_unique \
+    "alias set pri" \
+    "alias set print"
 
-    test_gdb_complete_unique \
-	"alias set print items = set pri" \
-	"alias set print items = set print"
+test_gdb_complete_unique \
+    "alias set print items = set pri" \
+    "alias set print items = set print"
 
-    test_gdb_complete_unique \
-	"alias set print items = set print ele" \
-	"alias set print items = set print elements"
+test_gdb_complete_unique \
+    "alias set print items = set print ele" \
+    "alias set print items = set print elements"
 
-   test_gdb_complete_unique \
-	"alias btfu = backt" \
-	"alias btfu = backtrace"
+test_gdb_complete_unique \
+    "alias btfu = backt" \
+    "alias btfu = backtrace"
 
-   test_gdb_complete_unique \
-	"alias btfu = backtrace -fu" \
-	"alias btfu = backtrace -full"
+test_gdb_complete_unique \
+    "alias btfu = backtrace -fu" \
+    "alias btfu = backtrace -full"
 
-   test_gdb_complete_unique \
-	"alias btfu = backtrace -full -past-e" \
-	"alias btfu = backtrace -full -past-entry"
+test_gdb_complete_unique \
+    "alias btfu = backtrace -full -past-e" \
+    "alias btfu = backtrace -full -past-entry"
 
-    gdb_test_no_output "alias btfu = backtrace -full -past-entry" \
-	"alias btfu"
+gdb_test_no_output "alias btfu = backtrace -full -past-entry" \
+    "alias btfu"
 
 }
 
 # Check alias of alias.
 with_test_prefix "alias_of_alias" {
-    # Verify we can alias an alias that has no default args.
-    # We allow an alias of an alias, to be backward compatible with
-    # GDB 9.1 .
-    gdb_test_no_output "alias aaa = backtrace"
-    gdb_test_no_output "alias bbb = backtrace"
+# Verify we can alias an alias that has no default args.
+# We allow an alias of an alias, to be backward compatible with
+# GDB 9.1 .
+gdb_test_no_output "alias aaa = backtrace"
+gdb_test_no_output "alias bbb = backtrace"
 
-    # Verify that we cannot define an alias of an alias that has default args.
-    gdb_test_no_output "alias ccc = backtrace -full"
-    gdb_test "alias ddd = ccc" \
-	"Cannot define an alias of an alias that has default args"
+# Verify that we cannot define an alias of an alias that has default args.
+gdb_test_no_output "alias ccc = backtrace -full"
+gdb_test "alias ddd = ccc" \
+    "Cannot define an alias of an alias that has default args"
 
 }

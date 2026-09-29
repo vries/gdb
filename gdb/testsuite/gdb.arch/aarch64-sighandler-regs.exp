@@ -68,17 +68,17 @@ set preg_main_value "\\{0x1, 0x0, .*"
 
 #Ignore x0, and x29 to x31
 set xreg_nums [list 1 2 3 4 5 6 7 8 9 11 12 13 14 15 16 17 18 19 21 22 23 24 \
-		    25 26 27 28 ]
+		   25 26 27 28 ]
 set vreg_nums [list 0 1 2 3 4 5 6 7 8 9 11 12 13 14 15 16 17 18 19 21 22 23 \
-		    24 25 26 27 28 29 30 31]
+		   24 25 26 27 28 29 30 31]
 set preg_nums [list 0 1 2 3 4 5 6 7 8 9 11 12 13 14 15]
 
 proc check_regs {regtype regnums value postfix} {
-  foreach regnum $regnums {
-    gdb_test "print /x \$$regtype$regnum$postfix" \
-      ".* = {?$value}?" \
-      "check register \$$regtype$regnum has value $value"
-  }
+    foreach regnum $regnums {
+	gdb_test "print /x \$$regtype$regnum$postfix" \
+	    ".* = {?$value}?" \
+	    "check register \$$regtype$regnum has value $value"
+    }
 }
 
 # Run until end of signal handler
@@ -97,56 +97,56 @@ set mainframe [expr {$handlerframe + 2}]
 # Check register values
 
 with_test_prefix "handler frame 1st" {
-  check_regs x $xreg_nums $reg_handler_value_64 ""
-  check_regs v $vreg_nums $reg_handler_value_128 ".q.u"
-  check_regs q $vreg_nums $reg_handler_value_128 ".u"
-  check_regs d $vreg_nums $reg_handler_value_64 ".u"
-  check_regs s $vreg_nums $reg_handler_value_32 ".u"
-  check_regs h $vreg_nums $reg_handler_value_16 ".u"
-  check_regs b $vreg_nums $reg_handler_value_8 ".u"
-  if { $sve_hw } {
-    check_regs z $vreg_nums $zreg_handler_value ".d.u"
-    check_regs p $preg_nums $preg_handler_value ""
-  }
+    check_regs x $xreg_nums $reg_handler_value_64 ""
+    check_regs v $vreg_nums $reg_handler_value_128 ".q.u"
+    check_regs q $vreg_nums $reg_handler_value_128 ".u"
+    check_regs d $vreg_nums $reg_handler_value_64 ".u"
+    check_regs s $vreg_nums $reg_handler_value_32 ".u"
+    check_regs h $vreg_nums $reg_handler_value_16 ".u"
+    check_regs b $vreg_nums $reg_handler_value_8 ".u"
+    if { $sve_hw } {
+	check_regs z $vreg_nums $zreg_handler_value ".d.u"
+	check_regs p $preg_nums $preg_handler_value ""
+    }
 }
 
 # Switch to the frame for main(), and check register values
 
 gdb_test "frame $mainframe" \
-      "#$mainframe.*in main ().*" \
-      "set to main frame"
+    "#$mainframe.*in main ().*" \
+    "set to main frame"
 
 
 with_test_prefix "main frame" {
-  check_regs x $xreg_nums $reg_main_value_64 ""
-  check_regs v $vreg_nums $reg_main_value_128 ".q.u"
-  check_regs q $vreg_nums $reg_main_value_128 ".u"
-  check_regs d $vreg_nums $reg_main_value_64 ".u"
-  check_regs s $vreg_nums $reg_main_value_32 ".u"
-  check_regs h $vreg_nums $reg_main_value_16 ".u"
-  check_regs b $vreg_nums $reg_main_value_8 ".u"
-  if { $sve_hw } {
-    check_regs z $vreg_nums $zreg_main_value ".d.u"
-    check_regs p $preg_nums $preg_main_value ""
-  }
+    check_regs x $xreg_nums $reg_main_value_64 ""
+    check_regs v $vreg_nums $reg_main_value_128 ".q.u"
+    check_regs q $vreg_nums $reg_main_value_128 ".u"
+    check_regs d $vreg_nums $reg_main_value_64 ".u"
+    check_regs s $vreg_nums $reg_main_value_32 ".u"
+    check_regs h $vreg_nums $reg_main_value_16 ".u"
+    check_regs b $vreg_nums $reg_main_value_8 ".u"
+    if { $sve_hw } {
+	check_regs z $vreg_nums $zreg_main_value ".d.u"
+	check_regs p $preg_nums $preg_main_value ""
+    }
 }
 
 # Switch back to the signal handler frame, and check register values
 
 gdb_test "frame $handlerframe" \
-      "#$handlerframe.*handler \\\(sig=4\\\).*" \
-      "set to signal handler frame"
+    "#$handlerframe.*handler \\\(sig=4\\\).*" \
+    "set to signal handler frame"
 
 with_test_prefix "handler frame 2nd" {
-  check_regs x $xreg_nums $reg_handler_value_64 ""
-  check_regs v $vreg_nums $reg_handler_value_128 ".q.u"
-  check_regs q $vreg_nums $reg_handler_value_128 ".u"
-  check_regs d $vreg_nums $reg_handler_value_64 ".u"
-  check_regs s $vreg_nums $reg_handler_value_32 ".u"
-  check_regs h $vreg_nums $reg_handler_value_16 ".u"
-  check_regs b $vreg_nums $reg_handler_value_8 ".u"
-  if { $sve_hw } {
-    check_regs z $vreg_nums $zreg_handler_value ".d.u"
-    check_regs p $preg_nums $preg_handler_value ""
-}
+    check_regs x $xreg_nums $reg_handler_value_64 ""
+    check_regs v $vreg_nums $reg_handler_value_128 ".q.u"
+    check_regs q $vreg_nums $reg_handler_value_128 ".u"
+    check_regs d $vreg_nums $reg_handler_value_64 ".u"
+    check_regs s $vreg_nums $reg_handler_value_32 ".u"
+    check_regs h $vreg_nums $reg_handler_value_16 ".u"
+    check_regs b $vreg_nums $reg_handler_value_8 ".u"
+    if { $sve_hw } {
+	check_regs z $vreg_nums $zreg_handler_value ".d.u"
+	check_regs p $preg_nums $preg_handler_value ""
+    }
 }

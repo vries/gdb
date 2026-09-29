@@ -133,7 +133,7 @@ append regs_output [capture_command_output "mt print reggroups" \
 			".*Group.*Type\[^\n]*\n"]
 append regs_output "\n"
 append regs_output [capture_command_output "mt print user-registers" \
-		     ".*Name.*Nr\[^\n]*\n"]
+			".*Name.*Nr\[^\n]*\n"]
 set all_regs {}
 foreach {- reg} [regexp -all -inline -line {^(\w+)} $regs_output] {
     lappend all_regs $reg
@@ -670,8 +670,8 @@ with_cwd $srcdir {
 # regexp operator. We use string_to_regexp for this purpose.
 
 gdb_test "cd ${fullsrcdir}" \
-	 "Working directory [string_to_regexp ${fullsrcdir}].*" \
-	 "cd to \${srcdir}"
+    "Working directory [string_to_regexp ${fullsrcdir}].*" \
+    "cd to \${srcdir}"
 
 
 # GDB used to fail adding / on directories, on the first try only.
@@ -682,27 +682,27 @@ set uniquesub ${uniquesu}r
 set escapeuniquesub [string_to_regexp ${uniquesub}]
 send_gdb "dir ${uniquedir}\t"
 gdb_expect {
-	-re "${escapeduniquedir}/" {
-	    pass "directory completion"
-	    send_gdb "${uniquesu}\t"
-	}
-	-re "${escapeduniquedir} $" {
-	    fail "directory completion (old gdb bug)"
-	    send_gdb "\b/${uniquesu}\t"
-	}
-	default {
-	    fail "directory completion (timeout)"
-	    send_gdb "\ndir ${uniquedir}/${uniquesu}\t"
-	}
+    -re "${escapeduniquedir}/" {
+	pass "directory completion"
+	send_gdb "${uniquesu}\t"
+    }
+    -re "${escapeduniquedir} $" {
+	fail "directory completion (old gdb bug)"
+	send_gdb "\b/${uniquesu}\t"
+    }
+    default {
+	fail "directory completion (timeout)"
+	send_gdb "\ndir ${uniquedir}/${uniquesu}\t"
+    }
 }
 
 gdb_expect {
-	-re "${escapeuniquesub}/$" {
-	    pass "directory completion 2"
-	}
-	timeout {
-	    fail "directory completion 2"
-	}
+    -re "${escapeuniquesub}/$" {
+	pass "directory completion 2"
+    }
+    timeout {
+	fail "directory completion 2"
+    }
 }
 
 # Empty COMMAND sends no newline while " " sends the newline we need.

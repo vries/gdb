@@ -214,12 +214,12 @@ gdb_test "print &dynamic_cast<VirtualRight &> (*vl) == vr" " = true"
 gdb_test "print &dynamic_cast<VirtualRight &> (*vr) == vr" " = true"
 
 if {[prepare_for_testing "failed to prepare" ${testfile}03 $srcfile2 \
-			 {debug c++ additional_flags=-std=c++03}]} {
+	 {debug c++ additional_flags=-std=c++03}]} {
     return
 }
 
 if {![runto_main]} {
-   return
+    return
 }
 
 # Prevent symbol on address 0x0 being printed.

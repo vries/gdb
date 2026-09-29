@@ -47,8 +47,8 @@ set function "standard"
 
 set retcode [gdb_test_multiple "disassemble $function" "disassemble function '$function'" {
     -re "($hex) <\\+0>.*($hex) <\\+$decimal>.*int3.*($hex) <\\+$decimal>.*leave.*$gdb_prompt $" {
-      set address_bp $expect_out(2,string)
-      set address_after_bp $expect_out(3,string)
+	set address_bp $expect_out(2,string)
+	set address_after_bp $expect_out(3,string)
     }
 }]
 
@@ -60,7 +60,7 @@ if {$retcode != 0} {
 gdb_breakpoint "*$address_bp"
 
 gdb_test "continue" "Breakpoint .*, $address_bp in $function.*" \
-	 "stop at permanent breakpoint"
+    "stop at permanent breakpoint"
 
 # We want to fetch the stack pointer at the start of '$function'
 # function to make sure the skip_permanent_breakpoint implementation
@@ -70,12 +70,12 @@ gdb_test "continue" "Breakpoint .*, $address_bp in $function.*" \
 set start_sp 0
 gdb_test_multiple "print \$sp" "fetch stack pointer value" {
     -re "\\\$1.*($hex).*$gdb_prompt $" {
-      set start_sp $expect_out(1,string)
+	set start_sp $expect_out(1,string)
     }
 }
 
 gdb_test "stepi" "$address_after_bp in $function.*" \
-	 "single-step past permanent breakpoint"
+    "single-step past permanent breakpoint"
 
 gdb_test "print \$sp" ".*$start_sp.*" \
-	 "stack pointer value matches"
+    "stack pointer value matches"

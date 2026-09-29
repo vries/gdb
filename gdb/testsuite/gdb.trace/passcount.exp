@@ -61,11 +61,11 @@ ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_asm_test at .*$srcfile:${::de
 \[\t \]+not installed on target.
 ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_recursion_test at .*$srcfile:${::decimal}.
 \[\t \]+not installed on target" \
-			"4.1a: set three tracepoints, passcounts all zero"
+    "4.1a: set three tracepoints, passcounts all zero"
 
 gdb_test "passcount 2 $trcpt1" \
-	"Setting tracepoint $trcpt1.s passcount to 2" \
-	"4.1b: set 1st tracepoint's passcount to two"
+    "Setting tracepoint $trcpt1.s passcount to 2" \
+    "4.1b: set 1st tracepoint's passcount to two"
 
 gdb_test "info tracepoints" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
@@ -76,11 +76,11 @@ ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_asm_test at .*$srcfile:${::de
 \[\t \]+not installed on target.
 ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_recursion_test at .*$srcfile:${::decimal}.
 \[\t \]+not installed on target" \
-	"4.1c: verify 1st tracepoint's passcount set to two"
+    "4.1c: verify 1st tracepoint's passcount set to two"
 
 gdb_test "passcount 4 $trcpt2" \
-	"Setting tracepoint $trcpt2.s passcount to 4" \
-	"4.1d: set 2nd tracepoint's passcount to four"
+    "Setting tracepoint $trcpt2.s passcount to 4" \
+    "4.1d: set 2nd tracepoint's passcount to four"
 
 gdb_test "info tracepoints" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
@@ -92,13 +92,13 @@ ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_asm_test at .*$srcfile:${::de
 \[\t \]+not installed on target.
 ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_recursion_test at .*$srcfile:${::decimal}.
 \[\t \]+not installed on target" \
-	"4.1c: verify 2nd tracepoint's passcount set to four"
+    "4.1c: verify 2nd tracepoint's passcount set to four"
 
 # 4.2 passcount of last (default) tracepoint
 
 gdb_test "passcount 6" \
-	"Setting tracepoint $trcpt3.s passcount to 6" \
-	"4.2b: set last (default) tp's passcount to six"
+    "Setting tracepoint $trcpt3.s passcount to 6" \
+    "4.2b: set last (default) tp's passcount to six"
 
 gdb_test "info tracepoints" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
@@ -108,7 +108,7 @@ ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_asm_test at .*$srcfile:${::de
 \[\t \]+pass count 4 .*
 ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_recursion_test at .*$srcfile:${::decimal}.
 \[\t \]+pass count 6 .*" \
-	"4.2b: verify last (default) tp's passcount set to six"
+    "4.2b: verify last (default) tp's passcount set to six"
 
 # 4.3 run until stopped explicitly by user
 #     [deferred to dynamic test section]
@@ -116,8 +116,8 @@ ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_recursion_test at .*$srcfile:
 # 4.4 reset the previously set passcounts to new values
 
 gdb_test "passcount 7" \
-	"Setting tracepoint $trcpt3.s passcount to 7" \
-	"4.4a: reset last (default) tp's passcount to seven"
+    "Setting tracepoint $trcpt3.s passcount to 7" \
+    "4.4a: reset last (default) tp's passcount to seven"
 
 gdb_test "info tracepoints" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
@@ -127,11 +127,11 @@ ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_asm_test at .*$srcfile:${::de
 \[\t \]+pass count 4 .*
 ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_recursion_test at .*$srcfile:${::decimal}.
 \[\t \]+pass count 7 .*" \
-	"4.4a: verify reset last (default) tp's passcount to seven"
+    "4.4a: verify reset last (default) tp's passcount to seven"
 
 gdb_test "passcount 5 $trcpt2" \
-	"Setting tracepoint $trcpt2.s passcount to 5" \
-	"4.4b: reset second tracepoint's passcount to five"
+    "Setting tracepoint $trcpt2.s passcount to 5" \
+    "4.4b: reset second tracepoint's passcount to five"
 
 gdb_test "info tracepoints" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
@@ -141,13 +141,13 @@ ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_asm_test at .*$srcfile:${::de
 \[\t \]+pass count 5 .*
 ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_recursion_test at .*$srcfile:${::decimal}.
 \[\t \]+pass count 7 .*" \
-	"4.4c: verify reset second tracepoint's passcount to five"
+    "4.4c: verify reset second tracepoint's passcount to five"
 
 # 4.20 <FIXME test number> passcount for "all"
 
 gdb_test "passcount 3 all" \
-	".*$trcpt1.s pass.* 3.*$trcpt2.s pass.* 3.*$trcpt3.s pass.* 3" \
-	"4.20a: set all three passcounts to three"
+    ".*$trcpt1.s pass.* 3.*$trcpt2.s pass.* 3.*$trcpt3.s pass.* 3" \
+    "4.20a: set all three passcounts to three"
 
 gdb_test "info tracepoints" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
@@ -157,11 +157,11 @@ ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_asm_test at .*$srcfile:${::de
 \[\t \]+pass count 3 .*
 ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_recursion_test at .*$srcfile:${::decimal}.
 \[\t \]+pass count 3 .*"  \
-	"4.20a: verify all three passcounts to three"
+    "4.20a: verify all three passcounts to three"
 
 gdb_test "passcount 4 all" \
-	".*$trcpt1.s pass.* 4.*$trcpt2.s pass.* 4.*$trcpt3.s pass.* 4" \
-	"4.20a: reset all three passcounts to four"
+    ".*$trcpt1.s pass.* 4.*$trcpt2.s pass.* 4.*$trcpt3.s pass.* 4" \
+    "4.20a: reset all three passcounts to four"
 
 gdb_test "info tracepoints" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
@@ -171,7 +171,7 @@ ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_asm_test at .*$srcfile:${::de
 \[\t \]+pass count 4 .*
 ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_recursion_test at .*$srcfile:${::decimal}.
 \[\t \]+pass count 4 .*"  \
-	"4.20b: reset all three passcounts to four"
+    "4.20b: reset all three passcounts to four"
 
 # 4.5 Verify trace stops on first "satisfied" passcount
 #     [deferred to dynamic test section]
@@ -179,8 +179,8 @@ ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_recursion_test at .*$srcfile:
 # 4.6 minimum passcount boundary condition
 
 gdb_test "passcount 0 $trcpt1" \
-	"Setting tracepoint $trcpt1.s passcount to 0" \
-	"4.6: set passcount to zero"
+    "Setting tracepoint $trcpt1.s passcount to 0" \
+    "4.6: set passcount to zero"
 
 gdb_test "info tracepoints" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
@@ -192,13 +192,13 @@ ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_asm_test at .*$srcfile:${::de
 ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_recursion_test at .*$srcfile:${::decimal}.
 \[\t \]+pass count 4 .
 \[\t \]+not installed on target"  \
-	"4.6: verify passcount to zero"
+    "4.6: verify passcount to zero"
 
 # 4.7 (test a very large passcount)
 
 gdb_test "passcount 32767 $trcpt1" \
-	"Setting tracepoint $trcpt1.s passcount to 32767" \
-	"4.7: set passcount to large number (32767)"
+    "Setting tracepoint $trcpt1.s passcount to 32767" \
+    "4.7: set passcount to large number (32767)"
 
 gdb_test "info tracepoints" \
     "Num     Type\[ \]+Disp Enb Address\[ \]+What.*
@@ -208,14 +208,14 @@ ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_asm_test at .*$srcfile:${::de
 \[\t \]+pass count 4 .*
 ${::decimal}\[\t \]+tracepoint     keep y.* in gdb_recursion_test at .*$srcfile:${::decimal}.
 \[\t \]+pass count 4 .*"  \
-	"4.7: verify passcount to large number (32767)"
+    "4.7: verify passcount to large number (32767)"
 
 # 4.8 set passcount for invalid tracepoint
 
 gdb_test "passcount 1 [expr {$trcpt2 + $trcpt3}]" \
-	"No tracepoint number [expr {$trcpt2 + $trcpt3}]." \
-	"4.8: invalid tracepoint number in passcount"
+    "No tracepoint number [expr {$trcpt2 + $trcpt3}]." \
+    "4.8: invalid tracepoint number in passcount"
 
 # 4.9 help passcount
 gdb_test "help passcount" "Set the passcount for a tracepoint.*" \
-	"4.9: help passcount"
+    "4.9: help passcount"

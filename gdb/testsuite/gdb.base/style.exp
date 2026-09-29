@@ -235,131 +235,131 @@ proc run_style_tests { } {
 		 ".* total size.*: *$decimal *$cend" \
 		 " *}.*"]
 
-	set address_style_expr [limited_style ".*\".*address.*\".*style.*" address]
-	set color "blue"
-	if { $currently_disabled_style == "address" } {
-	    set color "none"
-	}
-	gdb_test "show style address foreground" \
-	    "The ${address_style_expr} foreground color is: ${color}" \
-	    "style name and style word styled using its own style in show style"
-
-	set aliases_expr [limited_style ".*aliases.*" command]
-	set breakpoints_expr [limited_style ".*breakpoints.*" command]
-	gdb_test "help" \
-	    [multi_line \
-		 "List of classes of commands:" \
-		 "" \
-		 "${aliases_expr} -- User-defined aliases of other commands\." \
-		 "${breakpoints_expr} -- Making program stop at certain points\." \
-		 ".*" \
-		] \
-	    "help classes of commands styled with command"
-
-	set taas_expr  [limited_style ".*taas.*" command]
-	set tfaas_expr  [limited_style ".*tfaas.*" command]
-	set cut_for_thre_expr [limited_style "cut for 'thre" highlight]
-	gdb_test "apropos -v cut for 'thre" \
-	    [multi_line \
-		 "" \
-		 "${taas_expr}" \
-		 "Apply a command to all .*" \
-		 "Usage:.*" \
-		 "short${cut_for_thre_expr}ad apply.*" \
-		 "" \
-		 "${tfaas_expr}" \
-		 "Apply a command to all .*" \
-		 "Usage:.*" \
-		 "short${cut_for_thre_expr}ad apply.*" \
-		]
-
-	clean_restart_and_disable "restart 2"
-
-	set quoted [string_to_regexp $binfile]
-	set pass_re "Reading symbols from [limited_style $quoted file]\.\.\."
-	if { $readnow } {
-	    set pass_re \
-		[multi_line \
-		     $pass_re \
-		     "Expanding full symbols from [limited_style $quoted file]\.\.\."]
-	}
-	gdb_test "file $binfile" \
-	    $pass_re \
-	    "filename is styled when loading symbol file"
-
-	gdb_test "pwd" "Working directory [limited_style .*? file].*"
-
-	gdb_test_no_output "set print repeat 3"
-	gdb_test "print {0,0,0,0,0,0,0,0}" \
-	    " = \\{0 [limited_style {<repeats.*8.*times>} metadata]\\}"
-
-	gdb_test "show logging file" \
-	    "The current logfile is \"[limited_style .*? file]\"\\..*"
-
-	# Check warnings are styled by setting a rubbish data
-	# directory.
-	gdb_test "set data-directory Makefile" \
-	    "warning: [limited_style .*? file] is not a directory\\..*"
-	gdb_test "show data-directory" \
-	    "GDB's data directory is \"[limited_style .*? file]\"\\..*"
-
-	# Check that deprecation styles command names.
-	gdb_test_no_output "maintenance deprecate p \"new_p\"" \
-	    "maintenance deprecate p \"new_p\" /1/"
-	gdb_test "p 5" \
-	    "Warning: '[limited_style p command]', an alias for the command '[limited_style print command]', is deprecated.*Use '[limited_style new_p command]'.*" \
-	    "p deprecated warning, with replacement"
-
-	# Check that the version string is styled in the output of 'show
-	# version', and that this styling can be disabled.
-	set vers [style "GNU gdb.*" version]
-	set url [limited_style "http:.*html" file]
-	gdb_test "show version" "${vers}.*<$url>.*" \
-	    "'show version' is styled"
-
-	if { $currently_disabled_style != "version" } {
-	    # Check that colors in styling can be set as integer and as RGB hex
-	    # triplet.  Check that the version string is styled in the output of
-	    # 'show version' according to the set colors.
-	    gdb_test_no_output "set style version intensity normal"
-	    gdb_test_no_output "set style version background 255"
-	    gdb_test_no_output "set style version foreground #FED210"
-	    gdb_test "show style version background" \
-		"The \033\\\[38;2;254;210;16;48;5;255;22;23;24;27m.*\".*version.*\".*style.*\033\\\[m background color is: 255" \
-		"Version's 256-color background style"
-	    gdb_test "show style version foreground" \
-		"The \033\\\[38;2;254;210;16;48;5;255;22;23;24;27m.*\".*version.*\".*style.*\033\\\[m foreground color is: #FED210" \
-		"Version's TrueColor foreground style"
-	}
-
-	gdb_test_no_output "set host-charset UTF-8"
-	# Chosen since it will print an error.
-	gdb_test "maint translate-address" \
-	    "❌ requires argument.*" \
-	    "emoji output"
-
-	gdb_test_no_output "set style error-prefix abcd:" \
-	    "set the error prefix"
-	gdb_test "maint translate-address" \
-	    "abcd:requires argument.*" \
-	    "error prefix"
-
-	# Check styling in the 'skip' related commands.
-	gdb_test "skip -file xxxx.c" \
-	    "File [limited_style xxxx\\.c file] will be skipped when stepping\\."
-	gdb_test "skip -gfile zz*.c" \
-	    "File\\(s\\) [limited_style zz\\*\\.c file] will be skipped when stepping\\."
-	gdb_test "skip -function xxxx" \
-	    "Function [limited_style xxxx function] will be skipped when stepping\\."
-	gdb_test "skip -rfunction zzz.*" \
-	    "Function\\(s\\) [limited_style zzz\\.\\* function] will be skipped when stepping\\."
-	gdb_test "skip function qqq" \
-	    "Function [limited_style qqq function] will be skipped when stepping\\."
-	gdb_test "skip file blah.c" \
-	    "File [limited_style blah\\.c file] will be skipped when stepping\\."
-	gdb_test "skip ttt" \
-	    "Function [limited_style ttt function] will be skipped when stepping\\."
+    set address_style_expr [limited_style ".*\".*address.*\".*style.*" address]
+    set color "blue"
+    if { $currently_disabled_style == "address" } {
+	set color "none"
     }
+    gdb_test "show style address foreground" \
+	"The ${address_style_expr} foreground color is: ${color}" \
+	"style name and style word styled using its own style in show style"
+
+    set aliases_expr [limited_style ".*aliases.*" command]
+    set breakpoints_expr [limited_style ".*breakpoints.*" command]
+    gdb_test "help" \
+	[multi_line \
+	     "List of classes of commands:" \
+	     "" \
+	     "${aliases_expr} -- User-defined aliases of other commands\." \
+	     "${breakpoints_expr} -- Making program stop at certain points\." \
+	     ".*" \
+	    ] \
+	"help classes of commands styled with command"
+
+    set taas_expr  [limited_style ".*taas.*" command]
+    set tfaas_expr  [limited_style ".*tfaas.*" command]
+    set cut_for_thre_expr [limited_style "cut for 'thre" highlight]
+    gdb_test "apropos -v cut for 'thre" \
+	[multi_line \
+	     "" \
+	     "${taas_expr}" \
+	     "Apply a command to all .*" \
+	     "Usage:.*" \
+	     "short${cut_for_thre_expr}ad apply.*" \
+	     "" \
+	     "${tfaas_expr}" \
+	     "Apply a command to all .*" \
+	     "Usage:.*" \
+	     "short${cut_for_thre_expr}ad apply.*" \
+	    ]
+
+    clean_restart_and_disable "restart 2"
+
+    set quoted [string_to_regexp $binfile]
+    set pass_re "Reading symbols from [limited_style $quoted file]\.\.\."
+    if { $readnow } {
+	set pass_re \
+	    [multi_line \
+		 $pass_re \
+		 "Expanding full symbols from [limited_style $quoted file]\.\.\."]
+    }
+    gdb_test "file $binfile" \
+	$pass_re \
+	"filename is styled when loading symbol file"
+
+    gdb_test "pwd" "Working directory [limited_style .*? file].*"
+
+    gdb_test_no_output "set print repeat 3"
+    gdb_test "print {0,0,0,0,0,0,0,0}" \
+	" = \\{0 [limited_style {<repeats.*8.*times>} metadata]\\}"
+
+    gdb_test "show logging file" \
+	"The current logfile is \"[limited_style .*? file]\"\\..*"
+
+    # Check warnings are styled by setting a rubbish data
+    # directory.
+    gdb_test "set data-directory Makefile" \
+	"warning: [limited_style .*? file] is not a directory\\..*"
+    gdb_test "show data-directory" \
+	"GDB's data directory is \"[limited_style .*? file]\"\\..*"
+
+    # Check that deprecation styles command names.
+    gdb_test_no_output "maintenance deprecate p \"new_p\"" \
+	"maintenance deprecate p \"new_p\" /1/"
+    gdb_test "p 5" \
+	"Warning: '[limited_style p command]', an alias for the command '[limited_style print command]', is deprecated.*Use '[limited_style new_p command]'.*" \
+	"p deprecated warning, with replacement"
+
+    # Check that the version string is styled in the output of 'show
+    # version', and that this styling can be disabled.
+    set vers [style "GNU gdb.*" version]
+    set url [limited_style "http:.*html" file]
+    gdb_test "show version" "${vers}.*<$url>.*" \
+	"'show version' is styled"
+
+    if { $currently_disabled_style != "version" } {
+	# Check that colors in styling can be set as integer and as RGB hex
+	# triplet.  Check that the version string is styled in the output of
+	# 'show version' according to the set colors.
+	gdb_test_no_output "set style version intensity normal"
+	gdb_test_no_output "set style version background 255"
+	gdb_test_no_output "set style version foreground #FED210"
+	gdb_test "show style version background" \
+	    "The \033\\\[38;2;254;210;16;48;5;255;22;23;24;27m.*\".*version.*\".*style.*\033\\\[m background color is: 255" \
+	    "Version's 256-color background style"
+	gdb_test "show style version foreground" \
+	    "The \033\\\[38;2;254;210;16;48;5;255;22;23;24;27m.*\".*version.*\".*style.*\033\\\[m foreground color is: #FED210" \
+	    "Version's TrueColor foreground style"
+    }
+
+    gdb_test_no_output "set host-charset UTF-8"
+    # Chosen since it will print an error.
+    gdb_test "maint translate-address" \
+	"❌ requires argument.*" \
+	"emoji output"
+
+    gdb_test_no_output "set style error-prefix abcd:" \
+	"set the error prefix"
+    gdb_test "maint translate-address" \
+	"abcd:requires argument.*" \
+	"error prefix"
+
+    # Check styling in the 'skip' related commands.
+    gdb_test "skip -file xxxx.c" \
+	"File [limited_style xxxx\\.c file] will be skipped when stepping\\."
+    gdb_test "skip -gfile zz*.c" \
+	"File\\(s\\) [limited_style zz\\*\\.c file] will be skipped when stepping\\."
+    gdb_test "skip -function xxxx" \
+	"Function [limited_style xxxx function] will be skipped when stepping\\."
+    gdb_test "skip -rfunction zzz.*" \
+	"Function\\(s\\) [limited_style zzz\\.\\* function] will be skipped when stepping\\."
+    gdb_test "skip function qqq" \
+	"Function [limited_style qqq function] will be skipped when stepping\\."
+    gdb_test "skip file blah.c" \
+	"File [limited_style blah\\.c file] will be skipped when stepping\\."
+    gdb_test "skip ttt" \
+	"Function [limited_style ttt function] will be skipped when stepping\\."
+}
 }
 
 # Check that disassembler styling can be disabled.  The function that
@@ -561,12 +561,12 @@ proc test_colorsupport_monochrome { } {
 	    gdb_test_no_output "set style enabled off"
 	    gdb_test_no_output "set style filename foreground none"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: none" \
-	      "none without approximation"
+		"The \"filename\" style foreground color is: none" \
+		"none without approximation"
 	    gdb_test_no_output "set style filename foreground blue"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: none" \
-	      "blue approximated to none"
+		"The \"filename\" style foreground color is: none" \
+		"blue approximated to none"
 	}
     }
 }
@@ -584,24 +584,24 @@ proc test_colorsupport_8color { } {
 	    gdb_test_no_output "set style enabled off"
 	    gdb_test_no_output "set style filename foreground none"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: none" \
-	      "none without approximation"
+		"The \"filename\" style foreground color is: none" \
+		"none without approximation"
 	    gdb_test_no_output "set style filename foreground yellow"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: yellow" \
-	      "yellow without approximation"
+		"The \"filename\" style foreground color is: yellow" \
+		"yellow without approximation"
 	    gdb_test_no_output "set style filename foreground 9"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: red" \
-	      "9 approximated to red"
+		"The \"filename\" style foreground color is: red" \
+		"9 approximated to red"
 	    gdb_test_no_output "set style filename foreground 118"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: green" \
-	      "118 approximated to green"
+		"The \"filename\" style foreground color is: green" \
+		"118 approximated to green"
 	    gdb_test_no_output "set style filename foreground #000ABC"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: blue" \
-	      "#000ABC approximated to blue"
+		"The \"filename\" style foreground color is: blue" \
+		"#000ABC approximated to blue"
 	}
     }
 }
@@ -620,28 +620,28 @@ proc test_colorsupport_256color { } {
 	    gdb_test_no_output "set style enabled off"
 	    gdb_test_no_output "set style filename foreground none"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: none" \
-	      "none without approximation"
+		"The \"filename\" style foreground color is: none" \
+		"none without approximation"
 	    gdb_test_no_output "set style filename foreground red"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: red" \
-	      "red without approximation"
+		"The \"filename\" style foreground color is: red" \
+		"red without approximation"
 	    gdb_test_no_output "set style filename foreground 9"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: 9" \
-	      "9 without approximation"
+		"The \"filename\" style foreground color is: 9" \
+		"9 without approximation"
 	    gdb_test_no_output "set style filename foreground 118"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: 118" \
-	      "118 without approximation"
+		"The \"filename\" style foreground color is: 118" \
+		"118 without approximation"
 	    gdb_test_no_output "set style filename foreground #CD00CD"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: 5" \
-	      "#CD00CD approximated to 5"
+		"The \"filename\" style foreground color is: 5" \
+		"#CD00CD approximated to 5"
 	    gdb_test_no_output "set style filename foreground #FFAF12"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: 214" \
-	      "#FFAF12 approximated to 214"
+		"The \"filename\" style foreground color is: 214" \
+		"#FFAF12 approximated to 214"
 	}
     }
 }
@@ -661,24 +661,24 @@ proc test_colorsupport_truecolor { } {
 	    gdb_test_no_output "set style enabled off"
 	    gdb_test_no_output "set style filename foreground none"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: none" \
-	      "none without approximation"
+		"The \"filename\" style foreground color is: none" \
+		"none without approximation"
 	    gdb_test_no_output "set style filename foreground red"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: red" \
-	      "red without approximation"
+		"The \"filename\" style foreground color is: red" \
+		"red without approximation"
 	    gdb_test_no_output "set style filename foreground 9"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: 9" \
-	      "9 without approximation"
+		"The \"filename\" style foreground color is: 9" \
+		"9 without approximation"
 	    gdb_test_no_output "set style filename foreground 118"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: 118" \
-	      "118 without approximation"
+		"The \"filename\" style foreground color is: 118" \
+		"118 without approximation"
 	    gdb_test_no_output "set style filename foreground #CD00CD"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: #CD00CD" \
-	      "#CD00CD without approximation"
+		"The \"filename\" style foreground color is: #CD00CD" \
+		"#CD00CD without approximation"
 	}
     }
 }
@@ -698,24 +698,24 @@ proc test_colorsupport_truecolor_only { } {
 	    gdb_test_no_output "set style enabled off"
 	    gdb_test_no_output "set style filename foreground none"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: none" \
-	      "none without approximation"
+		"The \"filename\" style foreground color is: none" \
+		"none without approximation"
 	    gdb_test_no_output "set style filename foreground red"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: #DE382B" \
-	      "red replaced by #DE382B"
+		"The \"filename\" style foreground color is: #DE382B" \
+		"red replaced by #DE382B"
 	    gdb_test_no_output "set style filename foreground 9"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: #FF0000" \
-	      "9 replaced by #FF0000"
+		"The \"filename\" style foreground color is: #FF0000" \
+		"9 replaced by #FF0000"
 	    gdb_test_no_output "set style filename foreground 118"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: #87FF00" \
-	      "118 replaced by #87FF00"
+		"The \"filename\" style foreground color is: #87FF00" \
+		"118 replaced by #87FF00"
 	    gdb_test_no_output "set style filename foreground #CD00CD"
 	    gdb_test "show style filename foreground" \
-	      "The \"filename\" style foreground color is: #CD00CD" \
-	      "#CD00CD without approximation"
+		"The \"filename\" style foreground color is: #CD00CD" \
+		"#CD00CD without approximation"
 	}
     }
 }

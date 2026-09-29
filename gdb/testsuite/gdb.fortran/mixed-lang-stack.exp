@@ -102,7 +102,7 @@ proc run_tests { lang } {
 	# Hidden argument name changes depending on compiler.
 	set mi_hidden "\{name=\"\[^\r\n\]+\",value=\"6\"\}"
 	gdb_test "interpreter-exec mi '-stack-list-arguments --no-frame-filters --all-values 7 7'" \
-		 "\\^done,stack-args=\\\[frame=\{level=\"7\",args=\\\[$mi_a,$mi_b,$mi_c,$mi_d,$mi_e,$mi_g,$mi_hidden\\\]\}\\\]"
+	    "\\^done,stack-args=\\\[frame=\{level=\"7\",args=\\\[$mi_a,$mi_b,$mi_c,$mi_d,$mi_e,$mi_g,$mi_hidden\\\]\}\\\]"
 
 	# Check the language for frame #0.
 	gdb_test "info frame" "source language fortran\..*" \

@@ -30,19 +30,19 @@ lappend opts "ldflags=-Wl,-e,main"
 
 # Place variables in .data instead of .sdata.
 if {[istarget "riscv*-*-*"]} {
-   lappend opts "additional_flags=-msmall-data-limit=0"
+    lappend opts "additional_flags=-msmall-data-limit=0"
 }
 
 remote_exec build "rm -f ${binfile1}"
 remote_exec build "rm -f ${binfile2}"
 
 if { [gdb_compile "${srcdir}/${subdir}/${srcfile1}" "${binfile1}" executable $opts] != "" } {
-     untested "failed to compile"
+    untested "failed to compile"
     return
 }
 
 if { [gdb_compile "${srcdir}/${subdir}/${srcfile2}" "${binfile2}" executable $opts] != "" } {
-     untested "failed to compile"
+    untested "failed to compile"
     return
 }
 
@@ -80,8 +80,8 @@ gdb_exit
 gdb_start
 
 gdb_test "symbol-file ${binfile1}" \
-	"Reading symbols from .*${testfile1}\\.\\.\\.(|\r\nUsing host libthread_db library .*libthread_db.so.*\\.)" \
-	"symbol-file ${testfile1}"
+    "Reading symbols from .*${testfile1}\\.\\.\\.(|\r\nUsing host libthread_db library .*libthread_db.so.*\\.)" \
+    "symbol-file ${testfile1}"
 
 with_test_prefix "single psymtabs" {
     test_eliminated_var my_global_symbol
@@ -113,16 +113,16 @@ gdb_start
 
 with_test_prefix "order1" {
     gdb_test "add-symbol-file ${binfile1} 0x100000 -s .bss 0x120000" \
-	    "Reading symbols from .*${testfile1}\\.\\.\\." \
-	    "add-symbol-file ${testfile1} 0x100000" \
-	    "add symbol table from file \".*${testfile1}\" at.*\\(y or n\\) " \
-	    "y"
+	"Reading symbols from .*${testfile1}\\.\\.\\." \
+	"add-symbol-file ${testfile1} 0x100000" \
+	"add symbol table from file \".*${testfile1}\" at.*\\(y or n\\) " \
+	"y"
 
     gdb_test "add-symbol-file ${binfile2} 0x200000 -s .data 0x210000 -s .bss 0x220000" \
-	    "Reading symbols from .*${testfile2}\\.\\.\\." \
-	    "add-symbol-file ${testfile2} 0x200000" \
-	    "add symbol table from file \".*${testfile2}\" at.*\\(y or n\\) " \
-	    "y"
+	"Reading symbols from .*${testfile2}\\.\\.\\." \
+	"add-symbol-file ${testfile2} 0x200000" \
+	"add symbol table from file \".*${testfile2}\" at.*\\(y or n\\) " \
+	"y"
 
     not_null_var_address my_global_symbol
     not_null_var_address my_static_symbol
@@ -137,16 +137,16 @@ gdb_start
 
 with_test_prefix "order2" {
     gdb_test "add-symbol-file ${binfile2} 0x200000 -s .data 0x210000 -s .bss 0x220000" \
-	    "Reading symbols from .*${testfile2}\\.\\.\\." \
-	    "add-symbol-file ${testfile2} 0x200000" \
-	    "add symbol table from file \".*${testfile2}\" at.*\\(y or n\\) " \
-	    "y"
+	"Reading symbols from .*${testfile2}\\.\\.\\." \
+	"add-symbol-file ${testfile2} 0x200000" \
+	"add symbol table from file \".*${testfile2}\" at.*\\(y or n\\) " \
+	"y"
 
     gdb_test "add-symbol-file ${binfile1} 0x100000 -s .bss 0x120000" \
-	    "Reading symbols from .*${testfile1}\\.\\.\\." \
-	    "add-symbol-file ${testfile1} 0x100000" \
-	    "add symbol table from file \".*${testfile1}\" at.*\\(y or n\\) " \
-	    "y"
+	"Reading symbols from .*${testfile1}\\.\\.\\." \
+	"add-symbol-file ${testfile1} 0x100000" \
+	"add symbol table from file \".*${testfile1}\" at.*\\(y or n\\) " \
+	"y"
 
     not_null_var_address my_global_symbol
     not_null_var_address my_static_symbol

@@ -25,15 +25,15 @@ proc 1d_array_value_pattern { byte elements } {
     set brace_open "{"
     set brace_close "}"
 
-    append data $brace_open $byte
-    if {$elements > 1} {
-	append data " <repeats $elements times>"
-    }
-    append data $brace_close
+append data $brace_open $byte
+if {$elements > 1} {
+    append data " <repeats $elements times>"
+}
+append data $brace_close
 
-    verbose -log "1d_array_value_pattern Pattern string is..."
-    verbose -log $data
-    return $data
+verbose -log "1d_array_value_pattern Pattern string is..."
+verbose -log $data
+return $data
 }
 
 #

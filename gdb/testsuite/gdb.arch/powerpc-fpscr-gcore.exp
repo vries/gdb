@@ -25,9 +25,9 @@ standard_testfile .c
 set gen_src [standard_output_file $srcfile]
 
 gdb_produce_source $gen_src {
-	int main() {
-	    return 0;
-	}
+    int main() {
+	return 0;
+    }
 }
 
 if {[build_executable "compile" $binfile $gen_src] == -1} {

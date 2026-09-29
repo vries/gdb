@@ -83,14 +83,14 @@ gdb_test_no_output "set breakpoint always-inserted off"
 # (through board settings) that it did not support them in the first place.
 # Just exit.
 if { $hwatch_count == 0} {
-  fail "no hardware watchpoints available"
-  return 0
+    fail "no hardware watchpoints available"
+    return 0
 }
 
 # Set the testcase's internal variable indicating the number of
 # hardware watchpoints the target supports.
 gdb_test_no_output "set var hw_watch_count=${hwatch_count}" \
-		   "set var hw_watch_count=${hwatch_count}"
+    "set var hw_watch_count=${hwatch_count}"
 
 # At this point, we know how many hardware watchpoints
 # the target supports.  Use that to do further testing.
@@ -98,8 +98,8 @@ delete_breakpoints
 
 # Prepare to create all the threads.
 gdb_test "break thread_started" \
-	 "Breakpoint ${::decimal} at .*: file .*${srcfile}, line .*" \
-	 "breakpoint on thread_started"
+    "Breakpoint ${::decimal} at .*: file .*${srcfile}, line .*" \
+    "breakpoint on thread_started"
 
 # Move all threads to where they're supposed to be for testing.
 for { set i 0 } { $i < $NR_THREADS } { incr i } {
@@ -110,20 +110,20 @@ for { set i 0 } { $i < $NR_THREADS } { incr i } {
     # threads correctly, and that no new watchpoints got created
     # in the background for a specific thread.
     if {$i < $hwatch_count} {
-      gdb_test "watch watched_data\[$i\]" \
-	"Hardware watchpoint .*"
+	gdb_test "watch watched_data\[$i\]" \
+	    "Hardware watchpoint .*"
     } else {
-      verbose -log "Not setting watchpoint for watched_data\[$i\]\n"
+	verbose -log "Not setting watchpoint for watched_data\[$i\]\n"
     }
 
     gdb_test continue "Continuing\\..*Breakpoint ${::decimal}, thread_started \\(\\) at .*$srcfile.*" \
-    "Thread $i hit breakpoint at thread_started"
+	"Thread $i hit breakpoint at thread_started"
 }
 
 # Let the threads run and change the watched data, leading
 # to watchpoint triggers.
 gdb_test_no_output "set var test_ready=1" \
-      "set var test_ready=1"
+    "set var test_ready=1"
 
 # Set the number of expected watchpoint triggers.
 set TRIGGERS [expr {$NR_THREADS * $hwatch_count * $NR_TRIGGERS_PER_THREAD}]
@@ -132,5 +132,5 @@ set TRIGGERS [expr {$NR_THREADS * $hwatch_count * $NR_TRIGGERS_PER_THREAD}]
 for { set i 1 } { $i <= $TRIGGERS } { incr i } {
     gdb_test continue \
 	"Continuing\\..*Hardware watchpoint ${::decimal}: watched_data\\\[${::decimal}\\\].*Old value = ${::decimal}.*New value = ${::decimal}.*thread_function \\(arg=$hex\\) at .*$srcfile.*" \
-    "Continue to watchpoint trigger $i out of ${TRIGGERS} on watched_data"
+	"Continue to watchpoint trigger $i out of ${TRIGGERS} on watched_data"
 }

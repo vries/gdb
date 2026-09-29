@@ -27,5 +27,5 @@ if {![runto_main]} {
 gdb_test "set language ada" ".*"
 
 gdb_test "set x=3" \
-	"warning: Expression is not an assignment \\(and might have no effect\\)" \
-	"warning for set without assignment"
+    "warning: Expression is not an assignment \\(and might have no effect\\)" \
+    "warning for set without assignment"

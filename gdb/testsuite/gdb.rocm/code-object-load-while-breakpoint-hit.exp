@@ -46,8 +46,8 @@ set hipmodule_path [standard_output_file ${testfile}.co]
 
 # Build the kernel object file.
 if { [gdb_compile $srcdir/$subdir/$srcfile \
-	$hipmodule_path object \
-	{ debug hip additional_flags=--cuda-device-only additional_flags=-DDEVICE } ] != "" } {
+	  $hipmodule_path object \
+	  { debug hip additional_flags=--cuda-device-only additional_flags=-DDEVICE } ] != "" } {
     return
 }
 
@@ -57,7 +57,7 @@ proc do_test { } {
 	gdb_load $::binfile
 
 	if { ![runto_main -inferior-args $::hipmodule_path] } {
-		return
+	    return
 	}
 
 	gdb_test "with breakpoint pending on -- break break_here if 0"

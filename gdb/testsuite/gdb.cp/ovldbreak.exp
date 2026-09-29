@@ -198,7 +198,7 @@ foreach type $all_types {
 		set type_map($types($type)) $type
 		pass "detect $type"
 	    }
-    }
+	}
 }
 
 # This is a list of the actual overloaded method arguments.
@@ -370,8 +370,8 @@ append bptable "${::decimal}\[\t \]+breakpoint\[\t \]+keep\[\t \]y\[\t \]+<MULTI
 foreach ovld {void char signed_char unsigned_char short_int \
 		  unsigned_short_int int unsigned_int long_int \
 		  unsigned_long_int float double} {
-  append bptable [format "\r\n${::decimal}.${::decimal}\[\t \]+y\[\t \]+$hex\[\t \]+in foo::overload1arg\\(%s\\) at.*$srcfile:%d" \
-		      $types($ovld) $line($ovld)]
+    append bptable [format "\r\n${::decimal}.${::decimal}\[\t \]+y\[\t \]+$hex\[\t \]+in foo::overload1arg\\(%s\\) at.*$srcfile:%d" \
+			$types($ovld) $line($ovld)]
 }
 
 gdb_test "info break" $bptable "breakpoint info, after setting on all"
@@ -386,7 +386,7 @@ proc continue_to_bp_overloaded {bpnumber might_fail line argtype argument} {
 	set actuals "arg=$argument"
 	if {[regexp {char} $argtype]} {
 	    append actuals " \\'\\\\00$argument\\'"
-      }
+	}
     }
 
     if {[string match $argtype "void"]} {

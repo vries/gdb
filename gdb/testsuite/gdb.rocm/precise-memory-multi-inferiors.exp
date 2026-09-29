@@ -71,7 +71,7 @@ proc test_copy_precise_memory_on_clone {precise_memory} {
     if {$precise_memory != "unspecified"} {
 	gdb_test_no_output "set amdgpu precise-memory $value"
 	gdb_test "show amdgpu precise-memory" "is $value.*" \
-		 "show amdgpu precise-memory on original inferior"
+	    "show amdgpu precise-memory on original inferior"
     }
 
     gdb_test "clone-inferior" "Added inferior 2.*"

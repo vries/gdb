@@ -63,9 +63,9 @@ set expected_line_b [gdb_get_line_number "c + d"]
 
 # Test that the locations return correct source locations.
 gdb_test "python print(gdb.breakpoints()\[1\].locations\[0\].source)" \
-	 ".*('.*py-bp-locations.c', $expected_line_a).*"
+    ".*('.*py-bp-locations.c', $expected_line_a).*"
 gdb_test "python print(gdb.breakpoints()\[1\].locations\[1\].source)" \
-	 ".*('.*py-bp-locations.c', $expected_line_b).*"
+    ".*('.*py-bp-locations.c', $expected_line_b).*"
 gdb_test "python print(gdb.breakpoints()\[1\].locations\[1\])" \
     [build_bpl_regexp -enabled True -source ".*py-bp-locations.c" \
 	 -line "$expected_line_b" -func ".*"] \

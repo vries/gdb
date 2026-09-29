@@ -38,11 +38,11 @@ gdb_py_test_silent_cmd "python lt = gdb.selected_frame().find_sal().symtab.linet
     "get instruction" 0
 
 gdb_test_multiline "input simple command" \
-  "python" "" \
-  "def list_lines():" "" \
-  "   for l in lt:" "" \
-  "     print ('L' + str(l.line) + ' A ' + hex(l.pc))" "" \
-  "end" ""
+    "python" "" \
+    "def list_lines():" "" \
+    "   for l in lt:" "" \
+    "     print ('L' + str(l.line) + ' A ' + hex(l.pc))" "" \
+    "end" ""
 
 gdb_test "python list_lines()" \
     "L20 A $hex.*L21 A $hex.*L22 A $hex.*L24 A $hex.*L25 A $hex.*L40 A $hex.*L42 A $hex.*L44 A $hex.*L42 A $hex.*L46 A $hex.*" \

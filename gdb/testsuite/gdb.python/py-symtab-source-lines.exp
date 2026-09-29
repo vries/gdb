@@ -120,9 +120,9 @@ proc compare_list_cmds { cli_args { py_args "NONE" } } {
 gdb_test_no_output -nopass "source $pyfile"
 
 foreach {first last} [list $lineno_a $lineno_b \
-			   $lineno_a $lineno_c \
-			   1         $lineno_b \
-			   1         999] {
+			  $lineno_a $lineno_c \
+			  1         $lineno_b \
+			  1         999] {
 
     with_test_prefix "$first..$last" {
 	compare_list_cmds $first,$last

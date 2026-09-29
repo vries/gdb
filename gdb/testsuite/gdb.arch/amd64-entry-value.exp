@@ -186,13 +186,13 @@ gdb_continue_to_breakpoint "entry_reference: reference"
 
 # GCC PR debug/49980: Missing stackparam1@entry and stackparam2@entry.
 gdb_test "bt" "#0 +reference \\(regparam=regparam@entry=@${::hex}: 1, nodataparam=@${::hex}: 2, \[^\r\n\]+, stackparam1=@${::hex}: 11, stackparam2=@${::hex}: 12\\) \[^\r\n\]*\r\n#1 +${::hex} in main \\(\\) \[^\r\n\]*" \
-	 "entry_reference: bt at entry"
+    "entry_reference: bt at entry"
 
 gdb_continue_to_breakpoint "entry_reference: breakhere_reference"
 
 # GCC PR debug/49980: Missing stackparam1@entry and stackparam2@entry.
 gdb_test "bt" "#0 +reference \\(regparam=@${::hex}: 21, regparam@entry=@${::hex}: 1, nodataparam=@${::hex}: 22, \[^\r\n\]+, stackparam1=@${::hex}: 31, stackparam2=@${::hex}: 32\\) \[^\r\n\]*\r\n#1 +${::hex} in main \\(\\) \[^\r\n\]*" \
-	 "entry_reference: bt"
+    "entry_reference: bt"
 gdb_test "ptype regparam" " = int &" "entry_reference: ptype regparam"
 
 set test "entry_reference: p regparam"
@@ -290,4 +290,4 @@ gdb_test "bt" \
 
 gdb_test_no_output "set debug entry-values 1"
 gdb_test "bt" "DW_OP_entry_value resolving has found function \"self\\(int\\)\" at ${::hex} can call itself via tail calls\r\n.*" \
-	 "self: bt debug entry-values"
+    "self: bt debug entry-values"

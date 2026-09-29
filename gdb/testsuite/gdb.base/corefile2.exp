@@ -186,7 +186,7 @@ gdb_continue_to_breakpoint "at abort"
 set corefile [standard_output_file gcore.test]
 set core_supported [gdb_gcore_cmd "$corefile" "save a corefile"]
 if {!$core_supported} {
-  return
+    return
 }
 
 # maint print-core-file-backed-mappings shouldn't produce any output

@@ -63,10 +63,10 @@ mi_gdb_test "[incr i]-dprintf-insert foo \"\\\"foobarbazqux\\\" At foo entry\\n\
     "$i\\^done,$bps" "mi insert dprintf foo"
 
 set bps [mi_make_breakpoint -type dprintf -func foo \
-		   -file ".*mi-dprintf.c" -fullname ".*mi-dprintf.c" \
-		   -line $dp_location1]
+	     -file ".*mi-dprintf.c" -fullname ".*mi-dprintf.c" \
+	     -line $dp_location1]
 mi_gdb_test "[incr i]-dprintf-insert $dp_location1 \"arg=%d, g=%d\\n\" arg g" \
-		   "$i\\^done,$bps" "mi insert dprintf dp_location1"
+    "$i\\^done,$bps" "mi insert dprintf dp_location1"
 
 set bps {}
 lappend bps [mi_make_breakpoint -type dprintf -func foo \

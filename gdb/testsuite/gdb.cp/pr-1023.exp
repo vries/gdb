@@ -46,7 +46,7 @@ gdb_test_multiple "break myClass::performBlocking" "break myClass::performBlocki
 }
 
 gdb_test \
-  "break myClass::performUnblocking" \
-  "Breakpoint $decimal at $hex: file .*$srcfile, line 10.*"
+    "break myClass::performUnblocking" \
+    "Breakpoint $decimal at $hex: file .*$srcfile, line 10.*"
 
 gdb_exit

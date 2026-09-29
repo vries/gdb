@@ -56,12 +56,12 @@ CompileExpression::test "d.doit3 ()" -3
 
 # These two tests are "disabled".  They represent new/future features.
 # CompileExpression::test \
-    [concat "struct ABC {int doit2() { return 3333; }} abc;" \
-	 "var = abc.doit2()"] \
+[concat "struct ABC {int doit2() { return 3333; }} abc;" \
+     "var = abc.doit2()"] \
     3333 -explicit
 # CompileExpression::test \
-    [concat "struct ABC : A {int doit2() { return 4444; }} abc;" \
-	 "var = abc.doit2()"] \
+[concat "struct ABC : A {int doit2() { return 4444; }} abc;" \
+     "var = abc.doit2()"] \
     4444 -explicit
 
 # Test some error conditions

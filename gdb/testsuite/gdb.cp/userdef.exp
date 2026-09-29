@@ -52,7 +52,7 @@ gdb_test_multiple "frame" "re-selected 'main' frame after inferior call" {
 	setup_kfail "gdb/1155" s390-*-linux-gnu
 	fail "re-selected 'main' frame after inferior call"
 	gdb_test "finish" ".*main.*at .*userdef.cc:.*// marker1-returns-here.*" \
-		"finish call to marker1"
+	    "finish call to marker1"
     }
     -re "#1  ($hex in )?main.*$gdb_prompt $" {
 	pass "re-selected 'main' frame after inferior call"

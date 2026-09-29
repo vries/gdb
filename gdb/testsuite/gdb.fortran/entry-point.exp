@@ -41,9 +41,9 @@ gdb_test "print l" "= 33" "print l, entered via $entry_point_name"
 gdb_test "print i1" "= 44" "print i1, entered via $entry_point_name"
 gdb_test "info args" \
     [multi_line "j = 11" \
-		"k = 22" \
-		"l = 33" \
-		"i1 = 44"] \
+	 "k = 22" \
+	 "l = 33" \
+	 "i1 = 44"] \
     "info args, entered via $entry_point_name"
 
 # Test if we can set a breakpoint via the function name.

@@ -21,8 +21,8 @@ if { [build_executable ${testfile}.exp ${binfile} "${srcfile}" {debug}] != 0 } {
 
 proc switch_to_inferior { num message } {
     gdb_test "inferior ${num}" \
-	     "\\\[Switching to inferior ${num} \\\[<null>\\\] \\\(<noexec>\\\)\\\]" \
-	     "${message}"
+	"\\\[Switching to inferior ${num} \\\[<null>\\\] \\\(<noexec>\\\)\\\]" \
+	"${message}"
 }
 
 proc add_inferior { expected_num message } {
@@ -40,8 +40,8 @@ proc test_remove_inferiors { } {
 
     # Test that it is not possible to remove the current inferior.
     gdb_test "remove-inferiors 2" \
-	     "warning: Can not remove current inferior 2." \
-	     "can't remove current inferior"
+	"warning: Can not remove current inferior 2." \
+	"can't remove current inferior"
 
     # Test that it is possible to remove a non-active non-current inferior.
     gdb_test_no_output "remove-inferiors 1" "remove non-current inferior"
@@ -63,8 +63,8 @@ proc test_remove_inferiors { } {
 
     # Test that it is not possible to remove an active non-current inferior.
     gdb_test "remove-inferiors 2" \
-	     "warning: Can not remove active inferior 2." \
-	     "can't remove active inferior"
+	"warning: Can not remove active inferior 2." \
+	"can't remove active inferior"
 }
 
 test_remove_inferiors

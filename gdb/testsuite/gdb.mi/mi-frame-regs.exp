@@ -25,7 +25,7 @@ set MIFLAGS "-i=mi"
 standard_testfile basics.c
 
 if {[gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" \
-		 executable {debug}] != "" } then {
+	 executable {debug}] != "" } then {
     untested "failed to compile"
     return
 }

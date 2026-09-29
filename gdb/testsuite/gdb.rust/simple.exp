@@ -96,22 +96,22 @@ gdb_test "print (slice as &\[i32\])\[0\]" " = 3"
 gdb_test "print slice as \[i32; 73.9\]" "integer expected"
 
 gdb_test_sequence "ptype slice" "" {
-    " = struct &\\\[i32\\\] \\{"
-    "  data_ptr: \\*mut i32,"
-    "  length: usize,"
-    "\\}"
+" = struct &\\\[i32\\\] \\{"
+"  data_ptr: \\*mut i32,"
+"  length: usize,"
+"\\}"
 }
 gdb_test_sequence "ptype &slice\[..\]" "" {
-    " = struct &\\\[i32\\\] \\{"
-    "  data_ptr: \\*mut i32,"
-    "  length: usize,"
-    "\\}"
+" = struct &\\\[i32\\\] \\{"
+"  data_ptr: \\*mut i32,"
+"  length: usize,"
+"\\}"
 }
 gdb_test_sequence "ptype &b\[..\]" "" {
-    " = struct &\\\[\\*gdb\\*\\\] \\{"
-    "  data_ptr: \\*mut i32,"
-    "  length: usize,"
-    "\\}"
+" = struct &\\\[\\*gdb\\*\\\] \\{"
+"  data_ptr: \\*mut i32,"
+"  length: usize,"
+"\\}"
 }
 
 gdb_test "print x" " = \\(23, 25\\.5\\)"
@@ -120,19 +120,19 @@ gdb_test "print x as (i32,f64)" " = \\(23, 25\\.5\\)"
 
 gdb_test "print y" " = simple::HiBob \\{field1: 7, field2: 8\\}"
 gdb_test_sequence "ptype y" "" {
-    " = struct simple::HiBob \\{"
-    "  field1: i32,"
-    "  field2: u64,"
-    "\\}"
+" = struct simple::HiBob \\{"
+"  field1: i32,"
+"  field2: u64,"
+"\\}"
 }
 gdb_test "print y.field2" " = 8"
 
 gdb_test "print z" " = simple::ByeBob \\(7, 8\\)"
 gdb_test_sequence "ptype z" "" {
-    " = struct simple::ByeBob \\("
-    "  i32,"
-    "  u64,"
-    "\\)"
+" = struct simple::ByeBob \\("
+"  i32,"
+"  u64,"
+"\\)"
 }
 gdb_test "print z.1" " = 8"
 
@@ -149,22 +149,22 @@ gdb_test "print univariant_anon.sss" \
     "Attempting to access named field sss of tuple variant simple::UnivariantAnon::Foo, which has only anonymous fields"
 
 gdb_test_sequence "ptype simple::Univariant" "" {
-    "type = enum simple::Univariant \\{"
-    "  Foo\\{a: u8\\},"
-    "\\}"
+"type = enum simple::Univariant \\{"
+"  Foo\\{a: u8\\},"
+"\\}"
 }
 
 gdb_test_sequence "ptype simple::UnivariantAnon" "" {
-    "type = enum simple::UnivariantAnon \\{"
-    "  Foo\\(u8\\),"
-    "\\}"
+"type = enum simple::UnivariantAnon \\{"
+"  Foo\\(u8\\),"
+"\\}"
 }
 
 gdb_test_sequence "ptype simple::ByeBob" "" {
-    " = struct simple::ByeBob \\("
-    "  i32,"
-    "  u64,"
-    "\\)"
+" = struct simple::ByeBob \\("
+"  i32,"
+"  u64,"
+"\\)"
 }
 gdb_test "print simple::ByeBob(0xff, 5)" \
     " = simple::ByeBob \\(255, 5\\)"
@@ -190,12 +190,12 @@ gdb_test "print e2" \
     " = simple::MoreComplicated::Four\\{this: true, is: 8, a: 109 'm', struct_: 100, variant: 10\\}"
 gdb_test "print sizeof(e)" " = (20|24)"
 gdb_test_sequence "ptype e" "" {
-    " = enum simple::MoreComplicated \\{"
-    "  One,"
-    "  Two\\(i32\\),"
-    "  Three\\(simple::HiBob\\),"
-    "  Four\\{this: bool, is: u8, a: char, struct_: u64, variant: u32\\},"
-    "\\}"
+" = enum simple::MoreComplicated \\{"
+"  One,"
+"  Two\\(i32\\),"
+"  Three\\(simple::HiBob\\),"
+"  Four\\{this: bool, is: u8, a: char, struct_: u64, variant: u32\\},"
+"\\}"
 }
 
 # Test a parser error.
@@ -216,12 +216,12 @@ gdb_test "print e2.0" \
 set pass_pattern " = simple::SpaceSaver::Nothing"
 set xfail_pattern " = simple::SpaceSaver::Thebox\\($decimal, 0x0\\)"
 gdb_test_multiple "print k" "" {
-    -re "\[\r\n\]*(?:$pass_pattern)\[\r\n\]+$gdb_prompt $" {
-	pass $gdb_test_name
-    }
-    -re "\[\r\n\]*(?:$xfail_pattern)\[\r\n\]+$gdb_prompt $" {
-	xfail $gdb_test_name
-    }
+-re "\[\r\n\]*(?:$pass_pattern)\[\r\n\]+$gdb_prompt $" {
+    pass $gdb_test_name
+}
+-re "\[\r\n\]*(?:$xfail_pattern)\[\r\n\]+$gdb_prompt $" {
+    xfail $gdb_test_name
+}
 }
 gdb_test "print l" " = simple::SpaceSaver::Thebox\\(9, $hex\\)"
 gdb_test "print *l.1" " = 1729"
@@ -259,22 +259,22 @@ set pass_pattern \
 set xfail_pattern \
     "( = <error reading variable>|That operation is not available on .*)"
 gdb_test_multiple "print str_some" "" {
-    -re "\[\r\n\]*(?:$pass_pattern)\[\r\n\]+$gdb_prompt $" {
-	pass $gdb_test_name
-    }
-    -re "\[\r\n\]*(?:$xfail_pattern)\[\r\n\]+$gdb_prompt $" {
-	xfail $gdb_test_name
-    }
+-re "\[\r\n\]*(?:$pass_pattern)\[\r\n\]+$gdb_prompt $" {
+    pass $gdb_test_name
+}
+-re "\[\r\n\]*(?:$xfail_pattern)\[\r\n\]+$gdb_prompt $" {
+    xfail $gdb_test_name
+}
 }
 
 set pass_pattern " = core::option::Option<\[a-z\]+::string::String>::None"
 gdb_test_multiple "print str_none" "" {
-    -re "\[\r\n\]*(?:$pass_pattern)\[\r\n\]+$gdb_prompt $" {
-	pass $gdb_test_name
-    }
-    -re "\[\r\n\]*(?:$xfail_pattern)\[\r\n\]+$gdb_prompt $" {
-	xfail $gdb_test_name
-    }
+-re "\[\r\n\]*(?:$pass_pattern)\[\r\n\]+$gdb_prompt $" {
+    pass $gdb_test_name
+}
+-re "\[\r\n\]*(?:$xfail_pattern)\[\r\n\]+$gdb_prompt $" {
+    xfail $gdb_test_name
+}
 }
 
 gdb_test "print int_some" " = core::option::Option<u8>::Some\\(1\\)"
@@ -291,22 +291,22 @@ gdb_test "print box_none" \
 set pass_pattern \
     " = simple::NonZeroOptimized::Value\\(\[a-z\]+::string::String .*"
 gdb_test_multiple "print custom_some" "" {
-    -re "\[\r\n\]*(?:$pass_pattern)\[\r\n\]+$gdb_prompt $" {
-	pass $gdb_test_name
-    }
-    -re "\[\r\n\]*(?:$xfail_pattern)\[\r\n\]+$gdb_prompt $" {
-	xfail $gdb_test_name
-    }
+-re "\[\r\n\]*(?:$pass_pattern)\[\r\n\]+$gdb_prompt $" {
+    pass $gdb_test_name
+}
+-re "\[\r\n\]*(?:$xfail_pattern)\[\r\n\]+$gdb_prompt $" {
+    xfail $gdb_test_name
+}
 }
 
 set pass_pattern " = simple::NonZeroOptimized::Empty"
 gdb_test_multiple "print custom_none" "" {
-    -re "\[\r\n\]*(?:$pass_pattern)\[\r\n\]+$gdb_prompt $" {
-	pass $gdb_test_name
-    }
-    -re "\[\r\n\]*(?:$xfail_pattern)\[\r\n\]+$gdb_prompt $" {
-	xfail $gdb_test_name
-    }
+-re "\[\r\n\]*(?:$pass_pattern)\[\r\n\]+$gdb_prompt $" {
+    pass $gdb_test_name
+}
+-re "\[\r\n\]*(?:$xfail_pattern)\[\r\n\]+$gdb_prompt $" {
+    xfail $gdb_test_name
+}
 }
 
 gdb_test "print st" \

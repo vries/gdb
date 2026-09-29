@@ -61,7 +61,7 @@ set test_params \
 	  { "tcp8:123"       1 "tcp8" } \
 	  { "udp123:::"      1 "udp123" } \
 	  { "garbage:1234"   1 "garbage:1234" } \
-    }
+      }
 
 # The best way to test different types of connections is to set the
 # GDB_TEST_SOCKETHOST variable accordingly.

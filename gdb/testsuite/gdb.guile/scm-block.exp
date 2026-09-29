@@ -49,9 +49,9 @@ gdb_test "guile (print (block-end block))" \
 
 # Test eq?.
 gdb_test "guile (print (eq? (frame-block frame) (frame-block frame)))" \
-     "= #t" "Check eq? on same block"
+    "= #t" "Check eq? on same block"
 gdb_test "guile (print (eq? block (block-global-block block)))" \
-     "= #f" "Check eq? on different blocks"
+    "= #f" "Check eq? on different blocks"
 
 # Test global/static blocks.
 gdb_scm_test_silent_cmd "guile (define frame (selected-frame))" \

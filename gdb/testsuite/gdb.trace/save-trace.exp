@@ -57,23 +57,23 @@ foreach x { 1 2 3 4 5 6 } {
     set trcpt [gdb_gettpnum $testline]
     set trcpt$x $trcpt
     gdb_test "passcount $x" \
-	     "Setting tracepoint $trcpt.* to $x" \
-	     "set passcount for tracepoint $trcpt"
+	"Setting tracepoint $trcpt.* to $x" \
+	"set passcount for tracepoint $trcpt"
 
     gdb_test_no_output "condition $trcpt $x - 1 == $x / 2" \
-	     "set condition for tracepoint $trcpt"
+	"set condition for tracepoint $trcpt"
 
     gdb_trace_setactions "set actions for tracepoint $x" \
-	    "" \
-	    "collect q$x" "^$" \
-	    "while-stepping $x" "^$" \
-	    "collect q$x" "^$" \
-	    "end" "^$"
+	"" \
+	"collect q$x" "^$" \
+	"while-stepping $x" "^$" \
+	"collect q$x" "^$" \
+	"end" "^$"
 }
 
 gdb_test "ftrace fast_tracepoint_loc" \
-	 "Fast tracepoint $decimal at $hex: file .*$srcfile, line $decimal.*" \
-	 "set a fast tracepoint"
+    "Fast tracepoint $decimal at $hex: file .*$srcfile, line $decimal.*" \
+    "set a fast tracepoint"
 
 gdb_test_no_output "set default-collect gdb_char_test, gdb_long_test - 100" \
     "set default-collect"
@@ -83,8 +83,8 @@ proc gdb_save_tracepoints { save_path } {
     set save_path_regexp [string_to_regexp $save_path]
     remote_file host delete $save_path
     gdb_test "save tracepoints $save_path" \
-	     "Saved to file '$save_path_regexp'." \
-	     "save tracepoint definitions"
+	"Saved to file '$save_path_regexp'." \
+	"save tracepoint definitions"
 }
 
 # Load tracepoint definitions from a file, from path SAVE_PATH.
@@ -96,7 +96,7 @@ proc gdb_load_tracepoints { save_path } {
     gdb_test "info tracepoints" "No tracepoints." "delete tracepoints"
 
     gdb_test "source $save_path" "Tracepoint ${::decimal} at .*" \
-	     "read back saved tracepoints"
+	"read back saved tracepoints"
 }
 
 proc gdb_verify_tracepoints { testname } {
@@ -108,9 +108,9 @@ proc gdb_verify_tracepoints { testname } {
     set result "pass"
     gdb_test_multiple "info tracepoints" "$testname" {
 	-re "${::decimal}\[\t \]+tracepoint\[\t \]+keep y\[\t \]+${::hex} in gdb_recursion_test\[^\r\n\]+\r\n\[ \t]+trace only if \[0-9\] - 1 == \[0-9\] / 2" {
-#           if { $expect_out(1,string) != $ourstate } {
-#               set result "fail"
-#           }
+	    #           if { $expect_out(1,string) != $ourstate } {
+	    #               set result "fail"
+	    #           }
 	    incr ourstate
 	    exp_continue
 	}
@@ -173,5 +173,5 @@ with_test_prefix "absolute" {
 # help save tracepoints
 
 gdb_test "help save tracepoints" \
-	"Save current tracepoint definitions as a script.*" \
-	"verify help save tracepoints"
+    "Save current tracepoint definitions as a script.*" \
+    "verify help save tracepoints"

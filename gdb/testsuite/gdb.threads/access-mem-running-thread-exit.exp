@@ -50,8 +50,8 @@ proc test { non_stop } {
     global GDBFLAGS
 
     save_vars { GDBFLAGS } {
-      append GDBFLAGS " -ex \"set non-stop $non_stop\""
-      clean_restart ${::testfile}
+	append GDBFLAGS " -ex \"set non-stop $non_stop\""
+	clean_restart ${::testfile}
     }
 
     if {![runto setup_done]} {
@@ -183,9 +183,9 @@ proc test { non_stop } {
 	    "print global_var after writing again"
     }
 
-   if {$ok} {
-       pass "access mem"
-   }
+    if {$ok} {
+	pass "access mem"
+    }
 }
 
 foreach non_stop { "off" "on" } {

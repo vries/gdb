@@ -74,7 +74,7 @@ proc check_info_bp_many_syscalls { syscalls } {
     set filter_str ""
 
     foreach name $syscalls {
-      set filter_str "${filter_str}${name}, "
+	set filter_str "${filter_str}${name}, "
     }
 
     set filter_str [ string trimright $filter_str ", " ]
@@ -89,7 +89,7 @@ proc check_call_to_syscall { syscall { pattern "" } } {
     global decimal
 
     if { $pattern eq "" } {
-      set pattern "${syscall}"
+	set pattern "${syscall}"
     }
 
     set thistest "program has called $syscall"
@@ -102,7 +102,7 @@ proc check_return_from_syscall { syscall { pattern "" } } {
     global decimal
 
     if { $pattern eq "" } {
-      set pattern "${syscall}"
+	set pattern "${syscall}"
     }
 
     set thistest "syscall $syscall has returned"
@@ -167,7 +167,7 @@ proc insert_catch_syscall_with_many_args { syscalls numbers } {
     set filter_str ""
 
     foreach name $syscalls number $numbers {
-      set filter_str "${filter_str}'${name}' \\\[${number}\\\] "
+	set filter_str "${filter_str}'${name}' \\\[${number}\\\] "
     }
 
     set filter_str [ string trimright $filter_str " " ]
@@ -548,8 +548,8 @@ proc test_catch_syscall_with_wrong_args_noxml {} {
 }
 
 proc test_catch_syscall_multi_arch_1 {
-  arch1 arch2 syscall1_name syscall2_name syscall_number
-} {
+				      arch1 arch2 syscall1_name syscall2_name syscall_number
+				  } {
     global decimal
 
     with_test_prefix "multiple targets: $arch1 vs $arch2" {
@@ -804,14 +804,14 @@ fill_all_syscalls_numbers
 # Execute the tests, using XML support
 gdb_exit
 if { [allow_xml_test] } {
-  clean_restart $testfile
-  do_syscall_tests
+    clean_restart $testfile
+    do_syscall_tests
 
-  # Now, we have to see if GDB displays a warning when we
-  # don't set the data-directory but try to use catch syscall
-  # anyway.  For that, we must restart GDB first.
-  clean_restart $testfile
-  test_catch_syscall_fail_nodatadir
+    # Now, we have to see if GDB displays a warning when we
+    # don't set the data-directory but try to use catch syscall
+    # anyway.  For that, we must restart GDB first.
+    clean_restart $testfile
+    test_catch_syscall_fail_nodatadir
 }
 
 # Restart gdb

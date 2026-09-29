@@ -38,10 +38,10 @@ Dwarf::assemble $asm_file {
 
     cu {} {
 	DW_TAG_compile_unit {
-		DW_AT_producer "Intel(R) C Intel(R) 64 Compiler XE for applications running on Intel(R) 64, Version 14.0.5.212 Build 20150212"
-		DW_AT_language @DW_LANG_C
-		DW_AT_name     $srcfile
-		DW_AT_comp_dir /tmp
+	    DW_AT_producer "Intel(R) C Intel(R) 64 Compiler XE for applications running on Intel(R) 64, Version 14.0.5.212 Build 20150212"
+	    DW_AT_language @DW_LANG_C
+	    DW_AT_name     $srcfile
+	    DW_AT_comp_dir /tmp
 	} {
 	    declare_labels int_type void_type ptr_type
 

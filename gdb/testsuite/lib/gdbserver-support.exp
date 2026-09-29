@@ -187,29 +187,29 @@ proc get_portnum {} {
 # Locate the gdbserver binary.  Returns "" if gdbserver could not be found.
 
 proc find_gdbserver { } {
-  global GDB
-  global GDBSERVER
+    global GDB
+    global GDBSERVER
 
-  if {[info exists GDBSERVER]} {
-    return ${GDBSERVER}
-  }
+    if {[info exists GDBSERVER]} {
+	return ${GDBSERVER}
+    }
 
-  if {[target_info exists gdb_server_prog]} {
-    return [target_info gdb_server_prog]
-  }
+    if {[target_info exists gdb_server_prog]} {
+	return [target_info gdb_server_prog]
+    }
 
-  set toplevel [file join [file dirname $GDB] .. gdbserver]
-  foreach gdbserver [list "${GDB}server" $toplevel] {
-      if { [file isdirectory $gdbserver] } {
-	  append gdbserver "/gdbserver"
-      }
+    set toplevel [file join [file dirname $GDB] .. gdbserver]
+    foreach gdbserver [list "${GDB}server" $toplevel] {
+	if { [file isdirectory $gdbserver] } {
+	    append gdbserver "/gdbserver"
+	}
 
-      if { [file executable $gdbserver] } {
-	  return $gdbserver
-      }
-  }
+	if { [file executable $gdbserver] } {
+	    return $gdbserver
+	}
+    }
 
-  return ""
+    return ""
 }
 
 # Return non-zero if we should run gdbserver-specific tests.
@@ -366,35 +366,35 @@ proc gdbserver_start { options arguments } {
 	    global gdbserverdebug
 	    set enabled 0
 	    foreach entry [split $gdbserverdebug ,] {
-	      switch -- $entry {
-		"debug-all" {
-		  append gdbserver_command " --debug=all"
-		  set enabled 1
+		switch -- $entry {
+		    "debug-all" {
+			append gdbserver_command " --debug=all"
+			set enabled 1
+		    }
+		    "all" {
+			# Different from the debug-all option, all argument sets
+			# the replay log file.  See gdb_debug_init.
+			append gdbserver_command " --debug=all"
+			set enabled 1
+		    }
+		    "debug-threads" {
+			append gdbserver_command " --debug=threads"
+			set enabled 1
+		    }
+		    "debug-remote" {
+			append gdbserver_command " --debug=remote"
+			set enabled 1
+		    }
+		    "debug-event-loop" {
+			append gdbserver_command " --debug=event-loop"
+			set enabled 1
+		    }
 		}
-		"all" {
-		  # Different from the debug-all option, all argument sets
-		  # the replay log file.  See gdb_debug_init.
-		  append gdbserver_command " --debug=all"
-		  set enabled 1
-		}
-		"debug-threads" {
-		  append gdbserver_command " --debug=threads"
-		  set enabled 1
-		}
-		"debug-remote" {
-		  append gdbserver_command " --debug=remote"
-		  set enabled 1
-		}
-		"debug-event-loop" {
-		  append gdbserver_command " --debug=event-loop"
-		  set enabled 1
-		}
-	      }
 	    }
 	    # Ensure debugfile is only added if something has been enabled
 	    if { $enabled } {
-	      set debugfile [standard_output_file gdbserver.debug]
-	      append gdbserver_command " --debug-file=$debugfile"
+		set debugfile [standard_output_file gdbserver.debug]
+		append gdbserver_command " --debug-file=$debugfile"
 	    }
 	}
 
@@ -545,9 +545,9 @@ proc gdbserver_exit { is_mi } {
 			exp_continue
 		    }
 		}
-	       timeout {
-		   warning "Timed out waiting for EOF in server after $monitor_exit"
-	       }
+		timeout {
+		    warning "Timed out waiting for EOF in server after $monitor_exit"
+		}
 	    }
 	}
     }
@@ -744,15 +744,15 @@ proc gdb_debug_init { } {
     global gdb_prompt
 
     if {[gdbserver_debug_enabled]} {
-      foreach entry [split $gdbserverdebug ,] {
-	if { $entry == "replay" || $entry == "all"} {
-	  set replayfile [standard_output_file_with_gdb_instance gdbserver.replay]
-	  send_gdb "set remotelogfile $replayfile\n" optional
-	  gdb_expect 10 {
-	    -re "$gdb_prompt $" {}
-	  }
+	foreach entry [split $gdbserverdebug ,] {
+	    if { $entry == "replay" || $entry == "all"} {
+		set replayfile [standard_output_file_with_gdb_instance gdbserver.replay]
+		send_gdb "set remotelogfile $replayfile\n" optional
+		gdb_expect 10 {
+		    -re "$gdb_prompt $" {}
+		}
+	    }
 	}
-      }
     }
 
     # Now call the standard debug init function

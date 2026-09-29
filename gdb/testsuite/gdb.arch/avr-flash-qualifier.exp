@@ -37,13 +37,13 @@ if {![runto [gdb_get_line_number "break here."]]} {
 }
 
 gdb_test "print pointer_to_flash" \
-  " = $hex <data_in_flash> .*"
+    " = $hex <data_in_flash> .*"
 
 gdb_breakpoint "pass_to_function"
 gdb_continue_to_breakpoint "pass_to_function"
 
 gdb_test "print p" \
-  " = $hex <data_in_flash> .*"
+    " = $hex <data_in_flash> .*"
 
 gdb_test "backtrace 1" \
-  "\#0  pass_to_function \\(p=$hex <data_in_flash> .*\\).*"
+    "\#0  pass_to_function \\(p=$hex <data_in_flash> .*\\).*"

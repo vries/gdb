@@ -35,5 +35,5 @@ gdb_breakpoint [gdb_get_line_number "Break here"]
 gdb_continue_to_breakpoint "run to breakpoint" ".*Break here.*"
 
 gdb_print_expr_at_depths "s1" [list "{...}" \
-				    "{m_struct = {...}, m_string = $hex \"hello world\"}" \
-				    "{m_struct = {m_a = 3, m_b = 7}, m_string = $hex \"hello world\"}"]
+				   "{m_struct = {...}, m_string = $hex \"hello world\"}" \
+				   "{m_struct = {m_a = 3, m_b = 7}, m_string = $hex \"hello world\"}"]

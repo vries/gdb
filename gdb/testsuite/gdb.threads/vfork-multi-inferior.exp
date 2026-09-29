@@ -47,14 +47,14 @@ set nr_loops 20
 # Compile the main program that calls vfork and hits a breakpoint.
 set opts [list debug additional_flags=-DNR_LOOPS=$nr_loops]
 if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable \
-	$opts] != "" } {
+	   $opts] != "" } {
     untested "failed to compile"
     return
 }
 
 # Compile the secondary program, which just sleeps.
 if  { [gdb_compile "${srcdir}/${subdir}/${srcfile_sleep}" "${binfile_sleep}" executable \
-	{debug}] != "" } {
+	   {debug}] != "" } {
     untested "failed to compile"
     return
 }
@@ -82,7 +82,7 @@ proc do_test {method} {
 	gdb_test "run &" "Starting program: .*" "run inferior 2"
     } else {
 	gdb_test "start" "Temporary breakpoint $::decimal, main .*" \
-		"start inferior 2"
+	    "start inferior 2"
     }
 
     # Start the first inferior.
@@ -112,5 +112,5 @@ proc do_test {method} {
 }
 
 foreach_with_prefix method {schedule-multiple non-stop} {
-    do_test $method
-}
+							 do_test $method
+						     }

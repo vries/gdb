@@ -28,17 +28,17 @@ proc get_tag_nn { tag } {
 
 # Return the address of PTR with a tag of TAG.
 proc get_tagged_ptr { tag ptr } {
-  set addr [get_hexadecimal_valueof $ptr -1]
-  return [get_valueof "/x" \
-	      "${addr} & (0xf0ffffffffffffff) | ((unsigned long) ${tag} << 56)" \
-	      "0" "fetch pointer ${ptr} with tag ${tag}"]
+    set addr [get_hexadecimal_valueof $ptr -1]
+    return [get_valueof "/x" \
+		"${addr} & (0xf0ffffffffffffff) | ((unsigned long) ${tag} << 56)" \
+		"0" "fetch pointer ${ptr} with tag ${tag}"]
 }
 
 # Return the logical TAG from PTR.
 proc get_ltag_from_ptr { ptr } {
-  set addr [get_hexadecimal_valueof $ptr -1]
-  return [get_valueof "/x" "${addr} >> 56 & 0xf" -1 \
-		      "fetch tag from pointer ${ptr}"]
+    set addr [get_hexadecimal_valueof $ptr -1]
+    return [get_valueof "/x" "${addr} >> 56 & 0xf" -1 \
+		"fetch tag from pointer ${ptr}"]
 }
 
 require is_aarch64_target
@@ -88,10 +88,10 @@ with_test_prefix "literals" {
     # is not mapped with PROT_MTE.
     set msg "Address ${untagged_ptr_addr} not in a region mapped with a memory tagging flag\."
     gdb_test "memory-tag print-allocation-tag ${untagged_ptr_addr}" $msg \
-	     "memory-tag print-allocation-tag with an untagged address"
+	"memory-tag print-allocation-tag with an untagged address"
 
     gdb_test "memory-tag set-allocation-tag ${untagged_ptr_addr} 1 00" $msg \
-	     "memory-tag set-allocation-tag with an untagged address"
+	"memory-tag set-allocation-tag with an untagged address"
 
     set addr_tagged 0
     set addr_tagged_valid 0
@@ -104,13 +104,13 @@ with_test_prefix "literals" {
 
 	set tag_hexnz [get_hex_tag [expr {$i % 16}]]
 	gdb_test "memory-tag print-logical-tag ${addr_tagged}" \
-		 " = 0x${tag_hexnz}" \
-		 "print-logical-tag with tag ${i}"
+	    " = 0x${tag_hexnz}" \
+	    "print-logical-tag with tag ${i}"
 
 	set tag_hexnn [get_tag_nn $i]
 	gdb_test "memory-tag with-logical-tag ${addr_tagged} ${tag_hexnn}" \
-		 " = \\(void \\*\\) ${addr_tagged}" \
-		 "with-logical-tag with tag ${i}"
+	    " = \\(void \\*\\) ${addr_tagged}" \
+	    "with-logical-tag with tag ${i}"
     }
 
     set atag_msg "Allocation tag\\(s\\) updated successfully\."
@@ -119,12 +119,12 @@ with_test_prefix "literals" {
 
 	set tag_hexnn [get_tag_nn $i]
 	gdb_test "memory-tag set-allocation-tag ${tagged_ptr_addr} 1 ${tag_hexnn}" \
-		 $atag_msg \
-		 "set-allocation-tag with tag ${i}"
+	    $atag_msg \
+	    "set-allocation-tag with tag ${i}"
 
 	set tag_hexnz [get_hex_tag [expr {$i % 16}]]
 	gdb_test "memory-tag print-allocation-tag ${tagged_ptr_addr}" " = 0x${tag_hexnz}" \
-		 "print-allocation-tag with tag ${i}"
+	    "print-allocation-tag with tag ${i}"
     }
 
     # Test tag mismatches.
@@ -134,8 +134,8 @@ with_test_prefix "literals" {
 	    # Set the allocation tag to a known value.
 	    set tag_hexnn [get_tag_nn $i]
 	    gdb_test "memory-tag set-allocation-tag ${tagged_ptr_addr} 1 ${tag_hexnn}" \
-		     $atag_msg \
-		     "set-allocation-tag with tag ${i}"
+		$atag_msg \
+		"set-allocation-tag with tag ${i}"
 
 	    set atag_hexnz [get_hex_tag [expr {$i % 16}]]
 
@@ -145,8 +145,8 @@ with_test_prefix "literals" {
 	    }
 
 	    gdb_test "memory-tag check ${addr_tagged}" \
-		     "Memory tags for address $hex match \\(0x${atag_hexnz}\\)\." \
-		     "check match with tag ${i}"
+		"Memory tags for address $hex match \\(0x${atag_hexnz}\\)\." \
+		"check match with tag ${i}"
 
 	    # Get a pointer with the logical tag that does not match the
 	    # allocation tag.
@@ -159,8 +159,8 @@ with_test_prefix "literals" {
 	    # tag.
 	    set ltag_hexnz [get_hex_tag [expr {($i + 1) % 16}]]
 	    gdb_test "memory-tag check ${addr_tagged}" \
-		     "Logical tag \\(0x${ltag_hexnz}\\) does not match the allocation tag \\(0x${atag_hexnz}\\) for address $hex\." \
-		     "check mismatch with tag ${i}"
+		"Logical tag \\(0x${ltag_hexnz}\\) does not match the allocation tag \\(0x${atag_hexnz}\\) for address $hex\." \
+		"check mismatch with tag ${i}"
 	}
     }
 }
@@ -170,10 +170,10 @@ with_test_prefix "symbolic" {
     # is not mapped with PROT_MTE.
     set msg "Address ${untagged_ptr_addr} not in a region mapped with a memory tagging flag\."
     gdb_test "memory-tag print-allocation-tag ${untagged_ptr_symbol}" $msg \
-	     "memory-tag print-allocation-tag with an untagged address"
+	"memory-tag print-allocation-tag with an untagged address"
 
     gdb_test "memory-tag set-allocation-tag ${untagged_ptr_symbol} 1 00" $msg \
-	     "memory-tag set-allocation-tag with an untagged address"
+	"memory-tag set-allocation-tag with an untagged address"
 
     # Test setting and showing the logical tags for a literal address.
     for {set i 0} {$i < 32} {incr i} {
@@ -182,23 +182,23 @@ with_test_prefix "symbolic" {
 	with_test_prefix "tag ${i}" {
 	    set addr_tagged [get_tagged_ptr $i ${tagged_ptr_addr}]
 	    gdb_test_no_output "set variable ${tagged_ptr_symbol} = ${addr_tagged}" \
-			       "update value of symbol ${tagged_ptr_symbol}"
+		"update value of symbol ${tagged_ptr_symbol}"
 	}
 
 	set tag_hexnz [get_hex_tag [expr {$i % 16}]]
 	gdb_test "memory-tag print-logical-tag ${tagged_ptr_symbol}" \
-		 " = 0x${tag_hexnz}" \
-		 "print-logical-tag with tag ${i}"
+	    " = 0x${tag_hexnz}" \
+	    "print-logical-tag with tag ${i}"
 
 	set tag_hexnn [get_tag_nn $i]
 	gdb_test "memory-tag with-logical-tag ${tagged_ptr_symbol} ${tag_hexnn}" \
-		 " = \\(void \\*\\) ${addr_tagged}" \
-		 "with-logical-tag with tag ${i}"
+	    " = \\(void \\*\\) ${addr_tagged}" \
+	    "with-logical-tag with tag ${i}"
     }
 
     # Reset the tagged ptr to its original value
     gdb_test_no_output "set variable ${tagged_ptr_symbol} = ${tagged_ptr_addr}" \
-		       "reset ${tagged_ptr_symbol} to ${tagged_ptr_addr}"
+	"reset ${tagged_ptr_symbol} to ${tagged_ptr_addr}"
 
     set atag_msg "Allocation tag\\(s\\) updated successfully\."
     # Test setting and showing the allocation tags.
@@ -206,13 +206,13 @@ with_test_prefix "symbolic" {
 
 	set tag_hexnn [get_tag_nn $i]
 	gdb_test "memory-tag set-allocation-tag ${tagged_ptr_symbol} 1 ${tag_hexnn}" \
-		 $atag_msg \
-		 "set-allocation-tag with tag ${i}"
+	    $atag_msg \
+	    "set-allocation-tag with tag ${i}"
 
 	set tag_hexnz [get_hex_tag [expr {$i % 16}]]
 	gdb_test "memory-tag print-allocation-tag ${tagged_ptr_symbol}" \
-		 " = 0x${tag_hexnz}" \
-		 "print-allocation-tag with tag ${i}"
+	    " = 0x${tag_hexnz}" \
+	    "print-allocation-tag with tag ${i}"
     }
 
     # Test tag mismatches.
@@ -222,8 +222,8 @@ with_test_prefix "symbolic" {
 	    # Set the allocation tag to a known value (0).
 	    set tag_hexnn [get_tag_nn $i]
 	    gdb_test "memory-tag set-allocation-tag ${tagged_ptr_symbol} 1 ${tag_hexnn}" \
-		     $atag_msg \
-		     "set-allocation-tag with tag ${i}"
+		$atag_msg \
+		"set-allocation-tag with tag ${i}"
 
 	    set atag_hexnz [get_hex_tag [expr {$i % 16}]]
 
@@ -234,12 +234,12 @@ with_test_prefix "symbolic" {
 
 	    with_test_prefix "tag ${i}" {
 		gdb_test_no_output "set variable ${tagged_ptr_symbol} = ${addr_tagged}" \
-				   "set ${tagged_ptr_symbol} to a matching logical tag"
+		    "set ${tagged_ptr_symbol} to a matching logical tag"
 	    }
 
 	    gdb_test "memory-tag check ${tagged_ptr_symbol}" \
-		     "Memory tags for address $hex match \\(0x${atag_hexnz}\\)\." \
-		     "check match with tag ${i}"
+		"Memory tags for address $hex match \\(0x${atag_hexnz}\\)\." \
+		"check match with tag ${i}"
 
 	    # Get a pointer with the logical tag that does not match the
 	    # allocation tag.
@@ -250,19 +250,19 @@ with_test_prefix "symbolic" {
 
 	    with_test_prefix "tag ${i}" {
 		gdb_test_no_output "set variable ${tagged_ptr_symbol} = ${addr_tagged}" \
-				   "set ${tagged_ptr_symbol} to a mismatching logical tag"
+		    "set ${tagged_ptr_symbol} to a mismatching logical tag"
 	    }
 
 	    # Validate that the logical tag does not match the allocation
 	    # tag.
 	    set ltag_hexnz [get_hex_tag [expr {($i + 1) % 16}]]
 	    gdb_test "memory-tag check ${tagged_ptr_symbol}" \
-		     "Logical tag \\(0x${ltag_hexnz}\\) does not match the allocation tag \\(0x${atag_hexnz}\\) for address $hex\." \
-		     "check mismatch with tag ${i}"
+		"Logical tag \\(0x${ltag_hexnz}\\) does not match the allocation tag \\(0x${atag_hexnz}\\) for address $hex\." \
+		"check mismatch with tag ${i}"
 	}
 	# Reset the tagged ptr to its original value
 	gdb_test_no_output "set variable ${tagged_ptr_symbol} = ${tagged_ptr_addr}" \
-			   "reset ${tagged_ptr_symbol} to ${tagged_ptr_addr}"
+	    "reset ${tagged_ptr_symbol} to ${tagged_ptr_addr}"
     }
 }
 
@@ -283,15 +283,15 @@ with_test_prefix "print command" {
     set atag_hexnn [get_tag_nn $atag]
 
     gdb_test "memory-tag set-allocation-tag ${tagged_ptr_symbol} 1 ${atag_hexnn}" \
-	     $atag_msg \
-	     "make atag and ltag different"
+	$atag_msg \
+	"make atag and ltag different"
 
     set atag_hexnz [get_hex_tag $atag]
     gdb_test "p/x ${tagged_ptr_symbol}" \
 	[multi_line \
-	    "Logical tag \\(${ltag}\\) does not match the allocation tag \\(0x${atag_hexnz}\\)\." \
-	    "${::valnum_re} = ${untagged_ptr}"] \
-	    "show tag mismatch"
+	     "Logical tag \\(${ltag}\\) does not match the allocation tag \\(0x${atag_hexnz}\\)\." \
+	     "${::valnum_re} = ${untagged_ptr}"] \
+	"show tag mismatch"
 }
 
 # Test the memory tagging extensions for the "x" command.
@@ -300,35 +300,35 @@ with_test_prefix "x command" {
     # Check if the allocation tags match what we expect.
     gdb_test "x/gxm ${tagged_ptr_symbol}" \
 	[multi_line \
-	    "<Allocation Tag $hex for range \\\[$hex,$hex\\)>" \
-	    "$hex:\[ \t\]+$hex"] \
+	     "<Allocation Tag $hex for range \\\[$hex,$hex\\)>" \
+	     "$hex:\[ \t\]+$hex"] \
 	"outputs tag information"
 
     # Also make sure no tag information is output for memory areas without
     # PROT_MTE mappings.
     gdb_test "x/gxm ${untagged_ptr_symbol}" \
-	     "$hex:\[ \t\]+$hex" \
-	     "does not output tag information"
+	"$hex:\[ \t\]+$hex" \
+	"does not output tag information"
 }
 
 # Validate the presence of the MTE registers.
 foreach reg {"tag_ctl" } {
     gdb_test "info registers $reg" \
-	     "$reg\[ \t\]+$hex\[ \t\]+$decimal" \
-	     "register $reg available"
+	"$reg\[ \t\]+$hex\[ \t\]+$decimal" \
+	"register $reg available"
 }
 
 # Run until a crash and confirm GDB displays memory tag violation
 # information.
 gdb_test "continue" \
     [multi_line \
-	"Program received signal SIGSEGV, Segmentation fault" \
-	"Memory tag violation while accessing address $hex" \
-	"Allocation tag $hex" \
-	"Logical tag $hex\." \
-	"$hex in access_memory \\(.*\\) at .*" \
-	".*tagged_ptr\\\[0\\\] = 'a';"] \
-	 "display tag violation information"
+	 "Program received signal SIGSEGV, Segmentation fault" \
+	 "Memory tag violation while accessing address $hex" \
+	 "Allocation tag $hex" \
+	 "Logical tag $hex\." \
+	 "$hex in access_memory \\(.*\\) at .*" \
+	 ".*tagged_ptr\\\[0\\\] = 'a';"] \
+    "display tag violation information"
 
 # Restart to execute the async tag fault test.
 with_test_prefix "async" {
@@ -345,8 +345,8 @@ with_test_prefix "async" {
 
     # Force a tag fault.
     gdb_test "memory-tag set-allocation-tag tagged_ptr 1 05" \
-	     $atag_msg \
-	     "make atag and ltag different"
+	$atag_msg \
+	"make atag and ltag different"
 
     # Force the tag fault to be async.
     gdb_test_no_output "set \$tag_ctl=0x7fff5" "set tag_ctl to async"
@@ -355,9 +355,9 @@ with_test_prefix "async" {
     # information for async mode
     gdb_test "continue" \
 	[multi_line \
-	    "Program received signal SIGSEGV, Segmentation fault" \
-	    "Memory tag violation" \
-	    "Fault address unavailable\." \
-	    "$hex in .* \\(.*\\) .*"] \
-	    "display tag violation information"
+	     "Program received signal SIGSEGV, Segmentation fault" \
+	     "Memory tag violation" \
+	     "Fault address unavailable\." \
+	     "$hex in .* \\(.*\\) .*"] \
+	"display tag violation information"
 }

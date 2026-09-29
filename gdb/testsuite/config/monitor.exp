@@ -95,7 +95,7 @@ proc gdb_target_monitor { exec_file } {
 	gdb_test "set remote Z-packet disable" ""
     }
     if [target_info exists gdb_serial] {
-       set serialport "[target_info gdb_serial]"
+	set serialport "[target_info gdb_serial]"
     } elseif [target_info exists netport] {
 	set serialport "[target_info netport]"
     } else {

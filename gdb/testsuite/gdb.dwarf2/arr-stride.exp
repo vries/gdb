@@ -117,10 +117,10 @@ if { [prepare_for_testing "failed to prepare" ${testfile} \
 gdb_test_no_output "set language ada"
 
 gdb_test "ptype pck.table" \
-	 "type = array \\(0 \\.\\. 4\\) of pck\\.item <packed: 6-bit elements>"
+    "type = array \\(0 \\.\\. 4\\) of pck\\.item <packed: 6-bit elements>"
 
 gdb_test "ptype pck.big_table" \
-	 "type = array \\(0 \\.\\. 4\\) of pck\\.item <packed: 8-bit elements>"
+    "type = array \\(0 \\.\\. 4\\) of pck\\.item <packed: 8-bit elements>"
 
 gdb_test "print the_struct" \
     "\\(intfield => 1, arrayfield => \\(0 => <optimized out>\\)\\)"

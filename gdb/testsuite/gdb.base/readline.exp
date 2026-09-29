@@ -27,120 +27,120 @@ require {!is_remote host}
 # NAME is the name of the test.
 # ARGS is a list of alternating commands and expected results.
 proc operate_and_get_next {name args} {
-  global gdb_prompt
+    global gdb_prompt
 
-  set my_gdb_prompt "($gdb_prompt| >)"
+    set my_gdb_prompt "($gdb_prompt| >)"
 
-  set reverse {}
-  foreach {item result} $args {
-    verbose "sending $item"
-    sleep 1
+    set reverse {}
+    foreach {item result} $args {
+	verbose "sending $item"
+	sleep 1
 
-    # We can't use gdb_test here because we might see a " >" prompt.
-    set status 0
-    send_gdb "$item\n"
-    gdb_expect {
-      -re "$item" {
-	# Ok
-      }
-      timeout {
-	set status 1
-      }
-    }
-
-    if {! $status} {
-      gdb_expect {
-	-re "$result" {
-	  # Ok.
+	# We can't use gdb_test here because we might see a " >" prompt.
+	set status 0
+	send_gdb "$item\n"
+	gdb_expect {
+	    -re "$item" {
+		# Ok
+	    }
+	    timeout {
+		set status 1
+	    }
 	}
-	timeout {
-	  set status 1
+
+	if {! $status} {
+	    gdb_expect {
+		-re "$result" {
+		    # Ok.
+		}
+		timeout {
+		    set status 1
+		}
+	    }
 	}
-      }
-    }
 
-    if {$status} {
-      fail "$name - send $item"
-      return 0
-    }
-    pass "$name - send $item"
-
-    set reverse [linsert $reverse 0 $item $result]
-  }
-
-  # Now use C-p to go back to the start.
-  foreach {item result} $reverse {
-    # Actually send C-p followed by C-l.  This lets us recognize the
-    # command when gdb prints it again.
-    send_gdb "\x10\x0c"
-    set status 0
-    gdb_expect {
-      -re "$item" {
-	# Ok
-      }
-      timeout {
-	set status 1
-      }
-    }
-    if {$status} {
-      fail "$name - C-p to $item"
-      return 0
-    }
-    pass "$name - C-p to $item"
-  }
-
-  # Now C-o through the list.  Don't send the command, since it is
-  # already there.  Strip off the first command from the list so we
-  # can see the next command inside the loop.
-  set count 0
-  foreach {item result} $args {
-    set status 0
-
-    # If this isn't the first item, make sure we see the command at
-    # the prompt.
-    if {$count > 0} {
-      gdb_expect {
-	-re ".*$item" {
-	  # Ok
+	if {$status} {
+	    fail "$name - send $item"
+	    return 0
 	}
-	timeout {
-	  set status 1
-	}
-      }
+	pass "$name - send $item"
+
+	set reverse [linsert $reverse 0 $item $result]
     }
 
-    if {! $status} {
-      # For the last item, send a simple \n instead of C-o.
-      if {$count == [llength $args] - 2} {
-	send_gdb "\n"
-      } else {
-	# 15 is C-o.
-	send_gdb [format %c 15]
-      }
-      set status 0
-      gdb_expect {
-	-re "$result" {
-	  # Ok
+    # Now use C-p to go back to the start.
+    foreach {item result} $reverse {
+	# Actually send C-p followed by C-l.  This lets us recognize the
+	# command when gdb prints it again.
+	send_gdb "\x10\x0c"
+	set status 0
+	gdb_expect {
+	    -re "$item" {
+		# Ok
+	    }
+	    timeout {
+		set status 1
+	    }
 	}
-	timeout {
-	  set status 1
+	if {$status} {
+	    fail "$name - C-p to $item"
+	    return 0
 	}
-      }
+	pass "$name - C-p to $item"
     }
 
-    if {$status} {
-      fail "$name - C-o for $item"
-      return 0
+    # Now C-o through the list.  Don't send the command, since it is
+    # already there.  Strip off the first command from the list so we
+    # can see the next command inside the loop.
+    set count 0
+    foreach {item result} $args {
+	set status 0
+
+	# If this isn't the first item, make sure we see the command at
+	# the prompt.
+	if {$count > 0} {
+	    gdb_expect {
+		-re ".*$item" {
+		    # Ok
+		}
+		timeout {
+		    set status 1
+		}
+	    }
+	}
+
+	if {! $status} {
+	    # For the last item, send a simple \n instead of C-o.
+	    if {$count == [llength $args] - 2} {
+		send_gdb "\n"
+	    } else {
+		# 15 is C-o.
+		send_gdb [format %c 15]
+	    }
+	    set status 0
+	    gdb_expect {
+		-re "$result" {
+		    # Ok
+		}
+		timeout {
+		    set status 1
+		}
+	    }
+	}
+
+	if {$status} {
+	    fail "$name - C-o for $item"
+	    return 0
+	}
+	pass "$name - C-o for $item"
+
+	set count [expr {$count + 2}]
     }
-    pass "$name - C-o for $item"
 
-    set count [expr {$count + 2}]
-  }
+    # Match the prompt so the next test starts at the right place.
+    gdb_test "" ".*" "$name - final prompt"
 
-  # Match the prompt so the next test starts at the right place.
-  gdb_test "" ".*" "$name - final prompt"
-
-  return 1
+    return 1
 }
 
 save_vars { env(TERM) } {

@@ -39,17 +39,17 @@ gdb_test_no_output "record btrace"
 gdb_test "stepi" ".*"
 
 with_test_prefix "replay" {
-	# start replaying
-	gdb_test "record goto begin" ".*"
-	gdb_test "info record" "Replay in progress\.\[^\\\r\\\n\]*"
+    # start replaying
+    gdb_test "record goto begin" ".*"
+    gdb_test "info record" "Replay in progress\.\[^\\\r\\\n\]*"
 
-	# capture the disassembly of gettimeofday while replaying
-	set replay_gettimeofday [capture_command_output "disassemble gettimeofday" ""]
+    # capture the disassembly of gettimeofday while replaying
+    set replay_gettimeofday [capture_command_output "disassemble gettimeofday" ""]
 
-	# the two disassemblies must be identical
-	if {![string compare $live_gettimeofday $replay_gettimeofday]} {
-		pass "disassemble gettimeofday"
-	} else {
-		fail "disassemble gettimeofday"
-	}
+    # the two disassemblies must be identical
+    if {![string compare $live_gettimeofday $replay_gettimeofday]} {
+	pass "disassemble gettimeofday"
+    } else {
+	fail "disassemble gettimeofday"
+    }
 }

@@ -122,28 +122,28 @@ proc compile_and_run_tests { lang } {
 
 	gdb_print_expr_at_depths "v1" [list "{...}" "{v1 = 1}" ]
 	gdb_print_expr_at_depths "v2" [list "{...}" \
-					    "{<V1> = {...}, _vptr.V2 = $hex <VTT for V2>, v2 = 2}" \
-					    "{<V1> = {v1 = 1}, _vptr.V2 = $hex <VTT for V2>, v2 = 2}" ]
+					   "{<V1> = {...}, _vptr.V2 = $hex <VTT for V2>, v2 = 2}" \
+					   "{<V1> = {v1 = 1}, _vptr.V2 = $hex <VTT for V2>, v2 = 2}" ]
 	gdb_print_expr_at_depths "v3" [list "{...}" \
-					    "{<V1> = {...}, _vptr.V3 = $hex <VTT for V3>, v3 = 3}" \
-					    "{<V1> = {v1 = 1}, _vptr.V3 = $hex <VTT for V3>, v3 = 3}" ]
+					   "{<V1> = {...}, _vptr.V3 = $hex <VTT for V3>, v3 = 3}" \
+					   "{<V1> = {v1 = 1}, _vptr.V3 = $hex <VTT for V3>, v3 = 3}" ]
 	gdb_print_expr_at_depths "v4" [list "{...}" \
-					    "{<V2> = {...}, _vptr.V4 = $hex <vtable for V4\[^>\]+>, v4 = 4}" \
-					    "{<V2> = {<V1> = {...}, _vptr.V2 = $hex <VTT for V4>, v2 = 2}, _vptr.V4 = $hex <vtable for V4\[^>\]+>, v4 = 4}" \
-					    "{<V2> = {<V1> = {v1 = 1}, _vptr.V2 = $hex <VTT for V4>, v2 = 2}, _vptr.V4 = $hex <vtable for V4\[^>\]+>, v4 = 4}" ]
+					   "{<V2> = {...}, _vptr.V4 = $hex <vtable for V4\[^>\]+>, v4 = 4}" \
+					   "{<V2> = {<V1> = {...}, _vptr.V2 = $hex <VTT for V4>, v2 = 2}, _vptr.V4 = $hex <vtable for V4\[^>\]+>, v4 = 4}" \
+					   "{<V2> = {<V1> = {v1 = 1}, _vptr.V2 = $hex <VTT for V4>, v2 = 2}, _vptr.V4 = $hex <vtable for V4\[^>\]+>, v4 = 4}" ]
 	gdb_print_expr_at_depths "v5" [list "{...}" \
-					    "{<V2> = {...}, _vptr.V5 = $hex <vtable for V5\[^>\]+>, v5 = 1}" \
-					    "{<V2> = {<V1> = {...}, _vptr.V2 = $hex <VTT for V5>, v2 = 2}, _vptr.V5 = $hex <vtable for V5\[^>\]+>, v5 = 1}" \
-					    "{<V2> = {<V1> = {v1 = 1}, _vptr.V2 = $hex <VTT for V5>, v2 = 2}, _vptr.V5 = $hex <vtable for V5\[^>\]+>, v5 = 1}" ]
+					   "{<V2> = {...}, _vptr.V5 = $hex <vtable for V5\[^>\]+>, v5 = 1}" \
+					   "{<V2> = {<V1> = {...}, _vptr.V2 = $hex <VTT for V5>, v2 = 2}, _vptr.V5 = $hex <vtable for V5\[^>\]+>, v5 = 1}" \
+					   "{<V2> = {<V1> = {v1 = 1}, _vptr.V2 = $hex <VTT for V5>, v2 = 2}, _vptr.V5 = $hex <vtable for V5\[^>\]+>, v5 = 1}" ]
 	gdb_print_expr_at_depths "v6" [list "{...}" \
-					    "{<V2> = {...}, <V3> = {...}, _vptr.V6 = $hex <vtable for V6\[^>\]+>, v6 = 1}" \
-					    "{<V2> = {<V1> = {...}, _vptr.V2 = $hex <vtable for V6\[^>\]+>, v2 = 2}, <V3> = {_vptr.V3 = $hex <VTT for V6>, v3 = 3}, _vptr.V6 = $hex <vtable for V6\[^>\]+>, v6 = 1}" \
-					    "{<V2> = {<V1> = {v1 = 1}, _vptr.V2 = $hex <vtable for V6\[^>\]+>, v2 = 2}, <V3> = {_vptr.V3 = $hex <VTT for V6>, v3 = 3}, _vptr.V6 = $hex <vtable for V6\[^>\]+>, v6 = 1}" ]
+					   "{<V2> = {...}, <V3> = {...}, _vptr.V6 = $hex <vtable for V6\[^>\]+>, v6 = 1}" \
+					   "{<V2> = {<V1> = {...}, _vptr.V2 = $hex <vtable for V6\[^>\]+>, v2 = 2}, <V3> = {_vptr.V3 = $hex <VTT for V6>, v3 = 3}, _vptr.V6 = $hex <vtable for V6\[^>\]+>, v6 = 1}" \
+					   "{<V2> = {<V1> = {v1 = 1}, _vptr.V2 = $hex <vtable for V6\[^>\]+>, v2 = 2}, <V3> = {_vptr.V3 = $hex <VTT for V6>, v3 = 3}, _vptr.V6 = $hex <vtable for V6\[^>\]+>, v6 = 1}" ]
 	gdb_print_expr_at_depths "v7" [list "{...}" \
-					    "{<V4> = {...}, <V5> = {...}, <V6> = {...}, _vptr.V7 = $hex <vtable for V7\[^>\]+>, v7 = 1}" \
-					    "{<V4> = {<V2> = {...}, _vptr.V4 = $hex <vtable for V7\[^>\]+>, v4 = 4}, <V5> = {_vptr.V5 = $hex <vtable for V7\[^>\]+>, v5 = 1}, <V6> = {<V3> = {...}, _vptr.V6 = $hex <vtable for V7\[^>\]+>, v6 = 1}, _vptr.V7 = $hex <vtable for V7\[^>\]+>, v7 = 1}" \
-					    "{<V4> = {<V2> = {<V1> = {...}, _vptr.V2 = $hex <vtable for V7\[^>\]+>, v2 = 2}, _vptr.V4 = $hex <vtable for V7\[^>\]+>, v4 = 4}, <V5> = {_vptr.V5 = $hex <vtable for V7\[^>\]+>, v5 = 1}, <V6> = {<V3> = {_vptr.V3 = $hex <VTT for V7>, v3 = 3}, _vptr.V6 = $hex <vtable for V7\[^>\]+>, v6 = 1}, _vptr.V7 = $hex <vtable for V7\[^>\]+>, v7 = 1}" \
-					    "{<V4> = {<V2> = {<V1> = {v1 = 1}, _vptr.V2 = $hex <vtable for V7\[^>\]+>, v2 = 2}, _vptr.V4 = $hex <vtable for V7\[^>\]+>, v4 = 4}, <V5> = {_vptr.V5 = $hex <vtable for V7\[^>\]+>, v5 = 1}, <V6> = {<V3> = {_vptr.V3 = $hex <VTT for V7>, v3 = 3}, _vptr.V6 = $hex <vtable for V7\[^>\]+>, v6 = 1}, _vptr.V7 = $hex <vtable for V7\[^>\]+>, v7 = 1}" ]
+					   "{<V4> = {...}, <V5> = {...}, <V6> = {...}, _vptr.V7 = $hex <vtable for V7\[^>\]+>, v7 = 1}" \
+					   "{<V4> = {<V2> = {...}, _vptr.V4 = $hex <vtable for V7\[^>\]+>, v4 = 4}, <V5> = {_vptr.V5 = $hex <vtable for V7\[^>\]+>, v5 = 1}, <V6> = {<V3> = {...}, _vptr.V6 = $hex <vtable for V7\[^>\]+>, v6 = 1}, _vptr.V7 = $hex <vtable for V7\[^>\]+>, v7 = 1}" \
+					   "{<V4> = {<V2> = {<V1> = {...}, _vptr.V2 = $hex <vtable for V7\[^>\]+>, v2 = 2}, _vptr.V4 = $hex <vtable for V7\[^>\]+>, v4 = 4}, <V5> = {_vptr.V5 = $hex <vtable for V7\[^>\]+>, v5 = 1}, <V6> = {<V3> = {_vptr.V3 = $hex <VTT for V7>, v3 = 3}, _vptr.V6 = $hex <vtable for V7\[^>\]+>, v6 = 1}, _vptr.V7 = $hex <vtable for V7\[^>\]+>, v7 = 1}" \
+					   "{<V4> = {<V2> = {<V1> = {v1 = 1}, _vptr.V2 = $hex <vtable for V7\[^>\]+>, v2 = 2}, _vptr.V4 = $hex <vtable for V7\[^>\]+>, v4 = 4}, <V5> = {_vptr.V5 = $hex <vtable for V7\[^>\]+>, v5 = 1}, <V6> = {<V3> = {_vptr.V3 = $hex <VTT for V7>, v3 = 3}, _vptr.V6 = $hex <vtable for V7\[^>\]+>, v6 = 1}, _vptr.V7 = $hex <vtable for V7\[^>\]+>, v7 = 1}" ]
     }
 }
 

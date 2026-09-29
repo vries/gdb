@@ -118,18 +118,18 @@ proc test_info_inferiors {multi_process} {
 		     "[inf_desc 5 $inf]4 \\(extended-remote localhost:$decimal\\)${ws}${binfile}${ws}" \
 		     "[inf_desc 6 $inf]5 \\(core\\)${ws}${binfile}${ws}" \
 		     "${ws}core file ${gcorefile_re}"
-		    ]
+		]
 
 	    if { $::run_python_tests } {
 		gdb_test "python info_inferiors()" \
 		    [multi_line \
-		     "Inferior 1, Connection #1: native" \
-		     "Inferior 2, Connection #2: extended-remote localhost:$decimal" \
-		     "Inferior 3, Connection #3: core" \
-		     "Inferior 4, Connection #1: native" \
-		     "Inferior 5, Connection #4: extended-remote localhost:$decimal" \
-		     "Inferior 6, Connection #5: core" \
-		    ]
+			 "Inferior 1, Connection #1: native" \
+			 "Inferior 2, Connection #2: extended-remote localhost:$decimal" \
+			 "Inferior 3, Connection #3: core" \
+			 "Inferior 4, Connection #1: native" \
+			 "Inferior 5, Connection #4: extended-remote localhost:$decimal" \
+			 "Inferior 6, Connection #5: core" \
+			]
 	    }
 	}
     }

@@ -24,7 +24,7 @@ if { ![have_epilogue_line_info] } {
 }
 
 if { [prepare_for_testing "failed to prepare" $testfile \
-			  {step-through-epilogue.c}] } {
+	  {step-through-epilogue.c}] } {
     untested "failed to prepare"
     return
 }
@@ -37,16 +37,16 @@ if { ![runto_main] } {
 proc step_till_epilogue_multiply {} {
     gdb_test "step" ".*return a . b;.*" "step into multiply"
     gdb_test "step" \
-	     "$::decimal\\s+\\\}\[^\r\n\]+Epilogue line of multiply.*" \
-	     "stop at the epilogue of multiply"
+	"$::decimal\\s+\\\}\[^\r\n\]+Epilogue line of multiply.*" \
+	"stop at the epilogue of multiply"
 }
 
 proc step_till_epilogue_square {} {
     gdb_test "step" ".*return multiply.*" "step into square"
     step_till_epilogue_multiply
     gdb_test "step" \
-	     "$::decimal\\s+\\\}\[^\r\n\]+Epilogue line of square.*" \
-	     "stop at epilogue of square"
+	"$::decimal\\s+\\\}\[^\r\n\]+Epilogue line of square.*" \
+	"stop at epilogue of square"
 }
 
 with_test_prefix "multiply" {
@@ -83,8 +83,8 @@ with_test_prefix "square, first argument" {
 with_test_prefix "square, second argument" {
     step_till_epilogue_multiply
     gdb_test "step" \
-	     "$::decimal\\s+\\\}\[^\r\n\]+Epilogue line of square.*" \
-	     "stop at epilogue of square"
+	"$::decimal\\s+\\\}\[^\r\n\]+Epilogue line of square.*" \
+	"stop at epilogue of square"
     if {$midway_return} {
 	gdb_test "step"\
 	    ".*x = multiply \\(square \\(1\\), square \\(2\\)\\);.*"\

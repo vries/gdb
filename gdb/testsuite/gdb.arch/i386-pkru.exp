@@ -29,7 +29,7 @@ if { [istarget *-*-linux*] } {
 set comp_flags "-I${srcdir}/../nat/"
 
 if { [prepare_for_testing "failed to prepare" ${testfile} ${srcfile} \
-     [list debug additional_flags=${comp_flags}]] } {
+	  [list debug additional_flags=${comp_flags}]] } {
     untested "failed to compile x86 PKEYS test."
     return
 }

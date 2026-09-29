@@ -58,7 +58,7 @@ proc src_layout_answer_prompt_check_screen { answer } {
 
     if { $answer eq "n" } {
 	gdb_assert { [Term::check_region_contents_p 0 15 80 9 \
-			 "Debuginfod has been disabled\\."] } \
+			  "Debuginfod has been disabled\\."] } \
 	    "debuginfod has been disabled"
 
 	gdb_assert { [Term::check_region_contents_p 1 1 78 13 \
@@ -66,11 +66,11 @@ proc src_layout_answer_prompt_check_screen { answer } {
 	    "source code was not downloaded"
     } else {
 	gdb_assert { [Term::check_region_contents_p 0 15 80 9 \
-			 "Debuginfod has been enabled\\."] } \
+			  "Debuginfod has been enabled\\."] } \
 	    "debuginfod has been enabled"
 
 	gdb_assert { [Term::check_region_contents_p 1 1 78 13 \
-			 "main \\(void\\)"] } \
+			  "main \\(void\\)"] } \
 	    "source code was downloaded"
     }
 

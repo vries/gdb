@@ -57,9 +57,9 @@ proc prepare_test_source_file { count } {
     }
 
     puts $outfile "  return 0;\n}"
-    close $outfile
+close $outfile
 
-    return $filename
+return $filename
 }
 
 # Build a source file and compile it.

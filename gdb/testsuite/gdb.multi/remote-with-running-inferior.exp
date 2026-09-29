@@ -132,42 +132,42 @@ proc run_test { target_non_stop non_stop } {
     gdb_continue_to_breakpoint "breakpoint in main"
     gdb_test "bt 1" \
 	{#0\s+main \(\) at [^\r\n]+} \
-	"check inferior 2 is in main"
+	     "check inferior 2 is in main"
 
-    # Switch to inferior 1 and allow it to continue.  This is a
-    # critical part of the test.  When the test was added a bug (in
-    # all-stop mode) would leave inferior 1 stopped, but GDB code
-    # would think the thread was running.  As such, the thread
-    # couldn't be resumed again.
-    gdb_test "inferior 1" "Switching to inferior 1.*"
+	    # Switch to inferior 1 and allow it to continue.  This is a
+	    # critical part of the test.  When the test was added a bug (in
+	    # all-stop mode) would leave inferior 1 stopped, but GDB code
+	    # would think the thread was running.  As such, the thread
+	    # couldn't be resumed again.
+	    gdb_test "inferior 1" "Switching to inferior 1.*"
 
-    # In non-stop mode, thread 1.1 is correctly left running, so we
-    # need to stop it now.
-    if { $non_stop } {
-	gdb_test -no-prompt-anchor "interrupt"
-	gdb_test "p 1 + 1" " = 2" \
-	    "simple print to resync output"
-    }
+	    # In non-stop mode, thread 1.1 is correctly left running, so we
+	    # need to stop it now.
+	    if { $non_stop } {
+		gdb_test -no-prompt-anchor "interrupt"
+		gdb_test "p 1 + 1" " = 2" \
+		    "simple print to resync output"
+	    }
 
-    gdb_breakpoint breakpt
-    gdb_continue_to_breakpoint "continue to breakpoint in breakpt"
-    gdb_test "bt 1" \
-	[multi_line \
-	     {#0\s+breakpt \(\) at [^\r\n]+} \
-	     [string_to_regexp "(More stack frames follow...)"]] \
-	"check inferior 1 is in breakpt"
+	    gdb_breakpoint breakpt
+	    gdb_continue_to_breakpoint "continue to breakpoint in breakpt"
+	    gdb_test "bt 1" \
+		 [multi_line \
+		      {#0\s+breakpt \(\) at [^\r\n]+} \
+			   [string_to_regexp "(More stack frames follow...)"]] \
+		      "check inferior 1 is in breakpt"
 
-    # Switch back to inferior 2.  The testing infrastructure will try to
-    # use 'monitor exit' to close gdbserver.  It helps if we are in the
-    # gdbserver inferior when the script finishes.
-    gdb_test "inferior 2" "Switching to inferior 2.*" \
-	"switch back to inferior 2"
-}
+		  # Switch back to inferior 2.  The testing infrastructure will try to
+		  # use 'monitor exit' to close gdbserver.  It helps if we are in the
+		  # gdbserver inferior when the script finishes.
+		  gdb_test "inferior 2" "Switching to inferior 2.*" \
+		      "switch back to inferior 2"
+	      }
 
-# Multi-inferior support requires non-stop targets.
-foreach_with_prefix target_non_stop { auto on } {
-    # But it's OK if we're emulating all-stop mode on top of non-stop.
-    foreach_with_prefix non_stop { on off } {
-	run_test $target_non_stop $non_stop
-    }
-}
+	    # Multi-inferior support requires non-stop targets.
+	    foreach_with_prefix target_non_stop { auto on } {
+		# But it's OK if we're emulating all-stop mode on top of non-stop.
+		foreach_with_prefix non_stop { on off } {
+		    run_test $target_non_stop $non_stop
+		}
+	    }

@@ -108,7 +108,7 @@ if {[runto_main]} {
     # ...call the function, which is immediately interrupted
 
     gdb_test "p func1 ()" \
-"Breakpoint \[0-9\]*, handler.*
+	"Breakpoint \[0-9\]*, handler.*
 The program being debugged stopped while in a function called from GDB.*" \
 	"p func1 () #2"
 

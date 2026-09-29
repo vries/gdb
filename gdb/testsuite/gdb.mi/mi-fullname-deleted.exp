@@ -73,8 +73,8 @@ mi_gdb_test "-file-list-exec-source-file" ".*\",fullname=\"$srcfileabssubst_rege
 # with Clang, and possibly other compilers too; see the comment
 # above for more.
 mi_gdb_test "-break-insert -t /$srcfile:main" \
-	    "\\^error,msg=\"No source file named /[string_to_regexp $srcfile]\\.\"" \
-	    "compare_filenames_for_search does not match"
+    "\\^error,msg=\"No source file named /[string_to_regexp $srcfile]\\.\"" \
+    "compare_filenames_for_search does not match"
 mi_gdb_test "-break-insert -t $srcfile:main" \
-	    {\^done,bkpt=.*} \
-	    "compare_filenames_for_search does match"
+    {\^done,bkpt=.*} \
+    "compare_filenames_for_search does match"

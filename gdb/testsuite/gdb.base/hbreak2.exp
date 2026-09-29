@@ -581,4 +581,4 @@ gdb_test_multiple "continue" \
 	    }
 	    fail "run until hardware breakpoint set at small function, optimized file"
 	}
-}
+    }

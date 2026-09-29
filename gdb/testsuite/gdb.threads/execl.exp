@@ -39,7 +39,7 @@ if { [is_remote target] } {
 runto_main
 
 gdb_test "b [gdb_get_line_number "breakpoint here"]" \
-	 ".*Breakpoint .*execl.*" "set breakpoint at execl"
+    ".*Breakpoint .*execl.*" "set breakpoint at execl"
 
 gdb_test "continue" ".*breakpoint here.*" "continue to exec"
 
@@ -58,18 +58,18 @@ gdb_test "continue" ".*Breakpoint 1, main.*" \
     "continue across exec"
 
 gdb_test_multiple "info threads" "info threads after exec" {
-    -re "2 *${tdlabel_re} .*$gdb_prompt $" {
-	# Old threads left behind.
-	fail "$gdb_test_name"
-    }
-    -re "4 *${tdlabel_re} .*$gdb_prompt $" {
-	# New threads registered.
-	fail "$gdb_test_name"
-    }
-    -re "$gdb_prompt $" {
-	# Target doesn't register the main thread, pass for now.
-	pass "$gdb_test_name"
-    }
+-re "2 *${tdlabel_re} .*$gdb_prompt $" {
+    # Old threads left behind.
+    fail "$gdb_test_name"
+}
+-re "4 *${tdlabel_re} .*$gdb_prompt $" {
+    # New threads registered.
+    fail "$gdb_test_name"
+}
+-re "$gdb_prompt $" {
+    # Target doesn't register the main thread, pass for now.
+    pass "$gdb_test_name"
+}
 }
 
 gdb_continue_to_end

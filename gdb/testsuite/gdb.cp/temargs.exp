@@ -107,9 +107,9 @@ gdb_test "print I" " = 47" "test value of I in inner_m"
 
 if {$have_older_template_gcc} { setup_xfail "*-*-*"
 } elseif {[test_compiler_info {gcc-[0-3]-*}]
-	 || [test_compiler_info {gcc-4-[0-5]-*}]} {
-  # gcc-4.5.x still does not emit inner DW_TAG_structure_type.
-  setup_xfail "*-*-*"
+	  || [test_compiler_info {gcc-4-[0-5]-*}]} {
+    # gcc-4.5.x still does not emit inner DW_TAG_structure_type.
+    setup_xfail "*-*-*"
 }
 gdb_test "print P == &a_global" " = true" "test value of P in inner_m"
 
@@ -118,9 +118,9 @@ gdb_test "print MP" "&S::f" "test value of MP in inner_m"
 
 if {$have_older_template_gcc} { setup_xfail "*-*-*"
 } elseif {[test_compiler_info {gcc-[0-3]-*}]
-	 || [test_compiler_info {gcc-4-[0-5]-*}]} {
-  # gcc-4.5.x still does not emit outer DW_TAG_structure_type.
-  setup_xfail "*-*-*"
+	  || [test_compiler_info {gcc-4-[0-5]-*}]} {
+    # gcc-4.5.x still does not emit outer DW_TAG_structure_type.
+    setup_xfail "*-*-*"
 }
 gdb_test "whatis Z" "float" "test type of Z in inner_m"
 
@@ -200,4 +200,4 @@ gdb_test "ptype F" {type = void \(\*\)\(int\)} "test type of F in k3_m"
 if {$have_older_template_gcc} { setup_xfail "*-*-*"
 } elseif { $using_gcc } { setup_xfail gcc/49546 "*-*-*" }
 gdb_test "print F" { = \(void \(\*\)\(int\)\) 0x[0-9a-f]+ <S3::m\(int\)>} \
-	 "test value of F in k3_m"
+    "test value of F in k3_m"

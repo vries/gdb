@@ -44,7 +44,7 @@ set re [string_list_to_regexp & {"} $cmd \\ n {"} \r\n ^ done]
 mi_gdb_test $cmd $re "load python file"
 
 mi_continue_to_line [gdb_get_line_number {MI breakpoint here} ${srcfile}] \
-  "step to breakpoint"
+    "step to breakpoint"
 
 with_test_prefix "varobj container" {
     mi_create_floating_varobj container c \
@@ -208,11 +208,11 @@ mi_next "next over update 5"
 # Regression test: examine an object that has no children, then update
 # it to ensure that we don't print the children.
 mi_create_dynamic_varobj container2 c2 "container .* with 0 elements" 0 \
-  "create second container varobj"
+    "create second container varobj"
 
 mi_gdb_test "-var-update container2" \
-  "\\^done,changelist=.." \
-  "update varobj, no children requested"
+    "\\^done,changelist=.." \
+    "update varobj, no children requested"
 
 mi_next "next over update 6"
 
@@ -229,23 +229,23 @@ mi_continue_to_line \
     "step to first outer breakpoint"
 
 mi_create_dynamic_varobj outer outer "x = 0" 1 \
-  "create outer varobj"
+    "create outer varobj"
 
 mi_list_varobj_children outer {
-  { outer.s s 2 "struct substruct" }
-  { outer.x x 0 "int" }
+    { outer.s s 2 "struct substruct" }
+    { outer.x x 0 "int" }
 } "list children of outer"
 
 mi_list_varobj_children outer.s {
-  { outer.s.a a 0 int }
-  { outer.s.b b 0 int }
+    { outer.s.a a 0 int }
+    { outer.s.b b 0 int }
 } "list children of outer.s"
 
 mi_next "next over outer update"
 
 mi_gdb_test "-var-update outer" \
-  ".done,changelist=.{name=\"outer.s.a\",in_scope=\"true\",type_changed=\"false\",has_more=\"0\"}." \
-  "update after updating element of outer"
+    ".done,changelist=.{name=\"outer.s.a\",in_scope=\"true\",type_changed=\"false\",has_more=\"0\"}." \
+    "update after updating element of outer"
 
 mi_continue_to_line \
     [gdb_get_line_number {Another MI breakpoint} ${srcfile}] \
@@ -285,18 +285,18 @@ set re [string_list_to_regexp & {"} $cmd \\ n {"} \r\n ^ done]
 mi_gdb_test $cmd $re
 
 mi_create_dynamic_varobj nstype2 nstype2 ".*" 1 \
-  "create nstype2 varobj"
+    "create nstype2 varobj"
 
 mi_list_varobj_children nstype2 {
     { {nstype2.<error at 0>} {<error at 0>} 7 {char \[7\]} }
 } "list children after setting exception flag"
 
 mi_create_varobj me me \
-  "create me varobj"
+    "create me varobj"
 
 mi_gdb_test "-var-evaluate-expression me" \
-	"\\^done,value=\"<error reading variable: Cannot access memory.>.*\"" \
-	"evaluate me varobj"
+    "\\^done,value=\"<error reading variable: Cannot access memory.>.*\"" \
+    "evaluate me varobj"
 
 # Regression test for python/14836.
 mi_create_dynamic_varobj children_as_list children_as_list \
@@ -319,11 +319,11 @@ mi_continue_to_line \
     "step to breakpoint for bug 14741"
 
 mi_create_dynamic_varobj c c "container .* with 1 elements" 1 \
-  "create varobj for c"
+    "create varobj for c"
 
 mi_gdb_test "-var-set-visualizer c ArrayPrinter" \
-  "\\^done" \
-  "choose array visualizer for c"
+    "\\^done" \
+    "choose array visualizer for c"
 
 mi_list_varobj_children c {
     { {c.\[0\]} {\[0\]} 0 int }

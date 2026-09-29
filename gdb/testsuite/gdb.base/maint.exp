@@ -167,8 +167,8 @@ gdb_test "maint set per-command off" \
 # statistical information about Cygwin and Windows libraries takes a lot
 # of time.
 if {[istarget "*-*-cygwin*"]} {
-	set oldtimeout $timeout
-	set timeout [expr {$timeout + 500}]
+    set oldtimeout $timeout
+    set timeout [expr {$timeout + 500}]
 }
 
 set re \
@@ -331,48 +331,48 @@ gdb_test "show configuration" \
 set saw_srcfile 0
 gdb_test_multiple "maint info line-table" \
     "maint info line-table w/o a file name" {
-    -re "symtab: \[^\n\r\]+${srcfile} \\(\\(struct symtab \\*\\) $hex\\)\r\nlinetable: \\(\\(struct linetable \\*\\) $hex\\):\r\nINDEX\[ \t\]+LINE\[ \t\]+REL-ADDRESS\[ \t\]+UNREL-ADDRESS\[^\r\n\]*\r\n" {
-	set saw_srcfile 1
-	exp_continue
+	-re "symtab: \[^\n\r\]+${srcfile} \\(\\(struct symtab \\*\\) $hex\\)\r\nlinetable: \\(\\(struct linetable \\*\\) $hex\\):\r\nINDEX\[ \t\]+LINE\[ \t\]+REL-ADDRESS\[ \t\]+UNREL-ADDRESS\[^\r\n\]*\r\n" {
+	    set saw_srcfile 1
+	    exp_continue
+	}
+	-re "symtab: \[^\n\r\]+ \\(\\(struct symtab \\*\\) $hex\\)\r\nlinetable: \\(\\(struct linetable \\*\\) $hex\\):\r\nINDEX\[ \t\]+LINE\[ \t\]+REL-ADDRESS\[ \t\]+UNREL-ADDRESS\[^\r\n\]*\r\n" {
+	    # Match each symtab to avoid overflowing expect's buffer.
+	    exp_continue
+	}
+	-re "symtab: \[^\n\r\]+ \\(\\(struct symtab \\*\\) $hex\\)\r\nlinetable: \\(\\(struct linetable \\*\\) 0x0\\):\r\nNo line table.\r\n" {
+	    # For symtabs with no linetable.
+	    exp_continue
+	}
+	-re "^$decimal\[ \t\]+$decimal\[ \t\]+$hex\[ \t\]+$hex\[^\r\n\]*\r\n" {
+	    # Line table entries can be long too:
+	    #
+	    #  INDEX    LINE ADDRESS
+	    #  0          29 0x00000000004006f6
+	    #  1          30 0x00000000004006fa
+	    #  2          31 0x0000000000400704
+	    #  3          42 0x0000000000400706
+	    #  4          43 0x0000000000400719
+	    #  5          44 0x0000000000400722
+	    #  6          45 0x0000000000400740
+	    #  (...)
+	    #  454       129 0x00007ffff7df1d28
+	    #  455       END 0x00007ffff7df1d3f
+	    #
+	    # Match each line to avoid overflowing expect's buffer.
+	    exp_continue
+	}
+	-re "^$decimal\[ \t\]+END\[ \t\]+$hex\[ \t\]+$hex\[^\r\n\]*\r\n" {
+	    # Matches an end marker in the above.
+	    exp_continue
+	}
+	-re "^\r\n" {
+	    # Empty line between tables.
+	    exp_continue
+	}
+	-re "^$gdb_prompt $" {
+	    gdb_assert $saw_srcfile $gdb_test_name
+	}
     }
-    -re "symtab: \[^\n\r\]+ \\(\\(struct symtab \\*\\) $hex\\)\r\nlinetable: \\(\\(struct linetable \\*\\) $hex\\):\r\nINDEX\[ \t\]+LINE\[ \t\]+REL-ADDRESS\[ \t\]+UNREL-ADDRESS\[^\r\n\]*\r\n" {
-	# Match each symtab to avoid overflowing expect's buffer.
-	exp_continue
-    }
-    -re "symtab: \[^\n\r\]+ \\(\\(struct symtab \\*\\) $hex\\)\r\nlinetable: \\(\\(struct linetable \\*\\) 0x0\\):\r\nNo line table.\r\n" {
-	# For symtabs with no linetable.
-	exp_continue
-    }
-    -re "^$decimal\[ \t\]+$decimal\[ \t\]+$hex\[ \t\]+$hex\[^\r\n\]*\r\n" {
-	# Line table entries can be long too:
-	#
-	#  INDEX    LINE ADDRESS
-	#  0          29 0x00000000004006f6
-	#  1          30 0x00000000004006fa
-	#  2          31 0x0000000000400704
-	#  3          42 0x0000000000400706
-	#  4          43 0x0000000000400719
-	#  5          44 0x0000000000400722
-	#  6          45 0x0000000000400740
-	#  (...)
-	#  454       129 0x00007ffff7df1d28
-	#  455       END 0x00007ffff7df1d3f
-	#
-	# Match each line to avoid overflowing expect's buffer.
-	exp_continue
-    }
-    -re "^$decimal\[ \t\]+END\[ \t\]+$hex\[ \t\]+$hex\[^\r\n\]*\r\n" {
-	# Matches an end marker in the above.
-	exp_continue
-    }
-    -re "^\r\n" {
-	# Empty line between tables.
-	exp_continue
-    }
-    -re "^$gdb_prompt $" {
-	gdb_assert $saw_srcfile $gdb_test_name
-    }
-}
 
 gdb_test "maint info line-table ${srcfile}" \
     "symtab: \[^\n\r\]+${srcfile}.*INDEX.*LINE.*ADDRESS.*" \

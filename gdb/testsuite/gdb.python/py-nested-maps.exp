@@ -107,7 +107,7 @@ with_test_prefix "pretty=on" {
 		  "\}" ] \
 	    ]
 
-     gdb_print_expr_at_depths "*mm" \
+    gdb_print_expr_at_depths "*mm" \
 	[list \
 	     "\{\\.\\.\\.\}" \
 	     [multi_line \

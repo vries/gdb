@@ -25,7 +25,7 @@ standard_testfile
 
 with_ansi_styling_terminal {
     if { [prepare_for_testing "failed to prepare" \
-	    ${testfile} ${srcfile}] } {
+	      ${testfile} ${srcfile}] } {
 	return
     }
 

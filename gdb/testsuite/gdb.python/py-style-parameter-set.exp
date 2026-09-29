@@ -145,9 +145,9 @@ proc_with_prefix test_basic_usage {} {
 
 
 	set out 	    [gen_help_set_style_re $style true \
-		 [multi_line \
-		      "The $style display styling\\." \
-		      "Configure $style colors and display intensity\\."]]
+				 [multi_line \
+				      "The $style display styling\\." \
+				      "Configure $style colors and display intensity\\."]]
 
 	gdb_test "help set style $style" \
 	    [gen_help_set_style_re $style true \

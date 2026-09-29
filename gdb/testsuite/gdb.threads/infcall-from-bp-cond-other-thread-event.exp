@@ -90,7 +90,7 @@ proc run_condition_test { stop_at_cond other_thread_signal \
     gdb_breakpoint \
 	"${::srcfile}:${::cond_bp_line} if (${cond_func} ())"
     set cond_bp_num [get_integer_valueof "\$bpnum" "*UNKNOWN*" \
-			"get number for conditional breakpoint"]
+			 "get number for conditional breakpoint"]
 
     if { $other_thread_signal } {
 	# Arrange for the other thread to raise a signal while GDB is

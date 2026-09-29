@@ -51,10 +51,10 @@ if { ![readline_is_used] } {
 # [See comments for makefoo for description of arglist format.]
 
 proc consume {arglistvar} {
-  upvar $arglistvar arglist
+    upvar $arglistvar arglist
 
-  # ARGLIST is a string -- simply strip off the first character.
-  set arglist [string range $arglist 1 end]
+    # ARGLIST is a string -- simply strip off the first character.
+    set arglist [string range $arglist 1 end]
 }
 
 # Create a function template named NAME, using the given stack ID to grab
@@ -66,49 +66,49 @@ proc consume {arglistvar} {
 
 proc maket {sid name {num 1}} {
 
-  # Set up a temporary stack of parameters.  This will reverse
-  # the order in SID so that when they are popped again below,
-  # we get them in the correct order.  This also takes into account
-  # how many levels of the result stack we want to consider.
+    # Set up a temporary stack of parameters.  This will reverse
+    # the order in SID so that when they are popped again below,
+    # we get them in the correct order.  This also takes into account
+    # how many levels of the result stack we want to consider.
 
-  set paramstack [::Stack::new]
-  if {[string equal $num "all"]} {
-    while {![stack empty $sid]} {
-      stack push $paramstack [stack pop $sid]
-    }
-  } else {
-    for {set i 0} {$i < $num} {incr i} {
-      stack push $paramstack [stack pop $sid]
-    }
-  }
-
-  # Construct the function template and push it back to the
-  # top of the stack given by SID.
-  set result ""
-  set first true
-  while {![stack empty $paramstack]} {
-    set top [stack pop $paramstack]
-    if {$first} {
-      set first false
+    set paramstack [::Stack::new]
+    if {[string equal $num "all"]} {
+	while {![stack empty $sid]} {
+	    stack push $paramstack [stack pop $sid]
+	}
     } else {
-      append result ", "
+	for {set i 0} {$i < $num} {incr i} {
+	    stack push $paramstack [stack pop $sid]
+	}
     }
-    append result $top
-  }
 
-  # Save argument list.
-  set args $result
+    # Construct the function template and push it back to the
+    # top of the stack given by SID.
+    set result ""
+    set first true
+    while {![stack empty $paramstack]} {
+	set top [stack pop $paramstack]
+	if {$first} {
+	    set first false
+	} else {
+	    append result ", "
+	}
+	append result $top
+    }
 
-  # GDB outputs "> >" instead of ">>".
-  if {[string index $top end] == ">"} {
-      append result " "
-  }
-  set result "$name<$result>"
-  if {[string equal $num "all"]} {
-    append result "($args)"
-  }
-  stack push $sid $result
-  stack delete $paramstack
+    # Save argument list.
+    set args $result
+
+    # GDB outputs "> >" instead of ">>".
+    if {[string index $top end] == ">"} {
+	append result " "
+    }
+    set result "$name<$result>"
+    if {[string equal $num "all"]} {
+	append result "($args)"
+    }
+    stack push $sid $result
+    stack delete $paramstack
 }
 
 # Given the stack SID and the name of a variable of the desired template
@@ -118,44 +118,44 @@ proc maket {sid name {num 1}} {
 proc makearg {sid arglistvar} {
     upvar $arglistvar arglist
 
-  set c [string index $arglist 0]
-  consume arglist
-  switch $c {
-    A -
-    B {
-      makearg $sid arglist
-      makearg $sid arglist
-      maket $sid $c 2
-    }
+    set c [string index $arglist 0]
+    consume arglist
+    switch $c {
+	A -
+	B {
+	    makearg $sid arglist
+	    makearg $sid arglist
+	    maket $sid $c 2
+	}
 
-    a -
-    b -
-    c -
-    d {
-      makearg $sid arglist
-      maket $sid $c
-    }
+	a -
+	b -
+	c -
+	d {
+	    makearg $sid arglist
+	    maket $sid $c
+	}
 
-    i {
-      stack push $sid "int"
-    }
+	i {
+	    stack push $sid "int"
+	}
 
-    n {
-      # These are not templates.
-      set c [string index $arglist 0]
-      stack push $sid "n::n$c"
-      consume arglist
-    }
+	n {
+	    # These are not templates.
+	    set c [string index $arglist 0]
+	    stack push $sid "n::n$c"
+	    consume arglist
+	}
 
-    N {
-      set c [string index $arglist 0]
-      makearg $sid arglist
-      set top [stack pop $sid]
-      stack push $sid "n::N$top"
-    }
+	N {
+	    set c [string index $arglist 0]
+	    makearg $sid arglist
+	    set top [stack pop $sid]
+	    stack push $sid "n::N$top"
+	}
 
-    default { error "unhandled arglist identifier: '$c'" }
-  }
+	default { error "unhandled arglist identifier: '$c'" }
+    }
 }
 
 # Given ARGLIST, construct a class template for the type and return
@@ -204,48 +204,48 @@ proc makefoo {arglist} {
 	makearg $s arglist
     }
 
-  maket $s "foo" all
-  set result [stack pop $s]
-  stack delete $s
-  return $result
+    maket $s "foo" all
+    set result [stack pop $s]
+    stack delete $s
+    return $result
 }
 
 # Test wrapper for a single "makefoo" unit test.
 
 proc test_makefoo_1 {arglist expected} {
-  set exp "foo<$expected"
-  if {[string index $exp end] == ">"} {
-    append exp " "
-  }
-  append exp ">"
-  append exp "($expected)"
+    set exp "foo<$expected"
+    if {[string index $exp end] == ">"} {
+	append exp " "
+    }
+    append exp ">"
+    append exp "($expected)"
 
-  set calc [makefoo $arglist]
-  send_log "makefoo $arglist = $calc\n"
-  send_log "expecting: $exp\n"
-  if {[string equal $exp $calc]} {
-    pass "makefoo unit test: $arglist"
-  } else {
-      fail "makefoo unit test: $arglist"
-  }
+    set calc [makefoo $arglist]
+    send_log "makefoo $arglist = $calc\n"
+    send_log "expecting: $exp\n"
+    if {[string equal $exp $calc]} {
+	pass "makefoo unit test: $arglist"
+    } else {
+	fail "makefoo unit test: $arglist"
+    }
 }
 
 # Test whether the procedure "makefoo" is functioning as expected.
 
 proc test_makefoo {} {
-  test_makefoo_1 "i" "int"
-  test_makefoo_1 "ai" "a<int>"
-  test_makefoo_1 "aai" "a<a<int> >"
-  test_makefoo_1 "ii" "int, int"
-  test_makefoo_1 "aaibi" "a<a<int> >, b<int>"
+    test_makefoo_1 "i" "int"
+    test_makefoo_1 "ai" "a<int>"
+    test_makefoo_1 "aai" "a<a<int> >"
+    test_makefoo_1 "ii" "int, int"
+    test_makefoo_1 "aaibi" "a<a<int> >, b<int>"
     test_makefoo_1 \
-      "ababiibababai" "a<b<a<b<int> > > >, int, b<a<b<a<b<a<int> > > > > >"
-  test_makefoo_1 "Aii" "A<int, int>"
-  test_makefoo_1 "ABaibibi" "A<B<a<int>, b<int> >, b<int> >"
-  test_makefoo_1 "na" "n::na"
-  test_makefoo_1 "nana" "n::na, n::na"
-  test_makefoo_1 "NAii" "n::NA<int, int>"
-  test_makefoo_1 "NANAiiNAii" "n::NA<n::NA<int, int>, n::NA<int, int> >"
+	"ababiibababai" "a<b<a<b<int> > > >, int, b<a<b<a<b<a<int> > > > > >"
+    test_makefoo_1 "Aii" "A<int, int>"
+    test_makefoo_1 "ABaibibi" "A<B<a<int>, b<int> >, b<int> >"
+    test_makefoo_1 "na" "n::na"
+    test_makefoo_1 "nana" "n::na, n::na"
+    test_makefoo_1 "NAii" "n::NA<int, int>"
+    test_makefoo_1 "NANAiiNAii" "n::NA<n::NA<int, int>, n::NA<int, int> >"
 }
 
 #
@@ -330,9 +330,9 @@ proc_with_prefix overload {} {
 	# the remaining matching overloads to the user.
 	test_gdb_complete_multiple \
 	    "$cmd_prefix " "overload_ambiguous_test(i" "nt, " {
-	    "overload_ambiguous_test(int, int)"
-	    "overload_ambiguous_test(int, long)"
-	}
+		"overload_ambiguous_test(int, int)"
+		"overload_ambiguous_test(int, long)"
+	    }
 
 	# Add a few more characters to make the completion
 	# unambiguous.
@@ -899,8 +899,8 @@ proc_with_prefix append-end-quote-char-when-unambiguous {} {
 	foreach qc $completion::all_quotes_list {
 	    set linespec "${qc}not_overloaded_fn()${qc}"
 	    foreach cmd [list "$cmd_prefix ${qc}not_overloaded_fn()" \
-			      "$cmd_prefix ${qc}not_overloaded_fn" \
-			      "$cmd_prefix ${qc}not_overloaded_"] {
+			     "$cmd_prefix ${qc}not_overloaded_fn" \
+			     "$cmd_prefix ${qc}not_overloaded_"] {
 		test_gdb_complete_unique $cmd "$cmd_prefix $linespec"
 	    }
 	    check_bp_locations_match_list \
@@ -951,7 +951,7 @@ proc_with_prefix in-source-file-unambiguous {} {
 	    set input_line [string range $complete_line 0 $start]
 	    test_gdb_complete_unique $input_line ${complete_line}
 	    check_bp_locations_match_list "$complete_line" {
-		    "file_constrained_test_cpls2_function(int)"
+		"file_constrained_test_cpls2_function(int)"
 	    }
 	}
     }
@@ -976,9 +976,9 @@ proc_with_prefix in-source-file-ambiguous {} {
 	    # Explicit location.
 	    test_gdb_complete_multiple \
 		"b -source ${sqc}cpls2.cc${sqc} -function " ${fqc} "" {
-		"another_file_constrained_test_cpls2_function(int)"
-		"file_constrained_test_cpls2_function(int)"
-	    } ${fqc} ${fqc}
+		    "another_file_constrained_test_cpls2_function(int)"
+		    "file_constrained_test_cpls2_function(int)"
+		} ${fqc} ${fqc}
 	}
     }
 }
@@ -1196,8 +1196,8 @@ proc_with_prefix operator< {} {
     # There's a label in the function; try completing it.  (Exhaustive
     # label completion tests further below.)
     foreach location [list \
-		     "$function:label1" \
-		     "-function $function -label label1"] {
+			  "$function:label1" \
+			  "-function $function -label label1"] {
 
 	set cmd "b $location"
 	set input_line [string range $cmd 0 [expr {[string length $cmd] - 3}]]

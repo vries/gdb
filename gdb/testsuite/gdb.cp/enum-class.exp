@@ -30,10 +30,10 @@ if {![runto_main]} {
 
 gdb_test "ptype E1" \
     [multi_line \
-	"type = enum class E1 (: int )?{" \
-	"    E1::HI = 7," \
-	"    E1::THERE = 8" \
-	"}"]
+	 "type = enum class E1 (: int )?{" \
+	 "    E1::HI = 7," \
+	 "    E1::THERE = 8" \
+	 "}"]
 
 gdb_test "print E1::HI" " = E1::HI"
 gdb_test "print (int) E1::HI" " = 7"

@@ -40,9 +40,9 @@ lappend lopts c++
 lappend lopts additional_flags=-nostdlib
 
 if { [prepare_for_testing_full "failed to prepare" \
-	 [list $testfile $lopts \
-	      $srcfile $opts \
-	      $srcfile2 $opts2]] } {
+	  [list $testfile $lopts \
+	       $srcfile $opts \
+	       $srcfile2 $opts2]] } {
     return
 }
 

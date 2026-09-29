@@ -80,20 +80,20 @@ puts $outfile {
 
     unsigned a_int3 = alignof (int[3]);
 
-#if defined __GNUC__ && !defined __clang__
+    #if defined __GNUC__ && !defined __clang__
     /* As a GNU C extension, GCC allows void pointer arithmetic, with
-       sizeof (void) == 1.
-       Another GNU C extension is __alignof__, which can be used to get
-       __alignof__ (void), which is also 1.  This is unavailabe on clang.
-       GCC used to only warn for alignof (void), but starting with GCC 12.1,
-       as well as GCC 11.3, it will generate an error (note that using
-       -std=gnu++11 does not prevent the error).
-       So we avoid using alignof, and use __alignof__ instead.  */
+    sizeof (void) == 1.
+    Another GNU C extension is __alignof__, which can be used to get
+    __alignof__ (void), which is also 1.  This is unavailabe on clang.
+    GCC used to only warn for alignof (void), but starting with GCC 12.1,
+    as well as GCC 11.3, it will generate an error (note that using
+						    -std=gnu++11 does not prevent the error).
+    So we avoid using alignof, and use __alignof__ instead.  */
     unsigned a_void = __alignof__ (void);
-#else
+    #else
     /* No support for __alignof__ (void), hardcode value.  */
     unsigned a_void = 1;
-#endif
+    #endif
 
     struct base { char c; };
     struct derived : public virtual base { int i; };

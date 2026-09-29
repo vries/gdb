@@ -141,12 +141,12 @@ proc float_and_integral_args {} {
     gdb_run_cmd
     set test "run to call2a"
     gdb_test_multiple "" $test {
-	 -re ".* call2a \\(c=97 'a', f1=4, s=1, d1=5, i=2, f2=4, l=3, d2=5\\) .*$gdb_prompt $" {
-	     pass $test
-	 }
-	 -re ".* call2a \\(c=97 'a', f1=.*, s=1, d1=5, i=2, f2=4, l=3, d2=5\\) .*$gdb_prompt $" {
-	     xfail $test
-	 }
+	-re ".* call2a \\(c=97 'a', f1=4, s=1, d1=5, i=2, f2=4, l=3, d2=5\\) .*$gdb_prompt $" {
+	    pass $test
+	}
+	-re ".* call2a \\(c=97 'a', f1=.*, s=1, d1=5, i=2, f2=4, l=3, d2=5\\) .*$gdb_prompt $" {
+	    xfail $test
+	}
     }
 
     # Print each arg as a double check to see if we can print
@@ -330,16 +330,16 @@ proc_with_prefix structs_by_reference {} {
     # Try dereferencing the arguments.
     if { $target_sizeof_long == $target_sizeof_int } {
 	gdb_test "print *unp" ".* = \{u1 = 1, u2 = 1\}" \
-		"print *unp (sizeof long == sizeof int)"
+	    "print *unp (sizeof long == sizeof int)"
     } elseif { ! $target_bigendian_p } {
 	gdb_test "print *unp" ".* = \{u1 = 1, u2 = 1\}" \
-		"print *unp (little-endian, sizeof long != sizeof int)"
+	    "print *unp (little-endian, sizeof long != sizeof int)"
     } elseif { $target_sizeof_long == 8 && $target_sizeof_int == 4 } {
 	gdb_test "print *unp" ".* = \{u1 = 1, u2 = 4294967296\}" \
-		"print *unp (big-endian, sizeof long == 8, sizeof int = 4)"
+	    "print *unp (big-endian, sizeof long == 8, sizeof int = 4)"
     } elseif { $target_sizeof_long == 4 && $target_sizeof_int == 2 } {
 	gdb_test "print *unp" ".* = \{u1 = 1, u2 = 65536\}" \
-		"print *unp (big-endian, sizeof long == 4, sizeof int = 2)"
+	    "print *unp (big-endian, sizeof long == 4, sizeof int = 2)"
     } else {
 	fail "print *unp (unknown case)"
     }
@@ -375,16 +375,16 @@ proc_with_prefix structs_by_value {} {
     # Continue; should stop at call5b and print actual arguments.
     if { $target_sizeof_long == $target_sizeof_int } {
 	gdb_test "cont" ".* call5b \\(un=\{u1 = 2, u2 = 2\}\\) .*" \
-		"continue to call5b (sizeof long == sizeof int)"
+	    "continue to call5b (sizeof long == sizeof int)"
     } elseif { ! $target_bigendian_p } {
 	gdb_test "cont" ".* call5b \\(un=\{u1 = 2, u2 = 2\}\\) .*" \
-		"continue to call5b (little-endian, sizeof long != sizeof int)"
+	    "continue to call5b (little-endian, sizeof long != sizeof int)"
     } elseif { $target_sizeof_long == 8 && $target_sizeof_int == 4 } {
 	gdb_test "cont" ".* call5b \\(un=\{u1 = 2, u2 = 8589934592\}\\) .*" \
-		"continue to call5b (big-endian, sizeof long == 8, sizeof int = 4)"
+	    "continue to call5b (big-endian, sizeof long == 8, sizeof int = 4)"
     } elseif { $target_sizeof_long == 4 && $target_sizeof_int == 2 } {
 	gdb_test "cont" ".* call5b \\(un=\{u1 = 2, u2 = 131072\}\\) .*" \
-		"continue to call5b (big-endian, sizeof long == 4, sizeof int = 2)"
+	    "continue to call5b (big-endian, sizeof long == 4, sizeof int = 2)"
     } else {
 	fail "continue to call5b (unknown case)"
     }
@@ -392,16 +392,16 @@ proc_with_prefix structs_by_value {} {
     # Try dereferencing the arguments.
     if { $target_sizeof_long == $target_sizeof_int } {
 	gdb_test "print un" ".* = \{u1 = 2, u2 = 2\}" \
-		"print un (sizeof long == sizeof int)"
+	    "print un (sizeof long == sizeof int)"
     } elseif { ! $target_bigendian_p } {
 	gdb_test "print un" ".* = \{u1 = 2, u2 = 2\}" \
-		"print un (little-endian, sizeof long != sizeof int)"
+	    "print un (little-endian, sizeof long != sizeof int)"
     } elseif { $target_sizeof_long == 8 && $target_sizeof_int == 4 } {
 	gdb_test "print un" ".* = \{u1 = 2, u2 = 8589934592\}" \
-		"print un (big-endian, sizeof long == 8, sizeof int = 4)"
+	    "print un (big-endian, sizeof long == 8, sizeof int = 4)"
     } elseif { $target_sizeof_long == 4 && $target_sizeof_int == 2 } {
 	gdb_test "print un" ".* = \{u1 = 2, u2 = 131072\}" \
-		"print un (big-endian, sizeof long == 4, sizeof int = 2)"
+	    "print un (big-endian, sizeof long == 4, sizeof int = 2)"
     } else {
 	fail "print un (unknown case)"
     }
@@ -1079,7 +1079,7 @@ gdb_test_no_output "set print frame-arguments all"
 integral_args
 unsigned_integral_args
 if {$allow_float_test} {
-  float_and_integral_args
+    float_and_integral_args
 }
 
 # Test _Complex type here if supported.

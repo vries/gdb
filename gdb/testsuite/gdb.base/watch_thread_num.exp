@@ -32,7 +32,7 @@ if { [prepare_for_testing "prepare" $testfile $srcfile {debug pthreads}] != 0 } 
 }
 
 if {![runto_main]} {
-   return
+    return
 }
 
 gdb_test "watch shared_var thread 0" "Invalid thread ID: 0" "watchpoint on invalid thread"
@@ -43,7 +43,7 @@ gdb_breakpoint "$bpexitline"
 gdb_continue_to_breakpoint "all threads started"
 
 gdb_test "break loop" "Breakpoint \[0-9\].*" \
-  "Set breakpoint at loop"
+    "Set breakpoint at loop"
 
 gdb_test "continue" ".*Breakpoint .*loop.*" "stopped in loop"
 

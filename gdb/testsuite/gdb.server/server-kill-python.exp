@@ -45,7 +45,7 @@ set break_linenr [gdb_get_line_number "@@XX@@ Inferior Starting @@XX@@"]
 set file1 [standard_output_file file1.py]
 set fd [open "$file1" w]
 puts $fd \
-"import gdb
+    "import gdb
 
 def do_gdb_stuff ():
     gdb.execute ('continue')

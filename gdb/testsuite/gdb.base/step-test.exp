@@ -113,14 +113,14 @@ proc test_i {name command here there} {
 }
 
 test_i "stepi to next line" "stepi" \
-       ".*${decimal}.*a.*5.* = a.*3" \
-       ".*${decimal}.*callee.*STEPI"
+    ".*${decimal}.*a.*5.* = a.*3" \
+    ".*${decimal}.*callee.*STEPI"
 
 # Continue to step until we enter the function.  Also keep stepping
 # if this passes through a (useless) PLT entry.
 test_i "stepi into function" "stepi" \
-       "(.*${decimal}.*callee.*STEPI|.* in callee@plt)" \
-       ".*callee \\(\\) at .*step-test\\.c"
+    "(.*${decimal}.*callee.*STEPI|.* in callee@plt)" \
+    ".*callee \\(\\) at .*step-test\\.c"
 
 # Continue to step until we reach the function's body.  This makes it
 # more likely that we've actually completed the prologue, so "finish"
@@ -128,8 +128,8 @@ test_i "stepi into function" "stepi" \
 set alphanum_re "\[a-zA-Z0-9\]"
 set pic_thunk_re  "__$alphanum_re*\\.get_pc_thunk\\.$alphanum_re* \\(\\)"
 test_i "stepi into function's first source line" "stepi" \
-	"(${decimal}.*int callee|$pic_thunk_re)" \
-	".*${decimal}.*myglob.*; return 0;"
+    "(${decimal}.*int callee|$pic_thunk_re)" \
+    ".*${decimal}.*myglob.*; return 0;"
 
 # Have to be careful here, if the finish does not work,
 # then we may run to the end of the program, which
@@ -164,8 +164,8 @@ gdb_test_multiple "finish" "$test" {
 }
 
 test_i "nexti over function" "nexti" \
-       ".*${decimal}.*callee.*NEXTI" \
-       ".*${decimal}.*y = w \\+ z;"
+    ".*${decimal}.*callee.*NEXTI" \
+    ".*${decimal}.*y = w \\+ z;"
 
 # On some platforms, if we try to step into a function call that
 # passes a large structure by value, then we actually end up stepping
@@ -181,22 +181,22 @@ test_i "nexti over function" "nexti" \
 # cases where gdb stops in memcpy/bcopy.
 
 gdb_test \
-  "break [gdb_get_line_number "step-test.exp: large struct by value"]" \
-  ".*Breakpoint.* at .*" \
-  "set breakpoint at call to large_struct_by_value"
+    "break [gdb_get_line_number "step-test.exp: large struct by value"]" \
+    ".*Breakpoint.* at .*" \
+    "set breakpoint at call to large_struct_by_value"
 gdb_test "continue" \
-	 ".*Breakpoint ${decimal},.*large_struct_by_value.*" \
-	 "run to pass large struct"
+    ".*Breakpoint ${decimal},.*large_struct_by_value.*" \
+    "run to pass large struct"
 set test "large struct by value"
 gdb_test_multiple "step" "$test" {
-    -re ".*step-test.exp: arrive here 1.*$gdb_prompt $" {
-	pass "$test"
-    }
-    -re ".*(memcpy|bcopy).*$gdb_prompt $" {
-	send_gdb "finish\n" ; gdb_expect -re "$gdb_prompt $"
-	send_gdb "step\n"
-	exp_continue
-    }
+-re ".*step-test.exp: arrive here 1.*$gdb_prompt $" {
+    pass "$test"
+}
+-re ".*(memcpy|bcopy).*$gdb_prompt $" {
+    send_gdb "finish\n" ; gdb_expect -re "$gdb_prompt $"
+    send_gdb "step\n"
+    exp_continue
+}
 }
 
 gdb_continue_to_end

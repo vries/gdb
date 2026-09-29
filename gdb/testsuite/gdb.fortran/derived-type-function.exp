@@ -35,4 +35,4 @@ gdb_breakpoint [gdb_get_line_number "bp"]
 gdb_continue_to_breakpoint "bp"
 
 gdb_test "print aRec" "= \\( a = 2, b = 3 \\)"\
-"Print rectangle structure with members' name"
+    "Print rectangle structure with members' name"

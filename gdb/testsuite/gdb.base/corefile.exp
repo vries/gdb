@@ -189,7 +189,7 @@ if { ![istarget *-linux*] } {
     setup_xfail "*-*-*"
 }
 gdb_test "x/wx buf3" "$hex:\[ \t\]+0x00000000" \
-	 "accessing anonymous, unwritten-to mmap data"
+    "accessing anonymous, unwritten-to mmap data"
 
 # test reinit_frame_cache
 

@@ -67,27 +67,27 @@ proc setup_gdb { binfile srcfile {message ""} } {
 }
 
 proc check_vfork_catchpoints {} {
-  setup_gdb $::binfile $::srcfile "vfork catchpoints"
+    setup_gdb $::binfile $::srcfile "vfork catchpoints"
 
-  # Verify that the system supports "catch vfork".
-  gdb_test "catch vfork" "Catchpoint \[0-9\]* \\(vfork\\)" "insert first vfork catchpoint"
-  set has_vfork_catchpoints 0
-  gdb_test_multiple "continue" "continue to first vfork catchpoint" {
-    -re -wrap ".*Your system does not support this type\r\nof catchpoint.*" {
-      unsupported "continue to first vfork catchpoint"
+    # Verify that the system supports "catch vfork".
+    gdb_test "catch vfork" "Catchpoint \[0-9\]* \\(vfork\\)" "insert first vfork catchpoint"
+    set has_vfork_catchpoints 0
+    gdb_test_multiple "continue" "continue to first vfork catchpoint" {
+	-re -wrap ".*Your system does not support this type\r\nof catchpoint.*" {
+	    unsupported "continue to first vfork catchpoint"
+	}
+	-re -wrap ".*Catchpoint.*" {
+	    set has_vfork_catchpoints 1
+	    pass "continue to first vfork catchpoint"
+	}
     }
-    -re -wrap ".*Catchpoint.*" {
-      set has_vfork_catchpoints 1
-      pass "continue to first vfork catchpoint"
-    }
-  }
 
-  if {$has_vfork_catchpoints == 0} {
-      unsupported "vfork catchpoints"
-      transparent_uplevel {
-	  return
-      }
-  }
+    if {$has_vfork_catchpoints == 0} {
+	unsupported "vfork catchpoints"
+	transparent_uplevel {
+	    return
+	}
+    }
 }
 
 proc_with_prefix vfork_parent_follow_through_step { binfile srcfile } {
@@ -209,7 +209,7 @@ proc_with_prefix tcatch_vfork_then_child_follow_exec { binfile srcfile } {
 
     gdb_test_multiple "finish" "" {
 	-re -wrap "Run till exit from.*vfork.*${srcfile}:${linenum1}.*" {
-	  pass $gdb_test_name
+	    pass $gdb_test_name
 	}
 	-re -wrap "Run till exit from.*__kernel_v?syscall.*0x\[0-9a-fA-F\]* in vfork .*" {
 	    send_gdb "finish\n"
@@ -222,7 +222,7 @@ proc_with_prefix tcatch_vfork_then_child_follow_exec { binfile srcfile } {
 }
 
 proc tcatch_vfork_then_child_follow_exit { binfile srcfile } {
-   setup_gdb $binfile $srcfile
+    setup_gdb $binfile $srcfile
 
     gdb_test_no_output "set follow-fork child"
 
@@ -236,7 +236,7 @@ proc tcatch_vfork_then_child_follow_exit { binfile srcfile } {
 	    fail $gdb_test_name
 	}
 	-re -wrap "Run till exit from.*vfork.*pid = vfork \\(\\).*" {
-	  pass $gdb_test_name
+	    pass $gdb_test_name
 	}
 	-re -wrap "Run till exit from.*__kernel_v?syscall.*0x\[0-9a-fA-F\]* in vfork .*" {
 	    send_gdb "finish\n"
@@ -277,7 +277,7 @@ proc_with_prefix vfork_relations_in_info_inferiors { variant binfile srcfile non
 
     gdb_test_multiple "info inferiors" "vfork relation no longer appears in info inferiors" {
 	-re -wrap "is vfork child of inferior 1.*" {
-	   fail $gdb_test_name
+	    fail $gdb_test_name
 	}
 	-re -wrap "is vfork parent of inferior 2.*" {
 	    fail $gdb_test_name
@@ -289,75 +289,75 @@ proc_with_prefix vfork_relations_in_info_inferiors { variant binfile srcfile non
 }
 
 proc do_vfork_and_follow_parent_tests { binfile srcfile } {
-   # Try following the parent process by stepping through a call to
-   # vfork.  Do this without catchpoints.
-   vfork_parent_follow_through_step $binfile $srcfile
+    # Try following the parent process by stepping through a call to
+    # vfork.  Do this without catchpoints.
+    vfork_parent_follow_through_step $binfile $srcfile
 
-   # Try following the parent process by setting a breakpoint on the
-   # other side of a vfork, and running to that point.  Do this
-   # without catchpoints.
-   vfork_parent_follow_to_bp $binfile $srcfile
+    # Try following the parent process by setting a breakpoint on the
+    # other side of a vfork, and running to that point.  Do this
+    # without catchpoints.
+    vfork_parent_follow_to_bp $binfile $srcfile
 
-   # Try catching a vfork, and stepping out to the parent.
-   #
-   tcatch_vfork_then_parent_follow $binfile $srcfile
+    # Try catching a vfork, and stepping out to the parent.
+    #
+    tcatch_vfork_then_parent_follow $binfile $srcfile
 }
 
 proc do_vfork_and_follow_child_tests_exec { binfile srcfile non_stop } {
-   # Try following the child process by just continuing through the
-   # vfork, and letting the parent's breakpoint on "main" be auto-
-   # magically reset in the child.
-   #
-   vfork_and_exec_child_follow_to_main_bp $binfile $srcfile
+    # Try following the child process by just continuing through the
+    # vfork, and letting the parent's breakpoint on "main" be auto-
+    # magically reset in the child.
+    #
+    vfork_and_exec_child_follow_to_main_bp $binfile $srcfile
 
-   # Try following the child process by stepping through a call to
-   # vfork.  The child also executes an exec.  Since the child cannot
-   # be debugged until after it has exec'd, and since there's a bp on
-   # "main" in the parent, and since the bp's for the parent are
-   # recomputed in the exec'd child, the step through a vfork should
-   # land us in the "main" for the exec'd child, too.
-   #
-   vfork_and_exec_child_follow_through_step $binfile $srcfile
+    # Try following the child process by stepping through a call to
+    # vfork.  The child also executes an exec.  Since the child cannot
+    # be debugged until after it has exec'd, and since there's a bp on
+    # "main" in the parent, and since the bp's for the parent are
+    # recomputed in the exec'd child, the step through a vfork should
+    # land us in the "main" for the exec'd child, too.
+    #
+    vfork_and_exec_child_follow_through_step $binfile $srcfile
 
-   # Try catching a vfork, and stepping out to the child.
-   #
-   tcatch_vfork_then_child_follow_exec $binfile $srcfile
+    # Try catching a vfork, and stepping out to the child.
+    #
+    tcatch_vfork_then_child_follow_exec $binfile $srcfile
 
-   # Test the ability to follow both child and parent of a vfork.  Do
-   # this without catchpoints.
-   # ??rehrauer: NYI.  Will add testpoints here when implemented.
-   #
+    # Test the ability to follow both child and parent of a vfork.  Do
+    # this without catchpoints.
+    # ??rehrauer: NYI.  Will add testpoints here when implemented.
+    #
 
-   # Test the ability to have the debugger ask the user at vfork-time
-   # whether to follow the parent, child or both.  Do this without
-   # catchpoints.
-   # ??rehrauer: NYI.  Will add testpoints here when implemented.
-   #
+    # Test the ability to have the debugger ask the user at vfork-time
+    # whether to follow the parent, child or both.  Do this without
+    # catchpoints.
+    # ??rehrauer: NYI.  Will add testpoints here when implemented.
+    #
 
-   # Step over a vfork in the child, do "info inferiors" and check the
-   # parent/child relation is displayed.  Run the child over the exec,
-   # and confirm the relation is no longer displayed in "info
-   # inferiors".
-   #
-   vfork_relations_in_info_inferiors "exec" $binfile $srcfile $non_stop
+    # Step over a vfork in the child, do "info inferiors" and check the
+    # parent/child relation is displayed.  Run the child over the exec,
+    # and confirm the relation is no longer displayed in "info
+    # inferiors".
+    #
+    vfork_relations_in_info_inferiors "exec" $binfile $srcfile $non_stop
 }
 
 proc do_vfork_and_follow_child_tests_exit { binfile srcfile non_stop } {
-   # Try following the child process by just continuing through the
-   # vfork, and letting the child exit.
-   #
-   vfork_child_follow_to_exit $binfile $srcfile
+    # Try following the child process by just continuing through the
+    # vfork, and letting the child exit.
+    #
+    vfork_child_follow_to_exit $binfile $srcfile
 
-   # Try catching a vfork, and stepping out to the child.
-   #
-   tcatch_vfork_then_child_follow_exit $binfile $srcfile
+    # Try catching a vfork, and stepping out to the child.
+    #
+    tcatch_vfork_then_child_follow_exit $binfile $srcfile
 
-   # Step over a vfork in the child, do "info inferiors" and check the
-   # parent/child relation is displayed.  Run the child to completion,
-   # and confirm the relation is no longer displayed in "info
-   # inferiors".
-   #
-   vfork_relations_in_info_inferiors "exit" $binfile $srcfile $non_stop
+    # Step over a vfork in the child, do "info inferiors" and check the
+    # parent/child relation is displayed.  Run the child to completion,
+    # and confirm the relation is no longer displayed in "info
+    # inferiors".
+    #
+    vfork_relations_in_info_inferiors "exit" $binfile $srcfile $non_stop
 }
 
 with_test_prefix "check vfork support" {

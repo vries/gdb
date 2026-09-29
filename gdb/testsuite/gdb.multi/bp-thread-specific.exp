@@ -39,7 +39,7 @@ delete_breakpoints
 # Create a thread-specific b/p on main.
 gdb_breakpoint "main thread 1"
 set bpnum [get_integer_valueof "\$bpnum" "INVALID" \
-	      "get number for thread specific b/p on main"]
+	       "get number for thread specific b/p on main"]
 
 # Check the b/p has a location and is displayed correctly.
 gdb_test "info breakpoints" \

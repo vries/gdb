@@ -127,10 +127,10 @@ mi_gdb_test "103-exec-continue --all" "\[^\n\]*\r\n$running_re" \
 
 gdb_expect {
     -re "\\*stopped,reason=\"exited-normally\"" {
-       pass "resume all, program exited normally"
+	pass "resume all, program exited normally"
     }
     timeout {
-       fail "resume all, waiting for program exit (timeout)"
+	fail "resume all, waiting for program exit (timeout)"
     }
 }
 

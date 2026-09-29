@@ -54,8 +54,8 @@ Term::command "p 1"
 
 Term::check_region_contents "info win, layout h" \
     0 13 80 11 [multi_line "info win\\s+" \
-		   "Name\\s+Lines\\s+Columns\\s+Focus\\s+" \
-		   "src\\s+12\\s+40\\s+\\(has focus\\)\\s+" \
-		   "asm\\s+12\\s+41\\s+" \
-		   "status\\s+1\\s+80\\s+" \
-		   "cmd\\s+11\\s+80\\s+"]
+		    "Name\\s+Lines\\s+Columns\\s+Focus\\s+" \
+		    "src\\s+12\\s+40\\s+\\(has focus\\)\\s+" \
+		    "asm\\s+12\\s+41\\s+" \
+		    "status\\s+1\\s+80\\s+" \
+		    "cmd\\s+11\\s+80\\s+"]

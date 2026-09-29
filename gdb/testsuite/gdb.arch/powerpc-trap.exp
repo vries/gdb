@@ -19,15 +19,15 @@
 # the code.
 
 if { [istarget powerpc-*] } {
-   standard_testfile powerpc-trap.s
-   # Number of expected SIGTRAPs to get.  This needs to be kept in sync
-   # with the source file powerpc-trap.s.
-   set expected_traps 3
+    standard_testfile powerpc-trap.s
+    # Number of expected SIGTRAPs to get.  This needs to be kept in sync
+    # with the source file powerpc-trap.s.
+    set expected_traps 3
 } elseif {[istarget powerpc64*] } {
-   standard_testfile powerpc64-trap.s
-   # Number of expected SIGTRAPs to get.  This needs to be kept in sync
-   # with the source file powerpc64-trap.s.
-   set expected_traps 5
+    standard_testfile powerpc64-trap.s
+    # Number of expected SIGTRAPs to get.  This needs to be kept in sync
+    # with the source file powerpc64-trap.s.
+    set expected_traps 5
 } else {
     unsupported "Skipping powerpc-specific tests"
     return

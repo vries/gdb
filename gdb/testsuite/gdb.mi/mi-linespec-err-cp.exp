@@ -33,8 +33,8 @@ mi_clean_restart $::testfile
 
 # Turn off the pending breakpoint queries.
 mi_gdb_test "-interpreter-exec console \"set breakpoint pending off\"" \
-  {=cmd-param-changed,param=\"breakpoint pending\",.*\^done} \
-  "-interpreter-exec console \"set breakpoint pending off\""
+    {=cmd-param-changed,param=\"breakpoint pending\",.*\^done} \
+    "-interpreter-exec console \"set breakpoint pending off\""
 
 mi_runto_main
 

@@ -22,7 +22,7 @@ load_lib fortran.exp
 require allow_fortran_tests
 
 if { [prepare_for_testing ${testfile}.exp ${testfile} ${srcfile} \
-    {debug f90 quiet}] } {
+	  {debug f90 quiet}] } {
     return
 }
 
@@ -84,9 +84,9 @@ gdb_breakpoint [gdb_get_line_number "Before value assignment"]
 gdb_continue_to_breakpoint "Before value assignment"
 gdb_test "ptype twop" \
     [multi_line "type = PTR TO -> \\( Type two" \
-		"    $int, allocatable :: ivla1\\(:\\)" \
-		"    $int, allocatable :: ivla2\\(:,:\\)" \
-		"End Type two \\)"]
+	 "    $int, allocatable :: ivla1\\(:\\)" \
+	 "    $int, allocatable :: ivla2\\(:,:\\)" \
+	 "End Type two \\)"]
 
 gdb_breakpoint [gdb_get_line_number "After value assignment"]
 gdb_continue_to_breakpoint "After value assignment"

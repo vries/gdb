@@ -59,8 +59,8 @@ Dwarf::assemble $asm_file {
 		MACRO_AT_range main
 	    } {
 		DW_TAG_template_type_param {
-		  DW_AT_name "T"
-		  DW_AT_type :$int DW_FORM_ref4
+		    DW_AT_name "T"
+		    DW_AT_type :$int DW_FORM_ref4
 		}
 	    }
 	}

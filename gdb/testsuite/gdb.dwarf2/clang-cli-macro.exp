@@ -73,8 +73,8 @@ Dwarf::assemble $asm_file {
 	    "debug-line-offset-label" $L
 	} {
 	    start_file 0 1
-		# A macro defined at line 1 of the main file.
-		define 1 "TWO 2"
+	    # A macro defined at line 1 of the main file.
+	    define 1 "TWO 2"
 	    end_file
 	    define 0 "ONE 1"
 	}

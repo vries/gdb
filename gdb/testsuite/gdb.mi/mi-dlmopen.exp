@@ -214,8 +214,8 @@ proc check_solib_unload_events {} {
     # each library.  Each DESC is a list of two elements, a filename for a
     # library, and the number of times it should have been unloaded.
     foreach desc [list [list $::binfile_lib1 3] \
-		       [list $::binfile_lib_dep 3] \
-		       [list $::binfile_lib2 1]] {
+		      [list $::binfile_lib_dep 3] \
+		      [list $::binfile_lib2 1]] {
 	set filename [file tail [lindex $desc 0]]
 	set count [lindex $desc 1]
 	gdb_assert { $unload_counts($filename) == $count } \

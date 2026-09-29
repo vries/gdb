@@ -79,7 +79,7 @@ if {[istarget "aarch64*-*-*"]} {
 }
 
 if { [build_executable "failed to prepare" ${exec2} "${srcfile2}" \
-	 $options]} {
+	  $options]} {
     return
 }
 

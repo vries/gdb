@@ -223,9 +223,9 @@ proc test_list_range {} {
 
     gdb_test "list 2,5" "2\[ \t\]+\r\n3\[ \t\]+int main \[)(\]+.*5\[ \t\]+int x;" "list range; line1,line2"
 
-#    gdb_test     "list -1,6"   "Line number 0 out of range; .*list0.c has 39 lines." "list range; lower bound negative"
+    #    gdb_test     "list -1,6"   "Line number 0 out of range; .*list0.c has 39 lines." "list range; lower bound negative"
 
-#    gdb_test     "list -100,-40"       "Line number -60 out of range; .*list0.c has 39 lines." "list range; both bounds negative"
+    #    gdb_test     "list -100,-40"       "Line number -60 out of range; .*list0.c has 39 lines." "list range; both bounds negative"
 
     set past_end [expr {${last_line} + 10}]
     set much_past_end [expr {${past_end} + 10}]
@@ -326,10 +326,10 @@ proc test_list_filename_and_function {} {
 
     setup_xfail "*-*-*"
 
-# Does this actually work ANYWHERE?  I believe not, as this is an `aspect' of
-# lookup_symbol(), where, when it is given a specific symtab which does not
-# contain the requested symbol, it will subsequently search all of the symtabs
-# for the requested symbol.
+    # Does this actually work ANYWHERE?  I believe not, as this is an `aspect' of
+    # lookup_symbol(), where, when it is given a specific symtab which does not
+    # contain the requested symbol, it will subsequently search all of the symtabs
+    # for the requested symbol.
 
     gdb_test "list list0.c:foo" "Function \"foo\" not defined in .*list0.c" "list filename:function; wrong filename rejected"
 
@@ -342,38 +342,38 @@ proc test_list_filename_and_function {} {
 # Test the forward-search (aka search) and the reverse-search commands.
 
 proc test_forward_reverse_search {} {
-	global timeout
+    global timeout
 
-	gdb_test_no_output "set listsize 4"
-	# On SunOS4, this gives us lines 19-22.  On AIX, it gives us
-	# lines 20-23.  This depends on whether the line number of a function
-	# is considered to be the openbrace or the first statement--either one
-	# is acceptable.
-	gdb_test "list long_line" "24\[ \t\]+long_line .*"
+    gdb_test_no_output "set listsize 4"
+    # On SunOS4, this gives us lines 19-22.  On AIX, it gives us
+    # lines 20-23.  This depends on whether the line number of a function
+    # is considered to be the openbrace or the first statement--either one
+    # is acceptable.
+    gdb_test "list long_line" "24\[ \t\]+long_line .*"
 
-	gdb_test "search 4321" " not found"
+    gdb_test "search 4321" " not found"
 
-	gdb_test "search 6789" "28\[ \t\]+oof .6789.;"
+    gdb_test "search 6789" "28\[ \t\]+oof .6789.;"
 
-	# Try again, we shouldn't re-find the same source line.  Also,
-	# while at it, test using the "forward-search" alias.
-	gdb_test "forward-search 6789" " not found"
+    # Try again, we shouldn't re-find the same source line.  Also,
+    # while at it, test using the "forward-search" alias.
+    gdb_test "forward-search 6789" " not found"
 
-	# Now test backwards.  First make sure we start searching from
-	# the previous line, not the current line.
-	gdb_test "reverse-search 6789" " not found"
+    # Now test backwards.  First make sure we start searching from
+    # the previous line, not the current line.
+    gdb_test "reverse-search 6789" " not found"
 
-	# Now find something in a previous line.
-	gdb_test "reverse-search 67" "26\[ \t\]+oof .67.;"
+    # Now find something in a previous line.
+    gdb_test "reverse-search 67" "26\[ \t\]+oof .67.;"
 
-	# Test that GDB won't crash if the line being searched is extremely long.
+    # Test that GDB won't crash if the line being searched is extremely long.
 
-	set oldtimeout $timeout
-	set timeout [expr {$timeout + 300}]
-	verbose "Timeout is now $timeout seconds" 2
-	gdb_test "search 1234" ".*1234.*" "search extremely long line (> 5000 chars)"
-	set timeout $oldtimeout
-	verbose "Timeout is now $timeout seconds" 2
+    set oldtimeout $timeout
+    set timeout [expr {$timeout + 300}]
+    verbose "Timeout is now $timeout seconds" 2
+    gdb_test "search 1234" ".*1234.*" "search extremely long line (> 5000 chars)"
+    set timeout $oldtimeout
+    verbose "Timeout is now $timeout seconds" 2
 }
 
 proc test_only_end {} {

@@ -28,55 +28,55 @@ if {![runto_main]} {
 
 # Test various error messages.
 gdb_test "info macro -- -all" \
-	 "The symbol `-all' has no definition .*\r\nat .*$srcfile:${::decimal}"
+    "The symbol `-all' has no definition .*\r\nat .*$srcfile:${::decimal}"
 gdb_test "info macro  -- -all" \
-	 "The symbol `-all' has no definition .*\r\nat .*$srcfile:${::decimal}"
+    "The symbol `-all' has no definition .*\r\nat .*$srcfile:${::decimal}"
 
 gdb_test "info macro -all --" \
-	 "You must follow.*with the name.*you want to see.*\[^\r\n\]*"
+    "You must follow.*with the name.*you want to see.*\[^\r\n\]*"
 
 gdb_test "info macro -all  --" \
-	 "You must follow.*with the name.*you want to see.*\[^\r\n\]*"
+    "You must follow.*with the name.*you want to see.*\[^\r\n\]*"
 
 gdb_test "info macro  -all  --" \
-	 "You must follow.*with the name.*you want to see.*\[^\r\n\]*"
+    "You must follow.*with the name.*you want to see.*\[^\r\n\]*"
 
 gdb_test "info macro --" \
-	 "You must follow.*with the name.*you want to see.*\[^\r\n\]*"
+    "You must follow.*with the name.*you want to see.*\[^\r\n\]*"
 
 gdb_test "info macro -- " \
-	 "You must follow.*with the name.*you want to see.*\[^\r\n\]*" \
-	 "info macro -- <EOL>"
+    "You must follow.*with the name.*you want to see.*\[^\r\n\]*" \
+    "info macro -- <EOL>"
 gdb_test "info macro  -- " \
-	 "You must follow.*with the name.*you want to see.*\[^\r\n\]*" \
-	 "info macro  -- <EOL>"
+    "You must follow.*with the name.*you want to see.*\[^\r\n\]*" \
+    "info macro  -- <EOL>"
 
 gdb_test "info macro -invalid-option" \
-	 "Unrecognized option.*Try \"help info macro\"\."
+    "Unrecognized option.*Try \"help info macro\"\."
 
 gdb_test "info macro  -invalid-option" \
-	 "Unrecognized option.*Try \"help info macro\"\."
+    "Unrecognized option.*Try \"help info macro\"\."
 
 gdb_test "info macro -invalid-option FOO" \
-	 "Unrecognized option.*Try \"help info macro\"\."
+    "Unrecognized option.*Try \"help info macro\"\."
 gdb_test "info macro  -invalid-option FOO" \
-	 "Unrecognized option.*Try \"help info macro\"\."
+    "Unrecognized option.*Try \"help info macro\"\."
 
 # Single macro lookups.
 gdb_test "info macro -- FOO" \
-	 ".*#define FOO \"hello\""
+    ".*#define FOO \"hello\""
 
 gdb_test "info macro  -- FOO" \
-	 ".*#define FOO \"hello\""
+    ".*#define FOO \"hello\""
 
 gdb_test "info macro --  FOO" \
-	 ".*#define FOO \"hello\""
+    ".*#define FOO \"hello\""
 
 gdb_test "info macro FOO" \
-	 ".*#define FOO \"hello\""
+    ".*#define FOO \"hello\""
 
 gdb_test "info macro  FOO" \
-	 ".*#define FOO \"hello\""
+    ".*#define FOO \"hello\""
 
 # Multiple macro lookups.
 set test "info macro -a FOO"

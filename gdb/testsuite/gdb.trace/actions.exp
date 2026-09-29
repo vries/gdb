@@ -67,8 +67,8 @@ gdb_test_multiple "info tracepoints" "5.1a: set three tracepoints, no actions" {
 }
 
 gdb_trace_setactions "5.1b: set actions for first tracepoint" \
-	"$trcpt1" \
-	"collect gdb_char_test" "^$"
+    "$trcpt1" \
+    "collect gdb_char_test" "^$"
 
 gdb_test "info tracepoints" \
     [multi_line \
@@ -83,8 +83,8 @@ gdb_test "info tracepoints" \
     "5.1c: verify actions set for first tracepoint"
 
 gdb_trace_setactions "5.1d: set actions for second tracepoint" \
-	"$trcpt2" \
-	"collect gdb_short_test" "^$"
+    "$trcpt2" \
+    "collect gdb_short_test" "^$"
 
 gdb_test "info tracepoints" \
     [multi_line \
@@ -100,8 +100,8 @@ gdb_test "info tracepoints" \
     "5.1e: verify actions set for second tracepoint"
 
 gdb_trace_setactions "5.2a: set actions for last (default) tracepoint" \
-	"" \
-	"collect gdb_long_test" "^$"
+    "" \
+    "collect gdb_long_test" "^$"
 
 gdb_test "info tracepoints" \
     [multi_line \
@@ -120,8 +120,8 @@ gdb_test "info tracepoints" \
 # 5.3 replace actions set earlier
 
 gdb_trace_setactions "5.3a: reset actions for first tracepoint" \
-	"$trcpt1" \
-	"collect gdb_struct1_test" "^$"
+    "$trcpt1" \
+    "collect gdb_struct1_test" "^$"
 
 gdb_test "info tracepoints" \
     [multi_line \
@@ -144,12 +144,12 @@ gdb_test "info tracepoints" \
 # 5.4 end outside of context
 
 gdb_test "end" "This command cannot be used at the top level." \
-			"5.4: 'end' command out of context"
+    "5.4: 'end' command out of context"
 
 # 5.5 empty actions (just an end with no other actions)
 
 gdb_trace_setactions "5.5a: set empty actions for first tracepoint" \
-	"$trcpt1"
+    "$trcpt1"
 
 gdb_test_multiple "info tracepoints" "5.5c: verify NO actions for first tracepoint" {
     -re "No tracepoints.*$gdb_prompt $" {
@@ -167,32 +167,32 @@ gdb_test_multiple "info tracepoints" "5.5c: verify NO actions for first tracepoi
 
 gdb_test "actions [expr {$trcpt2 + $trcpt3}]" \
     "No tracepoint number [expr {$trcpt2 + $trcpt3}]." \
-			"5.6: actions for invalid tracepoint number"
+    "5.6: actions for invalid tracepoint number"
 
 # 5.7 invalid action (other than 'collect', 'while-stepping' or 'end')
 #           "warning: .print gdb_c_test. is not a supported trace.*> $" \
 
 gdb_trace_setactions "5.7: invalid action" \
-	"$trcpt1" \
-	"print gdb_c_test" \
-	"`print gdb_c_test' is not a supported tracepoint action"
+    "$trcpt1" \
+    "print gdb_c_test" \
+    "`print gdb_c_test' is not a supported tracepoint action"
 
 # 5.8 help actions (collect, while-stepping, end)
 
 gdb_test "help actions" \
     "Specify the actions to be taken at a tracepoint.*" \
-			"5.8a: help actions"
+    "5.8a: help actions"
 
 gdb_test "help collect" \
     "Specify one or more data items to be collected at a tracepoint.*" \
-			"5.8b: help collect"
+    "5.8b: help collect"
 
 gdb_test "help while-stepping" \
     "Specify single-stepping behavior at a tracepoint.*" \
-			"5.8c: help while-stepping"
+    "5.8c: help while-stepping"
 
 gdb_test "help end" "Ends a list of commands or actions.*" \
-			"5.8d: help end"
+    "5.8d: help end"
 
 # 5.9 default-collect
 
@@ -209,16 +209,16 @@ gdb_test_no_output "set default-collect" \
 # 5.10 teval
 
 gdb_test "tvariable \$tsv" \
-  "Trace state variable \\\$tsv created, with initial value 0." \
-  "create a trace state variable"
+    "Trace state variable \\\$tsv created, with initial value 0." \
+    "create a trace state variable"
 
 gdb_trace_setactions "5.10a: set teval action for first tracepoint" \
-	"$trcpt1" \
-	"teval gdb_char_test" "^$"
+    "$trcpt1" \
+    "teval gdb_char_test" "^$"
 
 gdb_trace_setactions "5.10a: set teval action for second tracepoint" \
-	"$trcpt2" \
-	"teval \$tsv += 1" "^$"
+    "$trcpt2" \
+    "teval \$tsv += 1" "^$"
 
 gdb_test "info tracepoints" \
     [multi_line \

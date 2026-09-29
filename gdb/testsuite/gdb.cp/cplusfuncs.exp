@@ -401,7 +401,7 @@ proc test_lookup_operator_functions {} {
     info_func "operator>>=("	"void foo::operator>>=($dm_type_foo_ref);"
     info_func "operator|=("	"void foo::operator|=($dm_type_foo_ref);"
     info_func "operator$dm_operator_comma\("	\
-				"void foo::operator$dm_operator_comma\($dm_type_foo_ref);"
+	"void foo::operator$dm_operator_comma\($dm_type_foo_ref);"
     info_func "operator/("	"void foo::operator/($dm_type_foo_ref);"
     info_func "operator+("	"void foo::operator+($dm_type_foo_ref);"
     info_func "operator<<("	"void foo::operator<<($dm_type_foo_ref);"
@@ -435,7 +435,7 @@ proc test_lookup_operator_functions {} {
     info_func "operator int("	"int foo::operator int($dm_type_void);"
     info_func "operator()("	"void foo::operator()($dm_type_foo_ref);"
     info_func "operator $dm_operator_char_star_quoted\(" \
-				"char *foo::operator $dm_operator_char_star\($dm_type_void);"
+	"char *foo::operator $dm_operator_char_star\($dm_type_void);"
 
 }
 

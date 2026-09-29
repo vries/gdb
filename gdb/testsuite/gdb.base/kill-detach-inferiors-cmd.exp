@@ -53,11 +53,11 @@ gdb_test "info inferiors 1" "\r\n\\* 1 \[^\r\n\]+" "inf 1 is still current"
 
 # No inferiors should be running anymore.
 gdb_test "kill inferiors 1 2 3" \
-	 "ID 1 is not running.*ID 2 is not running.*ID 3 is not running.*"
+    "ID 1 is not running.*ID 2 is not running.*ID 3 is not running.*"
 gdb_test "detach inferiors 1 2 3" \
-	 "ID 1 is not running.*ID 2 is not running.*ID 3 is not running.*"
+    "ID 1 is not running.*ID 2 is not running.*ID 3 is not running.*"
 
 gdb_test "kill inferiors 10" \
-	 "ID 10 not known.*"
+    "ID 10 not known.*"
 
 kill_wait_spawned_process $test_spawn_id

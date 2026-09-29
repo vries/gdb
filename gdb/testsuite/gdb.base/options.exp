@@ -223,63 +223,63 @@ proc_with_prefix test-print {{prefix ""}} {
 	     "  c = 3" \
 	     "}"]
 
-    test_gdb_complete_unique \
-	"${prefix}print xxx" \
-	"${prefix}print xxx1"
-    test_gdb_complete_unique \
-	"${prefix}print -- xxx" \
-	"${prefix}print -- xxx1"
+test_gdb_complete_unique \
+    "${prefix}print xxx" \
+    "${prefix}print xxx1"
+test_gdb_complete_unique \
+    "${prefix}print -- xxx" \
+    "${prefix}print -- xxx1"
 
-    # Error messages when testing with "compile" are different from
-    # the error messages gdb's internal parser throws.  This procedure
-    # hides the difference.  EXPECTED_RE is only considered when not
-    # testing with "compile".
-    proc test_invalid_expression {cmd expected_re} {
-	upvar prefix prefix
+# Error messages when testing with "compile" are different from
+# the error messages gdb's internal parser throws.  This procedure
+# hides the difference.  EXPECTED_RE is only considered when not
+# testing with "compile".
+proc test_invalid_expression {cmd expected_re} {
+    upvar prefix prefix
 
-	if {$prefix != "compile "} {
-	    gdb_test $cmd $expected_re
-	} else {
-	    # Error messages depend on compiler version, so we just
-	    # look for the last line indicating a failure.
-	    gdb_test $cmd "Compilation failed\\."
-	}
-    }
-
-    # Check that '-XXX' without a "--" is handled as an
-    # expression.
-    gdb_test "${prefix}print -1" " = -1"
-    test_invalid_expression \
-	"${prefix}print --1" \
-	"Left operand of assignment is not an lvalue\\."
-    test_invalid_expression \
-	"${prefix}print -object" \
-	"No symbol \"object\".*"
-
-    # Test printing with options and no expression.
-    set test "${prefix}print -object --"
     if {$prefix != "compile "} {
-	# Regular "print" repeats the last history value.
-	gdb_test $test " = -1"
+	gdb_test $cmd $expected_re
     } else {
-	# "compile print" starts a multiline expression.
-	gdb_test_multiple $test $test {
-	    -re ">$" {
-		gdb_test "-1\nend" " = -1" \
-		    $test
-	    }
+	# Error messages depend on compiler version, so we just
+	# look for the last line indicating a failure.
+	gdb_test $cmd "Compilation failed\\."
+    }
+}
+
+# Check that '-XXX' without a "--" is handled as an
+# expression.
+gdb_test "${prefix}print -1" " = -1"
+test_invalid_expression \
+    "${prefix}print --1" \
+    "Left operand of assignment is not an lvalue\\."
+test_invalid_expression \
+    "${prefix}print -object" \
+    "No symbol \"object\".*"
+
+# Test printing with options and no expression.
+set test "${prefix}print -object --"
+if {$prefix != "compile "} {
+    # Regular "print" repeats the last history value.
+    gdb_test $test " = -1"
+} else {
+    # "compile print" starts a multiline expression.
+    gdb_test_multiple $test $test {
+	-re ">$" {
+	    gdb_test "-1\nend" " = -1" \
+		$test
 	}
     }
+}
 
-    # Check that everything after "-- " is treated as an
-    # expression, not confused with an option.
-    test_invalid_expression \
-	"${prefix}print -- -address" \
-	"No symbol.*"
-    gdb_test "${prefix}print -- -1" " = -1"
-    test_invalid_expression \
-	"${prefix}print -- --1" \
-	"Left operand of assignment is not an lvalue\\."
+# Check that everything after "-- " is treated as an
+# expression, not confused with an option.
+test_invalid_expression \
+    "${prefix}print -- -address" \
+    "No symbol.*"
+gdb_test "${prefix}print -- -1" " = -1"
+test_invalid_expression \
+    "${prefix}print -- --1" \
+    "Left operand of assignment is not an lvalue\\."
 }
 
 # Basic option-machinery + "backtrace" command integration tests.
@@ -570,55 +570,55 @@ proc_with_prefix test-misc {variant} {
     # Completing at "-" should list all options.
     res_test_gdb_complete_multiple \
 	"1 [expect_none "-"]" \
-	"$cmd " "-" "" $all_options
+    "$cmd " "-" "" $all_options
 
-    # Now with a double dash.
-    gdb_test "$cmd --" [expect_none ""]
+# Now with a double dash.
+gdb_test "$cmd --" [expect_none ""]
 
-    # "--" is recognized by options completer, gdb auto-appends a
-    # space.
-    test_completer_recognizes \
-	"1 [expect_none "--"]" \
-	"$cmd --"
+# "--" is recognized by options completer, gdb auto-appends a
+# space.
+test_completer_recognizes \
+    "1 [expect_none "--"]" \
+    "$cmd --"
 
-    # Now with a double dash, plus a dash as operand.
-    gdb_test "$cmd -- -" [expect_none "-"]
-    res_test_gdb_complete_none "0 -" "$cmd -- -"
+# Now with a double dash, plus a dash as operand.
+gdb_test "$cmd -- -" [expect_none "-"]
+res_test_gdb_complete_none "0 -" "$cmd -- -"
 
-    # Completing an unambiguous option just appends an empty space.
-    test_completer_recognizes \
-	"1 [expect_none "-flag"]" \
-	"$cmd -flag"
+# Completing an unambiguous option just appends an empty space.
+test_completer_recognizes \
+    "1 [expect_none "-flag"]" \
+    "$cmd -flag"
 
-    # Try running an ambiguous option.
-    if {$variant == "require-delimiter"} {
-	gdb_test "$cmd -xx" [expect_none "-xx"]
-    } else {
-	gdb_test "$cmd -xx" "Ambiguous option at: -xx"
-    }
+# Try running an ambiguous option.
+if {$variant == "require-delimiter"} {
+    gdb_test "$cmd -xx" [expect_none "-xx"]
+} else {
+    gdb_test "$cmd -xx" "Ambiguous option at: -xx"
+}
 
-    # Check that options are not case insensitive.
-    gdb_test "$cmd -flag --" [expect_flag ""]
+# Check that options are not case insensitive.
+gdb_test "$cmd -flag --" [expect_flag ""]
 
-    # Check how the different modes behave on unknown option, with a
-    # delimiter.
-    gdb_test "$cmd -FLAG --" \
-	"Unrecognized option at: -FLAG --"
+# Check how the different modes behave on unknown option, with a
+# delimiter.
+gdb_test "$cmd -FLAG --" \
+    "Unrecognized option at: -FLAG --"
 
-    # Check how the different modes behave on unknown option, without
-    # a delimiter.
-    if {$variant == "unknown-is-error"} {
-	gdb_test "$cmd -FLAG" \
-	    "Unrecognized option at: -FLAG"
-    } else {
-	gdb_test "$cmd -FLAG" [expect_none "-FLAG"]
-    }
+# Check how the different modes behave on unknown option, without
+# a delimiter.
+if {$variant == "unknown-is-error"} {
+    gdb_test "$cmd -FLAG" \
+	"Unrecognized option at: -FLAG"
+} else {
+    gdb_test "$cmd -FLAG" [expect_none "-FLAG"]
+}
 
-    # Test parsing stops at a negative integer.
-    gdb_test "$cmd -1 --" \
-	"Unrecognized option at: -1 --"
-    gdb_test "$cmd -2 --" \
-	"Unrecognized option at: -2 --"
+# Test parsing stops at a negative integer.
+gdb_test "$cmd -1 --" \
+    "Unrecognized option at: -1 --"
+gdb_test "$cmd -2 --" \
+    "Unrecognized option at: -2 --"
 }
 
 # Flag option tests.
@@ -630,61 +630,61 @@ proc_with_prefix test-flag {variant} {
     # Completing a flag just appends a space.
     test_completer_recognizes \
 	"1 [expect_none "-flag"]" \
-	"$cmd -flag"
+    "$cmd -flag"
 
-    # Add a dash, and all options should be shown.
-    res_test_gdb_complete_multiple \
-	"1 [expect_flag "-"]" \
-	"$cmd  -flag " "-" "" $all_options
+# Add a dash, and all options should be shown.
+res_test_gdb_complete_multiple \
+    "1 [expect_flag "-"]" \
+    "$cmd  -flag " "-" "" $all_options
 
-    # Basic smoke tests of accepted / not accepted values.
+# Basic smoke tests of accepted / not accepted values.
 
-    # Check all the different variants a bool option may be specified.
-    if {$variant == "require-delimiter"} {
-	gdb_test "$cmd -flag 999" [expect_none "-flag 999"]
-    } else {
-	gdb_test "$cmd -flag 999" [expect_flag "999"]
-    }
-    gdb_test "$cmd -flag -- 999" [expect_flag "999"]
+# Check all the different variants a bool option may be specified.
+if {$variant == "require-delimiter"} {
+    gdb_test "$cmd -flag 999" [expect_none "-flag 999"]
+} else {
+    gdb_test "$cmd -flag 999" [expect_flag "999"]
+}
+gdb_test "$cmd -flag -- 999" [expect_flag "999"]
 
-    # If the "--" separator is present, then GDB errors out if the
-    # flag option is passed some value -- check that too.
-    gdb_test "$cmd -flag xxx 999 --" "Unrecognized option at: xxx 999 --"
-    gdb_test "$cmd -flag o 999 --" "Unrecognized option at: o 999 --"
-    gdb_test "$cmd -flag 1 999 --" "Unrecognized option at: 1 999 --"
+# If the "--" separator is present, then GDB errors out if the
+# flag option is passed some value -- check that too.
+gdb_test "$cmd -flag xxx 999 --" "Unrecognized option at: xxx 999 --"
+gdb_test "$cmd -flag o 999 --" "Unrecognized option at: o 999 --"
+gdb_test "$cmd -flag 1 999 --" "Unrecognized option at: 1 999 --"
 
-    # Extract twice the same flag, separated by one space.
-    gdb_test "$cmd -flag -flag -- non flags args" \
-	[expect_flag "non flags args"]
+# Extract twice the same flag, separated by one space.
+gdb_test "$cmd -flag -flag -- non flags args" \
+    [expect_flag "non flags args"]
 
-    # Extract twice the same flag, separated by one space.
-    gdb_test "$cmd -xx1     -xx2 -xx1  -xx2 -xx1    -- non flags args" \
-	"-flag 0 -xx1 1 -xx2 1 -bool 0 -enum xxx -uint-unl 0 -pint-unl 0\
+# Extract twice the same flag, separated by one space.
+gdb_test "$cmd -xx1     -xx2 -xx1  -xx2 -xx1    -- non flags args" \
+    "-flag 0 -xx1 1 -xx2 1 -bool 0 -enum xxx -uint-unl 0 -pint-unl 0\
 	 -string '' -filename '' -color magenta -- non flags args"
 
-    # Extract 2 known flags in front of unknown flags.
-    gdb_test "$cmd -xx1 -xx2 -a -b -c -xx1 --" \
-	"Unrecognized option at: -a -b -c -xx1 --"
+# Extract 2 known flags in front of unknown flags.
+gdb_test "$cmd -xx1 -xx2 -a -b -c -xx1 --" \
+    "Unrecognized option at: -a -b -c -xx1 --"
 
-    # Check that combined flags are not recognised.
-    gdb_test "$cmd -xx1 -xx1xx2 -xx1 --" \
-	"Unrecognized option at: -xx1xx2 -xx1 --"
+# Check that combined flags are not recognised.
+gdb_test "$cmd -xx1 -xx1xx2 -xx1 --" \
+    "Unrecognized option at: -xx1xx2 -xx1 --"
 
-    # Make sure the completer don't confuse a flag option with a
-    # boolean option.  Specifically, "o" should not complete to
-    # "on/off".
+# Make sure the completer don't confuse a flag option with a
+# boolean option.  Specifically, "o" should not complete to
+# "on/off".
 
-    if {$variant == "require-delimiter"} {
-	res_test_gdb_complete_none \
-	    "1 [expect_flag "o"]" \
-	    "$cmd -flag o"
+if {$variant == "require-delimiter"} {
+    res_test_gdb_complete_none \
+	"1 [expect_flag "o"]" \
+    "$cmd -flag o"
 
-	gdb_test "$cmd -flag o" [expect_none "-flag o"]
-    } else {
-	res_test_gdb_complete_none "0 o" "$cmd -flag o"
+gdb_test "$cmd -flag o" [expect_none "-flag o"]
+} else {
+res_test_gdb_complete_none "0 o" "$cmd -flag o"
 
-	gdb_test "$cmd -flag o" [expect_flag "o"]
-    }
+gdb_test "$cmd -flag o" [expect_flag "o"]
+}
 }
 
 # Boolean option tests.
@@ -711,170 +711,170 @@ proc_with_prefix test-boolean {variant} {
 	lappend match_list "off" "on"
 	res_test_gdb_complete_multiple \
 	    "1 [expect_none ""]" \
-	    "$cmd -bool " "" "" $match_list
-    } else {
-	res_test_gdb_complete_none "0 " "$cmd -bool "
-    }
+	"$cmd -bool " "" "" $match_list
+} else {
+    res_test_gdb_complete_none "0 " "$cmd -bool "
+}
 
-    # Add another dash, and "on/off" are no longer offered:
+# Add another dash, and "on/off" are no longer offered:
+res_test_gdb_complete_multiple \
+    "1 [expect_bool "-"]" \
+    "$cmd -bool " "-" ""  $all_options
+
+# Basic smoke tests of accepted / not accepted values.
+
+# The command accepts all of "1/0/enable/disable/yes/no" too, even
+# though like the "set" command, we don't offer those as
+# completion candidates if you complete right after the boolean
+# command's name, like:
+#
+#  (gdb) maint test-options require-delimiter -bool [TAB]
+#  off        on
+#
+# However, the completer does recognize them if you start typing
+# the boolean value.
+foreach value {"0" "1"} {
+    test_completer_recognizes \
+	"1 [expect_none ""]" \
+    "$cmd -bool $value"
+}
+foreach value {"of" "off"} {
+    res_test_gdb_complete_unique \
+	"1 [expect_none ""]" \
+    "$cmd -bool $value" \
+    "$cmd -bool off"
+}
+foreach value {"y" "ye" "yes"} {
+    res_test_gdb_complete_unique \
+	"1 [expect_none ""]" \
+    "$cmd -bool $value" \
+    "$cmd -bool yes"
+}
+foreach value {"n" "no"} {
+    res_test_gdb_complete_unique \
+	"1 [expect_none ""]" \
+    "$cmd -bool $value" \
+    "$cmd -bool no"
+}
+foreach value {
+    "e"
+    "en"
+    "ena"
+    "enab"
+    "enabl"
+    "enable"
+} {
+    res_test_gdb_complete_unique \
+	"1 [expect_none ""]" \
+    "$cmd -bool $value" \
+    "$cmd -bool enable"
+}
+foreach value {
+    "d"
+    "di"
+    "dis"
+    "disa"
+    "disab"
+    "disabl"
+    "disable"
+} {
+    res_test_gdb_complete_unique \
+	"1 [expect_none ""]" \
+    "$cmd -bool $value" \
+    "$cmd -bool disable"
+}
+
+if {$variant == "require-delimiter"} {
+    res_test_gdb_complete_none \
+	"1 [expect_none "xxx"]" \
+    "$cmd -bool xxx"
+} else {
+res_test_gdb_complete_none "0 xxx" "$cmd -bool xxx"
+}
+
+# The command accepts abbreviations of "enable/disable/yes/no",
+# even though we don't offer those for completion.
+foreach value {
+    "1"
+    "y" "ye" "yes"
+    "e"
+    "en"
+    "ena"
+    "enab"
+    "enabl"
+    "enable"} {
+    gdb_test "$cmd -bool $value --" [expect_bool ""]
+}
+foreach value {
+    "0"
+    "of" "off"
+    "n" "no"
+    "d"
+    "di"
+    "dis"
+    "disa"
+    "disab"
+    "disabl"
+    "disable"} {
+    gdb_test "$cmd -bool $value --" [expect_none ""]
+}
+
+if {$variant == "require-delimiter"} {
+    gdb_test "$cmd -bool 999" [expect_none "-bool 999"]
+} else {
+    gdb_test "$cmd -bool 999" [expect_bool "999"]
+}
+gdb_test "$cmd -bool -- 999" [expect_bool "999"]
+
+# Since "on" is implied after a boolean option, for
+# !require-delimiter commands, anything that is not
+# yes/no/1/0/on/off/enable/disable should be considered as the raw
+# input after the last option.  Also check "o", which might look
+# like "on" or "off", but it's treated the same.
+
+foreach arg {"xxx" "o"} {
+    if {$variant == "require-delimiter"} {
+	gdb_test "$cmd -bool $arg" [expect_none "-bool $arg"]
+    } else {
+	gdb_test "$cmd -bool $arg" [expect_bool "$arg"]
+    }
+}
+# Also try -1.  "unknown-is-error" commands error out saying that
+# that's not a valid option.
+if {$variant == "require-delimiter"} {
+    gdb_test "$cmd -bool -1" \
+	[expect_none "-bool -1"]
+} elseif {$variant == "unknown-is-error"} {
+    gdb_test "$cmd -bool -1" \
+	"Unrecognized option at: -1"
+} else {
+    gdb_test "$cmd -bool -1" [expect_bool "-1"]
+}
+
+# OTOH, if the "--" separator is present, then GDB errors out if
+# the boolean option is passed an invalid value -- check that too.
+gdb_test "$cmd -bool -1 999 --" \
+    "Unrecognized option at: -1 999 --"
+gdb_test "$cmd -bool xxx 999 --" \
+    "Value given for `-bool' is not a boolean: xxx"
+gdb_test "$cmd -bool o 999 --" \
+    "Value given for `-bool' is not a boolean: o"
+
+# Completing after a boolean option + "o" does list "on/off",
+# though.
+if {$variant == "require-delimiter"} {
     res_test_gdb_complete_multiple \
-	"1 [expect_bool "-"]" \
-	"$cmd -bool " "-" ""  $all_options
-
-    # Basic smoke tests of accepted / not accepted values.
-
-    # The command accepts all of "1/0/enable/disable/yes/no" too, even
-    # though like the "set" command, we don't offer those as
-    # completion candidates if you complete right after the boolean
-    # command's name, like:
-    #
-    #  (gdb) maint test-options require-delimiter -bool [TAB]
-    #  off        on
-    #
-    # However, the completer does recognize them if you start typing
-    # the boolean value.
-    foreach value {"0" "1"} {
-	test_completer_recognizes \
-	    "1 [expect_none ""]" \
-	    "$cmd -bool $value"
+	"1 [expect_none "o"]" \
+    "$cmd -bool " "o" "" {
+	"off"
+	"on"
     }
-    foreach value {"of" "off"} {
-	res_test_gdb_complete_unique \
-	    "1 [expect_none ""]" \
-	    "$cmd -bool $value" \
-	    "$cmd -bool off"
-    }
-    foreach value {"y" "ye" "yes"} {
-	res_test_gdb_complete_unique \
-	    "1 [expect_none ""]" \
-	    "$cmd -bool $value" \
-	    "$cmd -bool yes"
-    }
-    foreach value {"n" "no"} {
-	res_test_gdb_complete_unique \
-	    "1 [expect_none ""]" \
-	    "$cmd -bool $value" \
-	    "$cmd -bool no"
-    }
-    foreach value {
-	"e"
-	"en"
-	"ena"
-	"enab"
-	"enabl"
-	"enable"
-    } {
-	res_test_gdb_complete_unique \
-	    "1 [expect_none ""]" \
-	    "$cmd -bool $value" \
-	    "$cmd -bool enable"
-    }
-    foreach value {
-	"d"
-	"di"
-	"dis"
-	"disa"
-	"disab"
-	"disabl"
-	"disable"
-    } {
-	res_test_gdb_complete_unique \
-	    "1 [expect_none ""]" \
-	    "$cmd -bool $value" \
-	    "$cmd -bool disable"
-    }
-
-    if {$variant == "require-delimiter"} {
-	res_test_gdb_complete_none \
-	    "1 [expect_none "xxx"]" \
-	    "$cmd -bool xxx"
-    } else {
-	res_test_gdb_complete_none "0 xxx" "$cmd -bool xxx"
-    }
-
-    # The command accepts abbreviations of "enable/disable/yes/no",
-    # even though we don't offer those for completion.
-    foreach value {
-	"1"
-	"y" "ye" "yes"
-	"e"
-	"en"
-	"ena"
-	"enab"
-	"enabl"
-	"enable"} {
-	gdb_test "$cmd -bool $value --" [expect_bool ""]
-    }
-    foreach value {
-	"0"
-	"of" "off"
-	"n" "no"
-	"d"
-	"di"
-	"dis"
-	"disa"
-	"disab"
-	"disabl"
-	"disable"} {
-	gdb_test "$cmd -bool $value --" [expect_none ""]
-    }
-
-    if {$variant == "require-delimiter"} {
-	gdb_test "$cmd -bool 999" [expect_none "-bool 999"]
-    } else {
-	gdb_test "$cmd -bool 999" [expect_bool "999"]
-    }
-    gdb_test "$cmd -bool -- 999" [expect_bool "999"]
-
-    # Since "on" is implied after a boolean option, for
-    # !require-delimiter commands, anything that is not
-    # yes/no/1/0/on/off/enable/disable should be considered as the raw
-    # input after the last option.  Also check "o", which might look
-    # like "on" or "off", but it's treated the same.
-
-    foreach arg {"xxx" "o"} {
-	if {$variant == "require-delimiter"} {
-	    gdb_test "$cmd -bool $arg" [expect_none "-bool $arg"]
-	} else {
-	    gdb_test "$cmd -bool $arg" [expect_bool "$arg"]
-	}
-    }
-    # Also try -1.  "unknown-is-error" commands error out saying that
-    # that's not a valid option.
-    if {$variant == "require-delimiter"} {
-	gdb_test "$cmd -bool -1" \
-	     [expect_none "-bool -1"]
-    } elseif {$variant == "unknown-is-error"} {
-	gdb_test "$cmd -bool -1" \
-	    "Unrecognized option at: -1"
-    } else {
-	gdb_test "$cmd -bool -1" [expect_bool "-1"]
-    }
-
-    # OTOH, if the "--" separator is present, then GDB errors out if
-    # the boolean option is passed an invalid value -- check that too.
-    gdb_test "$cmd -bool -1 999 --" \
-	"Unrecognized option at: -1 999 --"
-    gdb_test "$cmd -bool xxx 999 --" \
-	"Value given for `-bool' is not a boolean: xxx"
-    gdb_test "$cmd -bool o 999 --" \
-	"Value given for `-bool' is not a boolean: o"
-
-    # Completing after a boolean option + "o" does list "on/off",
-    # though.
-    if {$variant == "require-delimiter"} {
-	res_test_gdb_complete_multiple \
-	    "1 [expect_none "o"]" \
-	    "$cmd -bool " "o" "" {
-	    "off"
-	    "on"
-	}
-    } else {
-	res_test_gdb_complete_multiple "0 o" "$cmd -bool " "o" "" {
-	    "off"
-	    "on"
-	}
-    }
+} else {
+res_test_gdb_complete_multiple "0 o" "$cmd -bool " "o" "" {
+    "off"
+    "on"
+}
+}
 }
 
 # Uinteger option tests.  OPTION is which integer option we're
@@ -887,109 +887,109 @@ proc_with_prefix test-uinteger {variant option} {
     # Test completing an integer option:
     res_test_gdb_complete_multiple \
 	"1 [expect_none ""]" \
-	"$cmd " "" "" {
+    "$cmd " "" "" {
 	"NUMBER"
 	"unlimited"
     }
 
-    # NUMBER above is just a placeholder, make sure we don't complete
-    # it as a valid option.
+# NUMBER above is just a placeholder, make sure we don't complete
+# it as a valid option.
+res_test_gdb_complete_none \
+    "1 [expect_none "NU"]" \
+    "$cmd NU"
+
+# "unlimited" is valid though.
+res_test_gdb_complete_unique \
+    "1 [expect_none "u"]" \
+    "$cmd u" \
+    "$cmd unlimited"
+
+# Basic smoke test of accepted / not accepted values.
+gdb_test "$cmd 1 -- 999" [expect_integer $option "1" "999"]
+gdb_test "$cmd unlimited -- 999" \
+    [expect_integer $option "unlimited" "999"]
+if {$option == "pinteger-unlimited"} {
+    gdb_test "$cmd -1 --" [expect_integer $option "unlimited" ""]
+    gdb_test "$cmd 0 --" [expect_integer $option "0" ""]
+} else {
+    gdb_test "$cmd -1 --" "integer -1 out of range"
+    gdb_test "$cmd 0 --" [expect_integer $option "unlimited" ""]
+}
+gdb_test "$cmd xxx --" \
+    "Expected integer at: xxx --"
+gdb_test "$cmd unlimitedx --" \
+    "Expected integer at: unlimitedx --"
+
+# Don't offer completions until we're past the
+# -uinteger-unlimited/-pinteger-unlimited argument.
+res_test_gdb_complete_none \
+    "1 [expect_none ""]" \
+    "$cmd 1"
+
+# A number of invalid values.
+foreach value {"x" "x " "1a" "1a " "1-" "1- " "unlimitedx"} {
     res_test_gdb_complete_none \
-	"1 [expect_none "NU"]" \
-	"$cmd NU"
+	"1 [expect_none $value]" \
+	"$cmd $value"
+}
 
-    # "unlimited" is valid though.
-    res_test_gdb_complete_unique \
-	"1 [expect_none "u"]" \
-	"$cmd u" \
-	"$cmd unlimited"
-
-    # Basic smoke test of accepted / not accepted values.
-    gdb_test "$cmd 1 -- 999" [expect_integer $option "1" "999"]
-    gdb_test "$cmd unlimited -- 999" \
-	[expect_integer $option "unlimited" "999"]
-    if {$option == "pinteger-unlimited"} {
-	gdb_test "$cmd -1 --" [expect_integer $option "unlimited" ""]
-	gdb_test "$cmd 0 --" [expect_integer $option "0" ""]
-    } else {
-	gdb_test "$cmd -1 --" "integer -1 out of range"
-	gdb_test "$cmd 0 --" [expect_integer $option "unlimited" ""]
-    }
-    gdb_test "$cmd xxx --" \
-	"Expected integer at: xxx --"
-    gdb_test "$cmd unlimitedx --" \
-	"Expected integer at: unlimitedx --"
-
-    # Don't offer completions until we're past the
-    # -uinteger-unlimited/-pinteger-unlimited argument.
-    res_test_gdb_complete_none \
-	"1 [expect_none ""]" \
-	"$cmd 1"
-
-    # A number of invalid values.
-    foreach value {"x" "x " "1a" "1a " "1-" "1- " "unlimitedx"} {
-	res_test_gdb_complete_none \
-	    "1 [expect_none $value]" \
-	    "$cmd $value"
-    }
-
-    # Try "-1".
-    if {$option == "uinteger-unlimited"} {
-	# -1 is invalid uinteger-unlimited.
-	foreach value {"-1" "-1 "} {
-	    res_test_gdb_complete_none \
-		"1 [expect_none ""]" \
-		"$cmd $value"
-	}
-    } else {
-	# -1 is valid for pinteger-unlimited.
+# Try "-1".
+if {$option == "uinteger-unlimited"} {
+    # -1 is invalid uinteger-unlimited.
+    foreach value {"-1" "-1 "} {
 	res_test_gdb_complete_none \
 	    "1 [expect_none ""]" \
-	    "$cmd -1"
-	if {$variant == "require-delimiter"} {
-	    res_test_gdb_complete_multiple \
-		"1 [expect_integer $option "unlimited" ""]" \
-		"$cmd -1 " "" "-" $all_options
-	} else {
-	    res_test_gdb_complete_none "0 " "$cmd -1 "
-	}
-    }
+	"$cmd $value"
+}
+} else {
+# -1 is valid for pinteger-unlimited.
+res_test_gdb_complete_none \
+    "1 [expect_none ""]" \
+    "$cmd -1"
+if {$variant == "require-delimiter"} {
+    res_test_gdb_complete_multiple \
+	"1 [expect_integer $option "unlimited" ""]" \
+    "$cmd -1 " "" "-" $all_options
+} else {
+res_test_gdb_complete_none "0 " "$cmd -1 "
+}
+}
 
-    # Check that after a fully parsed option:
-    #
-    #  - for require-delimiter commands, completion offers all
-    #    options.
-    #
-    #  - for !require-delimiter commands, completion offers nothing
-    #    and returns false.
+# Check that after a fully parsed option:
+#
+#  - for require-delimiter commands, completion offers all
+#    options.
+#
+#  - for !require-delimiter commands, completion offers nothing
+#    and returns false.
+if {$variant == "require-delimiter"} {
+    res_test_gdb_complete_multiple \
+	"1 [expect_integer $option 1 ""]" \
+    "$cmd 1 " "" "-" $all_options
+} else {
+res_test_gdb_complete_none "0 " "$cmd 1 "
+}
+
+# Test completing non-option arguments after "-uinteger-unlimited 1 ".
+foreach operand {"x" "x " "1a" "1a " "1-" "1- "} {
     if {$variant == "require-delimiter"} {
-	res_test_gdb_complete_multiple \
-	    "1 [expect_integer $option 1 ""]" \
-	    "$cmd 1 " "" "-" $all_options
+	res_test_gdb_complete_none \
+	    "1 [expect_integer $option 1 $operand]" \
+	    "$cmd 1 $operand"
     } else {
-	res_test_gdb_complete_none "0 " "$cmd 1 "
+	res_test_gdb_complete_none "0 $operand" "$cmd 1 $operand"
     }
-
-    # Test completing non-option arguments after "-uinteger-unlimited 1 ".
-    foreach operand {"x" "x " "1a" "1a " "1-" "1- "} {
-	if {$variant == "require-delimiter"} {
-	    res_test_gdb_complete_none \
-		"1 [expect_integer $option 1 $operand]" \
-		"$cmd 1 $operand"
-	} else {
-	    res_test_gdb_complete_none "0 $operand" "$cmd 1 $operand"
-	}
+}
+# These look like options, but they aren't.
+foreach operand {"-1" "-1 "} {
+    if {$variant == "unknown-is-operand"} {
+	res_test_gdb_complete_none "0 $operand" "$cmd 1 $operand"
+    } else {
+	res_test_gdb_complete_none \
+	    "1 [expect_integer $option 1 $operand]" \
+	    "$cmd 1 $operand"
     }
-    # These look like options, but they aren't.
-    foreach operand {"-1" "-1 "} {
-	if {$variant == "unknown-is-operand"} {
-	    res_test_gdb_complete_none "0 $operand" "$cmd 1 $operand"
-	} else {
-	    res_test_gdb_complete_none \
-		"1 [expect_integer $option 1 $operand]" \
-		"$cmd 1 $operand"
-	}
-    }
+}
 }
 
 # Enum option tests.
@@ -998,23 +998,23 @@ proc_with_prefix test-enum {variant} {
 
     res_test_gdb_complete_multiple \
 	"1 [expect_none ""]" \
-	"$cmd -enum " "" "" {
+    "$cmd -enum " "" "" {
 	"xxx"
 	"yyy"
 	"zzz"
     }
 
-    # Check that "-" where a value is expected does not show the
-    # command's options.  I.e., an enum's value is not optional.
-    # Check both completion and running the command.
-    res_test_gdb_complete_none \
-	"1 [expect_none "-"]" \
-	"$cmd -enum -"
-    gdb_test "$cmd -enum --"\
-	"Requires an argument. Valid arguments are xxx, yyy, zzz\\."
+# Check that "-" where a value is expected does not show the
+# command's options.  I.e., an enum's value is not optional.
+# Check both completion and running the command.
+res_test_gdb_complete_none \
+    "1 [expect_none "-"]" \
+    "$cmd -enum -"
+gdb_test "$cmd -enum --"\
+    "Requires an argument. Valid arguments are xxx, yyy, zzz\\."
 
-    # Try passing an undefined item to an enum option.
-    gdb_test "$cmd -enum www --" "Undefined item: \"www\"."
+# Try passing an undefined item to an enum option.
+gdb_test "$cmd -enum www --" "Undefined item: \"www\"."
 }
 
 # String option tests.
@@ -1025,58 +1025,58 @@ proc_with_prefix test-string {variant} {
 
     res_test_gdb_complete_none \
 	"1 [expect_none ""]" \
-	"$cmd -string "
+    "$cmd -string "
 
-    # Check that "-" where a value is expected does not show the
-    # command's options.  I.e., a string's value is not optional.
-    # Check both completion and running the command.
+# Check that "-" where a value is expected does not show the
+# command's options.  I.e., a string's value is not optional.
+# Check both completion and running the command.
+res_test_gdb_complete_none \
+    "1 [expect_none ""]" \
+    "$cmd -string -"
+gdb_test "$cmd -string --"\
+    "-string requires an argument"
+if {$variant == "require-delimiter"} {
+    gdb_test "$cmd -string" [expect_none "-string"]
+} else {
+    gdb_test "$cmd -string"\
+	"-string requires an argument"
+}
+
+foreach_with_prefix str {
+    "STR"
+    "\"STR\""
+    "\\\"STR"
+    "'STR'"
+    "\\'STR"
+    "\"STR AAA\""
+    "'STR BBB'"
+    "\"STR 'CCC' DDD\""
+    "'STR \"EEE\" FFF'"
+    "\"STR \\\"GGG\\\" HHH\""
+    "'STR \\\'III\\\' JJJ'"
+} {
     res_test_gdb_complete_none \
 	"1 [expect_none ""]" \
-	"$cmd -string -"
-    gdb_test "$cmd -string --"\
-	"-string requires an argument"
-    if {$variant == "require-delimiter"} {
-	gdb_test "$cmd -string" [expect_none "-string"]
-    } else {
-	gdb_test "$cmd -string"\
-	    "-string requires an argument"
-    }
+    "$cmd -string ${str}"
+gdb_test "$cmd -string ${str} --" [expect_string "${str}" ""]
 
-    foreach_with_prefix str {
-	"STR"
-	"\"STR\""
-	"\\\"STR"
-	"'STR'"
-	"\\'STR"
-	"\"STR AAA\""
-	"'STR BBB'"
-	"\"STR 'CCC' DDD\""
-	"'STR \"EEE\" FFF'"
-	"\"STR \\\"GGG\\\" HHH\""
-	"'STR \\\'III\\\' JJJ'"
-    } {
-	res_test_gdb_complete_none \
-	    "1 [expect_none ""]" \
-	    "$cmd -string ${str}"
-	gdb_test "$cmd -string ${str} --" [expect_string "${str}" ""]
+# Completing at "-" after parsing STR should list all options.
+res_test_gdb_complete_multiple \
+    "1 [expect_string "${str}" "-"]" \
+    "$cmd -string ${str} " "-" "" $all_options
 
-	# Completing at "-" after parsing STR should list all options.
-	res_test_gdb_complete_multiple \
-	    "1 [expect_string "${str}" "-"]" \
-	    "$cmd -string ${str} " "-" "" $all_options
-
-	# Check that only $STR is considered part of the string's value.
-	# I.e., that we stop parsing the string at the first
-	# whitespace or after the closing quote of $STR.
-	if {$variant == "require-delimiter"} {
-	    res_test_gdb_complete_none \
-		"1 [expect_string "${str}" "BAR"]" \
-		"$cmd -string ${str} BAR"
-	} else {
-	    res_test_gdb_complete_none "0 BAR" "$cmd -string ${str} BAR"
-	}
-	gdb_test "$cmd -string ${str} BAR --" "Unrecognized option at: BAR --"
-    }
+# Check that only $STR is considered part of the string's value.
+# I.e., that we stop parsing the string at the first
+# whitespace or after the closing quote of $STR.
+if {$variant == "require-delimiter"} {
+    res_test_gdb_complete_none \
+	"1 [expect_string "${str}" "BAR"]" \
+    "$cmd -string ${str} BAR"
+} else {
+res_test_gdb_complete_none "0 BAR" "$cmd -string ${str} BAR"
+}
+gdb_test "$cmd -string ${str} BAR --" "Unrecognized option at: BAR --"
+}
 }
 
 # Filename option tests.  These tests only focus on how GDB parses the
@@ -1096,51 +1096,51 @@ proc_with_prefix test-filename {variant} {
     # Check both completion and running the command.
     res_test_gdb_complete_none \
 	"1 [expect_none ""]" \
-	"$cmd -filename -"
-    gdb_test "$cmd -filename --" \
+    "$cmd -filename -"
+gdb_test "$cmd -filename --" \
+    "-filename requires an argument"
+if {$variant == "require-delimiter"} {
+    gdb_test "$cmd -filename" [expect_none "-filename"]
+} else {
+    gdb_test "$cmd -filename" \
 	"-filename requires an argument"
-    if {$variant == "require-delimiter"} {
-	gdb_test "$cmd -filename" [expect_none "-filename"]
-    } else {
-	gdb_test "$cmd -filename" \
-	    "-filename requires an argument"
-    }
+}
 
-    foreach_with_prefix str {
-	"STR"
-	"\"STR\""
-	"\\\"STR"
-	"'STR'"
-	"\\'STR"
-	"\"STR AAA\""
-	"'STR BBB'"
-	"\"STR 'CCC' DDD\""
-	"'STR \"EEE\" FFF'"
-	"\"STR \\\"GGG\\\" HHH\""
-	"'STR \\\'III\\\' JJJ'"
-    } {
-	res_test_gdb_complete_none \
-	    "1 [expect_none ""]" \
-	    "$cmd -filename ${str}"
-	gdb_test "$cmd -filename ${str} --" [expect_filename "${str}" ""]
+foreach_with_prefix str {
+    "STR"
+    "\"STR\""
+    "\\\"STR"
+    "'STR'"
+    "\\'STR"
+    "\"STR AAA\""
+    "'STR BBB'"
+    "\"STR 'CCC' DDD\""
+    "'STR \"EEE\" FFF'"
+    "\"STR \\\"GGG\\\" HHH\""
+    "'STR \\\'III\\\' JJJ'"
+} {
+    res_test_gdb_complete_none \
+	"1 [expect_none ""]" \
+    "$cmd -filename ${str}"
+gdb_test "$cmd -filename ${str} --" [expect_filename "${str}" ""]
 
-	# Completing at "-" after parsing STR should list all options.
-	res_test_gdb_complete_multiple \
-	    "1 [expect_filename "${str}" "-"]" \
-	    "$cmd -filename ${str} " "-" "" $all_options
+# Completing at "-" after parsing STR should list all options.
+res_test_gdb_complete_multiple \
+    "1 [expect_filename "${str}" "-"]" \
+    "$cmd -filename ${str} " "-" "" $all_options
 
-	# Check that only $STR is considered part of the filename's value.
-	# I.e., that we stop parsing the filename at the first
-	# whitespace or after the closing quote of $STR.
-	if {$variant == "require-delimiter"} {
-	    res_test_gdb_complete_none \
-		"1 [expect_filename "${str}" "BAR"]" \
-		"$cmd -filename ${str} BAR"
-	} else {
-	    res_test_gdb_complete_none "0 BAR" "$cmd -filename ${str} BAR"
-	}
-	gdb_test "$cmd -filename ${str} BAR --" "Unrecognized option at: BAR --"
-    }
+# Check that only $STR is considered part of the filename's value.
+# I.e., that we stop parsing the filename at the first
+# whitespace or after the closing quote of $STR.
+if {$variant == "require-delimiter"} {
+    res_test_gdb_complete_none \
+	"1 [expect_filename "${str}" "BAR"]" \
+    "$cmd -filename ${str} BAR"
+} else {
+res_test_gdb_complete_none "0 BAR" "$cmd -filename ${str} BAR"
+}
+gdb_test "$cmd -filename ${str} BAR --" "Unrecognized option at: BAR --"
+}
 }
 
 # Run the options framework tests first.

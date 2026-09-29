@@ -19,9 +19,9 @@ proc hex_for_lang { lang val } {
     set neg_p [regexp ^- $val]
     set val [regsub ^-?0x $val ""]
     if { $lang == "modula-2" } {
-       set val 0[string toupper $val]H
+	set val 0[string toupper $val]H
     } else {
-       set val 0x$val
+	set val 0x$val
     }
     if { $neg_p } {
 	return -$val
@@ -355,7 +355,7 @@ set all_languages [get_set_option_choices "set language"]
 
 gdb_test_no_output "set language unknown"
 gdb_test "p/x 0" \
-	"expression parsing not implemented for language \"Unknown\""
+    "expression parsing not implemented for language \"Unknown\""
 
 # If 1, test each arch.  If 0, test one arch for each sizeof
 # short/int/long/longlong configuration.

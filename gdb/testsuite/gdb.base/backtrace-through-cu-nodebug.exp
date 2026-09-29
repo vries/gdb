@@ -28,26 +28,26 @@ proc prepare_test {has_cfi} {
     if {$has_cfi} {
 	set extension "cfi"
 	if {[gdb_compile "${srcdir}/${subdir}/${srcfile}" \
-	     "${objcallerfile}" \
-	     object [list {additional_flags=-fomit-frame-pointer \
-		 -funwind-tables -fasynchronous-unwind-tables}]] != "" } {
+		 "${objcallerfile}" \
+		 object [list {additional_flags=-fomit-frame-pointer \
+				   -funwind-tables -fasynchronous-unwind-tables}]] != "" } {
 	    untested "couldn't compile"
 	    return false
-      }
+	}
     } else {
 	set extension "no-cfi"
 	if {[gdb_compile "${srcdir}/${subdir}/${srcfile}" \
-	     "${objcallerfile}" \
-	     object [list {additional_flags=-fomit-frame-pointer \
-		 -fno-unwind-tables \
-		 -fno-asynchronous-unwind-tables}]] != "" } {
+		 "${objcallerfile}" \
+		 object [list {additional_flags=-fomit-frame-pointer \
+				   -fno-unwind-tables \
+				   -fno-asynchronous-unwind-tables}]] != "" } {
 	    untested "couldn't compile"
 	    return false
-      }
+	}
     }
     if {[gdb_compile [list "${objmainfile}" \
-	    "${objcallerfile}"] \
-	    "${binfile}-${extension}" binfile {}] != ""} {
+			  "${objcallerfile}"] \
+	     "${binfile}-${extension}" binfile {}] != ""} {
 	untested "couldn't link object files"
 	return false
     }
@@ -63,8 +63,8 @@ proc prepare_test {has_cfi} {
 }
 
 if {[gdb_compile "${srcdir}/${subdir}/${srcfile2}" \
-	"${objmainfile}" \
-	object {debug}] != "" } {
+	 "${objmainfile}" \
+	 object {debug}] != "" } {
     untested "couldn't compile main file"
     return
 }

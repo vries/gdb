@@ -244,7 +244,7 @@ if {[record_full_function "vmov"] == true} {
 	"from register: "
 
     test_one_memory "vmovdqu" "dyn_buf1" \
-	    "0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29" \
+	"0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29" \
 	true "dynamic buffer: "
     test_one_register "vmovdqu" "ymm0" \
 	"0x1f1e1d1c1b1a19181716151413121110, 0x1f1e1d1c1b1a19181716151413121110" \
@@ -446,22 +446,22 @@ if {[record_full_function "vzeroupper"] == true} {
     # the only ones we're setting.
     gdb_test "maint print record-instruction" \
 	[multi_line "Register ymm0h changed: 74565" \
-	    "Register ymm1h changed: 0" \
-	    "Register ymm2h changed: 48879" \
-	    "Register ymm3h changed: ${decimal}" \
-	    "Register ymm4h changed: ${decimal}" \
-	    "Register ymm5h changed: ${decimal}" \
-	    "Register ymm6h changed: ${decimal}" \
-	    "Register ymm7h changed: ${decimal}" \
-	    "Register ymm8h changed: ${decimal}" \
-	    "Register ymm9h changed: ${decimal}" \
-	    "Register ymm10h changed: ${decimal}" \
-	    "Register ymm11h changed: ${decimal}" \
-	    "Register ymm12h changed: ${decimal}" \
-	    "Register ymm13h changed: ${decimal}" \
-	    "Register ymm14h changed: ${decimal}" \
-	    "Register ymm15h changed: 3405707982" \
-	    "Register rip changed: \[^\r\n\]+" ] \
+	     "Register ymm1h changed: 0" \
+	     "Register ymm2h changed: 48879" \
+	     "Register ymm3h changed: ${decimal}" \
+	     "Register ymm4h changed: ${decimal}" \
+	     "Register ymm5h changed: ${decimal}" \
+	     "Register ymm6h changed: ${decimal}" \
+	     "Register ymm7h changed: ${decimal}" \
+	     "Register ymm8h changed: ${decimal}" \
+	     "Register ymm9h changed: ${decimal}" \
+	     "Register ymm10h changed: ${decimal}" \
+	     "Register ymm11h changed: ${decimal}" \
+	     "Register ymm12h changed: ${decimal}" \
+	     "Register ymm13h changed: ${decimal}" \
+	     "Register ymm14h changed: ${decimal}" \
+	     "Register ymm15h changed: 3405707982" \
+	     "Register rip changed: \[^\r\n\]+" ] \
 	"verify vzeroupper recording"
 
     gdb_test "record stop" "Process record is stopped.*" \
@@ -722,19 +722,19 @@ gdb_test_no_output "set \$ymm4.v2_int128 = {0xcafeface, 0xcafeface}" \
     "set ymm4 for vaddsubpd"
 
 if {[record_full_function "vaddsubpd"] == true} {
-   test_one_register "vaddsubpd" "xmm10" \
-       "0xbeef" "xmm10:"
-   test_one_register "vaddsubpd" "xmm2" \
-       "0xbeef" "xmm2:"
+    test_one_register "vaddsubpd" "xmm10" \
+	"0xbeef" "xmm10:"
+    test_one_register "vaddsubpd" "xmm2" \
+	"0xbeef" "xmm2:"
     test_one_register "vaddsubpd" "ymm4" \
-       "0xcafeface, 0xcafeface" "ymm4: "
+	"0xcafeface, 0xcafeface" "ymm4: "
     test_one_register "vaddsubpd" "ymm15" \
-       "0xcafeface, 0xcafeface" "ymm15: "
+	"0xcafeface, 0xcafeface" "ymm15: "
     test_one_register "vaddsubpd" "ymm0" \
-       "0xcafeface, 0xcafeface" "ymm0: "
+	"0xcafeface, 0xcafeface" "ymm0: "
 
     gdb_test "record stop" "Process record is stopped.*" \
-       "delete history for vaddsubpd_test"
+	"delete history for vaddsubpd_test"
 } else {
     untested "couldn't run vaddsubpd tests"
 }
@@ -758,18 +758,18 @@ gdb_test_no_output "set \$ymm4.v2_int128 = {0xcafeface, 0xcafeface}" \
 
 if {[record_full_function "vaddsubps"] == true} {
     test_one_register "vaddsubps" "xmm0" \
-       "0xbeef" "xmm0: "
+	"0xbeef" "xmm0: "
     test_one_register "vaddsubps" "xmm15" \
-       "0xbeef" "xmm15: "
+	"0xbeef" "xmm15: "
     test_one_register "vaddsubps" "ymm4" \
-       "0xcafeface, 0xcafeface" "ymm4: "
+	"0xcafeface, 0xcafeface" "ymm4: "
     test_one_register "vaddsubps" "ymm10" \
-       "0xcafeface, 0xcafeface" "ymm10: "
+	"0xcafeface, 0xcafeface" "ymm10: "
     test_one_register "vaddsubps" "ymm2" \
-       "0xcafeface, 0xcafeface" "ymm2: "
+	"0xcafeface, 0xcafeface" "ymm2: "
 
     gdb_test "record stop" "Process record is stopped.*" \
-       "delete history for vaddsubps_test"
+	"delete history for vaddsubps_test"
 } else {
     untested "couldn't run vaddsubps tests"
 }

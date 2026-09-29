@@ -194,7 +194,7 @@ if {[nodebug_runto inner]} {
 
     set dataglobal_unk_re "dataglobal.*$unk_type_re"
 
-	 #exp                           #fmt #print                                             #ptype/whatis
+    #exp                           #fmt #print                                             #ptype/whatis
     foreach line {
 	{"dataglobal"			""   $dataglobal_unk_re					" = $data_var_type"}
 	{"(int) dataglobal"		""   "= 3"						" = int"}
@@ -289,7 +289,7 @@ if {[nodebug_runto inner]} {
     # Commented out because if we aren't going to xfail the above test
     # ever, why bother with a weaker test?
     #gdb_test "backtrace 10" "#0.*inner.*#1.*#2.*top.*#3.*main.*" \
-	#    "backtrace from inner for externals"
+    #    "backtrace from inner for externals"
 
     # This test is not as obscure as it might look.  `p getenv ("TERM")'
     # is a real-world example, at least on many systems.

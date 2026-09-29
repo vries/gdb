@@ -19,9 +19,9 @@
 require {istarget "riscv64-*-*"}
 
 standard_testfile riscv64-unwind-prologue-with-ld-lw.c \
-		  riscv64-unwind-prologue-with-ld-lw-foo.s
+    riscv64-unwind-prologue-with-ld-lw-foo.s
 if {[prepare_for_testing "failed to prepare" $testfile \
-			 "$srcfile $srcfile2"  nodebug]} {
+	 "$srcfile $srcfile2"  nodebug]} {
     return
 }
 

@@ -69,8 +69,8 @@ foreach reorder {0 1} { with_test_prefix "reorder$reorder" {
     # same.  Such order cannot be guaranteed for GDB in general.
 
     gdb_test "continue" \
-	     "Hardware read watchpoint ${::decimal}: thread\[12\]_rwatch\r\n\r\nValue = 0\r\n${::hex} in thread\[12\]_func .*" \
-	     "continue a"
+	"Hardware read watchpoint ${::decimal}: thread\[12\]_rwatch\r\n\r\nValue = 0\r\n${::hex} in thread\[12\]_func .*" \
+	"continue a"
 
     if {$reorder} {
 	# GDB orders watchpoints by their addresses so inserting new variables
@@ -82,8 +82,8 @@ foreach reorder {0 1} { with_test_prefix "reorder$reorder" {
     }
 
     gdb_test "continue" \
-	     "Hardware read watchpoint ${::decimal}: thread\[12\]_rwatch\r\n\r\nValue = 0\r\n${::hex} in thread\[12\]_func .*" \
-	     "continue b"
+	"Hardware read watchpoint ${::decimal}: thread\[12\]_rwatch\r\n\r\nValue = 0\r\n${::hex} in thread\[12\]_func .*" \
+	"continue b"
 
     # While the debug output itself is not checked in this testcase one bug was
     # found in the DEBUG_INFRUN code path.

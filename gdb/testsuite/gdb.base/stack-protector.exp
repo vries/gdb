@@ -30,7 +30,7 @@ if { !([test_compiler_info "gcc-*"] || [test_compiler_info "clang-*"])
 standard_testfile
 
 set protector_options { "-fno-stack-protector" "-fstack-protector" \
-			"-fstack-protector-all" "-fstack-protector-strong" }
+			    "-fstack-protector-all" "-fstack-protector-strong" }
 
 proc simple_func_break_test { protection } {
     global testfile

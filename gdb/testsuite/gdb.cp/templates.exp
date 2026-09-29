@@ -139,8 +139,8 @@ proc test_template_breakpoints {} {
 	}
 	-re ".*\n> $" {
 	    gdb_test "0" \
-		    "nonsense intended to insure that this test fails" \
-		    "constructor breakpoint (bad menu choices)"
+		"nonsense intended to insure that this test fails" \
+		"constructor breakpoint (bad menu choices)"
 	}
     }
 
@@ -279,7 +279,7 @@ gdb_breakpoint [gdb_get_line_number "Final breakpoint"]
 gdb_continue_to_breakpoint "Final breakpoint"
 
 gdb_test "print fint" \
-   "${::valnum_re} = \\{x = 0, t = 0\\}"
+    "${::valnum_re} = \\{x = 0, t = 0\\}"
 
 # Prevent symbol on address 0x0 being printed.
 gdb_test_no_output "set print symbol off"
@@ -334,9 +334,9 @@ gdb_test_multiple "ptype/r fchar" "ptype fchar" {
     -re "type = (class |)Foo<char> \\{\r\n\[ \t\]*public:\r\n\[ \t\]*int x;\r\n\[ \t\]*char t;\r\n\r\n\[ \t\]*.*char foo\\(int, char\\);\r\n\\}\r\n$gdb_prompt $" {
 	pass "ptype fchar"
     }
-   -re "type = (class |)Foo<char> \\{\r\n\[ \t\]*public:\r\n\[ \t\]*int x;\r\n\[ \t\]*char t;\r\n\r\n\[ \t\]*char foo\\(int, char\\);.*\r\n\\}\r\n$gdb_prompt $" {
-       pass "ptype fchar"
-   }
+    -re "type = (class |)Foo<char> \\{\r\n\[ \t\]*public:\r\n\[ \t\]*int x;\r\n\[ \t\]*char t;\r\n\r\n\[ \t\]*char foo\\(int, char\\);.*\r\n\\}\r\n$gdb_prompt $" {
+	pass "ptype fchar"
+    }
 }
 
 # ptype Foo<volatile char *>
@@ -449,9 +449,9 @@ gdb_test_multiple "ptype/r bazint" "ptype bazint" {
     -re "type = (class |)Baz<int, ?(\\(char\\)|)(115|\\'s\\')> \\{\r\n\[ \t\]*public:\r\n\[ \t\]*int x;\r\n\[ \t\]*int t;\r\n\r\n\[ \t\]*.*int baz\\(int, int\\);\r\n\\}\r\n$gdb_prompt $" {
 	pass "ptype bazint"
     }
-   -re "type = (class |)Baz<int,(\\(char\\)|)(115|\\'s\\')> \\{\r\n\[ \t\]*public:\r\n\[ \t\]*int x;\r\n\[ \t\]*int t;\r\n\r\n\[ \t\]*int baz\\(int, int\\).*;\r\n\\}\r\n$gdb_prompt $" {
-       pass "ptype bazint"
-   }
+    -re "type = (class |)Baz<int,(\\(char\\)|)(115|\\'s\\')> \\{\r\n\[ \t\]*public:\r\n\[ \t\]*int x;\r\n\[ \t\]*int t;\r\n\r\n\[ \t\]*int baz\\(int, int\\).*;\r\n\\}\r\n$gdb_prompt $" {
+	pass "ptype bazint"
+    }
 }
 
 # ptype Baz<char, 'a'>
@@ -543,38 +543,38 @@ gdb_test_multiple "ptype/r siip" "ptype siip" {
 # Check cv qualifiers and substitute parameters.
 
 if {[test_compiler_info {clang-*}]} {
-	setup_kfail "llvm/52262 " "*-*-*"
+    setup_kfail "llvm/52262 " "*-*-*"
 }
 gdb_test "ptype cfoo" [multi_line \
-"type = (class |)Cfoo<double> \\\[with DataT = double\\\] \\{" \
-  "\[ \t\]*public:" \
-    "\[ \t\]*DataT me0;" \
-    "\[ \t\]*const DataT me1;" \
-    "\[ \t\]*const myfloat me2;" \
-    "\[ \t\]*const int me3;" \
-    "" \
-  "\[ \t\]*private:" \
-    "\[ \t\]*typedef float myfloat;" \
-"\\}" \
-] "print type of cfoo"
+			   "type = (class |)Cfoo<double> \\\[with DataT = double\\\] \\{" \
+			   "\[ \t\]*public:" \
+			   "\[ \t\]*DataT me0;" \
+			   "\[ \t\]*const DataT me1;" \
+			   "\[ \t\]*const myfloat me2;" \
+			   "\[ \t\]*const int me3;" \
+			   "" \
+			   "\[ \t\]*private:" \
+			   "\[ \t\]*typedef float myfloat;" \
+			   "\\}" \
+   ] "print type of cfoo"
 
 # Check cv qualifiers and do not substitute.
 
 if {[test_compiler_info {clang-*}]} {
-	setup_kfail "llvm/52262 " "*-*-*"
+    setup_kfail "llvm/52262 " "*-*-*"
 }
 gdb_test "ptype/r cfoo" [multi_line \
-"type = (class |)Cfoo<double> \\{" \
-  "\[ \t\]*public:" \
-    "\[ \t\]*double me0;" \
-    "\[ \t\]*const double me1;" \
-    "\[ \t\]*const Cfoo<double>::myfloat me2;" \
-    "\[ \t\]*const int me3;" \
-    "" \
-  "\[ \t\]*private:" \
-    "\[ \t\]*typedef float myfloat;" \
-"\\}" \
-] "print raw type of cfoo"
+			     "type = (class |)Cfoo<double> \\{" \
+			     "\[ \t\]*public:" \
+			     "\[ \t\]*double me0;" \
+			     "\[ \t\]*const double me1;" \
+			     "\[ \t\]*const Cfoo<double>::myfloat me2;" \
+			     "\[ \t\]*const int me3;" \
+			     "" \
+			     "\[ \t\]*private:" \
+			     "\[ \t\]*typedef float myfloat;" \
+			     "\\}" \
+			    ] "print raw type of cfoo"
 
 # pt Garply<int>
 

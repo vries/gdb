@@ -41,7 +41,7 @@ proc get_func_address { func } {
 	    }
 	}
     }
-  return ""
+    return ""
 }
 
 # Load the file as an executable; GDB should assign non-overlapping
@@ -80,9 +80,9 @@ set caller_addr [get_func_address "caller"]
 if { "${func1_addr}" == "${func2_addr}"
      || "${func1_addr}" == "${func2_addr}"
      || "${func2_addr}" == "${caller_addr}" } {
-  fail "C++ functions have different addresses"
+    fail "C++ functions have different addresses"
 } else {
-  pass "C++ functions have different addresses"
+    pass "C++ functions have different addresses"
 }
 
 # Figure out the names of the sections containing the template
@@ -95,7 +95,7 @@ gdb_test_multiple "info file" "info file" {
 	     && $expect_out(2,string) > $func1_addr } {
 	    set func1_sec $expect_out(3,string)
 	} elseif { $expect_out(1,string) <= $func2_addr
-	    && $expect_out(2,string) > $func2_addr } {
+		   && $expect_out(2,string) > $func2_addr } {
 	    set func2_sec $expect_out(3,string)
 	}
 	exp_continue
@@ -121,10 +121,10 @@ clean_restart
 set host_binfile [gdb_remote_download host $binfile]
 
 gdb_test "add-symbol-file $host_binfile 0 -s ${func1_sec} 0x10000 -s ${func2_sec} 0x20000" \
-	"Reading symbols from .*${testfile}\\.o\\.\\.\\.(|\r\nUsing host libthread_db library .*libthread_db.so.*\\.)" \
-	"add-symbol-file ${testfile}.o" \
-	"add symbol table from file \".*${testfile}\\.o\" at.*\\(y or n\\) " \
-	"y"
+    "Reading symbols from .*${testfile}\\.o\\.\\.\\.(|\r\nUsing host libthread_db library .*libthread_db.so.*\\.)" \
+    "add-symbol-file ${testfile}.o" \
+    "add symbol table from file \".*${testfile}\\.o\" at.*\\(y or n\\) " \
+    "y"
 
 # Make sure the function addresses were updated.
 gdb_test "break *$func1_name" \

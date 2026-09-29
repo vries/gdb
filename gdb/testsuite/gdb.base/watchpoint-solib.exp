@@ -64,9 +64,9 @@ if {!$allow_hw_watchpoint_tests_p} {
 # in a explicitly loaded shared library, and then
 # re-run the application, gdb does not crash.
 gdb_test_multiple "break foo" "set pending breakpoint" {
-     -re ".*Make breakpoint pending.*y or \\\[n\\\]. $" {
-	    gdb_test "y" "Breakpoint.*foo.*pending." "set pending breakpoint"
-     }
+    -re ".*Make breakpoint pending.*y or \\\[n\\\]. $" {
+	gdb_test "y" "Breakpoint.*foo.*pending." "set pending breakpoint"
+    }
 }
 
 gdb_test "continue" ".*Breakpoint 2.*foo.*" "continue to foo"

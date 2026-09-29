@@ -86,8 +86,8 @@ gdb_test "frame 3" "No frame at level 3\."
 
 # Find an address that matches no frame.
 set no_frame_address [ get_new_address [list $frame_0_address \
-					     $frame_1_address \
-					     $frame_2_address] ]
+					    $frame_1_address \
+					    $frame_2_address] ]
 
 # Select frame using 'level' specification.
 gdb_test "frame level 0" "#0  frame_2.*"
@@ -181,7 +181,7 @@ with_test_prefix "second frame_2 breakpoint" {
     gdb_test "frame function recursive" "#1  $hex in recursive.*" \
 	"select frame for function recursive, first attempt"
     gdb_test "frame function recursive" "#1  $hex in recursive.*" \
-		"select frame for function recursive, second attempt"
+	"select frame for function recursive, second attempt"
     gdb_test "frame function main" "#4  $hex in main.*"
     gdb_test "frame function recursive" "#1  $hex in recursive.*" \
 	"select frame for function recursive, third attempt"

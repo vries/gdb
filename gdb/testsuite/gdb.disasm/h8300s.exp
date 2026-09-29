@@ -22,8 +22,8 @@ set testfile "h8300s"
 set srcfile ${srcdir}/${subdir}/${testfile}.s
 set binfile ${objdir}/${subdir}/${testfile}
 if  { [gdb_compile "${srcfile}" "${binfile}" executable {debug additional_flags=-ms}] != "" } {
-     untested "failed to compile"
-     return
+    untested "failed to compile"
+    return
 }
 
 proc all_set_machine_h8300s { } {

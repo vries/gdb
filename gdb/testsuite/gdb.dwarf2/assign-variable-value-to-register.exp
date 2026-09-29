@@ -66,7 +66,7 @@ Dwarf::assemble $dwarf_file {
 }
 
 if { [prepare_for_testing "failed to prepare" $testfile \
-	[list $srcfile $dwarf_file] {nodebug}] } {
+	  [list $srcfile $dwarf_file] {nodebug}] } {
     return
 }
 

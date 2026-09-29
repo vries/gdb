@@ -55,8 +55,8 @@ gdb_test "gu (print (value->lazy-string null #:length -2))" \
     "bad length"
 
 foreach var_spec { { "ptr" "pointer" "const char \\*" -1 } \
-		   { "array" "array" "const char \\[6\\]" 6 } \
-		   { "typedef_ptr" "typedef pointer" "pointer" -1 } } {
+		       { "array" "array" "const char \\[6\\]" 6 } \
+		       { "typedef_ptr" "typedef pointer" "pointer" -1 } } {
     set var [lindex $var_spec 0]
     set value [lindex $var_spec 1]
     set type [lindex $var_spec 2]

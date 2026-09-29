@@ -27,7 +27,7 @@ set outputdir [standard_output_file {}]
 
 # Make a copy source file that we can move around
 if { [catch {file copy -force ${srcdir}/${subdir}/${srcfile} \
-	     [standard_output_file ${sourcetmp}]}] != 0 } {
+		 [standard_output_file ${sourcetmp}]}] != 0 } {
     error "create temporary file"
     return
 }

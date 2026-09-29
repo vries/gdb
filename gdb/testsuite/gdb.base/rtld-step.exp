@@ -83,7 +83,7 @@ set binfile_rtld [standard_output_file ${rtld_basename}]
 # find -lc" is a clue that you're missing a static version of libc.)
 
 set rtld_flags [list debug additional_flags=[list -static-pie -fPIE \
-						  -nostdlib -static -lc]]
+						 -nostdlib -static -lc]]
 
 if { ![gdb_can_simple_compile static-pie-static-libc \
 	   {

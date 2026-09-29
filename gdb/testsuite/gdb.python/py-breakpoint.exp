@@ -841,7 +841,7 @@ proc_with_prefix test_bkpt_probe {} {
     global decimal hex testfile srcfile
 
     if { [prepare_for_testing "failed to prepare" ${testfile}-probes \
-	    ${srcfile} {debug c++ additional_flags=-DUSE_PROBES}] } {
+	      ${srcfile} {debug c++ additional_flags=-DUSE_PROBES}] } {
 	return -1
     }
 

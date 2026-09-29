@@ -53,7 +53,7 @@ with_test_prefix "skip-cf-protection" {
     set opts {debug additional_flags=-fcf-protection=full}
 
     if { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable \
-	$opts] != "" } {
+	      $opts] != "" } {
 	untested "failed to compile"
 	return
     }
@@ -75,7 +75,7 @@ with_test_prefix "skip-cf-protection-stackalign" {
     }
 
     if { [prepare_for_testing "failed to prepare" "${testfile}-stackalign" \
-	$srcfile2 [list optimize=-O0 additional_flags=-fcf-protection=full]] } {
+	      $srcfile2 [list optimize=-O0 additional_flags=-fcf-protection=full]] } {
 	return
     }
 

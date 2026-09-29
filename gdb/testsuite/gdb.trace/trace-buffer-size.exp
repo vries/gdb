@@ -46,56 +46,56 @@ gdb_test_multiple "tstatus" $test {
 # If we did not get the default size then there is no point in running the
 # tests below.
 if { $default_size < 0 } {
-  return
+    return
 }
 
 # Change buffer size to 'BUFFER_SIZE'.
 gdb_test_no_output \
-  "set trace-buffer-size $BUFFER_SIZE" \
-  "set trace buffer size 1"
+    "set trace-buffer-size $BUFFER_SIZE" \
+    "set trace buffer size 1"
 
 gdb_test "tstatus" \
-  ".*Trace buffer has $decimal bytes of $BUFFER_SIZE bytes free.*" \
-  "tstatus check 2"
+    ".*Trace buffer has $decimal bytes of $BUFFER_SIZE bytes free.*" \
+    "tstatus check 2"
 
 gdb_test "show trace-buffer-size $BUFFER_SIZE" \
-  "Requested size of trace buffer is $BUFFER_SIZE.*" \
-  "show trace buffer size"
+    "Requested size of trace buffer is $BUFFER_SIZE.*" \
+    "show trace buffer size"
 
 # -1 means "no limit on GDB's end.  Let the target choose."
 gdb_test_no_output \
-  "set trace-buffer-size -1" \
-  "set trace buffer size 2"
+    "set trace-buffer-size -1" \
+    "set trace buffer size 2"
 
 # "unlimited" means the same.
 gdb_test_no_output "set trace-buffer-size unlimited"
 
 # Test that tstatus gives us default buffer size now.
 gdb_test "tstatus" \
-  ".*Trace buffer has $decimal bytes of $default_size bytes free.*" \
-  "tstatus check 3"
+    ".*Trace buffer has $decimal bytes of $default_size bytes free.*" \
+    "tstatus check 3"
 
 gdb_test_no_output \
-  "set trace-buffer-size $BUFFER_SIZE" \
-  "set trace buffer size 3"
+    "set trace-buffer-size $BUFFER_SIZE" \
+    "set trace buffer size 3"
 
 # We set trace buffer to very small size.  Then after running trace,
 # we check if it is full.  This will show if setting trace buffer
 # size really worked.
 gdb_breakpoint ${srcfile}:[gdb_get_line_number "breakpoint1"]
 gdb_test "trace test_function" \
-  "Tracepoint ${::decimal} at .*" \
-  "set tracepoint at test_function"
+    "Tracepoint ${::decimal} at .*" \
+    "set tracepoint at test_function"
 gdb_trace_setactions "Set action for trace point 1" "" \
-  "collect var" "^$"
+    "collect var" "^$"
 gdb_test_no_output "tstart" \
     "tstart with very small trace buffer"
 gdb_test "continue" \
-  "Continuing.*Breakpoint $decimal.*" \
-  "run trace experiment 1"
+    "Continuing.*Breakpoint $decimal.*" \
+    "run trace experiment 1"
 gdb_test "tstatus" \
-  ".*Trace stopped because the buffer was full.*" \
-  "buffer full check 1"
+    ".*Trace stopped because the buffer was full.*" \
+    "buffer full check 1"
 
 # Use the default size -- the trace buffer should not end up
 # full this time
@@ -103,16 +103,16 @@ clean_restart ${testfile}
 runto_main
 gdb_breakpoint ${srcfile}:[gdb_get_line_number "breakpoint1"]
 gdb_test "trace test_function" \
-  "Tracepoint ${::decimal} at .*" \
-  "set tracepoint at test_function again"
+    "Tracepoint ${::decimal} at .*" \
+    "set tracepoint at test_function again"
 gdb_trace_setactions "Set action for trace point 2" "" \
-  "collect var" "^$"
+    "collect var" "^$"
 gdb_test_no_output "tstart" \
     "tstart with default trace buffer size"
 gdb_test "continue" \
-  "Continuing.*Breakpoint $decimal.*" \
-  "run trace experiment 2"
+    "Continuing.*Breakpoint $decimal.*" \
+    "run trace experiment 2"
 gdb_test "tstatus" \
-  ".*Trace is running on the target.*" \
-  "buffer full check 2"
+    ".*Trace is running on the target.*" \
+    "buffer full check 2"
 gdb_test_no_output "tstop"

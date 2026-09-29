@@ -41,8 +41,8 @@ gdb_load_shlib $binfile_lib
 
 # Set a breakpoint in the binary.
 gdb_test "br foo2" \
-	 "Breakpoint.*file.*${testfile}\\.c.*" \
-	 "foo2 in main"
+    "Breakpoint.*file.*${testfile}\\.c.*" \
+    "foo2 in main"
 
 delete_breakpoints
 
@@ -52,15 +52,15 @@ if {![runto_main]} {
 
 # Break in the library.
 gdb_test "br foo" \
-	 "Breakpoint.*file.*${libname}\\.c.*" \
-	 "foo in libmd"
+    "Breakpoint.*file.*${libname}\\.c.*" \
+    "foo in libmd"
 
 gdb_test "continue" \
-	 "Continuing.*"
+    "Continuing.*"
 
 # This symbol is now looked up in the ELF library and the binary.
 gdb_test "br foo2" \
-	 "Breakpoint.*: foo2. .2 locations..*" \
-	 "foo2 in mdlib"
+    "Breakpoint.*: foo2. .2 locations..*" \
+    "foo2 in mdlib"
 
 gdb_exit

@@ -31,10 +31,10 @@ proc compile_jit_main {main_srcfile main_binfile options} {
     global jit_load_address jit_load_increment
 
     set options [concat \
-	$options \
-	additional_flags=-DLOAD_ADDRESS=$jit_load_address \
-	additional_flags=-DLOAD_INCREMENT=$jit_load_increment \
-	debug]
+		     $options \
+		     additional_flags=-DLOAD_ADDRESS=$jit_load_address \
+		     additional_flags=-DLOAD_INCREMENT=$jit_load_increment \
+		     debug]
 
     if { [gdb_compile ${main_srcfile} ${main_binfile} \
 	      executable $options] != "" } {
@@ -56,10 +56,10 @@ proc compile_jit_elf_main_as_so {main_solib_srcfile main_solib_binfile options} 
     global jit_load_address jit_load_increment
 
     set options [concat \
-	$options \
-	additional_flags=-DLOAD_ADDRESS=$jit_load_address \
-	additional_flags=-DLOAD_INCREMENT=$jit_load_increment \
-	debug]
+		     $options \
+		     additional_flags=-DLOAD_ADDRESS=$jit_load_address \
+		     additional_flags=-DLOAD_INCREMENT=$jit_load_increment \
+		     debug]
 
     if { [gdb_compile_shlib ${main_solib_srcfile} ${main_solib_binfile} \
 	      $options] != "" } {

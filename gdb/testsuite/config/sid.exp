@@ -80,12 +80,12 @@ proc sid_start {} {
     eval $post_spawn
 
     # Don't do the following any more; it breaks with "runtest ... < /dev/null"
-#    expect_background {
-#       -re \[^\n\]*\n {
-#           regsub "\n" $expect_out(buffer) {} msg
-#           verbose "SID: $msg" 2
-#       }
-#    }
+    #    expect_background {
+    #       -re \[^\n\]*\n {
+    #           regsub "\n" $expect_out(buffer) {} msg
+    #           verbose "SID: $msg" 2
+    #       }
+    #    }
 
     # There should be no need to sleep to give SID time to start;
     # GDB would wait for a fair while for the stub to respond.

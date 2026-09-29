@@ -35,7 +35,7 @@ set jit_reader_header [standard_output_file "../../../../../gdb/jit-reader.h"]
 set jit_reader_flag "-DJIT_READER_H=\"$jit_reader_header\""
 
 if  { [gdb_compile "${srcdir}/${subdir}/${jit_host_src}" "${jit_host_bin}" \
-       executable  [list debug additional_flags=$jit_reader_flag]] != "" } {
+	   executable  [list debug additional_flags=$jit_reader_flag]] != "" } {
     untested "failed to compile"
     return
 }
@@ -248,7 +248,7 @@ proc jit_reader_test {} {
 	    # Check that jitted symbol completion works
 	    gdb_test "complete break jit_func" \
 		[multi_line "break jit_function_add" \
-		    "break jit_function_stack_mangle" ] \
+		     "break jit_function_stack_mangle" ] \
 
 	    # Check that breakpoint can be set on jitted function
 	    gdb_test "break jit_function_add" \

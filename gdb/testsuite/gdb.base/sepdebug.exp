@@ -184,26 +184,26 @@ gdb_test "" \
 # run until the breakpoint at a line number
 #
 gdb_test continue "Continuing\\..*Breakpoint ${::decimal}, main \\(argc=.*, argv=.*, envp=.*\\) at .*$srcfile:$bp_location1.*$bp_location1\[\t \]+printf.*factorial.*" \
-			"run until breakpoint set at a line number"
+    "run until breakpoint set at a line number"
 
 #
 # Run until the breakpoint set in a function in a file
 #
 for {set i 6} {$i >= 1} {incr i -1} {
-	gdb_test continue "Continuing\\..*Breakpoint ${::decimal}, factorial \\(value=$i\\) at .*$srcfile:$bp_location7.*$bp_location7\[\t \]+.*if .value > 1. \{.*" \
-			"run until file:function($i) breakpoint"
+    gdb_test continue "Continuing\\..*Breakpoint ${::decimal}, factorial \\(value=$i\\) at .*$srcfile:$bp_location7.*$bp_location7\[\t \]+.*if .value > 1. \{.*" \
+	"run until file:function($i) breakpoint"
 }
 
 #
 # Run until the breakpoint set at a quoted function
 #
 gdb_test continue "Continuing\\..*Breakpoint ${::decimal}, (${::hex} in )?marker2 \\(a=43\\) at .*$srcfile:$bp_location8.*" \
-		"run until quoted breakpoint"
+    "run until quoted breakpoint"
 #
 # run until the file:function breakpoint at a line number in a file
 #
 gdb_test continue "Continuing\\..*Breakpoint ${::decimal}, main \\(argc=.*, argv=.*, envp=.*\\) at .*$srcfile:$bp_location2.*$bp_location2\[\t \]+argc = \\(argc == 12345\\);.*" \
-		"run until file:linenum breakpoint"
+    "run until file:linenum breakpoint"
 
 # Test break at offset +1
 set bp_location10 [gdb_get_line_number "set breakpoint 10 here"]
@@ -234,7 +234,7 @@ gdb_test "tbreak -q main" "Temporary breakpoint.*at.* file .*$srcfile, line.*" "
 #
 
 gdb_test "tbreak $srcfile:factorial" "Temporary breakpoint.*at.* file .*$srcfile, line.*" \
-	"Temporary breakpoint function in file"
+    "Temporary breakpoint function in file"
 
 #
 # test break at line number
@@ -338,7 +338,7 @@ gdb_test_multiple "break $bp_location1" \
 	-re "Breakpoint (\[0-9\]*) at .*, line $bp_location1.*$gdb_prompt $" {
 	    pass "set to-be-silent break bp_location1"
 	}
-}
+    }
 
 gdb_test "commands $expect_out(1,string)\nsilent\nend" ">end" "set silent break bp_location1"
 
@@ -537,14 +537,14 @@ proc test_next_with_recursion {} {
     # kind of knowledge that belongs in this file.
 
     gdb_test next "\[0-9\]*\[\t \]+return \\(value\\);.*" \
-	    "next over recursive call"
+	"next over recursive call"
 
     # OK, we should be back in the same stack frame we started from.
     # Do a backtrace just to confirm.
 
     gdb_test "backtrace" \
-	    "#0\[ \t\]+ factorial .value=120.*\r\n#1\[ \t\]+ \[0-9a-fx\]+ in factorial .value=6..*" \
-	    "backtrace from factorial(5.1)"
+	"#0\[ \t\]+ factorial .value=120.*\r\n#1\[ \t\]+ \[0-9a-fx\]+ in factorial .value=6..*" \
+	"backtrace from factorial(5.1)"
 
     if { ![target_info exists gdb,noresults] } {
 	gdb_continue_to_end "recursive next test"

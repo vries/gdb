@@ -292,8 +292,8 @@ gdb_test_multiple "explore struct SimpleStruct" "" {
 }
 
 gdb_test_multiple "explore union SimpleUnion" "" {
-  -re ".*[compound_type_description $SU {union}].*$SU_fields_types.*" {
-      pass "explore union SimpleUnion"
+    -re ".*[compound_type_description $SU {union}].*$SU_fields_types.*" {
+	pass "explore union SimpleUnion"
 	gdb_test_multiple "0" "explore type union SimpleUnion field 0" {
 	    -re ".*[child_scalar_type_description {field 'i' of 'union SimpleUnion'} {int}].*" {
 		pass "explore type union SimpleUnion field 0"
@@ -339,7 +339,7 @@ gdb_test_multiple "explore union SimpleUnion" "" {
 		pass "return to GDB prompt from union SimpleUnion"
 	    }
 	}
-  }
+    }
 }
 
 gdb_test_multiple "explore SS" "" {

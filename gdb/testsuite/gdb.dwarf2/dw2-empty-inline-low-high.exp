@@ -110,7 +110,7 @@ gdb_test "continue" \
 set foo_start [get_hexadecimal_valueof "&main_1" "*UNKNOWN*" \
 		   "get address of foo start"]
 set foo_end [get_hexadecimal_valueof "&main_1 + 1" "*UNKNOWN*" \
-		   "get address of foo end"]
+		 "get address of foo end"]
 
 gdb_test "maintenance info blocks" \
     [multi_line \

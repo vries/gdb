@@ -341,10 +341,10 @@ test_set "set variable v_struct1.v_float_member=4.0" "print v_struct1.v_float_me
 test_set "set variable v_struct1.v_double_member=5.0" "print v_struct1.v_double_member" ".*.\[0-9\]* = 5"        "set variable structure double member"
 
 gdb_test "print v_struct1" \
-  ".*.\[0-9\]* = \{.*v_char_member = 104 \'h\',.*v_short_member = 1,\
+    ".*.\[0-9\]* = \{.*v_char_member = 104 \'h\',.*v_short_member = 1,\
 .*v_int_member = 2,.*\
 v_long_member = 3,.*v_float_member = 4,.*v_double_member = 5.*\}" \
-  "set print structure #1"
+    "set print structure #1"
 
 # Some believe that the following  should be an error.  GCC extensions for
 # structure constants require the type of the structure to be specified, as in
@@ -361,27 +361,27 @@ set timeout 60
 
 # Change the values
 test_set "set variable v_struct1 = {32, 33, 34, 35, 36, 37}" \
-  "print v_struct1" \
-  ".*.\[0-9\]* = \\{.*v_char_member = 32 \' \',.*v_short_member = 33,\
+    "print v_struct1" \
+    ".*.\[0-9\]* = \\{.*v_char_member = 32 \' \',.*v_short_member = 33,\
 .*v_int_member = 34,.*\
 v_long_member = 35,.*v_float_member = 36,.*v_double_member = 37.*\\}" \
-  "set print structure #2"
+    "set print structure #2"
 
 # Change them back
 test_set "set variable v_struct1 = {'h', 1, 2, 3, 4.0, 5.0}" \
-  "print v_struct1" \
-  ".*.\[0-9\]* = \\{.*v_char_member = 104 \'h\',.*v_short_member = 1,\
+    "print v_struct1" \
+    ".*.\[0-9\]* = \\{.*v_char_member = 104 \'h\',.*v_short_member = 1,\
 .*v_int_member = 2,.*\
 v_long_member = 3,.*v_float_member = 4,.*v_double_member = 5.*\\}" \
-  "set print structure #3"
+    "set print structure #3"
 
 #
 # test "set variable" for nested struct
 #
 test_set "set variable v_struct3 = {1, {'h', 1, 2, 3, 4.0, 5.0}, 37}" \
-  "print v_struct3" \
+    "print v_struct3" \
     ".*.\[0-9\]* = \\{.*v_long_member = 1,.*t = \\{.*v_char_member = 104 \'h\',.*v_short_member = 1,.*v_int_member = 2,.*v_long_member = 3,.*v_float_member = 4,.*v_double_member = 5.*\\},.*v_char_member = 37 \'%\'\\}" \
-  "set print structure #4"
+    "set print structure #4"
 
 set timeout $prev_timeout
 

@@ -30,9 +30,9 @@ proc do_test { debug } {
 	lappend opts debug
 
 	if {[prepare_for_testing_full "failed to prepare" \
-		[list ${::testfile}-${debug} $opts \
-		    $::srcfile [list nodebug] \
-		    $::srcfile2 [list debug]]]} {
+		 [list ${::testfile}-${debug} $opts \
+		      $::srcfile [list nodebug] \
+		      $::srcfile2 [list debug]]]} {
 	    return -1
 	}
 
@@ -44,7 +44,7 @@ proc do_test { debug } {
 
 	gdb_test "list ." \
 	    .*[string_to_regexp \
-		 "This testcase is part of GDB, the GNU debugger."].* \
+		   "This testcase is part of GDB, the GNU debugger."].* \
 	    "print before start"
 
 	with_test_prefix "after list" {
@@ -57,7 +57,7 @@ proc do_test { debug } {
 
 	set executable ${::testfile}-none
 	if {[build_executable "failed to prepare" ${executable} \
-		[list $::srcfile $::srcfile2] $opts]} {
+		 [list $::srcfile $::srcfile2] $opts]} {
 	    return -1
 	}
 

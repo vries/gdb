@@ -37,5 +37,5 @@ gdb_test_no_output "set may-call-functions on"
 # Call function (causing the program to exit), and see if gdb handles
 # it properly.
 gdb_test "call callexit()" \
-	"The program being debugged exited.*" \
-	"inferior function call terminated program"
+    "The program being debugged exited.*" \
+    "inferior function call terminated program"

@@ -33,9 +33,9 @@ file mkdir $root/dd/ee/ff
 # the new directory tree, and the global srcfile* variable is updated.
 # The initial srcfile is not copied over.
 foreach spec {{srcfile2 aa/bb} \
-	      {srcfile3 cc/bb} \
-	      {srcfile4 dd/ee} \
-	      {srcfile5 dd/ee/ff}} {
+		  {srcfile3 cc/bb} \
+		  {srcfile4 dd/ee} \
+		  {srcfile5 dd/ee/ff}} {
     set var [lindex $spec 0]
     set dir [lindex $spec 1]
     set src [set $var]
@@ -99,7 +99,7 @@ proc compile_test { destfile relative_filenames } {
 # source filenames in the output, or false if we expect to see
 # absolute filenames.
 proc run_test { file_glob skip_func1 skip_func2 skip_func3 skip_func4 \
-		relative_src_filenames testfile } {
+		    relative_src_filenames testfile } {
     clean_restart $testfile
 
     if { ![runto_main] } {
@@ -171,23 +171,23 @@ proc run_test { file_glob skip_func1 skip_func2 skip_func3 skip_func4 \
     }
 }
 
-    #                        Should Function Be Skipped?
-    #     Glob               func1  func2  func3  func4
+#                        Should Function Be Skipped?
+#     Glob               func1  func2  func3  func4
 set test_specs [list \
-    [list xxx                false  false  false  false ] \
-    [list file.?             true   true   true   true  ] \
-    [list aa/bb*/file*.*c*   true   false  false  false ] \
-    [list *.c                true   true   true   true  ] \
-    [list bb/*.c             true   true   false  false ] \
-    [list ee/*.c             false  false  true   false ] \
-    [list ee/**/*.c          false  false  true   true  ] \
-    [list ee/ff/*.c          false  false  false  true  ] \
-    [list dd/**/**/*.c       false  false  true   true  ] \
-    [list **/**/**/*.c       true   true   true   true  ] \
-    [list $root/aa/bb/*.c    true   false  false  false ] \
-    [list $root/**/*.c       true   true   true   true  ] \
-    [list $root/**           true   true   true   true  ] \
-]
+		    [list xxx                false  false  false  false ] \
+		    [list file.?             true   true   true   true  ] \
+		    [list aa/bb*/file*.*c*   true   false  false  false ] \
+		    [list *.c                true   true   true   true  ] \
+		    [list bb/*.c             true   true   false  false ] \
+		    [list ee/*.c             false  false  true   false ] \
+		    [list ee/**/*.c          false  false  true   true  ] \
+		    [list ee/ff/*.c          false  false  false  true  ] \
+		    [list dd/**/**/*.c       false  false  true   true  ] \
+		    [list **/**/**/*.c       true   true   true   true  ] \
+		    [list $root/aa/bb/*.c    true   false  false  false ] \
+		    [list $root/**/*.c       true   true   true   true  ] \
+		    [list $root/**           true   true   true   true  ] \
+		   ]
 
 foreach_with_prefix relative_compile_filenames { true false } {
     if { $relative_compile_filenames } {

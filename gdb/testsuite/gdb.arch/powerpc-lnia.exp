@@ -30,12 +30,12 @@ set retval 0
 standard_testfile .s
 
 if { [prepare_for_testing "failed to prepare" $testfile "$srcfile" \
-      {debug quiet}] } {
+	  {debug quiet}] } {
     return
 }
 
 if {![runto_main]} {
-      return
+    return
 }
 
 set before_pc 0

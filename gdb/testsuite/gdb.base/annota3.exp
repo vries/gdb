@@ -89,7 +89,7 @@ send_gdb "info break\n"
 gdb_expect_list "breakpoint info" "$gdb_prompt$" [concat {
     "\r\n\032\032post-prompt\r\n"
     "Num     Type           Disp Enb Address    +What\r\n" } [list \
-    "1       breakpoint     keep y   0x\[0-9a-zA-Z\]+ +in main at .*annota3.c:$main_line\r\n"]]
+								  "1       breakpoint     keep y   0x\[0-9a-zA-Z\]+ +in main at .*annota3.c:$main_line\r\n"]]
 
 
 #
@@ -104,10 +104,10 @@ gdb_expect_list "run until main breakpoint" "$gdb_prompt$" [concat {
     "\r\n"
     "Breakpoint 1, "
     "\r\n\032\032frame-begin 0 0x\[0-9a-z\]+\r\n" } [list \
-    "main \\(\\) at .*annota3.c:$main_line\r\n"] [list \
-    "\r\n\032\032source.*annota3.c:$main_line:.*:beg:0x\[0-9a-z\]+\r\n"] {
-    "\r\n\032\032stopped\r\n"
-}]
+							 "main \\(\\) at .*annota3.c:$main_line\r\n"] [list \
+													   "\r\n\032\032source.*annota3.c:$main_line:.*:beg:0x\[0-9a-z\]+\r\n"] {
+													       "\r\n\032\032stopped\r\n"
+													   }]
 
 #
 # Let's do a next, to get to a point where the array is initialized
@@ -287,17 +287,17 @@ if {![is_remote host]} {
 
 send_gdb "run\n"
 gdb_expect {
-  -re "pre-query.*already.*\\(y or n\\).*query\r\n" {
-	 send_gdb "y\n"
-	 gdb_expect {
-	     -re ".*post-query.*$gdb_prompt$" \
-		     { pass "re-run" }
-	     -re ".*$gdb_prompt$"  { fail "re-run" }
-	     timeout { fail "re-run (timeout)" }
-	 }
-     }
-  -re ".*$gdb_prompt$"  { fail "re-run" }
-  timeout { fail "re-run (timeout)" }
+    -re "pre-query.*already.*\\(y or n\\).*query\r\n" {
+	send_gdb "y\n"
+	gdb_expect {
+	    -re ".*post-query.*$gdb_prompt$" \
+		{ pass "re-run" }
+	    -re ".*$gdb_prompt$"  { fail "re-run" }
+	    timeout { fail "re-run (timeout)" }
+	}
+    }
+    -re ".*$gdb_prompt$"  { fail "re-run" }
+    timeout { fail "re-run (timeout)" }
 }
 
 #
@@ -327,11 +327,11 @@ gdb_expect_list "annotate ignore count change" "$gdb_prompt$" [concat {
     "\r\n"
     "Breakpoint 5, "
     "\r\n\032\032frame-begin 0 0x\[0-9a-z\]+\r\n" } [list \
-    "main \\(\\) at .*annota3.c:$value_inc_line\r\n"] [list \
-    "\r\n\032\032source .*annota3.c:$value_inc_line:${::decimal}:beg:0x\[0-9a-z\]+\r\n"] {
-    "1: value = 11\r\n"
-    "\r\n\032\032stopped\r\n"
-}]
+							 "main \\(\\) at .*annota3.c:$value_inc_line\r\n"] [list \
+														"\r\n\032\032source .*annota3.c:$value_inc_line:${::decimal}:beg:0x\[0-9a-z\]+\r\n"] {
+														    "1: value = 11\r\n"
+														    "\r\n\032\032stopped\r\n"
+														}]
 
 # check that ignore command is working, or the above can provide
 # misleading assurance ...
@@ -351,10 +351,10 @@ send_gdb "next\n"
 gdb_expect_list "breakpoint ignore count" "$gdb_prompt$" [concat {
     "\r\n\032\032post-prompt\r\n"
     "\r\n\032\032starting\r\n" } [list \
-    "\r\n\032\032source.*annota3.c:$after_loop_line:${::decimal}:beg:0x\[0-9a-z\]+\r\n"] {
-    "1: value = 12\r\n"
-    "\r\n\032\032stopped\r\n"
-}]
+				      "\r\n\032\032source.*annota3.c:$after_loop_line:${::decimal}:beg:0x\[0-9a-z\]+\r\n"] {
+					  "1: value = 12\r\n"
+					  "\r\n\032\032stopped\r\n"
+				      }]
 
 # Get the inferior's PID for later.
 

@@ -154,24 +154,24 @@ with_test_prefix "iterations equals to counter" {
 # Record the hit times of each tracepoint in this array.
 array set tracepoint_hits { }
 for { set i $tpnum } { $i < $tpnum + 2 } { incr i } {
-  set tracepoint_hits($i) 0
+    set tracepoint_hits($i) 0
 }
 
 while { 1 } {
-   set test "tfind"
-   set idx 0
-   gdb_test_multiple $test $test {
+    set test "tfind"
+    set idx 0
+    gdb_test_multiple $test $test {
 	-re "Found trace frame $decimal, tracepoint ($decimal).*\r\n$gdb_prompt $" {
 	    set idx [expr {$expect_out(1,string)}]
 	    incr tracepoint_hits($idx)
 	}
-       -re "Target failed to find requested trace frame\..*\r\n$gdb_prompt $" {
-	   set idx 0
-       }
-   }
-   if {$idx == 0} {
+	-re "Target failed to find requested trace frame\..*\r\n$gdb_prompt $" {
+	    set idx 0
+	}
+    }
+    if {$idx == 0} {
 	break
-   }
+    }
 }
 
 # Step 3, check the number of collections on each tracepoint.

@@ -141,16 +141,16 @@ foreach func {caller callee main dummy_func} {
 
     set found 0
     gdb_test_multiple "p $func" "" {
-       -re -wrap $re_found {
-	   set found 1
-       }
-       -re -wrap "" {
-       }
+	-re -wrap $re_found {
+	    set found 1
+	}
+	-re -wrap "" {
+	}
     }
 
     if {!$found} {
-       unsupported "couldn't find function $func"
-       return
+	unsupported "couldn't find function $func"
+	return
     }
 }
 

@@ -97,13 +97,13 @@ foreach bt_cmd { "bt" "bt -no-filters" } {
 		"Register cache flushed\\."
 	    gdb_test_lines "$bt_cmd" "backtrace when the unwind is broken at frame 5" \
 		[multi_line \
-		    "#0 \[^\r\n\]* inline_func \\(\\) at \[^\r\n\]+" \
-		    "#1 \[^\r\n\]* normal_func \\(\\) at \[^\r\n\]+" \
-		    "#2 \[^\r\n\]* inline_func \\(\\) at \[^\r\n\]+" \
-		    "#3 \[^\r\n\]* normal_func \\(\\) at \[^\r\n\]+" \
-		    "#4 \[^\r\n\]* inline_func \\(\\) at \[^\r\n\]+" \
-		    "#5 \[^\r\n\]* normal_func \\(\\) at \[^\r\n\]+" \
-		    "Backtrace stopped: previous frame identical to this frame \\(corrupt stack\\?\\)"]
+		     "#0 \[^\r\n\]* inline_func \\(\\) at \[^\r\n\]+" \
+		     "#1 \[^\r\n\]* normal_func \\(\\) at \[^\r\n\]+" \
+		     "#2 \[^\r\n\]* inline_func \\(\\) at \[^\r\n\]+" \
+		     "#3 \[^\r\n\]* normal_func \\(\\) at \[^\r\n\]+" \
+		     "#4 \[^\r\n\]* inline_func \\(\\) at \[^\r\n\]+" \
+		     "#5 \[^\r\n\]* normal_func \\(\\) at \[^\r\n\]+" \
+		     "Backtrace stopped: previous frame identical to this frame \\(corrupt stack\\?\\)"]
 	}
 
 	with_test_prefix "cycle at level 3" {
@@ -113,11 +113,11 @@ foreach bt_cmd { "bt" "bt -no-filters" } {
 		"Register cache flushed\\."
 	    gdb_test_lines "$bt_cmd" "backtrace when the unwind is broken at frame 3" \
 		[multi_line \
-		    "#0 \[^\r\n\]* inline_func \\(\\) at \[^\r\n\]+" \
-		    "#1 \[^\r\n\]* normal_func \\(\\) at \[^\r\n\]+" \
-		    "#2 \[^\r\n\]* inline_func \\(\\) at \[^\r\n\]+" \
-		    "#3 \[^\r\n\]* normal_func \\(\\) at \[^\r\n\]+" \
-		    "Backtrace stopped: previous frame identical to this frame \\(corrupt stack\\?\\)"]
+		     "#0 \[^\r\n\]* inline_func \\(\\) at \[^\r\n\]+" \
+		     "#1 \[^\r\n\]* normal_func \\(\\) at \[^\r\n\]+" \
+		     "#2 \[^\r\n\]* inline_func \\(\\) at \[^\r\n\]+" \
+		     "#3 \[^\r\n\]* normal_func \\(\\) at \[^\r\n\]+" \
+		     "Backtrace stopped: previous frame identical to this frame \\(corrupt stack\\?\\)"]
 	}
 
 	with_test_prefix "cycle at level 1" {
@@ -127,9 +127,9 @@ foreach bt_cmd { "bt" "bt -no-filters" } {
 		"Register cache flushed\\."
 	    gdb_test_lines "$bt_cmd" "backtrace when the unwind is broken at frame 1" \
 		[multi_line \
-		    "#0 \[^\r\n\]* inline_func \\(\\) at \[^\r\n\]+" \
-		    "#1 \[^\r\n\]* normal_func \\(\\) at \[^\r\n\]+" \
-		    "Backtrace stopped: previous frame identical to this frame \\(corrupt stack\\?\\)"]
+		     "#0 \[^\r\n\]* inline_func \\(\\) at \[^\r\n\]+" \
+		     "#1 \[^\r\n\]* normal_func \\(\\) at \[^\r\n\]+" \
+		     "Backtrace stopped: previous frame identical to this frame \\(corrupt stack\\?\\)"]
 	}
 
 	# Flush the register cache (which also flushes the frame cache) so we
@@ -157,7 +157,7 @@ foreach bt_cmd { "bt" "bt -no-filters" } {
 	# Prepare for the next iteration of the test loop
 	gdb_test_no_output "set debug frame 0"
 	gdb_test_no_output "python stop_at_level=None"
-	    gdb_test "maint flush register-cache" \
-		"Register cache flushed\\." "maint flush register-cache at (loop end)"
+	gdb_test "maint flush register-cache" \
+	    "Register cache flushed\\." "maint flush register-cache at (loop end)"
     }
 }

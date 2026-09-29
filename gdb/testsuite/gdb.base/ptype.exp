@@ -36,17 +36,17 @@ set gcc_compiled [is_c_compiler_gcc]
 
 
 set re1 [multi_line \
-    "type = enum primary1_tag {" \
-    "    red1 = 0," \
-    "    green1 = 1," \
-    "    blue1 = 2" \
-    "}.*$gdb_prompt $"]
+	     "type = enum primary1_tag {" \
+	     "    red1 = 0," \
+	     "    green1 = 1," \
+	     "    blue1 = 2" \
+	     "}.*$gdb_prompt $"]
 set re2 [multi_line \
-    "type = enum {" \
-    "    red1 = 0," \
-    "    green1 = 1," \
-    "    blue1 = 2" \
-    "}.*$gdb_prompt $"]
+	     "type = enum {" \
+	     "    red1 = 0," \
+	     "    green1 = 1," \
+	     "    blue1 = 2" \
+	     "}.*$gdb_prompt $"]
 
 gdb_test_multiple "ptype red1" "ptype unnamed enumeration member" {
     -re $re1 {
@@ -67,14 +67,14 @@ gdb_test_multiple "ptype red1" "ptype unnamed enumeration member" {
 # has an XFAIL for "int" (Sun cc bug), so no need to fail it here).
 gdb_test "ptype struct t_struct" \
     [multi_line \
-	"type = struct t_struct {" \
-	"    (unsigned |)char v_char_member;" \
-	"    (short|short int) v_short_member;" \
-	"    int v_int_member;" \
-	"    (long|long int|int) v_long_member;" \
-	"    float v_float_member;" \
-	"    double v_double_member;" \
-	"}"] "ptype structure"
+	 "type = struct t_struct {" \
+	 "    (unsigned |)char v_char_member;" \
+	 "    (short|short int) v_short_member;" \
+	 "    int v_int_member;" \
+	 "    (long|long int|int) v_long_member;" \
+	 "    float v_float_member;" \
+	 "    double v_double_member;" \
+	 "}"] "ptype structure"
 
 
 # Test the equivalence between '.' and '->' for struct member references.
@@ -98,35 +98,35 @@ if {[gdb_test "ptype v_t_struct_p->v_float_member" "type = float"] < 0} {
 
 gdb_test "ptype struct link" \
     [multi_line \
-	"type = struct link {" \
-	"    struct link \\*next;" \
-	"    struct link \\*\\(\\*linkfunc\\)\\((struct link \\*, int|void|)\\);" \
-	"    struct t_struct stuff.1..2..3.;" \
-	"}"] "ptype linked list structure"
+	 "type = struct link {" \
+	 "    struct link \\*next;" \
+	 "    struct link \\*\\(\\*linkfunc\\)\\((struct link \\*, int|void|)\\);" \
+	 "    struct t_struct stuff.1..2..3.;" \
+	 "}"] "ptype linked list structure"
 
 #
 # test ptype command with unions
 #
 gdb_test "ptype union t_union" \
     [multi_line \
-	"type = union t_union {" \
-	"    (unsigned |)char v_char_member;" \
-	"    (short|short int) v_short_member;" \
-	"    int v_int_member;" \
-	"    (long|long int|int) v_long_member;" \
-	"    float v_float_member;" \
-	"    double v_double_member;" \
-	"}"] "ptype union"
+	 "type = union t_union {" \
+	 "    (unsigned |)char v_char_member;" \
+	 "    (short|short int) v_short_member;" \
+	 "    int v_int_member;" \
+	 "    (long|long int|int) v_long_member;" \
+	 "    float v_float_member;" \
+	 "    double v_double_member;" \
+	 "}"] "ptype union"
 
 # IBM's xlc puts out bogus stabs--the stuff field is type 42,
 # which isn't defined.
 gdb_test "ptype union tu_link" \
     [multi_line \
-	"type = union tu_link {" \
-	"    struct link \\*next;" \
-	"    struct link \\*\\(\\*linkfunc\\)\\((struct link \\*, int|void|)\\);" \
-	"    struct t_struct stuff.1..2..3.;" \
-	"}"] "ptype linked list union"
+	 "type = union tu_link {" \
+	 "    struct link \\*next;" \
+	 "    struct link \\*\\(\\*linkfunc\\)\\((struct link \\*, int|void|)\\);" \
+	 "    struct t_struct stuff.1..2..3.;" \
+	 "}"] "ptype linked list union"
 
 #
 # test ptype command with enums
@@ -134,19 +134,19 @@ gdb_test "ptype union tu_link" \
 
 gdb_test "ptype primary" \
     [multi_line \
-	"type = enum {" \
-	"    red = 0," \
-	"    green = 1," \
-	"    blue = 2" \
-	"}"] "ptype unnamed enumeration"
+	 "type = enum {" \
+	 "    red = 0," \
+	 "    green = 1," \
+	 "    blue = 2" \
+	 "}"] "ptype unnamed enumeration"
 
 gdb_test "ptype enum colors" \
     [multi_line \
-	"type = enum colors {" \
-	"    yellow = 0," \
-	"    purple = 1," \
-	"    pink = 2" \
-	"}"] "ptype named enumeration"
+	 "type = enum colors {" \
+	 "    yellow = 0," \
+	 "    purple = 1," \
+	 "    pink = 2" \
+	 "}"] "ptype named enumeration"
 
 
 #
@@ -154,10 +154,10 @@ gdb_test "ptype enum colors" \
 #
 gdb_test "ptype boolean" \
     [multi_line \
-	"type = enum (boolean |){" \
-	"    FALSE = 0," \
-	"    TRUE = 1" \
-	"}"] "ptype unnamed typedef'd enumeration"
+	 "type = enum (boolean |){" \
+	 "    FALSE = 0," \
+	 "    TRUE = 1" \
+	 "}"] "ptype unnamed typedef'd enumeration"
 
 # And check that whatis shows the name, not "enum {...}".
 # This probably fails for all DWARF 1 cases, so assume so for now. -fnf
@@ -177,7 +177,7 @@ if {!$gcc_compiled} {
 gdb_test "list -q main" ".*"
 get_debug_format
 gdb_test "whatis v_boolean" "type = (enum |)boolean" \
-  "whatis unnamed typedef'd enum (compiler bug in IBM's xlc)"
+    "whatis unnamed typedef'd enum (compiler bug in IBM's xlc)"
 
 # Same thing with struct and union.
 gdb_test "ptype t_struct3" "type = struct (t_struct3 |)\{.*
@@ -190,42 +190,42 @@ gdb_test "ptype t_union3" "type = union (t_union3 |)\{.*
 
 gdb_test "ptype enum bvals" \
     [multi_line \
-	"type = enum bvals {" \
-	"    my_false = 0," \
-	"    my_true = 1" \
-	"}"] "ptype named typedef'd enumf'd enum"
+	 "type = enum bvals {" \
+	 "    my_false = 0," \
+	 "    my_true = 1" \
+	 "}"] "ptype named typedef'd enumf'd enum"
 
 #
 # test ptype command with out-of-order enum values
 #
 gdb_test "ptype enum misordered" \
     [multi_line \
-	"type = enum misordered {" \
-	"    two = 2," \
-	"    one = 1," \
-	"    zero = 0," \
-	"    three = 3" \
-	"}"] "ptype misordered enumeration"
+	 "type = enum misordered {" \
+	 "    two = 2," \
+	 "    one = 1," \
+	 "    zero = 0," \
+	 "    three = 3" \
+	 "}"] "ptype misordered enumeration"
 
 #
 # test ptype command with a named enum's value
 #
 gdb_test "ptype three" \
     [multi_line \
-	"type = enum misordered {" \
-	"    two = 2," \
-	"    one = 1," \
-	"    zero = 0," \
-	"    three = 3" \
-	"}"] "ptype named enumeration member"
+	 "type = enum misordered {" \
+	 "    two = 2," \
+	 "    one = 1," \
+	 "    zero = 0," \
+	 "    three = 3" \
+	 "}"] "ptype named enumeration member"
 
 gdb_test "ptype red" \
     [multi_line \
-	"type = enum {" \
-	"    red = 0," \
-	"    green = 1," \
-	"    blue = 2" \
-	"}"] "ptype unnamed enumeration member #2"
+	 "type = enum {" \
+	 "    red = 0," \
+	 "    green = 1," \
+	 "    blue = 2" \
+	 "}"] "ptype unnamed enumeration member #2"
 
 #
 # test ptype command with basic C types
@@ -560,53 +560,53 @@ gdb_test "ptype pv_char_array" "type = (|unsigned )char \\(\\*\\)\\\[0?\\\]"
 #
 gdb_test "ptype struct outer_struct" \
     [multi_line \
-	"type = struct outer_struct {" \
-	"    int outer_int;" \
-	"    (struct|) inner_struct inner_struct_instance;" \
-	"    (union|) inner_union inner_union_instance;" \
-	"    (long|long int|int) outer_long;" \
-	"}"] "ptype outer structure"
+	 "type = struct outer_struct {" \
+	 "    int outer_int;" \
+	 "    (struct|) inner_struct inner_struct_instance;" \
+	 "    (union|) inner_union inner_union_instance;" \
+	 "    (long|long int|int) outer_long;" \
+	 "}"] "ptype outer structure"
 
 gdb_test "ptype struct inner_struct" \
     [multi_line \
-	"type = struct inner_struct {" \
-	"    int inner_int;" \
-	"    (long|long int|int) inner_long;" \
-	"}"] "ptype inner structure"
+	 "type = struct inner_struct {" \
+	 "    int inner_int;" \
+	 "    (long|long int|int) inner_long;" \
+	 "}"] "ptype inner structure"
 
 gdb_test "ptype union inner_union" \
     [multi_line \
-	"type = union inner_union {" \
-	"    int inner_union_int;" \
-	"    (long|long int|int) inner_union_long;" \
-	"}"] "ptype inner union"
+	 "type = union inner_union {" \
+	 "    int inner_union_int;" \
+	 "    (long|long int|int) inner_union_long;" \
+	 "}"] "ptype inner union"
 
 gdb_test "ptype nested_su" \
     [multi_line \
-	"type = struct outer_struct {" \
-	"    int outer_int;" \
-	"    (struct |)inner_struct inner_struct_instance;" \
-	"    (union |)inner_union inner_union_instance;" \
-	"    (long|long int|int) outer_long;" \
-	"}"] "ptype nested structure"
+	 "type = struct outer_struct {" \
+	 "    int outer_int;" \
+	 "    (struct |)inner_struct inner_struct_instance;" \
+	 "    (union |)inner_union inner_union_instance;" \
+	 "    (long|long int|int) outer_long;" \
+	 "}"] "ptype nested structure"
 
 gdb_test "ptype nested_su.outer_int" "type = int.*" "ptype outer int"
 
 gdb_test "ptype nested_su.inner_struct_instance" \
     [multi_line \
-	"type = struct inner_struct {" \
-	"    int inner_int;" \
-	"    (long|long int|int) inner_long;" \
-	"}"] "ptype nested structure #2"
+	 "type = struct inner_struct {" \
+	 "    int inner_int;" \
+	 "    (long|long int|int) inner_long;" \
+	 "}"] "ptype nested structure #2"
 
 gdb_test "ptype nested_su.inner_struct_instance.inner_int" "type = int.*" "ptype inner int"
 
 gdb_test "ptype nested_su.inner_union_instance" \
     [multi_line \
-	"type = union inner_union {" \
-	"    int inner_union_int;" \
-	"    (long|long int|int) inner_union_long;" \
-	"}"] "ptype nested union"
+	 "type = union inner_union {" \
+	 "    int inner_union_int;" \
+	 "    (long|long int|int) inner_union_long;" \
+	 "}"] "ptype nested union"
 
 # Print the type description of variable the_highest, and verify that
 # the type description for the fields whose type is anonymous are
@@ -614,13 +614,13 @@ gdb_test "ptype nested_su.inner_union_instance" \
 
 gdb_test "ptype the_highest" \
     [multi_line \
-	"type = struct highest {" \
-	"    int a;" \
-	"    struct {" \
-	"        int b;" \
-	"        struct \{\.\.\.\} anonymous_level_2;" \
-	"    \} anonymous_level_1;" \
-	"}"]
+	 "type = struct highest {" \
+	 "    int a;" \
+	 "    struct {" \
+	 "        int b;" \
+	 "        struct \{\.\.\.\} anonymous_level_2;" \
+	 "    \} anonymous_level_1;" \
+	 "}"]
 
 # Print the type description for one of the fields of variable the_highest.
 # The purpose is to verify that the type of a field that was printed above
@@ -629,12 +629,12 @@ gdb_test "ptype the_highest" \
 
 gdb_test "ptype the_highest.anonymous_level_1" \
     [multi_line \
-	"type = struct {" \
-	"    int b;" \
-	"    struct {" \
-	"        int c;" \
-	"    \} anonymous_level_2;" \
-	"}"] "ptype the_highest.anonymous_level_1"
+	 "type = struct {" \
+	 "    int b;" \
+	 "    struct {" \
+	 "        int c;" \
+	 "    \} anonymous_level_2;" \
+	 "}"] "ptype the_highest.anonymous_level_1"
 
 get_debug_format
 
@@ -680,20 +680,20 @@ proc ptype_maybe_prototyped { id prototyped plain { overprototyped "NO-MATCH" } 
 }
 
 ptype_maybe_prototyped "func_type" "int (*)(int (*)(int, float), float)" \
-				   "int (*)()"
+    "int (*)()"
 ptype_maybe_prototyped "old_fptr" "double (*)()" "double (*)()" \
-				  "double (*)(void)"
+    "double (*)(void)"
 ptype_maybe_prototyped "new_fptr" "double (*)(void)" "double (*)()"
 ptype_maybe_prototyped "fptr" "int (*)(int, float)" "int (*)()"
 ptype_maybe_prototyped "fptr2" "int *(*)(int (*)(int, float), float)" \
-			       "int *(*)()"
+    "int *(*)()"
 ptype_maybe_prototyped "xptr" "int (*)(int (*)(), int (*)(void), int)" \
-			      "int (*)()" \
-			      "int (*)(int (*)(void), int (*)(void), int)"
+    "int (*)()" \
+    "int (*)(int (*)(void), int (*)(void), int)"
 ptype_maybe_prototyped "ffptr" "int (*(*)(char))(short int)" \
-			       "int (*(*)())()"
+    "int (*(*)())()"
 ptype_maybe_prototyped "fffptr" "int (*(*(*)(char))(short int))(long int)" \
-				"int (*(*(*)())())()"
+    "int (*(*(*)())())()"
 
 # Test printing type of typedefs in different scopes, with same name
 # but different type.
@@ -713,27 +713,27 @@ gdb_test "ptype foo" "type = char" "ptype foo typedef after second list of charf
 
 if {[runto_main]} {
 
-  if {[target_info exists gdb,cannot_call_functions]} {
-    unsupported "this target can not call functions"
-    return
-  }
+    if {[target_info exists gdb,cannot_call_functions]} {
+	unsupported "this target can not call functions"
+	return
+    }
 
-  # We need to up this because this can be really slow on some boards.
-  # (malloc() is called as part of the test).
-  set prev_timeout $timeout
-  set timeout 60
+    # We need to up this because this can be really slow on some boards.
+    # (malloc() is called as part of the test).
+    set prev_timeout $timeout
+    set timeout 60
 
-  gdb_test "ptype \"abc\""	"type = char \\\[4\\\]"
-  gdb_test "ptype {'a','b','c'}"	"type = char \\\[3\\\]"
-  gdb_test "ptype {0,1,2}"		"type = int \\\[3\\\]"
-  gdb_test "ptype {(long)0,(long)1,(long)2}"	  "type = long \\\[3\\\]"
-  gdb_test "ptype {(float)0,(float)1,(float)2}" "type = float \\\[3\\\]"
-  gdb_test "ptype {{0,1,2},{3,4,5}}"	"type = int \\\[2\\\]\\\[3\\\]"
-  gdb_test "ptype {4,5,6}\[2\]"	"type = int"
-  gdb_test "ptype *&{4,5,6}\[1\]"	"Attempt to take address of value not located in memory."
+    gdb_test "ptype \"abc\""	"type = char \\\[4\\\]"
+    gdb_test "ptype {'a','b','c'}"	"type = char \\\[3\\\]"
+    gdb_test "ptype {0,1,2}"		"type = int \\\[3\\\]"
+    gdb_test "ptype {(long)0,(long)1,(long)2}"	  "type = long \\\[3\\\]"
+    gdb_test "ptype {(float)0,(float)1,(float)2}" "type = float \\\[3\\\]"
+    gdb_test "ptype {{0,1,2},{3,4,5}}"	"type = int \\\[2\\\]\\\[3\\\]"
+    gdb_test "ptype {4,5,6}\[2\]"	"type = int"
+    gdb_test "ptype *&{4,5,6}\[1\]"	"Attempt to take address of value not located in memory."
 
-  set timeout $prev_timeout
+    set timeout $prev_timeout
 
-  # Test ptype of user register
-  gdb_test "ptype \$pc" "void \\(\\*\\)\\(\\)"
+    # Test ptype of user register
+    gdb_test "ptype \$pc" "void \\(\\*\\)\\(\\)"
 }

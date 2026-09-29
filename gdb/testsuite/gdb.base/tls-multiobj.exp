@@ -57,14 +57,14 @@ proc do_tests {force_internal_tls {do_kfail_tls_access 0}} {
 	if {[target_is_gdbserver]} {
 	    gdb_test_multiple "print tls_main_tbss_1" \
 		"Check TLS accessibility when connected to a gdbserver" {
-		-re -wrap "= 0" {
-		    set do_kfail_tls_access 0
-		    pass $gdb_test_name
+		    -re -wrap "= 0" {
+			set do_kfail_tls_access 0
+			pass $gdb_test_name
+		    }
+		    -re -wrap "Remote target failed to process qGetTLSAddr request" {
+			pass $gdb_test_name
+		    }
 		}
-		-re -wrap "Remote target failed to process qGetTLSAddr request" {
-		    pass $gdb_test_name
-		}
-	    }
 	}
     }
 
@@ -200,9 +200,9 @@ set binprefix $binfile
 with_test_prefix "default" {
     set binfile $binprefix-default
     if  { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable \
-			[list debug shlib=${lib1obj} \
-				    shlib=${lib2obj} \
-				    shlib=${lib3obj}]] != "" } {
+	       [list debug shlib=${lib1obj} \
+		    shlib=${lib2obj} \
+		    shlib=${lib3obj}]] != "" } {
 	untested "failed to compile"
     } else {
 	foreach_with_prefix force_internal_tls $internal_tls_iters {
@@ -221,9 +221,9 @@ with_test_prefix "default" {
 with_test_prefix "pthreads" {
     set binfile $binprefix-pthreads
     if	{ [gdb_compile_pthreads "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable \
-				 [list debug shlib=${lib1obj} \
-					     shlib=${lib2obj} \
-					     shlib=${lib3obj}]] != "" } {
+	       [list debug shlib=${lib1obj} \
+		    shlib=${lib2obj} \
+		    shlib=${lib3obj}]] != "" } {
 	untested "failed to compile"
     } else {
 	foreach_with_prefix force_internal_tls $internal_tls_iters {

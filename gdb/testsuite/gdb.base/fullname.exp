@@ -25,7 +25,7 @@ require {!is_remote host}
 # Create a temporary file in the build directory.  Use a different
 # filename in case ${srcdir} == ${objdir}.
 if { [catch {file copy -force ${srcdir}/${subdir}/${srcfile} \
-			      [standard_output_file tmp-${srcfile}]}] != 0 } {
+		 [standard_output_file tmp-${srcfile}]}] != 0 } {
     error "Could not create temporary file"
     return
 }
@@ -55,7 +55,7 @@ if { [gdb_breakpoint [standard_output_file tmp-${srcfile}]:${line} -no-message] 
 }
 
 gdb_test "break -q main" \
-	 "Breakpoint.*at.*line.*" "set breakpoint at main - built absolute"
+    "Breakpoint.*at.*line.*" "set breakpoint at main - built absolute"
 
 set msg "set breakpoint by full path after loading symbols - built absolute"
 if { [gdb_breakpoint [standard_output_file tmp-${srcfile}]:${line} -no-message] != 0 } {
@@ -80,7 +80,7 @@ if { [gdb_breakpoint [standard_output_file tmp-${srcfile}]:${line} -no-message] 
 }
 
 gdb_test "break -q main" \
-	 "Breakpoint.*at.*line.*" "set breakpoint at main - built relative"
+    "Breakpoint.*at.*line.*" "set breakpoint at main - built relative"
 
 set msg "set breakpoint by full path after loading symbols - built relative"
 if { [gdb_breakpoint [standard_output_file tmp-${srcfile}]:${line} -no-message] != 0 } {
@@ -109,7 +109,7 @@ if { [gdb_breakpoint [standard_output_file tmp-${srcfile}]:${line} -no-message] 
 }
 
 gdb_test "break -q main" \
-	 "Breakpoint.*at.*line.*" "set breakpoint at main - built other"
+    "Breakpoint.*at.*line.*" "set breakpoint at main - built other"
 
 set msg "set breakpoint by full path after loading symbols - built other"
 if { [gdb_breakpoint [standard_output_file tmp-${srcfile}]:${line} -no-message] != 0 } {

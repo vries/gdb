@@ -30,67 +30,67 @@ gdb_test "tsave -r" "Argument required \\\(file in which to save trace data\\\)\
     "tsave command properly supports -r argument"
 
 gdb_test "tvariable \$tvar1" \
-  "Trace state variable \\\$tvar1 created, with initial value 0." \
-  "create a trace state variable"
+    "Trace state variable \\\$tvar1 created, with initial value 0." \
+    "create a trace state variable"
 
 gdb_test "tvariable \$tvar2 = 45" \
-  "Trace state variable \\\$tvar2 created, with initial value 45." \
-  "create a trace state variable with initial value"
+    "Trace state variable \\\$tvar2 created, with initial value 45." \
+    "create a trace state variable with initial value"
 
 gdb_test "tvariable \$tvar2 = -92" \
-  "Trace state variable \\\$tvar2 now has initial value -92." \
-  "change initial value of a trace state variable"
+    "Trace state variable \\\$tvar2 now has initial value -92." \
+    "change initial value of a trace state variable"
 
 gdb_test "tvariable \$tvar3 = 2 + 3" \
-  "Trace state variable \\\$tvar3 created, with initial value 5." \
-  "create a trace state variable with expression"
+    "Trace state variable \\\$tvar3 created, with initial value 5." \
+    "create a trace state variable with expression"
 
 gdb_test "tvariable \$tvar3 = 1234567000000" \
-  "Trace state variable \\\$tvar3 now has initial value 1234567000000." \
-  "init trace state variable to a 64-bit value"
+    "Trace state variable \\\$tvar3 now has initial value 1234567000000." \
+    "init trace state variable to a 64-bit value"
 
 gdb_test "tvariable $" \
-  "Must supply a non-empty variable name" \
-  "tvariable syntax error, not empty variable name"
+    "Must supply a non-empty variable name" \
+    "tvariable syntax error, not empty variable name"
 
 gdb_test "tvariable main" \
-  "Name of trace variable should start with '\\\$'" \
-  "tvariable syntax error, bad name"
+    "Name of trace variable should start with '\\\$'" \
+    "tvariable syntax error, bad name"
 
 gdb_test "tvariable \$\$" \
-  "Syntax must be \\\$NAME \\\[ = EXPR \\\]" \
-  "tvariable syntax error, bad name 2"
+    "Syntax must be \\\$NAME \\\[ = EXPR \\\]" \
+    "tvariable syntax error, bad name 2"
 
 gdb_test "tvariable \$123" \
-  "\\\$123 is not a valid trace state variable name" \
-  "tvariable syntax error, bad name 3"
+    "\\\$123 is not a valid trace state variable name" \
+    "tvariable syntax error, bad name 3"
 
 gdb_test "tvariable \$tvar1 - 93" \
-  "Syntax must be \\\$NAME \\\[ = EXPR \\\]" \
-  "tvariable syntax error, not an assignment"
+    "Syntax must be \\\$NAME \\\[ = EXPR \\\]" \
+    "tvariable syntax error, not an assignment"
 
 gdb_test "tvariable \$tvar0 = 1 = 1" \
-  "Left operand of assignment is not an lvalue\." \
-  "tvariable creation fails with invalid expression"
+    "Left operand of assignment is not an lvalue\." \
+    "tvariable creation fails with invalid expression"
 
 gdb_test "info tvariables" \
     "Name\[\t \]+Initial\[\t \]+Current.*
 \\\$tvar1\[\t \]+0\[\t \]+<undefined>.*
 \\\$tvar2\[\t \]+-92\[\t \]+<undefined>.*
 \\\$tvar3\[\t \]+1234567000000\[\t \]+.*<undefined>.*" \
-  "List tvariables"
+    "List tvariables"
 
 gdb_test "print \$tvar2" " = void" \
     "Print a trace state variable before run"
 
 gdb_test_no_output "delete tvariable \$tvar2" \
-  "delete trace state variable"
+    "delete trace state variable"
 
 gdb_test "info tvariables" \
     "Name\[\t \]+Initial\[\t \]+Current.*
 \\\$tvar1\[\t \]+0\[\t \]+<undefined>.*
 \\\$tvar3\[\t \]+1234567000000\[\t \]+.*<undefined>.*" \
-  "List tvariables after deletion"
+    "List tvariables after deletion"
 
 gdb_test "delete tvariable" \
     "" \
@@ -99,8 +99,8 @@ gdb_test "delete tvariable" \
     "y"
 
 gdb_test "info tvariables" \
-  "No trace state variables.*" \
-  "list tvariables after deleting all"
+    "No trace state variables.*" \
+    "list tvariables after deleting all"
 
 # Now try running a trace.
 
@@ -122,12 +122,12 @@ if {$trcpt1 <= 0} {
 }
 
 gdb_test "tvariable \$tvar5 = 15" \
-  "Trace state variable \\\$tvar5 created, with initial value 15." \
-  "create a trace state variable tvar5"
+    "Trace state variable \\\$tvar5 created, with initial value 15." \
+    "create a trace state variable tvar5"
 
 gdb_trace_setactions "collect tsv for first tracepoint" \
-	"$trcpt1" \
-	"collect \$tvar5 += 1" "^$"
+    "$trcpt1" \
+    "collect \$tvar5 += 1" "^$"
 
 gdb_test_no_output "tstart" ""
 

@@ -93,16 +93,16 @@ gdb_test "print v_unsigned_long_func" \
 
 if {![target_info exists no_long_long]} {
     gdb_test "print v_long_long_func" \
-	    "$decimal = \{long long \\(\\)\} 0x\[0-9a-z\]+ <v_long_long_func>.*" \
-		"print long long function"
+	"$decimal = \{long long \\(\\)\} 0x\[0-9a-z\]+ <v_long_long_func>.*" \
+	"print long long function"
 
     gdb_test "print v_signed_long_long_func" \
-	    "$decimal = \{long long \\(\\)\} 0x\[0-9a-z\]+ <v_signed_long_long_func>.*" \
-		"print signed long long function"
+	"$decimal = \{long long \\(\\)\} 0x\[0-9a-z\]+ <v_signed_long_long_func>.*" \
+	"print signed long long function"
 
     gdb_test "print v_unsigned_long_long_func" \
-	    "$decimal = \{unsigned long long \\(\\)\} 0x\[0-9a-z\]+ <v_unsigned_long_long_func>.*" \
-		"print unsigned long long function"
+	"$decimal = \{unsigned long long \\(\\)\} 0x\[0-9a-z\]+ <v_unsigned_long_long_func>.*" \
+	"print unsigned long long function"
 }
 
 # Sun /bin/cc calls this a function returning double.

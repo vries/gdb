@@ -177,7 +177,7 @@ proc check_info_breakpoints { testname bp_number expected_loc_count } {
 gdb_test "break foo inferior 1" \
     "Breakpoint $decimal at $hex: foo\\. \\(2 locations\\)"
 set bp_number [get_integer_valueof "\$bpnum" "INVALID" \
-		  "get b/p number for inferior specific breakpoint"]
+		   "get b/p number for inferior specific breakpoint"]
 
 set saw_header false
 set location_count 0
@@ -189,7 +189,7 @@ check_info_breakpoints "first check for inferior specific breakpoint" \
 # Create a multi-inferior breakpoint to stop at.
 gdb_breakpoint "stop_breakpt" -message
 set stop_bp_num [get_integer_valueof "\$bpnum" "INVALID" \
-		    "get b/p number for stop_breakpt"]
+		     "get b/p number for stop_breakpt"]
 
 # Now resume inferior 2, this should reach 'stop_breakpt'.
 gdb_test "continue" \

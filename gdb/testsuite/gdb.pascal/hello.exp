@@ -18,7 +18,7 @@ load_lib "pascal.exp"
 standard_testfile .pas
 
 if {[gdb_compile_pascal "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable [list debug ]] != "" } {
-  return
+    return
 }
 
 clean_restart ${testfile}
@@ -38,11 +38,11 @@ if { [gdb_breakpoint ${srcfile}:${bp_location2}] } {
 }
 
 gdb_test "cont" \
-	 "Breakpoint .*:${bp_location1}.*" \
-	 "Going to first breakpoint"
+    "Breakpoint .*:${bp_location1}.*" \
+    "Going to first breakpoint"
 gdb_test "print st" \
-	 ".* = ''.*" \
-	 "empty string check"
+    ".* = ''.*" \
+    "empty string check"
 
 # This test also fails for gpc because the program
 # stops after the string has been written
@@ -51,8 +51,8 @@ if { $pascal_compiler_is_gpc } {
     setup_xfail *-*-*
 }
 gdb_test "cont" \
-	 "Breakpoint .*:${bp_location2}.*" \
-	 "Going to second breakpoint"
+    "Breakpoint .*:${bp_location2}.*" \
+    "Going to second breakpoint"
 gdb_test "print st" \
-	 ".* = 'Hello, world!'.*" \
-	 "string after assignment check"
+    ".* = 'Hello, world!'.*" \
+    "string after assignment check"

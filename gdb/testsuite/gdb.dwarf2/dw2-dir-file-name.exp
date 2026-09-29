@@ -419,15 +419,15 @@ if { [gdb_compile "${asmsrcfile} ${srcdir}/${subdir}/$srcfile" "${binfile}" exec
 
 set dirs {}
 foreach r {"" /rdir} {
-  foreach x {"" /xdir} {
-      foreach comp {"" /compdir} {
-	  foreach l {"" /ldir} {
-	      foreach f {"" /fdir} {
-		  lappend dirs $r$x$comp$l$f
-	      }
-	  }
-      }
-  }
+    foreach x {"" /xdir} {
+	foreach comp {"" /compdir} {
+	    foreach l {"" /ldir} {
+		foreach f {"" /fdir} {
+		    lappend dirs $r$x$comp$l$f
+		}
+	    }
+	}
+    }
 }
 
 proc pathexpand {prefix dirlst suffix} {

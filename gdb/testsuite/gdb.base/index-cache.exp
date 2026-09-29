@@ -70,9 +70,9 @@ proc check_cache_stats { expected_hits expected_misses } {
     gdb_test_no_output "maintenance wait-for-index-cache"
 
     set re [multi_line \
-	"  Cache hits .this session.: $expected_hits" \
-	"Cache misses .this session.: $expected_misses" \
-    ]
+		"  Cache hits .this session.: $expected_hits" \
+		"Cache misses .this session.: $expected_misses" \
+	       ]
 
     gdb_test "show index-cache stats" $re "check index-cache stats"
 }

@@ -57,13 +57,13 @@ gdb_test "tbreak $stop_line" \
     "tbreakpoint at tbreak1"
 
 gdb_test continue \
-"Continuing\\..*main \\(\\) at.*$srcfile:$stop_line.*" \
-"run until breakpoint set at a line"
+    "Continuing\\..*main \\(\\) at.*$srcfile:$stop_line.*" \
+    "run until breakpoint set at a line"
 
 
 #call print_double_array(double_array)
 if {$allow_float_test && \
-    ![gdb_skip_stdio_test "print print_double_array(double_array)"] } {
+	![gdb_skip_stdio_test "print print_double_array(double_array)"] } {
 
     gdb_test_stdio "print print_double_array(double_array)" \
 	[multi_line \
@@ -92,8 +92,8 @@ if {![gdb_skip_stdio_test "print_char_array(char_array)"]} {
 
 set stop_line [gdb_get_line_number "-tbreak2-"]
 gdb_test "tbreak $stop_line" \
-"Temporary breakpoint.*file.*$srcfile, line $stop_line.*" \
-"tbreakpoint at tbreak2"
+    "Temporary breakpoint.*file.*$srcfile, line $stop_line.*" \
+    "tbreakpoint at tbreak2"
 
 if {![gdb_skip_stdio_test "continue to tbreak2"]} {
     set gdb_re \
@@ -120,11 +120,11 @@ if {![gdb_skip_stdio_test "continue to tbreak2"]} {
 #set timeout $oldtimeout
 set stop_line [gdb_get_line_number "-tbreak3-"]
 gdb_test "tbreak $stop_line" \
-	"Temporary breakpoint.* file .*$srcfile, line $stop_line.*" \
-	"tbreakpoint at tbreak3"
+    "Temporary breakpoint.* file .*$srcfile, line $stop_line.*" \
+    "tbreakpoint at tbreak3"
 
 if {$allow_float_test && \
-    ![gdb_skip_stdio_test "continuing to tbreak3"] } {
+	![gdb_skip_stdio_test "continuing to tbreak3"] } {
 
     gdb_test_stdio "continue" \
 	[multi_line \
@@ -177,7 +177,7 @@ if {![gdb_skip_stdio_test "next over print_int_array in print_all_arrays"]} {
 
 #call print_double_array(array_d)
 if {$allow_float_test && \
-    ![gdb_skip_stdio_test "print print_double_array(array_d)"] } {
+	![gdb_skip_stdio_test "print print_double_array(array_d)"] } {
 
     gdb_test_stdio "print print_double_array(array_d)" \
 	[multi_line \
@@ -191,11 +191,11 @@ if {$allow_float_test && \
 
 set stop_line [gdb_get_line_number "-tbreak4-"]
 gdb_test "tbreak $stop_line" \
-"Temporary breakpoint.* file .*$srcfile, line $stop_line.*" \
-"tbreakpoint at tbreak4"
+    "Temporary breakpoint.* file .*$srcfile, line $stop_line.*" \
+    "tbreakpoint at tbreak4"
 
 if {$allow_float_test && \
-    ![gdb_skip_stdio_test "continuing to tbreak4"] } {
+	![gdb_skip_stdio_test "continuing to tbreak4"] } {
 
     gdb_test_stdio "continue" \
 	[multi_line \
@@ -274,12 +274,12 @@ gdb_test "continue" \
 # may itself be a bug, but it's not the one we're trying to catch
 # here.  I've added something to step-test.exp for this.
 gdb_test "break sum_array_print" \
-	".*Breakpoint ${decimal}: file .*$srcfile, line.*" \
-	"set breakpoint in sum_array_print"
+    ".*Breakpoint ${decimal}: file .*$srcfile, line.*" \
+    "set breakpoint in sum_array_print"
 gdb_test_no_output "set print frame-arguments all"
 gdb_test "continue" \
     ".*Breakpoint ${decimal}, sum_array_print \\(seed=10, linked_list1=.next_index = .1, 2, 3, 4, 5, 6, 7, 8, 9, 10., values = .4, 6, 8, 10, 12, 14, 16, 18, 20, 22., head = 0., linked_list2=.next_index = .1, 2, 3, 4, 5, 6, 7, 8, 9, 10., values = .8, 10, 12, 14, 16, 18, 20, 22, 24, 26., head = 0., linked_list3=.next_index = .1, 2, 3, 4, 5, 6, 7, 8, 9, 10., values = .10, 12, 14, 16, 18, 20, 22, 24, 26, 28., head = 0., linked_list4=.next_index = .1, 2, 3, 4, 5, 6, 7, 8, 9, 10., values = .20, 22, 24, 26, 28, 30, 32, 34, 36, 38., head = 0.\\) at .*$srcfile:${decimal}\[ \t\n\r\]+${decimal}.*printf\\(.Sum of 4 arrays, by element \\(add in seed as well\\).*\\);.*" \
-	"check args of sum_array_print"
+    "check args of sum_array_print"
 
 #call print_array_rep(linked_list1, linked_list2, linked_list3)
 # this calls works from gdb without gdb_expect. But it does seem to hang
@@ -314,7 +314,7 @@ if {![gdb_skip_stdio_test "continuing to tbreak6"]} {
 #                         *int_char_combo, *d1, *d2, *d3, *f1, *f2, *f3)
 
 if {$allow_float_test && \
-    ![gdb_skip_stdio_test "print print_small_structs(...)"] } {
+	![gdb_skip_stdio_test "print print_small_structs(...)"] } {
     gdb_test_stdio "print print_small_structs(*struct1, *struct2, *struct3, *struct4, *flags, *flags_combo, *three_char, *five_char, *int_char_combo, *d1, *d2, *d3, *f1, *f2, *f3)" \
 	[multi_line \
 	     "alpha" \
@@ -377,7 +377,7 @@ gdb_test "print compute_with_small_structs(20)" \
 #                       3.14, -5678.12345, -0.11111111, 216.97065)
 
 if {$allow_float_test && \
-    ![gdb_skip_stdio_test "print print_ten_doubles(...)"]} {
+	![gdb_skip_stdio_test "print print_ten_doubles(...)"]} {
     gdb_test_stdio "print print_ten_doubles(123.456, 123.456, -0.12, -1.23, 343434.8, 89.098, 3.14, -5678.12345, -0.11111111, 216.97065)" \
 	[multi_line \
 	     "Two Doubles : 123.45\[0-9\]*.*123.45\[0-9\]*" \
@@ -385,7 +385,7 @@ if {$allow_float_test && \
 	     "Two Doubles : 343434.\[0-9\]*.*89.09\[0-9\]*" \
 	     "Two Doubles : 3.1400\[0-9\]*.*-5678.123\[0-9\]*" \
 	     "Two Doubles : -0.1111\[0-9\]*.*216.97\[0-9\]*" \
-	     ]
+	    ]
 }
 
 set stop_line [gdb_get_line_number "-tbreak7-"]
@@ -427,7 +427,7 @@ set ws "\[\n\r\t \]+"
 #                         d1, d2, d3, f1, f2, f3)
 
 if {$allow_float_test && \
-    ![gdb_skip_stdio_test "print_small_structs from print_long_arg_list"] } {
+	![gdb_skip_stdio_test "print_small_structs from print_long_arg_list"] } {
 
     # On 32-bit SPARC, some of the args are passed by ref, others by
     # value, and GDB gets confused and says "Invalid cast" because it
@@ -523,12 +523,12 @@ gdb_test "tbreak $stop_line" \
     "tbreakpoint at tbreak9"
 
 gdb_test continue "Continuing\\..*main \\(\\) at .*$srcfile:$stop_line\[\r\n\t \]+$stop_line.*init_int_char_combo\\(int_char_combo, 13, .!.\\);.*" \
-"continue to tbreak9"
+    "continue to tbreak9"
 
 #call print_long_arg_list(a, b, c, d, e, f, *struct1, *struct2, *struct3, *struct4, *flags, *flags_combo, *three_char, *five_char, *int_char_combo, *d1, *d2, *d3, *f1, *f2, *f3)
 
 if {$allow_float_test && \
-    ![gdb_skip_stdio_test "print print_long_arg_list"] } {
+	![gdb_skip_stdio_test "print print_long_arg_list"] } {
 
     gdb_test_stdio "print print_long_arg_list(a, b, c, d, e, f, *struct1, *struct2, *struct3, *struct4, *flags, *flags_combo, *three_char, *five_char, *int_char_combo, *d1, *d2, *d3, *f1, *f2, *f3)" \
 	[multi_line \
@@ -596,7 +596,7 @@ gdb_test "tbreak $stop_line" \
     "tbreakpoint at tbreak10"
 
 gdb_test continue "Continuing\\..*main \\(\\) at .*$srcfile:$stop_line\[ \t\n\r\]+$stop_line.*compute_with_small_structs\\(35\\);.*" \
-"continue to tbreak10"
+    "continue to tbreak10"
 
 
 #call sum_struct_print(10, *struct1, *struct2, *struct3, *struct4)

@@ -737,17 +737,17 @@ foreach name [get_functions list] {
 
 # Test c/v gets recognized even without quoting.
 foreach cv {{} { const} { volatile} { const volatile}} {
-  set test "p 'CV::m(int)$cv'"
-  set correct dummy_value
+    set test "p 'CV::m(int)$cv'"
+    set correct dummy_value
 
-  gdb_test_multiple $test $test {
-      -re "( = {.*} ${::hex} <CV::m.*>)\r\n$gdb_prompt $" {
-	  # = {void (CV * const, CV::t)} 0x400944 <CV::m(int)>
-	  set correct $expect_out(1,string)
-	  pass $test
-      }
-  }
-  gdb_test "p CV::m(int)$cv" [string_to_regexp $correct]
+    gdb_test_multiple $test $test {
+	-re "( = {.*} ${::hex} <CV::m.*>)\r\n$gdb_prompt $" {
+	    # = {void (CV * const, CV::t)} 0x400944 <CV::m(int)>
+	    set correct $expect_out(1,string)
+	    pass $test
+	}
+    }
+    gdb_test "p CV::m(int)$cv" [string_to_regexp $correct]
 }
 
 # Test TYPENAME:: gets recognized even in parentheses.

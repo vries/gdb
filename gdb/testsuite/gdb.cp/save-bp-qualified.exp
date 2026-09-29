@@ -64,10 +64,10 @@ with_test_prefix "restore" {
 
     # Verify that all breakpoints have been created correctly.
     gdb_test "info break" [multi_line \
-      "Num +Type +Disp +Enb +Address +What" \
-      "$decimal +breakpoint +keep +y +$hex +in function\\(\\) at \[^\r\n\]*$srcfile:$decimal" \
-      "$decimal +breakpoint +keep +y +<MULTIPLE> +" \
-      "$decimal.$decimal +y +$hex +in S::function\\(\\) at \[^\r\n\]*$srcfile:$decimal" \
-      "$decimal.$decimal +y +$hex +in function\\(\\) at \[^\r\n\]*$srcfile:$decimal" \
-    ]
+			       "Num +Type +Disp +Enb +Address +What" \
+			       "$decimal +breakpoint +keep +y +$hex +in function\\(\\) at \[^\r\n\]*$srcfile:$decimal" \
+			       "$decimal +breakpoint +keep +y +<MULTIPLE> +" \
+			       "$decimal.$decimal +y +$hex +in S::function\\(\\) at \[^\r\n\]*$srcfile:$decimal" \
+			       "$decimal.$decimal +y +$hex +in function\\(\\) at \[^\r\n\]*$srcfile:$decimal" \
+			      ]
 }

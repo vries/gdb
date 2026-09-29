@@ -54,13 +54,13 @@ gdb_test "print arg2" " = 4"
 set have_xfail [expr {[test_compiler_info gcc-*] && [gcc_major_version] < 5}]
 
 set enum1 [multi_line "" \
-    "type = enum enum1 : unsigned int {" \
-    "    <no enum values>" \
-    "}"]
+	       "type = enum enum1 : unsigned int {" \
+	       "    <no enum values>" \
+	       "}"]
 set enum1_no_type [multi_line "" \
-    "type = enum enum1 {" \
-    "    <no enum values>" \
-    "}"]
+		       "type = enum enum1 {" \
+		       "    <no enum values>" \
+		       "}"]
 gdb_test_multiple "ptype arg1" "" {
     -re -wrap $enum1 {
 	pass $gdb_test_name
@@ -74,13 +74,13 @@ gdb_test_multiple "ptype arg1" "" {
 }
 
 set enum2 [multi_line "" \
-    "type = enum class enum2 : unsigned char {" \
-    "    <no enum values>" \
-    "}"]
+	       "type = enum class enum2 : unsigned char {" \
+	       "    <no enum values>" \
+	       "}"]
 set enum2_no_type [multi_line "" \
-    "type = enum class enum2 {" \
-    "    <no enum values>" \
-    "}"]
+		       "type = enum class enum2 {" \
+		       "    <no enum values>" \
+		       "}"]
 gdb_test_multiple "ptype arg2" "" {
     -re -wrap $enum2 {
 	pass $gdb_test_name

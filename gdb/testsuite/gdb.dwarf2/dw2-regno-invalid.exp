@@ -43,8 +43,8 @@ Dwarf::assemble $asm_file {
 	    } {
 		DW_TAG_variable {
 		    DW_AT_name bregx
-			DW_AT_type :$integer_label
-			DW_AT_external 1 flag
+		    DW_AT_type :$integer_label
+		    DW_AT_external 1 flag
 		    DW_AT_location {
 			DW_OP_bregx 0xffffffff 0
 		    } SPECIAL_expr
@@ -55,7 +55,7 @@ Dwarf::assemble $asm_file {
 }
 
 if { [prepare_for_testing "failed to prepare" ${testfile} \
-			  [list $srcfile $asm_file] {nodebug}] } {
+	  [list $srcfile $asm_file] {nodebug}] } {
     return
 }
 

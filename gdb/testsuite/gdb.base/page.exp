@@ -48,17 +48,17 @@ gdb_test "show pagination" "State of pagination is on.*" "pagination is on"
 gdb_test_no_output "set height 10"
 send_gdb "help\n"
 gdb_expect_list "paged help" \
-	".*$pagination_prompt" {
-    "List of classes of commands:"
-    ""
-    "aliases -- User-defined aliases of other commands"
-    "breakpoints -- Making program stop at certain points"
-    "data -- Examining data"
-    "essential -- GDB essential commands"
-    "files -- Specifying and examining files"
-    "internals -- Maintenance commands"
-    "obscure -- Obscure features"
-}
+    ".*$pagination_prompt" {
+	"List of classes of commands:"
+	""
+	"aliases -- User-defined aliases of other commands"
+	"breakpoints -- Making program stop at certain points"
+	"data -- Examining data"
+	"essential -- GDB essential commands"
+	"files -- Specifying and examining files"
+	"internals -- Maintenance commands"
+	"obscure -- Obscure features"
+    }
 gdb_test "q"
 
 gdb_test_no_output "set height 5"
@@ -69,7 +69,7 @@ gdb_expect_list "paged count" \
 	2
 	3
 	4
-}
+    }
 send_gdb "c\n"
 gdb_expect_list "paged count remainder" "${gdb_prompt} " {
     5

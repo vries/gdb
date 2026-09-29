@@ -107,8 +107,8 @@ if { [gdb_breakpoint ${srcfile}:${bp_location2}] } {
 }
 
 gdb_test "cont" \
-	 "Breakpoint .*:${bp_location2}.*" \
-	 "Going to second breakpoint"
+    "Breakpoint .*:${bp_location2}.*" \
+    "Going to second breakpoint"
 gdb_test "print i" \
-	 ".* = 5.*" \
-	 "value of i after assignment"
+    ".* = 5.*" \
+    "value of i after assignment"

@@ -86,7 +86,7 @@ proc gdb_cont_to_no_history_backward { threads cmd nthreads } {
 	     "Backward execution from here not possible\." \
 	     "\[^\\\r\\\n\]*" \
 	     "\[^\\\r\\\n\]*" \
-	     ] \
+	    ] \
 	$nthreads
 }
 

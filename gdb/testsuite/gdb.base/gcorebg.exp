@@ -51,13 +51,13 @@ proc test_body { detached } {
     # We can't use gdb_test_multiple here because GDB is not started.
     set gcore_cmd "$GCORE -g $GDB"
     if {$GDB_DATA_DIRECTORY ne ""} {
-	    set gcore_cmd "$gcore_cmd -d '$GDB_DATA_DIRECTORY'"
+	set gcore_cmd "$gcore_cmd -d '$GDB_DATA_DIRECTORY'"
     }
     set res [remote_spawn target "$binfile $detached \"$gcore_cmd\" $corefile"]
     if { ![gdb_assert { ![expr {$res < 0 || $res == ""}] } \
-	"spawned gcore"] } {
-	    return
-	}
+	       "spawned gcore"] } {
+	return
+    }
 
     set saw_corefile_created false
     set testname "Spawned gcore finished"

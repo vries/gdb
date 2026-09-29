@@ -19,7 +19,7 @@ require {can_compile rust}
 
 standard_testfile .rs
 if {[prepare_for_testing "failed to prepare" \
-	$testfile $srcfile {debug rust}]} {
+	 $testfile $srcfile {debug rust}]} {
     return
 }
 

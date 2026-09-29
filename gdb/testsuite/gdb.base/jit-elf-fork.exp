@@ -31,7 +31,7 @@ set jit_solib_srcfile ${srcdir}/${subdir}/${jit_solib_basename}.c
 
 # Compile a shared library to use as JIT objects.
 set jit_solibs_target [compile_and_download_n_jit_so \
-		       $jit_solib_basename $jit_solib_srcfile 1]
+			   $jit_solib_basename $jit_solib_srcfile 1]
 if { $jit_solibs_target == -1 } {
     return
 }
@@ -54,147 +54,147 @@ if { [compile_jit_main ${main_srcfile} ${main_binfile} {}] != 0 } {
 # that the callers can continue execution until there.
 
 proc do_setup { detach-on-fork follow-fork-mode } {
-	clean_restart
-	gdb_load $::main_binfile
+    clean_restart
+    gdb_load $::main_binfile
 
-	gdb_test_no_output "set detach-on-fork ${detach-on-fork}"
-	gdb_test_no_output "set follow-fork-mode ${follow-fork-mode}"
+    gdb_test_no_output "set detach-on-fork ${detach-on-fork}"
+    gdb_test_no_output "set follow-fork-mode ${follow-fork-mode}"
 
-	if { ![runto_main] } {
-		return -1
-	}
+    if { ![runto_main] } {
+	return -1
+    }
 
-	# Poke desired values directly into inferior.
-	gdb_test_no_output "set var argc=2" "forging argc"
-	gdb_test_no_output "set var argv=fake_argv" "forging argv"
-	set jit_solib_target [lindex $::jit_solibs_target 0]
-	gdb_test_no_output "set var argv\[1]=\"${jit_solib_target}\"" {forging argv[1]}
+    # Poke desired values directly into inferior.
+    gdb_test_no_output "set var argc=2" "forging argc"
+    gdb_test_no_output "set var argv=fake_argv" "forging argv"
+    set jit_solib_target [lindex $::jit_solibs_target 0]
+    gdb_test_no_output "set var argv\[1]=\"${jit_solib_target}\"" {forging argv[1]}
 
-	# Put a breakpoint before the fork, continue there.
-	gdb_breakpoint [gdb_get_line_number "break before fork" $::main_srcfile]
-	gdb_continue_to_breakpoint "continue to before fork" ".*break before fork.*"
+    # Put a breakpoint before the fork, continue there.
+    gdb_breakpoint [gdb_get_line_number "break before fork" $::main_srcfile]
+    gdb_continue_to_breakpoint "continue to before fork" ".*break before fork.*"
 
-	# We should have one JIT object loaded.
-	gdb_test "maint info jit" \
-	    [multi_line \
-		 "jit_code_entry address\\s+symfile address\\s+symfile size\\s*" \
-		 "${::hex}\\s+${::hex}\\s+${::decimal}\\s*"] \
-	    "jit-ed objfiles before fork"
+    # We should have one JIT object loaded.
+    gdb_test "maint info jit" \
+	[multi_line \
+	     "jit_code_entry address\\s+symfile address\\s+symfile size\\s*" \
+	     "${::hex}\\s+${::hex}\\s+${::decimal}\\s*"] \
+	"jit-ed objfiles before fork"
 
-	# Put a breakpoint just after the fork, continue there.
-	gdb_breakpoint [gdb_get_line_number "break after fork" $::main_srcfile]
-	gdb_continue_to_breakpoint "continue to after fork" ".*break after fork.*"
+    # Put a breakpoint just after the fork, continue there.
+    gdb_breakpoint [gdb_get_line_number "break after fork" $::main_srcfile]
+    gdb_continue_to_breakpoint "continue to after fork" ".*break after fork.*"
 
-	# We should still have one JIT object loaded in whatever inferior we are
-	# currently stopped in, regardless of the mode.
-	gdb_test "maint info jit" \
-	    [multi_line \
-		 "jit_code_entry address\\s+symfile address\\s+symfile size\\s*" \
-		 "${::hex}\\s+${::hex}\\s+${::decimal}\\s*"] \
-	    "jit-ed objfiles after fork"
+    # We should still have one JIT object loaded in whatever inferior we are
+    # currently stopped in, regardless of the mode.
+    gdb_test "maint info jit" \
+	[multi_line \
+	     "jit_code_entry address\\s+symfile address\\s+symfile size\\s*" \
+	     "${::hex}\\s+${::hex}\\s+${::decimal}\\s*"] \
+	"jit-ed objfiles after fork"
 
-	# Delete our breakpoints.
-	delete_breakpoints
+    # Delete our breakpoints.
+    delete_breakpoints
 
-	# Put a breakpoint before return, for the convenience of our callers.
-	gdb_breakpoint [gdb_get_line_number "break before return" $::main_srcfile]
+    # Put a breakpoint before return, for the convenience of our callers.
+    gdb_breakpoint [gdb_get_line_number "break before return" $::main_srcfile]
 }
 
 proc_with_prefix test_detach_on_fork_off_follow_fork_mode_parent { } {
-	if { [do_setup off parent] == -1 } {
-		return -1
-	}
+    if { [do_setup off parent] == -1 } {
+	return -1
+    }
 
-	# We are stopped in the parent.
-	gdb_test "inferior" "Current inferior is 1.*" "current inferior is parent"
+    # We are stopped in the parent.
+    gdb_test "inferior" "Current inferior is 1.*" "current inferior is parent"
 
-	# Switch to the child, verify there is a JIT-ed objfile.
-	gdb_test "inferior 2" "Switching to inferior 2.*"
-	gdb_test "maint info jit" \
-	    [multi_line \
-		 "jit_code_entry address\\s+symfile address\\s+symfile size\\s*" \
-		 "${::hex}\\s+${::hex}\\s+${::decimal}\\s*"] \
-	    "jit-ed objfile in child"
+    # Switch to the child, verify there is a JIT-ed objfile.
+    gdb_test "inferior 2" "Switching to inferior 2.*"
+    gdb_test "maint info jit" \
+	[multi_line \
+	     "jit_code_entry address\\s+symfile address\\s+symfile size\\s*" \
+	     "${::hex}\\s+${::hex}\\s+${::decimal}\\s*"] \
+	"jit-ed objfile in child"
 
-	# Continue child past JIT unload, verify there are no more JIT-ed objfiles.
-	gdb_continue_to_breakpoint "continue to before return - child" ".*break before return.*"
-	gdb_test_no_output "maint info jit" "no more jit-ed objfiles in child"
+    # Continue child past JIT unload, verify there are no more JIT-ed objfiles.
+    gdb_continue_to_breakpoint "continue to before return - child" ".*break before return.*"
+    gdb_test_no_output "maint info jit" "no more jit-ed objfiles in child"
 
-	# Go back to parent, the JIT-ed objfile should still be there.
-	gdb_test "inferior 1" "Switching to inferior 1.*"
-	gdb_test "maint info jit"  \
-	    [multi_line \
-		 "jit_code_entry address\\s+symfile address\\s+symfile size\\s*" \
-		 "${::hex}\\s+${::hex}\\s+${::decimal}\\s*"] \
-	    "jit-ed objfile in parent"
+    # Go back to parent, the JIT-ed objfile should still be there.
+    gdb_test "inferior 1" "Switching to inferior 1.*"
+    gdb_test "maint info jit"  \
+	[multi_line \
+	     "jit_code_entry address\\s+symfile address\\s+symfile size\\s*" \
+	     "${::hex}\\s+${::hex}\\s+${::decimal}\\s*"] \
+	"jit-ed objfile in parent"
 
-	# Continue parent past JIT unload, verify there are no more JIT-ed objfiles.
-	gdb_continue_to_breakpoint "continue to before return - parent" ".*break before return.*"
-	gdb_test_no_output "maint info jit" "no more jit-ed objfiles in parent"
+    # Continue parent past JIT unload, verify there are no more JIT-ed objfiles.
+    gdb_continue_to_breakpoint "continue to before return - parent" ".*break before return.*"
+    gdb_test_no_output "maint info jit" "no more jit-ed objfiles in parent"
 }
 
 proc_with_prefix test_detach_on_fork_off_follow_fork_mode_child { } {
-	if { [do_setup off child] == -1 } {
-		return -1
-	}
+    if { [do_setup off child] == -1 } {
+	return -1
+    }
 
-	# We are stopped in the child.  This is the exact same thing as
-	# test_detach_on_fork_off_follow_fork_mode_parent, except that we are
-	# stopped in the child.
-	gdb_test "inferior" "Current inferior is 2.*" "current inferior is child"
+    # We are stopped in the child.  This is the exact same thing as
+    # test_detach_on_fork_off_follow_fork_mode_parent, except that we are
+    # stopped in the child.
+    gdb_test "inferior" "Current inferior is 2.*" "current inferior is child"
 
-	# Switch to the parent, verify there is a JIT-ed objfile.
-	gdb_test "inferior 1" "Switching to inferior 1.*"
-	gdb_test "maint info jit"  \
-	    [multi_line \
-		 "jit_code_entry address\\s+symfile address\\s+symfile size\\s*" \
-		 "${::hex}\\s+${::hex}\\s+${::decimal}\\s*"] \
-	    "jit-ed objfile in parent"
+    # Switch to the parent, verify there is a JIT-ed objfile.
+    gdb_test "inferior 1" "Switching to inferior 1.*"
+    gdb_test "maint info jit"  \
+	[multi_line \
+	     "jit_code_entry address\\s+symfile address\\s+symfile size\\s*" \
+	     "${::hex}\\s+${::hex}\\s+${::decimal}\\s*"] \
+	"jit-ed objfile in parent"
 
-	# Continue parent past JIT unload, verify there are no more JIT-ed objfiles.
-	gdb_continue_to_breakpoint "continue to before return - parent" ".*break before return.*"
-	gdb_test_no_output "maint info jit" "no more jit-ed objfiles in parent"
+    # Continue parent past JIT unload, verify there are no more JIT-ed objfiles.
+    gdb_continue_to_breakpoint "continue to before return - parent" ".*break before return.*"
+    gdb_test_no_output "maint info jit" "no more jit-ed objfiles in parent"
 
-	# Go back to child, the JIT-ed objfile should still be there.
-	gdb_test "inferior 2" "Switching to inferior 2.*"
-	gdb_test "maint info jit"  \
-	    [multi_line \
-		 "jit_code_entry address\\s+symfile address\\s+symfile size\\s*" \
-		 "${::hex}\\s+${::hex}\\s+${::decimal}\\s*"] \
-	    "jit-ed objfile in child"
+    # Go back to child, the JIT-ed objfile should still be there.
+    gdb_test "inferior 2" "Switching to inferior 2.*"
+    gdb_test "maint info jit"  \
+	[multi_line \
+	     "jit_code_entry address\\s+symfile address\\s+symfile size\\s*" \
+	     "${::hex}\\s+${::hex}\\s+${::decimal}\\s*"] \
+	"jit-ed objfile in child"
 
-	# Continue child past JIT unload, verify there are no more JIT-ed objfiles.
-	gdb_continue_to_breakpoint "continue to before return - child" ".*break before return.*"
-	gdb_test_no_output "maint info jit" "no more jit-ed objfiles in child"
+    # Continue child past JIT unload, verify there are no more JIT-ed objfiles.
+    gdb_continue_to_breakpoint "continue to before return - child" ".*break before return.*"
+    gdb_test_no_output "maint info jit" "no more jit-ed objfiles in child"
 }
 
 proc_with_prefix test_detach_on_fork_on_follow_fork_mode_parent { } {
-	if { [do_setup on parent] == -1 } {
-		return -1
-	}
+    if { [do_setup on parent] == -1 } {
+	return -1
+    }
 
-	# We are stopped in the parent, child is detached.
-	gdb_test "inferior" "Current inferior is 1.*" "current inferior is parent"
-	gdb_test "inferior 2" "Inferior ID 2 not known." "no inferior 2"
+    # We are stopped in the parent, child is detached.
+    gdb_test "inferior" "Current inferior is 1.*" "current inferior is parent"
+    gdb_test "inferior 2" "Inferior ID 2 not known." "no inferior 2"
 
-	# Continue past JIT unload, verify there are no more JIT-ed objfiles.
-	gdb_continue_to_breakpoint "continue to before return" ".*break before return.*"
-	gdb_test_no_output "maint info jit" "no more jit-ed objfiles"
+    # Continue past JIT unload, verify there are no more JIT-ed objfiles.
+    gdb_continue_to_breakpoint "continue to before return" ".*break before return.*"
+    gdb_test_no_output "maint info jit" "no more jit-ed objfiles"
 }
 
 proc_with_prefix test_detach_on_fork_on_follow_fork_mode_child { } {
-	if { [do_setup on child] == -1 } {
-		return -1
-	}
+    if { [do_setup on child] == -1 } {
+	return -1
+    }
 
-	# We are stopped in the child, parent is detached.
-	gdb_test "inferior" "Current inferior is 2.*" "current inferior is child"
-	gdb_test "inferior 1" "Switching to inferior 1 \\\[<null>\\\].*"
-	gdb_test "inferior 2" "Switching to inferior 2.*"
+    # We are stopped in the child, parent is detached.
+    gdb_test "inferior" "Current inferior is 2.*" "current inferior is child"
+    gdb_test "inferior 1" "Switching to inferior 1 \\\[<null>\\\].*"
+    gdb_test "inferior 2" "Switching to inferior 2.*"
 
-	# Continue past JIT unload, verify there are no more JIT-ed objfiles.
-	gdb_continue_to_breakpoint "continue to before return" ".*break before return.*"
-	gdb_test_no_output "maint info jit" "no more jit-ed objfiles"
+    # Continue past JIT unload, verify there are no more JIT-ed objfiles.
+    gdb_continue_to_breakpoint "continue to before return" ".*break before return.*"
+    gdb_test_no_output "maint info jit" "no more jit-ed objfiles"
 }
 
 test_detach_on_fork_off_follow_fork_mode_parent

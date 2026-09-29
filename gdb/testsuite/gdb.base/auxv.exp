@@ -26,9 +26,9 @@ set corefile ${binfile}.corefile
 set gcorefile ${binfile}.gcore
 
 if { [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable \
-		  {debug additional_flags=-DUSE_RLIMIT}] != ""
+	  {debug additional_flags=-DUSE_RLIMIT}] != ""
      && [gdb_compile "${srcdir}/${subdir}/${srcfile}" "${binfile}" executable \
-		  {debug}] != "" } {
+	     {debug}] != "" } {
     untested "failed to compile"
     return
 }

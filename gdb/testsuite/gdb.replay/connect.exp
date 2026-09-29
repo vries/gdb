@@ -118,7 +118,7 @@ proc_with_prefix replay_with_mustreplyempty_error {} {
 
     # Connect to gdbreplay.
     gdb_assert {[gdb_target_cmd_ext $gdbserver_protocol $gdbserver_gdbport \
-	".*Remote replied unexpectedly to 'vMustReplyEmpty': E.errtext"] == 0} \
+		     ".*Remote replied unexpectedly to 'vMustReplyEmpty': E.errtext"] == 0} \
 	"remote replied with an error"
 }
 

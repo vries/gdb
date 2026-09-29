@@ -300,15 +300,15 @@ proc test_info_linker_namespaces {} {
     # above.
     gdb_test "info linker-namespaces" \
 	[multi_line "There are 4 linker namespaces loaded\\." \
-		    "" \
-		    "$::decimal librar(y|ies) loaded in linker namespace 0:" \
-		    ".*" \
-		    "$::decimal librar(y|ies) loaded in linker namespace 1:" \
-		    ".*" \
-		    "$::decimal librar(y|ies) loaded in linker namespace 2:" \
-		    ".*" \
-		    "$::decimal librar(y|ies) loaded in linker namespace 3:" \
-		    ".*" ] "print namespaces with no argument"
+	     "" \
+	     "$::decimal librar(y|ies) loaded in linker namespace 0:" \
+	     ".*" \
+	     "$::decimal librar(y|ies) loaded in linker namespace 1:" \
+	     ".*" \
+	     "$::decimal librar(y|ies) loaded in linker namespace 2:" \
+	     ".*" \
+	     "$::decimal librar(y|ies) loaded in linker namespace 3:" \
+	     ".*" ] "print namespaces with no argument"
 }
 
 test_info_shared

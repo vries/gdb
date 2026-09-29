@@ -69,7 +69,7 @@ gdb_expect {
     -re "set annotate 2\r\n$gdb_prompt$" { pass "annotation set at level 2" }
     -re ".*$gdb_prompt$"       { fail "annotation set at level 2" }
     timeout	            { fail "annotation set at level 2 (timeout)" }
-  }
+}
 
 gdb_test_multiple "run" "run until main breakpoint, first time" {
     -re "$main_line.*$gdb_prompt$" {
@@ -109,14 +109,14 @@ set pat [multi_line "" \
 	     "2" \
 	     "\032\032field-end" \
 	     "\\}" \
-	     "" \
-	     "\032\032value-history-end" \
-	     $gdb_prompt$]
+    "" \
+    "\032\032value-history-end" \
+    $gdb_prompt$]
 
 gdb_test_multiple "print a" "print class" {
-    -re "$pat" {
-	pass "print class"
-    }
+-re "$pat" {
+    pass "print class"
+}
 }
 
 #
@@ -162,16 +162,16 @@ gdb_test_multiple "continue" "continue until exit" {
 #
 send_gdb "delete\n"
 gdb_expect {
-  -re ".*Delete all breakpoints, watchpoints, tracepoints, and catchpoints. \\(y or n\\) \r\n\032\032query.*$" {
-	   send_gdb "y\n"
-	   gdb_expect {
-	     -re "\r\n\032\032post-query\r\n${breakpoints_invalid}$gdb_prompt$" { pass "delete bps" }
-	     -re ".*$gdb_prompt$" { fail "delete bps" }
-	     timeout  { fail "delete bps (timeout)" }
-	 }
-     }
-  -re ".*$gdb_prompt$" { fail "delete bps" }
-  timeout  { fail "delete bps (timeout)" }
+    -re ".*Delete all breakpoints, watchpoints, tracepoints, and catchpoints. \\(y or n\\) \r\n\032\032query.*$" {
+	send_gdb "y\n"
+	gdb_expect {
+	    -re "\r\n\032\032post-query\r\n${breakpoints_invalid}$gdb_prompt$" { pass "delete bps" }
+	    -re ".*$gdb_prompt$" { fail "delete bps" }
+	    timeout  { fail "delete bps (timeout)" }
+	}
+    }
+    -re ".*$gdb_prompt$" { fail "delete bps" }
+    timeout  { fail "delete bps (timeout)" }
 }
 
 #

@@ -25,7 +25,7 @@ standard_testfile .cc stub-array-size2.cc
 include_file stub-array-size.h
 
 if {[prepare_for_testing "failed to prepare" $testfile "$srcfile $srcfile2" \
-	{c++ debug}]} {
+	 {c++ debug}]} {
     return
 }
 

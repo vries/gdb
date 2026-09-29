@@ -109,7 +109,7 @@ proc_with_prefix test { non-stop threaded run-or-attach } {
 
 foreach_with_prefix threaded {0 1} {
     set options [list debug additional_flags=-DWITH_THREADS=$threaded \
-		    additional_flags=-std=gnu99]
+		     additional_flags=-std=gnu99]
     if { $threaded } {
 	set testfile $testfile_threads
 	lappend options pthreads

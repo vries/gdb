@@ -48,12 +48,12 @@ reset_called_flags
 # a(x,y) .OR./.AND. a(a,b) correctly.
 foreach_with_prefix truth_table_index {1 2 3 4} {
     gdb_test "p truth_table($truth_table_index, 1) .OR. truth_table($truth_table_index, 2)" \
-	     "[expr {$truth_table_index > 1 ? ".TRUE." : ".FALSE."}]"
+	"[expr {$truth_table_index > 1 ? ".TRUE." : ".FALSE."}]"
 }
 
 foreach_with_prefix truth_table_index {1 2 3 4} {
     gdb_test "p truth_table($truth_table_index, 1) .AND. truth_table($truth_table_index, 2)" \
-	     "[expr {$truth_table_index > 3 ? ".TRUE." : ".FALSE."}]"
+	"[expr {$truth_table_index > 3 ? ".TRUE." : ".FALSE."}]"
 }
 
 # Vary number of function arguments to skip.
@@ -62,13 +62,13 @@ foreach_with_prefix arg {"No" "One" "Two"} {
     set trimmed_args [string trimright $argument_list ,]
     set arg_lower [string tolower $arg]
     gdb_test "p function_no_arg_false() .OR. function_${arg_lower}_arg($trimmed_args)" \
-	     " = .TRUE."
+	" = .TRUE."
     reset_called_flags
     gdb_test "p .TRUE. .OR. function_${arg_lower}_arg($trimmed_args)" \
-	     " = .TRUE."
+	" = .TRUE."
     # Check that none of the short-circuited functions have been called.
     gdb_test "p calls" \
-	     " = \\\( function_no_arg_called = $prime, function_no_arg_false_called = $prime, function_one_arg_called = $prime, function_two_arg_called = $prime, function_array_called = $prime \\\)"
+	" = \\\( function_no_arg_called = $prime, function_no_arg_false_called = $prime, function_one_arg_called = $prime, function_two_arg_called = $prime, function_array_called = $prime \\\)"
     append argument_list " .TRUE.,"
 }
 
@@ -76,16 +76,16 @@ with_test_prefix "nested call not skipped" {
     reset_called_flags
     # Check nested calls
     gdb_test "p function_one_arg(.FALSE. .OR. function_no_arg())" \
-	     " = .TRUE."
+	" = .TRUE."
     gdb_test "p calls" \
-	     " = \\\( function_no_arg_called = [expr {$prime + 1}], function_no_arg_false_called = $prime, function_one_arg_called = [expr {$prime + 1}], function_two_arg_called = $prime, function_array_called = $prime \\\)"
+	" = \\\( function_no_arg_called = [expr {$prime + 1}], function_no_arg_false_called = $prime, function_one_arg_called = [expr {$prime + 1}], function_two_arg_called = $prime, function_array_called = $prime \\\)"
 }
 
 with_test_prefix "nested call skipped" {
     gdb_test "p function_one_arg(.TRUE. .OR. function_no_arg())" \
-	     " = .TRUE."
+	" = .TRUE."
     gdb_test "p calls" \
-	     " = \\\( function_no_arg_called = [expr {$prime + 1}], function_no_arg_false_called = $prime, function_one_arg_called = [expr {$prime + 2}], function_two_arg_called = $prime, function_array_called = $prime \\\)"
+	" = \\\( function_no_arg_called = [expr {$prime + 1}], function_no_arg_false_called = $prime, function_one_arg_called = [expr {$prime + 2}], function_two_arg_called = $prime, function_array_called = $prime \\\)"
 }
 
 # Vary number of components in the expression to skip.
@@ -93,7 +93,7 @@ set expression "p .TRUE."
 foreach_with_prefix expression_components {1 2 3 4} {
     set expression "$expression .OR. function_one_arg(.TRUE.)"
     gdb_test "$expression" \
-	     " = .TRUE."
+	" = .TRUE."
 }
 
 # Check parsing skipped substring operations.
@@ -106,7 +106,7 @@ gdb_test "p .TRUE. .OR. binary_string(1)" " = .TRUE."
 foreach_with_prefix range1 {"1:2" ":" ":2" "1:"} {
     foreach_with_prefix range2 {"1:2" ":" ":2" "1:"} {
 	gdb_test "p .TRUE. .OR. binary_string($range1) .OR. binary_string($range2)" \
-		 " = .TRUE."
+	    " = .TRUE."
     }
 }
 
@@ -114,7 +114,7 @@ foreach_with_prefix range1 {"1:2" ":" ":2" "1:"} {
 foreach_with_prefix range1 {"1:2" ":" ":2" "1:"} {
     foreach_with_prefix range2 {"1:2" ":" ":2" "1:"} {
 	gdb_test "p .TRUE. .OR. binary_string($range1) .OR. truth_table($range2, 1)" \
-		 " = .TRUE."
+	    " = .TRUE."
     }
 }
 
@@ -125,7 +125,7 @@ with_test_prefix "binary string skip" {
     reset_called_flags
     # Function call and substring skip.
     gdb_test "p .TRUE. .OR. function_one_arg(binary_string(1))" \
-	     " = .TRUE."
+	" = .TRUE."
     gdb_test "p calls%function_one_arg_called" " = $prime"
 }
 
@@ -133,6 +133,6 @@ with_test_prefix "array skip" {
     # Function call and array skip.
     reset_called_flags
     gdb_test "p .TRUE. .OR. function_array(binary_string)" \
-	     " = .TRUE."
+	" = .TRUE."
     gdb_test "p calls%function_array_called" " = $prime"
 }

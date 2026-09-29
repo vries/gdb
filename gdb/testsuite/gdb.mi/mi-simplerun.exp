@@ -85,8 +85,8 @@ proc test_breakpoints_creation_and_listing {} {
 	"list of breakpoints"
 
     mi_gdb_test "205-break-disable 2 3 4" \
-		"205\\^done.*" \
-		"disabling of breakpoints"
+	"205\\^done.*" \
+	"disabling of breakpoints"
 
     set bp2 [mi_make_breakpoint -number 2 -enabled n]
     mi_gdb_test "206-break-info 2" \
@@ -108,7 +108,7 @@ proc test_running_the_program {} {
     # The following is equivalent to a send_gdb "000-exec-run\n"
     mi_run_cmd
     mi_expect_stop "breakpoint-hit" "main" "" ".*basics.c" "$line_main_body" \
-      { "" "disp=\"keep\"" } "run to main"
+	{ "" "disp=\"keep\"" } "run to main"
 }
 
 proc test_controlled_execution {} {

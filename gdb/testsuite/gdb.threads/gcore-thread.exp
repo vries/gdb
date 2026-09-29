@@ -129,17 +129,17 @@ proc load_core { filename } {
     # be at least two threads:
 
     gdb_test "info threads" "\\* 1 ${horiz}${nl}  2 ${horiz}.*" \
-	    "corefile contains at least two threads"
+	"corefile contains at least two threads"
 
     # One thread in the corefile should be in the "thread2" function.
 
     gdb_test "info threads" ".* thread2 .*" \
-	    "a corefile thread is executing thread2"
+	"a corefile thread is executing thread2"
 
     # The thread2 thread should be marked as the current thread.
 
     gdb_test "info threads" "\\* ${horiz} thread2 .*" \
-	    "thread2 is current thread in corefile"
+	"thread2 is current thread in corefile"
 }
 
 foreach name { corefile core0file } {

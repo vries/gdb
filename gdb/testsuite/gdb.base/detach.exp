@@ -30,15 +30,15 @@ if { [prepare_for_testing "prepare" $testfile $srcfile] != 0 } {
 }
 
 proc do_detach_tests {} {
-  global srcdir
-  global binfile
-  global escapedbinfile
-  global subdir
-  global pass
+    global srcdir
+    global binfile
+    global escapedbinfile
+    global subdir
+    global pass
 
-  runto_main
-  gdb_test_no_output "set should_exit = 1" "set should_exit, $pass"
-  gdb_test "detach" "Detaching from program: .*$escapedbinfile, .*" "detach, $pass"
+    runto_main
+    gdb_test_no_output "set should_exit = 1" "set should_exit, $pass"
+    gdb_test "detach" "Detaching from program: .*$escapedbinfile, .*" "detach, $pass"
 }
 
 set pass "one"

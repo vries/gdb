@@ -58,4 +58,4 @@ gdb_load $binfile
 
 # Verify that GDB notices the null DIE.
 gdb_assert { [regexp "DWARF Error: Unexpected null DIE" $gdb_file_cmd_msg] } \
-	"Null DIE error missing"
+    "Null DIE error missing"

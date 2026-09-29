@@ -50,7 +50,7 @@ proc test_command_param_changed { } {
 		{\^done} \
 		"\"set scheduler-locking on\" no event (requested by MI)"
 	    mi_gdb_test "interpreter-exec mi \"-gdb-set scheduler-locking step\"" \
-	    "\\&\"interpreter-exec mi .*\"-gdb-set scheduler-locking step.*\"\\\\n\"\r\n\\^done\r\n\\^done" \
+		"\\&\"interpreter-exec mi .*\"-gdb-set scheduler-locking step.*\"\\\\n\"\r\n\\^done\r\n\\^done" \
 		"\"set scheduler-locking step\" no event (requested by MI interp)"
 	    mi_gdb_test "set scheduler-locking step" \
 		"\\&\"set scheduler-locking step\\\\n\"\r\n\\^done" \

@@ -47,7 +47,7 @@ proc saved_regs_to_str { savedregs funcname } {
 	    set name [lindex $r 0]
 	    set offset [lindex $r 1]
 	    set addr [get_hexadecimal_valueof "\$sp+$offset" 0 \
-		 "get value of $name@sp+$offset in $funcname"]
+			  "get value of $name@sp+$offset in $funcname"]
 	    append str "\\s*$name at $addr,?"
 	    if { $name == "blink" } {
 		set has_blink 1
@@ -111,7 +111,7 @@ prologue_test "noncallee_saved_regs_r2_push" { {r2 0} {r13 4} }
 prologue_test "noncallee_saved_regs_gp_push" { {r25 4} {gp 0} }
 prologue_test "noncallee_saved_regs_lp_count" { {r25 4} {lp_count 0} }
 prologue_test "noncallee_saved_regs_blink_out_of_prologue" { {r25 8} {gp 4} \
-    {blink 0}}
+								 {blink 0}}
 # Argument registers are not reported as "saved" regs.
 prologue_test "arg_regs_fp" { {r0 12} {r1 8} {r7 4} {r8 0} {fp 16} } 16
 prologue_test "arg_regs_fp_mov_s" { {r0 4} {r8 0} {fp 8} } 8
@@ -126,8 +126,8 @@ prologue_test "enter_s_r15" { {r13 0} {r14 4} {r15 8} } 0
 # GDB will not report it as "saved register" (but maybe it should). GP is at
 # offset 56.
 prologue_test "enter_s_all" { {r13 4} {r14 8} {r15 12} {r16 16} {r17 20} \
-    {r18 24} {r19 28} {r20 32} {r21 36} {r22 40} {r23 44} {r24 48} {r25 52} \
-    {gp 56} {fp 60} {blink 0} } 0
+				  {r18 24} {r19 28} {r20 32} {r21 36} {r22 40} {r23 44} {r24 48} {r25 52} \
+				  {gp 56} {fp 60} {blink 0} } 0
 
 # Test more levels of backtrace.
 gdb_breakpoint nested_prologue_inner -temporary
@@ -145,9 +145,9 @@ gdb_test "info frame 1" ".*Saved registers:$regs" \
 # sub sp,sp for local variables is part of prologue, hence should be added to
 # all of those offsets.
 prologue_test "max_length_prologue" { {r0 72} {r1 76} {r2 80} {r3 84} {r4 88} \
-    {r5 92} {r6 96} {r7 100} {r13 20} {r14 24} {r15 28} {r16 32} \
-    {r17 36} {r18 40} {r19 44} {r20 48} {r21 52} {r22 56} {r23 60} {r24 64} \
-    {r25 68} {fp 16} {blink 104} }
+					  {r5 92} {r6 96} {r7 100} {r13 20} {r14 24} {r15 28} {r16 32} \
+					  {r17 36} {r18 40} {r19 44} {r20 48} {r21 52} {r22 56} {r23 60} {r24 64} \
+					  {r25 68} {fp 16} {blink 104} }
 
 prologue_test "branch_in_prologue" { {r13 0} }
 prologue_test "cond_branch_in_prologue" { {r13 4} }
@@ -173,7 +173,7 @@ prologue_test "r_relative_store_st_s" { {r13 8} {r14 0} {r15 4} }
 prologue_test "r_relative_store_unknown" { {r13 8} }
 prologue_test "st_s_r0gp" { {r13 8} }
 prologue_test "push_s_prologue" { {r0 28} {r1 16} {r2 4} {r3 24} {r12 32} \
-    {r13 20} {r14 12} {r15 8} {blink 0}}
+				      {r13 20} {r14 12} {r15 8} {blink 0}}
 prologue_test "sub_s_cbu3" { {r13 4} {r14 0} }
 prologue_test "sub_s_bbc" { {r1 4} {r13 12} {r14 0} }
 prologue_test "sub_s_bbu5" { {r13 8} {r14 0} }

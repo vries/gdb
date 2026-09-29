@@ -18,8 +18,8 @@ standard_testfile
 set epilogue [have_epilogue_line_info]
 
 if { [prepare_for_testing "failed to prepare" "skip-inline" \
-			  {skip-inline.c skip1.c } \
-			  {debug nowarnings}] } {
+	  {skip-inline.c skip1.c } \
+	  {debug nowarnings}] } {
     return
 }
 

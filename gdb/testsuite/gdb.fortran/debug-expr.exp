@@ -42,6 +42,6 @@ gdb_test_debug_expr "print .TRUE."  [multi_line \
 					 " Constant: .*1" \
 					 "${::valnum_re} = \.TRUE\."]
 gdb_test_debug_expr "print .FALSE."  [multi_line \
-					 "Operation: OP_BOOL" \
-					 " Constant: .*0" \
+					  "Operation: OP_BOOL" \
+					  " Constant: .*0" \
 					  "${::valnum_re} = \.FALSE\."]

@@ -18,7 +18,7 @@
 standard_testfile ${srcdir}/gdb.base/array-repeat.c
 
 if {[prepare_for_testing ${testfile}.exp ${testfile} ${srcfile} \
-	[list debug ${lang}]]} {
+	 [list debug ${lang}]]} {
     return
 }
 

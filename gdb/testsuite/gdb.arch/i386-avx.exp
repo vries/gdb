@@ -64,8 +64,8 @@ if {![runto_main]} {
 gdb_test_no_output "set should_dump_core_p=0"
 
 gdb_test "break [gdb_get_line_number "first breakpoint here"]" \
-	 "Breakpoint .* at .*i386-avx.c.*" \
-	 "set first breakpoint in main"
+    "Breakpoint .* at .*i386-avx.c.*" \
+    "set first breakpoint in main"
 gdb_continue_to_breakpoint "continue to first breakpoint in main"
 
 if {[is_amd64_regs_target]} {
@@ -81,8 +81,8 @@ for { set r 0 } { $r < $nr_regs } { incr r } {
 }
 
 gdb_test "break [gdb_get_line_number "second breakpoint here"]" \
-	 "Breakpoint .* at .*i386-avx.c.*" \
-	 "set second breakpoint in main"
+    "Breakpoint .* at .*i386-avx.c.*" \
+    "set second breakpoint in main"
 gdb_continue_to_breakpoint "continue to second breakpoint in main"
 
 for { set r 0 } { $r < $nr_regs } { incr r } {

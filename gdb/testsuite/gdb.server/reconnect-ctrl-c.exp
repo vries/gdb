@@ -42,7 +42,7 @@ set target_binfile [gdb_remote_download target $binfile]
 # Make sure we're disconnected, in case we're testing with an
 # extended-remote board, therefore already connected.
 with_test_prefix "preparation" {
-  gdb_test "disconnect" ".*"
+    gdb_test "disconnect" ".*"
 }
 
 # Connect, continue, send Ctrl-C and expect a SIGINT stop.

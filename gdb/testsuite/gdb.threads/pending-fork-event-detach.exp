@@ -68,9 +68,9 @@ set target_touch_file_bin [gdb_remote_download target $touch_file_bin]
 
 proc do_test { target-non-stop who_forks fork_function stop_mode } {
     set opts [list \
-	debug \
-	"additional_flags=-DFORK_FUNCTION=$fork_function" \
-	"additional_flags=-DTOUCH_FILE_BIN=\"$::target_touch_file_bin\""]
+		  debug \
+		  "additional_flags=-DFORK_FUNCTION=$fork_function" \
+		  "additional_flags=-DTOUCH_FILE_BIN=\"$::target_touch_file_bin\""]
 
     # WHO_FORKS says which of the main or other thread calls (v)fork.  The
     # thread that does not call (v)fork is the one who tries to step.

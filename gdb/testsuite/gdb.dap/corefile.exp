@@ -72,9 +72,9 @@ gdb_assert { $reg_scope ne "" } "found register scope"
 # Read all the registers from the register scope.
 set num [dict get $reg_scope variablesReference]
 set reply [lindex [dap_check_request_and_response "fetch all registers" \
-		      "variables" \
-		      [format {o variablesReference [i %d] count [i %d]} $num\
-			   [dict get $reg_scope namedVariables]]] 0]
+		       "variables" \
+		       [format {o variablesReference [i %d] count [i %d]} $num\
+			    [dict get $reg_scope namedVariables]]] 0]
 
 # Find the name and value of a register, we'll use this to try setting
 # a register below.

@@ -74,11 +74,11 @@ if {$tdp2 <= 0 || $tdp3 <= 0 || $tdp4 <= 0} {
 }
 
 gdb_test "passcount 4 $tdp2" "Setting tracepoint $tdp2's passcount to 4" \
-	"4.5: set passcount for tracepoint $tdp2"
+    "4.5: set passcount for tracepoint $tdp2"
 gdb_test "passcount 2 $tdp3" "Setting tracepoint $tdp3's passcount to 2" \
-	"4.5: set passcount for tracepoint $tdp3"
+    "4.5: set passcount for tracepoint $tdp3"
 gdb_test "passcount 3 $tdp4" "Setting tracepoint $tdp4's passcount to 3" \
-	"4.5: set passcount for tracepoint $tdp4"
+    "4.5: set passcount for tracepoint $tdp4"
 
 gdb_test "tstart" ".*" ""
 

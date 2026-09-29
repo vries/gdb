@@ -60,7 +60,7 @@ proc test_register { rn } {
 
     # Set all bits of x<rn>
     gdb_test_no_output "set \$x${rn}=0xffffffffffffffff" \
-		       "set all bits of x${rn}"
+	"set all bits of x${rn}"
 
     # Test setting/fetching values
     for {set i 0} {$i < 9} {incr i} {
@@ -82,7 +82,7 @@ proc test_register { rn } {
 
 	    # Set all bits of x<rn>
 	    gdb_test_no_output "set \$x${rn}=0xffffffffffffffff" \
-			       "set all bits of x${rn}"
+		"set all bits of x${rn}"
 	}
     }
 }

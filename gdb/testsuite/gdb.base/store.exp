@@ -194,7 +194,7 @@ proc check_field { t } {
     global gdb_prompt
     gdb_test "tbreak wack_field_${t}"
     gdb_test "continue" "register struct f_${t} u = f_${t};" \
-	    "continue field ${t}"
+	"continue field ${t}"
 
     # Match either the return statement, or the line immediately after
     # it.  The compiler can end up merging the return statement into

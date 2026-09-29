@@ -40,12 +40,12 @@ gdb_run_cmd
 # When the prompt comes back we'll be at the Set DFP rounding mode breakpoint.
 # Unless the program bails out after checking AT_HWCAP.
 gdb_expect {
-  -re "$inferior_exited_re with code 01.\[\r\n\]+$gdb_prompt $" {
-    unsupported "this machine doesn't support Decimal Floating Point."
-    return
-  }
+    -re "$inferior_exited_re with code 01.\[\r\n\]+$gdb_prompt $" {
+	unsupported "this machine doesn't support Decimal Floating Point."
+	return
+    }
 
-  -re ".*$gdb_prompt $" {}
+    -re ".*$gdb_prompt $" {}
 }
 
 # First, verify if FPSCR is all zeroes.

@@ -45,8 +45,8 @@ mi_step_to "do_block_tests" "" "var-cmd.c" \
 mi_create_varobj "cb" "cb" "create local variable cb"
 
 mi_gdb_test "-var-create foo * foo" \
-       "\\^error,msg=\"-var-create: unable to create variable object\"" \
-       "try to create local variable foo"
+    "\\^error,msg=\"-var-create: unable to create variable object\"" \
+    "try to create local variable foo"
 
 # step to "foo = 123;"
 mi_step_to "do_block_tests" "" "var-cmd.c" \
@@ -56,8 +56,8 @@ mi_step_to "do_block_tests" "" "var-cmd.c" \
 
 # Be paranoid and assume 3.2 created foo
 mi_gdb_test "-var-delete foo" \
-	"\\^error,msg=\"Variable object not found\"" \
-	"delete var foo 1"
+    "\\^error,msg=\"Variable object not found\"" \
+    "delete var foo 1"
 
 
 # Test: c_variable-3.3
@@ -72,8 +72,8 @@ mi_step_to "do_block_tests" "" "var-cmd.c" \
 # Test: c_variable-3.4
 # Desc: check foo, cb changed
 mi_gdb_test "-var-update *" \
-	"\\^done,changelist=\\\[\{name=\"foo\",in_scope=\"true\",type_changed=\"false\",has_more=\"0\"\},\{name=\"cb\",in_scope=\"true\",type_changed=\"false\",has_more=\"0\"\}\\\]" \
-	"update all vars: cb foo changed"
+    "\\^done,changelist=\\\[\{name=\"foo\",in_scope=\"true\",type_changed=\"false\",has_more=\"0\"\},\{name=\"cb\",in_scope=\"true\",type_changed=\"false\",has_more=\"0\"\}\\\]" \
+    "update all vars: cb foo changed"
 
 # step to "foo = 321;"
 mi_step_to "do_block_tests" "" "var-cmd.c" \
@@ -98,23 +98,23 @@ mi_create_varobj "foo2" "foo2" "create local variable foo2"
 # Note: also a known gdb problem
 setup_xfail *-*-*
 mi_gdb_test "-var-update inner_foo" \
-	"\\^done,changelist=\{FIXME\}" \
-	"update inner_foo: should be out of scope: KNOWN PROBLEM"
+    "\\^done,changelist=\{FIXME\}" \
+    "update inner_foo: should be out of scope: KNOWN PROBLEM"
 clear_xfail *-*-*
 
 setup_xfail *-*-*
 mi_gdb_test "-var-evaluate-expression inner_foo" \
-	"\\^done,value=\{FIXME\}" \
-	"evaluate inner_foo: should be out of scope: KNOWN PROBLEM"
+    "\\^done,value=\{FIXME\}" \
+    "evaluate inner_foo: should be out of scope: KNOWN PROBLEM"
 clear_xfail *-*-*
 
 mi_gdb_test "-var-update foo" \
-	"\\^done,changelist=\\\[\\\]" \
-	"update foo: did not change"
+    "\\^done,changelist=\\\[\\\]" \
+    "update foo: did not change"
 
 mi_gdb_test "-var-delete inner_foo" \
-	"\\^done,ndeleted=\"1\"" \
-	"delete var inner_foo"
+    "\\^done,ndeleted=\"1\"" \
+    "delete var inner_foo"
 
 # step to "foo = 0;"
 mi_step_to "do_block_tests" "" "var-cmd.c" \
@@ -125,8 +125,8 @@ mi_step_to "do_block_tests" "" "var-cmd.c" \
 # Desc: check that foo2 out of scope (known gdb problem)
 setup_xfail *-*-*
 mi_gdb_test "-var-update foo2" \
-	"\\^done,changelist=\{FIXME\}" \
-	"update foo2: should be out of scope: KNOWN PROBLEM"
+    "\\^done,changelist=\{FIXME\}" \
+    "update foo2: should be out of scope: KNOWN PROBLEM"
 clear_xfail *-*-*
 
 # step to "cb = 21;"
@@ -138,17 +138,17 @@ mi_step_to "do_block_tests" "" "var-cmd.c" \
 # Desc: check that only cb is in scope (known gdb problem)
 setup_xfail *-*-*
 mi_gdb_test "-var-update foo2" \
-	"\\^done,changelist=\\\[FIXME\\\]" \
-	"update foo2 should be out of scope: KNOWN PROBLEM"
+    "\\^done,changelist=\\\[FIXME\\\]" \
+    "update foo2 should be out of scope: KNOWN PROBLEM"
 clear_xfail *-*-*
 setup_xfail *-*-*
 mi_gdb_test "-var-update foo" \
-	"\\^done,changelist=\{FIXME\}" \
-	"update foo should be out of scope: KNOWN PROBLEM"
+    "\\^done,changelist=\{FIXME\}" \
+    "update foo should be out of scope: KNOWN PROBLEM"
 clear_xfail *-*-*
 mi_gdb_test "-var-update cb" \
-	"\\^done,changelist=\\\[\\\]" \
-	"update cb"
+    "\\^done,changelist=\\\[\\\]" \
+    "update cb"
 
 # Test: c_variable-3.10
 # Desc: names of editable variables
@@ -158,15 +158,15 @@ mi_gdb_test "-var-update cb" \
 
 # Done with block tests
 mi_gdb_test "-var-delete foo" \
-	"\\^done,ndeleted=\"1\"" \
-	"delete var foo 2"
+    "\\^done,ndeleted=\"1\"" \
+    "delete var foo 2"
 
 mi_gdb_test "-var-delete foo2" \
-	"\\^done,ndeleted=\"1\"" \
-	"delete var foo2"
+    "\\^done,ndeleted=\"1\"" \
+    "delete var foo2"
 
 mi_gdb_test "-var-delete cb" \
-	"\\^done,ndeleted=\"1\"" \
-	"delete var cb"
+    "\\^done,ndeleted=\"1\"" \
+    "delete var cb"
 
 mi_gdb_exit

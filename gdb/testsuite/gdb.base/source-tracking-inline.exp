@@ -47,14 +47,14 @@ gdb_test "break ${testfile}.c:$lineno" \
 # because it has 2 locations (inline function called from two places).
 # The output should show <MULTIPLE> but NOT "source-tracking enabled".
 gdb_test_multiple "info breakpoints" \
-  "multi-location breakpoint not tracked" {
-    -re -wrap "source-tracking enabled.*" {
-      fail "$gdb_test_name (tracking incorrectly enabled)"
+    "multi-location breakpoint not tracked" {
+	-re -wrap "source-tracking enabled.*" {
+	    fail "$gdb_test_name (tracking incorrectly enabled)"
+	}
+	-re -wrap "<MULTIPLE>.*" {
+	    pass $gdb_test_name
+	}
     }
-    -re -wrap "<MULTIPLE>.*" {
-      pass $gdb_test_name
-    }
-}
 
 sleep 1
 remote_exec build "cp $srcdir/$subdir/$srcfile2 $build_srcfile"
@@ -71,10 +71,10 @@ gdb_test "with confirm off -- start"
 # multi-location breakpoints even after reload.
 gdb_test_multiple "info breakpoints" \
     "multi-location breakpoint still not tracked after reload" {
-    -re -wrap "source-tracking enabled.*" {
-	fail "$gdb_test_name (tracking incorrectly enabled)"
+	-re -wrap "source-tracking enabled.*" {
+	    fail "$gdb_test_name (tracking incorrectly enabled)"
+	}
+	-re -wrap "<MULTIPLE>.*" {
+	    pass $gdb_test_name
+	}
     }
-    -re -wrap "<MULTIPLE>.*" {
-	pass $gdb_test_name
-    }
-}

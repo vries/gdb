@@ -41,13 +41,13 @@ gdb_test "next"
 
 # Inferior calls and return commands will create gaps in the recording.
 gdb_test "call square (3)" [multi_line \
-    "" \
-    "Breakpoint $decimal, square \\(num=3\\) at \[^\r\n\]+:$bp_1" \
-    "$decimal.*bp1.*" \
-    "The program being debugged stopped while in a function called from GDB\\." \
-    "Evaluation of the expression containing the function" \
-    "\\(square\\) will be abandoned\\." \
-    "When the function is done executing, GDB will silently stop\\."]
+				"" \
+				"Breakpoint $decimal, square \\(num=3\\) at \[^\r\n\]+:$bp_1" \
+				"$decimal.*bp1.*" \
+				"The program being debugged stopped while in a function called from GDB\\." \
+				"Evaluation of the expression containing the function" \
+				"\\(square\\) will be abandoned\\." \
+				"When the function is done executing, GDB will silently stop\\."]
 
 gdb_test "return 9" "0.*main.*" \
     "return" \

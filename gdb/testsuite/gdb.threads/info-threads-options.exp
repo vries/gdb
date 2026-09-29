@@ -122,10 +122,10 @@ foreach tid "\"$stopped_tid\" \"$stopped_tid $running_tid\"" {
 
 gdb_test_multiple "info threads -stopped -running $stopped_tid $running_tid" \
     "filter flags and tids combined" {
-    -re -wrap ".*stop_here.*running.*" {
-	pass $gdb_test_name
+	-re -wrap ".*stop_here.*running.*" {
+	    pass $gdb_test_name
+	}
+	-re -wrap ".*running.*stop_here.*" {
+	    pass $gdb_test_name
+	}
     }
-    -re -wrap ".*running.*stop_here.*" {
-	pass $gdb_test_name
-    }
-}

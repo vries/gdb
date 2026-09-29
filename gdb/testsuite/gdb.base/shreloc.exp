@@ -81,9 +81,9 @@ set fn_1_addr [get_var_address fn_1]
 set fn_2_addr [get_var_address fn_2]
 
 if { "${fn_1_addr}" == "${fn_2_addr}" } {
-  fail "relocated extern functions have different addresses"
+    fail "relocated extern functions have different addresses"
 } else {
-  pass "relocated extern functions have different addresses"
+    pass "relocated extern functions have different addresses"
 }
 
 # Check extern var for relocation
@@ -91,9 +91,9 @@ set extern_var_1_addr [get_var_address extern_var_1]
 set extern_var_2_addr [get_var_address extern_var_2]
 
 if { "${extern_var_1_addr}" == "${extern_var_2_addr}" } {
-  fail "relocated extern variables have different addresses"
+    fail "relocated extern variables have different addresses"
 } else {
-  pass "relocated extern variables have different addresses"
+    pass "relocated extern variables have different addresses"
 }
 
 # Check static var for relocation
@@ -101,9 +101,9 @@ set static_var_1_addr [get_var_address static_var_1]
 set static_var_2_addr [get_var_address static_var_2]
 
 if { "${static_var_1_addr}" == "${static_var_2_addr}" } {
-  fail "relocated static variables have different addresses"
+    fail "relocated static variables have different addresses"
 } else {
-  pass "relocated static variables have different addresses"
+    pass "relocated static variables have different addresses"
 }
 
 #
@@ -183,7 +183,7 @@ proc check_different {var msymfile} {
 
     foreach addr ${addr_list} {
 	if { ${prev} == ${addr} } {
-	  return 0
+	    return 0
 	}
 	set prev ${addr}
     }
