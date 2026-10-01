@@ -1185,6 +1185,37 @@ gdb_disassembly_1 (struct gdbarch *gdbarch, struct ui_out *uiout,
 
 /* See disasm.h.  */
 
+bool
+disassemble_section_p (addrmap_mutable &map,
+		       struct obj_section *s, CORE_ADDR range_low,
+		       CORE_ADDR range_high)
+{
+  if (s == nullptr)
+    {
+      struct obj_section *prev = (range_low == 0
+				  ? nullptr
+				  : (obj_section *)map.find (range_low - 1));
+      struct obj_section *next = (range_high == (CORE_ADDR)-1
+				  ? nullptr
+				  : (obj_section *)map.find (range_high + 1));
+      bool section_hole
+	= (prev != nullptr && next != nullptr
+	   && prev->objfile == next->objfile);
+      if (section_hole)
+	{
+	  /* Don't disassemble if it would trigger a memory error.  */
+	  return target_has_registers ();
+	}
+
+      /* Random memory not in a section; might contain JIT-ed instructions.  */
+      return true;
+    }
+
+  return true;
+}
+
+/* See disasm.h.  */
+
 int
 gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
 		 gdb_disassembly_flags flags, int how_many,
@@ -1197,8 +1228,17 @@ gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
     {
       CORE_ADDR tmp_high = high;
 
-      CORE_ADDR range_high;
-      map->find (low, nullptr, &range_high);
+      CORE_ADDR range_low, range_high;
+      struct obj_section *s
+	= (obj_section *)map->find (low, &range_low, &range_high);
+      if (!disassemble_section_p (*map, s, range_low, range_high))
+	{
+	  if (range_high == (CORE_ADDR)-1)
+	    break;
+
+	  low = range_high + 1;
+	  continue;
+	}
 
       /* Don't disassemble past a section change.  */
       if (range_high != (CORE_ADDR)-1)

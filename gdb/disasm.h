@@ -26,6 +26,7 @@
 struct gdbarch;
 struct ui_out;
 struct ui_file;
+struct addrmap_mutable;
 
 /* A wrapper around a disassemble_info and a gdbarch.  This is the core
    set of data that all disassembler sub-classes will need.  This class
@@ -322,6 +323,13 @@ struct disasm_insn
   /* True if the instruction was executed speculatively.  */
   unsigned int is_speculative:1;
 };
+
+/* Return true if memory in [RANGE_LOW, RANGE_HIGH] should be disassembled.
+   S is either the corresponding section, or nullptr if the range doesn't
+   match a section.  */
+
+extern bool disassemble_section_p (addrmap_mutable &map, struct obj_section *s,
+				   CORE_ADDR range_low, CORE_ADDR range_high);
 
 /* Print at most HOW_MANY instructions of the instruction stream at
    [LOW, HIGH) on UIOUT using FLAGS.  Return the number of the instructions

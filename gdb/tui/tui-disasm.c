@@ -179,8 +179,17 @@ tui_disassemble (struct gdbarch *gdbarch,
 
   while (count > 0)
     {
-      CORE_ADDR range_high;
-      map.find (pc, nullptr, &range_high);
+      CORE_ADDR range_low, range_high;
+      struct obj_section *s
+	= (struct obj_section *)map.find (pc, &range_low, &range_high);
+      if (!disassemble_section_p (map, s, range_low, range_high))
+	{
+	  if (range_high == (CORE_ADDR)-1)
+	    break;
+
+	  pc = range_high + 1;
+	  continue;
+	}
 
       /* Don't disassemble past a section change.  */
       std::optional<CORE_ADDR> high_pc;
@@ -206,17 +215,34 @@ tui_disassemble (struct gdbarch *gdbarch,
    addresses, or the start of a section.  */
 
 static CORE_ADDR
-tui_find_backward_disassembly_start_address (CORE_ADDR addr)
+tui_find_backward_disassembly_start_address (addrmap_mutable &map, CORE_ADDR addr)
 {
   if (addr == 0)
     {
       /* We cannot go backwards from zero.  */
       return addr;
     }
+  CORE_ADDR search_addr = addr - 1;
+
+  struct obj_section *s = nullptr;
+  CORE_ADDR range_low, range_high;
+  while (true)
+    {
+      s = (struct obj_section *)map.find (search_addr, &range_low,
+					  &range_high);
+
+      if (disassemble_section_p (map, s, range_low, range_high))
+	break;
+
+      if (range_low == 0)
+	return addr;
+
+      search_addr = range_low - 1;
+    }
 
   bound_minimal_symbol msym_prev;
   bound_minimal_symbol msym
-    = lookup_minimal_symbol_by_pc_section (addr - 1, nullptr,
+    = lookup_minimal_symbol_by_pc_section (search_addr, nullptr,
 					   lookup_msym_prefer::TEXT,
 					   &msym_prev);
   if (msym.minsym != nullptr)
@@ -226,11 +252,7 @@ tui_find_backward_disassembly_start_address (CORE_ADDR addr)
 
   /* Find the first section with start address before ADDR, and use its start
      address.  */
-  struct obj_section *section = find_pc_section (addr - 1);
-  if (section != NULL)
-    return section->addr ();
-
-  return addr;
+  return range_low;
 }
 
 /* Find the disassembly address that corresponds to FROM lines above
@@ -292,7 +314,7 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
       CORE_ADDR prev_low = new_low;
 
       /* Find an address from which we can start disassembling.  */
-      new_low = tui_find_backward_disassembly_start_address (new_low);
+      new_low = tui_find_backward_disassembly_start_address (*map, new_low);
       if (new_low == prev_low)
 	break;
 
