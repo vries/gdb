@@ -34,6 +34,7 @@
 #include "cli/cli-style.h"
 #include "objfiles.h"
 #include "inferior.h"
+#include "addrmap.h"
 
 /* Disassemble functions.
    FIXME: We should get rid of all the duplicate code in gdb that does
@@ -1145,12 +1146,12 @@ gdb_disassembler::print_insn (CORE_ADDR memaddr,
   return length;
 }
 
-/* See disasm.h.  */
+/* Helper function for gdb_disassembly.  */
 
-int
-gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
-		 gdb_disassembly_flags flags, int how_many,
-		 CORE_ADDR low, CORE_ADDR high)
+static int
+gdb_disassembly_1 (struct gdbarch *gdbarch, struct ui_out *uiout,
+		   gdb_disassembly_flags flags, int how_many,
+		   CORE_ADDR low, CORE_ADDR high)
 {
   struct symtab *symtab;
   int nlines = -1;
@@ -1178,6 +1179,45 @@ gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
 						 low, high, how_many, flags);
 
   gdb_flush (gdb_stdout);
+
+  return num_displayed;
+}
+
+/* See disasm.h.  */
+
+int
+gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
+		 gdb_disassembly_flags flags, int how_many,
+		 CORE_ADDR low, CORE_ADDR high)
+{
+  std::unique_ptr<addrmap_mutable> map = section_addrmap ();
+  bool update_how_many = how_many != -1;
+  int num_displayed = 0;
+  while (low < high)
+    {
+      CORE_ADDR tmp_high = high;
+
+      CORE_ADDR range_high;
+      map->find (low, nullptr, &range_high);
+
+      /* Don't disassemble past a section change.  */
+      if (range_high != (CORE_ADDR)-1)
+	tmp_high = std::min (tmp_high, range_high + 1);
+
+      int res
+	= gdb_disassembly_1 (gdbarch, uiout, flags, how_many, low,
+			     tmp_high);
+      num_displayed += res;
+
+      if (update_how_many)
+	{
+	  how_many -= res;
+	  if (how_many <= 0)
+	    break;
+	}
+
+      low = tmp_high;
+    }
 
   return num_displayed;
 }

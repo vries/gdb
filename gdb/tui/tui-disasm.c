@@ -38,6 +38,7 @@
 #include "tui/tui-location.h"
 #include "gdbsupport/selftest.h"
 #include "inferior.h"
+#include "addrmap.h"
 
 struct tui_asm_line
 {
@@ -80,23 +81,13 @@ len_without_escapes (const std::string &str)
   return len;
 }
 
-/* Function to disassemble up to COUNT instructions starting from address
-   PC into the ASM_LINES vector (which will be emptied of any previous
-   contents).  Return the address after the last disassembled instruction.
-   When ADDR_SIZE is non-null then place the maximum size of an address and
-   label into the value pointed to by ADDR_SIZE, and set the addr_size
-   field on each item in ASM_LINES, otherwise the addr_size fields within
-   ASM_LINES are undefined.
+/* Helper function for tui_disassemble.  */
 
-   It is worth noting that ASM_LINES might not have COUNT entries when this
-   function returns.  If the disassembly is truncated for some other
-   reason, for example, we hit invalid memory, then ASM_LINES can have
-   fewer entries than requested.  */
 static CORE_ADDR
-tui_disassemble (struct gdbarch *gdbarch,
-		 std::vector<tui_asm_line> &asm_lines,
-		 CORE_ADDR pc, int count,
-		 size_t *addr_size = nullptr)
+tui_disassemble_1 (struct gdbarch *gdbarch,
+		   std::vector<tui_asm_line> &asm_lines, CORE_ADDR pc,
+		   std::optional<CORE_ADDR> high_pc, int count,
+		   size_t *addr_size)
 {
   bool term_out = disassembler_styling && gdb_stdout->can_emit_style_escape ();
   string_file gdb_dis_out (term_out);
@@ -104,20 +95,29 @@ tui_disassemble (struct gdbarch *gdbarch,
 			    ? (decltype (stream))&null_stream
 			    : (decltype (stream))&gdb_dis_out);
 
-  /* Must start with an empty list.  */
-  asm_lines.clear ();
-
   /* Now construct each line.  */
   for (int i = 0; i < count; ++i)
     {
       tui_asm_line tal;
+
+      if (high_pc.has_value () && pc >= *high_pc)
+	break;
 
       /* Save the instruction address.  */
       tal.addr = pc;
 
       try
 	{
-	  pc += gdb_print_insn (gdbarch, pc, stream, NULL);
+	  int len = gdb_print_insn (gdbarch, pc, stream, NULL);
+	  CORE_ADDR next_pc = pc + len;
+	  if (high_pc.has_value () && next_pc > *high_pc)
+	    {
+	      /* Instruction spans high_pc.  */
+	      gdb_dis_out = "(bad)";
+	      next_pc = *high_pc;
+	    }
+
+	  pc = next_pc;
 	}
       catch (const gdb_exception_error &except)
 	{
@@ -150,6 +150,53 @@ tui_disassemble (struct gdbarch *gdbarch,
 
       asm_lines.push_back (std::move (tal));
     }
+  return pc;
+}
+
+/* Function to disassemble up to COUNT instructions starting from address
+   PC into the ASM_LINES vector (which will be emptied of any previous
+   contents).  Return the address after the last disassembled instruction.
+   When ADDR_SIZE is non-null then place the maximum size of an address and
+   label into the value pointed to by ADDR_SIZE, and set the addr_size
+   field on each item in ASM_LINES, otherwise the addr_size fields within
+   ASM_LINES are undefined.
+
+   MAP contains a map from adressess to sections and corresponding ranges.
+
+   It is worth noting that ASM_LINES might not have COUNT entries when this
+   function returns.  If the disassembly is truncated for some other
+   reason, for example, we hit invalid memory, then ASM_LINES can have
+   fewer entries than requested.  */
+
+static CORE_ADDR
+tui_disassemble (struct gdbarch *gdbarch,
+		 std::vector<tui_asm_line> &asm_lines,
+		 addrmap_mutable &map, CORE_ADDR pc, int count,
+		 size_t *addr_size = nullptr)
+{
+  /* Must start with an empty list.  */
+  asm_lines.clear ();
+
+  while (count > 0)
+    {
+      CORE_ADDR range_high;
+      map.find (pc, nullptr, &range_high);
+
+      /* Don't disassemble past a section change.  */
+      std::optional<CORE_ADDR> high_pc;
+      if (range_high != (CORE_ADDR)-1)
+	high_pc = range_high + 1;
+
+      int prev_nr_lines = asm_lines.size ();
+      pc = tui_disassemble_1 (gdbarch, asm_lines, pc, high_pc, count,
+			      addr_size);
+      int nr_lines = asm_lines.size () - prev_nr_lines;
+      if (nr_lines == 0)
+	break;
+
+      count -= nr_lines;
+    }
+
   return pc;
 }
 
@@ -197,13 +244,14 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
     return pc;
 
   std::vector<tui_asm_line> asm_lines;
+  std::unique_ptr<addrmap_mutable> map = section_addrmap ();
 
   if (from > 0)
     {
       /* Always disassemble 1 extra instruction here, then if the last
 	 instruction fails to disassemble we will take the address of the
 	 previous instruction that did disassemble as the result.  */
-      tui_disassemble (gdbarch, asm_lines, pc, max_lines + 1);
+      tui_disassemble (gdbarch, asm_lines, *map, pc, max_lines + 1);
       if (asm_lines.empty ())
 	return pc;
       return asm_lines.back ().addr;
@@ -249,7 +297,8 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
 	break;
 
       /* Disassemble forward.  */
-      next_addr = tui_disassemble (gdbarch, asm_lines, new_low, max_lines);
+      next_addr
+	= tui_disassemble (gdbarch, asm_lines, *map, new_low, max_lines);
       if (asm_lines.empty ())
 	{
 	  new_low = prev_low;
@@ -280,7 +329,8 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
 
       /* Take the best possible match we have.  */
       new_low = *possible_new_low;
-      next_addr = tui_disassemble (gdbarch, asm_lines, new_low, max_lines);
+      next_addr
+	= tui_disassemble (gdbarch, asm_lines, *map, new_low, max_lines);
     }
 
   /* The following walk forward assumes that ASM_LINES contains exactly
@@ -303,7 +353,7 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
 	CORE_ADDR old_next_addr = next_addr;
 	std::vector<tui_asm_line> single_asm_line;
 	next_addr = tui_disassemble (gdbarch, single_asm_line,
-				     next_addr, 1);
+				     *map, next_addr, 1);
 	/* If there are some problems while disassembling exit.  */
 	if (next_addr <= old_next_addr)
 	  return pc;
@@ -347,8 +397,9 @@ tui_disasm_window::set_contents (struct gdbarch *arch,
 
   /* Get temporary table that will hold all strings (addr & insn).  */
   std::vector<tui_asm_line> asm_lines;
+  std::unique_ptr<addrmap_mutable> map = section_addrmap ();
   size_t addr_size = 0;
-  tui_disassemble (m_gdbarch, asm_lines, pc, max_lines, &addr_size);
+  tui_disassemble (m_gdbarch, asm_lines, *map, pc, max_lines, &addr_size);
 
   /* Align instructions to the same column.  */
   insn_pos = (1 + (addr_size / tab_len)) * tab_len;
