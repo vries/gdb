@@ -323,9 +323,13 @@ struct disasm_insn
   unsigned int is_speculative:1;
 };
 
-extern void gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
-			     gdb_disassembly_flags flags, int how_many,
-			     CORE_ADDR low, CORE_ADDR high);
+/* Print at most HOW_MANY instructions of the instruction stream at
+   [LOW, HIGH) on UIOUT using FLAGS.  Return the number of the instructions
+   printed.  */
+
+extern int gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
+			    gdb_disassembly_flags flags, int how_many,
+			    CORE_ADDR low, CORE_ADDR high);
 
 /* Print the instruction at address MEMADDR in debugged memory,
    on STREAM.  Returns the length of the instruction, in bytes,

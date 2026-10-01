@@ -524,7 +524,7 @@ dump_insns (struct gdbarch *gdbarch,
 
    N.B. This view is deprecated.  */
 
-static void
+static int
 do_mixed_source_and_assembly_deprecated
   (struct gdbarch *gdbarch, struct ui_out *uiout,
    struct symtab *symtab,
@@ -669,6 +669,8 @@ do_mixed_source_and_assembly_deprecated
       if (how_many >= 0 && num_displayed >= how_many)
 	break;
     }
+
+  return num_displayed;
 }
 
 /* The idea here is to present a source-O-centric view of a
@@ -676,7 +678,7 @@ do_mixed_source_and_assembly_deprecated
    in source order, with (possibly) out of order assembly
    immediately following.  */
 
-static void
+static int
 do_mixed_source_and_assembly (struct gdbarch *gdbarch,
 			      struct ui_out *uiout,
 			      struct symtab *main_symtab,
@@ -906,16 +908,18 @@ do_mixed_source_and_assembly (struct gdbarch *gdbarch,
       last_symtab = sal.symtab;
       last_line = sal.line;
     }
+
+  return num_displayed;
 }
 
-static void
+static int
 do_assembly_only (struct gdbarch *gdbarch, struct ui_out *uiout,
 		  CORE_ADDR low, CORE_ADDR high,
 		  int how_many, gdb_disassembly_flags flags)
 {
   ui_out_emit_list list_emitter (uiout, "asm_insns");
 
-  dump_insns (gdbarch, uiout, low, high, how_many, flags, NULL);
+  return dump_insns (gdbarch, uiout, low, high, how_many, flags, NULL);
 }
 
 /* Combine implicit and user disassembler options and return them
@@ -1141,13 +1145,16 @@ gdb_disassembler::print_insn (CORE_ADDR memaddr,
   return length;
 }
 
-void
+/* See disasm.h.  */
+
+int
 gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
 		 gdb_disassembly_flags flags, int how_many,
 		 CORE_ADDR low, CORE_ADDR high)
 {
   struct symtab *symtab;
   int nlines = -1;
+  int num_displayed = 0;
 
   /* Assume symtab is valid for whole PC range.  */
   symtab = find_symtab_for_pc (low);
@@ -1157,17 +1164,22 @@ gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
 
   if (!(flags & (DISASSEMBLY_SOURCE_DEPRECATED | DISASSEMBLY_SOURCE))
       || nlines <= 0)
-    do_assembly_only (gdbarch, uiout, low, high, how_many, flags);
+    num_displayed
+      = do_assembly_only (gdbarch, uiout, low, high, how_many, flags);
 
   else if (flags & DISASSEMBLY_SOURCE)
-    do_mixed_source_and_assembly (gdbarch, uiout, symtab, low, high,
-				  how_many, flags);
+    num_displayed
+      = do_mixed_source_and_assembly (gdbarch, uiout, symtab, low, high,
+				      how_many, flags);
 
   else if (flags & DISASSEMBLY_SOURCE_DEPRECATED)
-    do_mixed_source_and_assembly_deprecated (gdbarch, uiout, symtab,
-					     low, high, how_many, flags);
+    num_displayed
+      = do_mixed_source_and_assembly_deprecated (gdbarch, uiout, symtab,
+						 low, high, how_many, flags);
 
   gdb_flush (gdb_stdout);
+
+  return num_displayed;
 }
 
 /* Print the instruction at address MEMADDR in debugged memory,
