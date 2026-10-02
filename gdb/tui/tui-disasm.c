@@ -192,16 +192,12 @@ tui_find_backward_disassembly_start_address (CORE_ADDR addr)
 static CORE_ADDR
 tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
 {
-  CORE_ADDR new_low;
-  int max_lines;
-
-  max_lines = (from > 0) ? from : - from;
+  int max_lines = (from > 0) ? from : - from;
   if (max_lines == 0)
     return pc;
 
   std::vector<tui_asm_line> asm_lines;
 
-  new_low = pc;
   if (from > 0)
     {
       /* Always disassemble 1 extra instruction here, then if the last
@@ -210,116 +206,115 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
       tui_disassemble (gdbarch, asm_lines, pc, max_lines + 1);
       if (asm_lines.empty ())
 	return pc;
-      new_low = asm_lines.back ().addr;
+      return asm_lines.back ().addr;
     }
-  else
+
+  /* In order to disassemble backwards we need to find a suitable
+     address to start disassembling from and then work forward until we
+     re-find the address we're currently at.  We can then figure out
+     which address will be at the top of the TUI window after our
+     backward scroll.  During our backward disassemble we need to be
+     able to distinguish between the case where the last address we
+     _can_ disassemble is ADDR, and the case where the disassembly
+     just happens to stop at ADDR, for this reason we increase
+     MAX_LINES by one.  */
+  max_lines++;
+
+  /* When we disassemble a series of instructions this will hold the
+     address of the last instruction disassembled.  */
+  CORE_ADDR last_addr;
+
+  /* And this will hold the address of the next instruction that would
+     have been disassembled.  */
+  CORE_ADDR next_addr;
+
+  /* As we search backward if we find an address that looks like a
+     promising starting point then we record it in this structure.  If
+     the next address we try is not a suitable starting point then we
+     will fall back to the address held here.  */
+  std::optional<CORE_ADDR> possible_new_low;
+
+  /* The previous value of NEW_LOW so we know if the new value is
+     different or not.  */
+  CORE_ADDR prev_low;
+
+  CORE_ADDR new_low = pc;
+  do
     {
-      /* In order to disassemble backwards we need to find a suitable
-	 address to start disassembling from and then work forward until we
-	 re-find the address we're currently at.  We can then figure out
-	 which address will be at the top of the TUI window after our
-	 backward scroll.  During our backward disassemble we need to be
-	 able to distinguish between the case where the last address we
-	 _can_ disassemble is ADDR, and the case where the disassembly
-	 just happens to stop at ADDR, for this reason we increase
-	 MAX_LINES by one.  */
-      max_lines++;
+      /* Find an address from which we can start disassembling.  */
+      prev_low = new_low;
+      new_low = tui_find_backward_disassembly_start_address (new_low);
 
-      /* When we disassemble a series of instructions this will hold the
-	 address of the last instruction disassembled.  */
-      CORE_ADDR last_addr;
-
-      /* And this will hold the address of the next instruction that would
-	 have been disassembled.  */
-      CORE_ADDR next_addr;
-
-      /* As we search backward if we find an address that looks like a
-	 promising starting point then we record it in this structure.  If
-	 the next address we try is not a suitable starting point then we
-	 will fall back to the address held here.  */
-      std::optional<CORE_ADDR> possible_new_low;
-
-      /* The previous value of NEW_LOW so we know if the new value is
-	 different or not.  */
-      CORE_ADDR prev_low;
-
-      do
-	{
-	  /* Find an address from which we can start disassembling.  */
-	  prev_low = new_low;
-	  new_low = tui_find_backward_disassembly_start_address (new_low);
-
-	  /* Disassemble forward.  */
-	  next_addr = tui_disassemble (gdbarch, asm_lines, new_low, max_lines);
-	  if (asm_lines.empty ())
-	    break;
-	  last_addr = asm_lines.back ().addr;
-
-	  /* If disassembling from the current value of NEW_LOW reached PC
-	     (or went past it) then this would do as a starting point if we
-	     can't find anything better, so remember it.  */
-	  if (last_addr >= pc && new_low != prev_low
-	      && asm_lines.size () >= max_lines)
-	    possible_new_low.emplace (new_low);
-
-	  /* Continue searching until we find a value of NEW_LOW from which
-	     disassembling MAX_LINES instructions doesn't reach PC.  We
-	     know this means we can find the required number of previous
-	     instructions then.  */
-	}
-      while ((last_addr > pc
-	      || (last_addr == pc && asm_lines.size () < max_lines))
-	     && new_low != prev_low);
-
-      /* If we failed to disassemble the required number of lines, try to fall
-	 back to a previous possible start address in POSSIBLE_NEW_LOW.  */
-      if (asm_lines.size () < max_lines)
-	{
-	  if (!possible_new_low.has_value ())
-	    return new_low;
-
-	  /* Take the best possible match we have.  */
-	  new_low = *possible_new_low;
-	  next_addr = tui_disassemble (gdbarch, asm_lines, new_low, max_lines);
-	}
-
-      /* The following walk forward assumes that ASM_LINES contains exactly
-	 MAX_LINES entries.  */
-      gdb_assert (asm_lines.size () == max_lines);
-
-      /* Scan forward disassembling one instruction at a time until
-	 the last visible instruction of the window matches the pc.
-	 We keep the disassembled instructions in the 'lines' window
-	 and shift it downward (increasing its addresses).  */
-      int pos = max_lines - 1;
+      /* Disassemble forward.  */
+      next_addr = tui_disassemble (gdbarch, asm_lines, new_low, max_lines);
+      if (asm_lines.empty ())
+	break;
       last_addr = asm_lines.back ().addr;
-      if (last_addr < pc)
-	do
-	  {
-	    pos++;
-	    if (pos >= max_lines)
-	      pos = 0;
 
-	    CORE_ADDR old_next_addr = next_addr;
-	    std::vector<tui_asm_line> single_asm_line;
-	    next_addr = tui_disassemble (gdbarch, single_asm_line,
-					 next_addr, 1);
-	    /* If there are some problems while disassembling exit.  */
-	    if (next_addr <= old_next_addr)
-	      return pc;
-	    gdb_assert (single_asm_line.size () == 1);
-	    asm_lines[pos] = single_asm_line[0];
-	  } while (next_addr <= pc);
-      pos++;
-      if (pos >= max_lines)
-	 pos = 0;
-      new_low = asm_lines[pos].addr;
+      /* If disassembling from the current value of NEW_LOW reached PC
+	 (or went past it) then this would do as a starting point if we
+	 can't find anything better, so remember it.  */
+      if (last_addr >= pc && new_low != prev_low
+	  && asm_lines.size () >= max_lines)
+	possible_new_low.emplace (new_low);
 
-      /* When scrolling backward the addresses should move backward, or at
-	 the very least stay the same if we are at the first address that
-	 can be disassembled.  */
-      gdb_assert (new_low <= pc);
+      /* Continue searching until we find a value of NEW_LOW from which
+	 disassembling MAX_LINES instructions doesn't reach PC.  We
+	 know this means we can find the required number of previous
+	 instructions then.  */
     }
+  while ((last_addr > pc
+	  || (last_addr == pc && asm_lines.size () < max_lines))
+	 && new_low != prev_low);
+
+  /* If we failed to disassemble the required number of lines, try to fall
+     back to a previous possible start address in POSSIBLE_NEW_LOW.  */
+  if (asm_lines.size () < max_lines)
+    {
+      if (!possible_new_low.has_value ())
+	return new_low;
+
+      /* Take the best possible match we have.  */
+      new_low = *possible_new_low;
+      next_addr = tui_disassemble (gdbarch, asm_lines, new_low, max_lines);
+    }
+
+  /* The following walk forward assumes that ASM_LINES contains exactly
+     MAX_LINES entries.  */
+  gdb_assert (asm_lines.size () == max_lines);
+
+  /* Scan forward disassembling one instruction at a time until
+     the last visible instruction of the window matches the pc.
+     We keep the disassembled instructions in the 'lines' window
+     and shift it downward (increasing its addresses).  */
+  int pos = max_lines - 1;
+  last_addr = asm_lines.back ().addr;
+  if (last_addr < pc)
+    do
+      {
+	pos++;
+	if (pos >= max_lines)
+	  pos = 0;
+
+	CORE_ADDR old_next_addr = next_addr;
+	std::vector<tui_asm_line> single_asm_line;
+	next_addr = tui_disassemble (gdbarch, single_asm_line,
+				     next_addr, 1);
+	/* If there are some problems while disassembling exit.  */
+	if (next_addr <= old_next_addr)
+	  return pc;
+	gdb_assert (single_asm_line.size () == 1);
+	asm_lines[pos] = single_asm_line[0];
+      } while (next_addr <= pc);
+  pos++;
+  if (pos >= max_lines)
+    pos = 0;
+  new_low = asm_lines[pos].addr;
+
+  /* When scrolling backward the addresses should move backward, or at
+     the very least stay the same if we are at the first address that
+     can be disassembled.  */
+  gdb_assert (new_low <= pc);
   return new_low;
 }
 
