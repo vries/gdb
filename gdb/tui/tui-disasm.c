@@ -234,15 +234,14 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
      will fall back to the address held here.  */
   std::optional<CORE_ADDR> possible_new_low;
 
-  /* The previous value of NEW_LOW so we know if the new value is
-     different or not.  */
-  CORE_ADDR prev_low;
-
   CORE_ADDR new_low = pc;
   do
     {
+      /* The previous value of NEW_LOW so we know if the new value is
+	 different or not.  */
+      CORE_ADDR prev_low = new_low;
+
       /* Find an address from which we can start disassembling.  */
-      prev_low = new_low;
       new_low = tui_find_backward_disassembly_start_address (new_low);
 
       /* Disassemble forward.  */
@@ -251,11 +250,13 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
 	break;
       last_addr = asm_lines.back ().addr;
 
+      if (new_low == prev_low)
+	break;
+
       /* If disassembling from the current value of NEW_LOW reached PC
 	 (or went past it) then this would do as a starting point if we
 	 can't find anything better, so remember it.  */
-      if (last_addr >= pc && new_low != prev_low
-	  && asm_lines.size () >= max_lines)
+      if (last_addr >= pc && asm_lines.size () >= max_lines)
 	possible_new_low.emplace (new_low);
 
       /* Continue searching until we find a value of NEW_LOW from which
@@ -263,9 +264,8 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
 	 know this means we can find the required number of previous
 	 instructions then.  */
     }
-  while ((last_addr > pc
-	  || (last_addr == pc && asm_lines.size () < max_lines))
-	 && new_low != prev_low);
+  while (last_addr > pc
+	 || (last_addr == pc && asm_lines.size () < max_lines));
 
   /* If we failed to disassemble the required number of lines, try to fall
      back to a previous possible start address in POSSIBLE_NEW_LOW.  */
