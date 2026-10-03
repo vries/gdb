@@ -147,10 +147,10 @@ tui_source_window_base::style_changed ()
 void
 tui_source_window_base::update_source_window
   (struct gdbarch *gdbarch,
-   const struct symtab_and_line &sal)
+   const struct symtab_and_line &sal, bool explicit_p)
 {
   m_horizontal_offset = 0;
-  update_source_window_as_is (gdbarch, sal);
+  update_source_window_as_is (gdbarch, sal, explicit_p);
 }
 
 
@@ -159,9 +159,9 @@ tui_source_window_base::update_source_window
 void
 tui_source_window_base::update_source_window_as_is
   (struct gdbarch *gdbarch,
-   const struct symtab_and_line &sal)
+   const struct symtab_and_line &sal, bool explicit_p)
 {
-  bool ret = set_contents (gdbarch, sal);
+  bool ret = set_contents (gdbarch, sal, explicit_p);
 
   if (!ret)
     erase_source_content ();
@@ -190,14 +190,15 @@ tui_source_window_base::update_source_window_with_addr (struct gdbarch *gdbarch,
 /* Function to ensure that the source and/or disassembly windows
    reflect the input address.  */
 void
-tui_update_source_windows_with_addr (struct gdbarch *gdbarch, CORE_ADDR addr)
+tui_update_source_windows_with_addr (struct gdbarch *gdbarch, CORE_ADDR addr,
+				     bool explicit_p)
 {
   struct symtab_and_line sal {};
   if (addr != 0)
     sal = find_sal_for_pc (addr, 0);
 
   for (struct tui_source_window_base *win_info : tui_source_windows ())
-    win_info->update_source_window (gdbarch, sal);
+    win_info->update_source_window (gdbarch, sal, explicit_p);
 }
 
 /* Function to ensure that the source and/or disassembly windows

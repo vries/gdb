@@ -329,7 +329,8 @@ struct disasm_insn
    match a section.  */
 
 extern bool disassemble_section_p (addrmap_mutable &map, struct obj_section *s,
-				   CORE_ADDR range_low, CORE_ADDR range_high);
+				   CORE_ADDR range_low, CORE_ADDR range_high,
+				   bool explicit_p = false);
 
 /* Print at most HOW_MANY instructions of the instruction stream at
    [LOW, HIGH) on UIOUT using FLAGS.  Return the number of the instructions
@@ -337,7 +338,8 @@ extern bool disassemble_section_p (addrmap_mutable &map, struct obj_section *s,
 
 extern int gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
 			    gdb_disassembly_flags flags, int how_many,
-			    CORE_ADDR low, CORE_ADDR high);
+			    CORE_ADDR low, CORE_ADDR high,
+			    bool explicit_p = false);
 
 /* Print the instruction at address MEMADDR in debugged memory,
    on STREAM.  Returns the length of the instruction, in bytes,

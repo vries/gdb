@@ -50,7 +50,7 @@ tui_source_window::~tui_source_window ()
 /* Function to display source in the source window.  */
 bool
 tui_source_window::set_contents (struct gdbarch *arch,
-				 const struct symtab_and_line &sal)
+				 const struct symtab_and_line &sal, bool)
 {
   struct symtab *s = sal.symtab;
   int line_no = sal.line;

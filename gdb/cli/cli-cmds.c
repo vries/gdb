@@ -1583,11 +1583,11 @@ static void
 print_disassembly (struct gdbarch *gdbarch, const char *name,
 		   CORE_ADDR low, CORE_ADDR high,
 		   const struct block *block,
-		   gdb_disassembly_flags flags)
+		   gdb_disassembly_flags flags, bool explicit_p = false)
 {
 #if defined(TUI)
   if (tui_is_window_visible (DISASSEM_WIN))
-    tui_show_assembly (gdbarch, low);
+    tui_show_assembly (gdbarch, low, explicit_p);
   else
 #endif
     {
@@ -1605,7 +1605,8 @@ print_disassembly (struct gdbarch *gdbarch, const char *name,
 				       paddress (gdbarch, high)));
 
 	  /* Dump the specified range.  */
-	  gdb_disassembly (gdbarch, current_uiout, flags, -1, low, high);
+	  gdb_disassembly (gdbarch, current_uiout, flags, -1, low, high,
+			   explicit_p);
 	}
       else
 	{
@@ -1620,7 +1621,7 @@ print_disassembly (struct gdbarch *gdbarch, const char *name,
 			  styled_string (address_style.style (),
 					 paddress (gdbarch, range_high)));
 	      gdb_disassembly (gdbarch, current_uiout, flags, -1,
-			       range_low, range_high);
+			       range_low, range_high, explicit_p);
 	    }
 	}
       gdb_printf (_("End of assembler dump.\n"));
@@ -1787,7 +1788,7 @@ disassemble_command (const char *arg, int from_tty)
 	high += low;
     }
 
-  print_disassembly (gdbarch, name, low, high, block, flags);
+  print_disassembly (gdbarch, name, low, high, block, flags, true);
 }
 
 /* Command completion for the disassemble command.  */

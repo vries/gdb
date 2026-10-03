@@ -172,7 +172,7 @@ static CORE_ADDR
 tui_disassemble (struct gdbarch *gdbarch,
 		 std::vector<tui_asm_line> &asm_lines,
 		 addrmap_mutable &map, CORE_ADDR pc, int count,
-		 size_t *addr_size = nullptr)
+		 size_t *addr_size = nullptr, bool explicit_p = false)
 {
   /* Must start with an empty list.  */
   asm_lines.clear ();
@@ -182,7 +182,7 @@ tui_disassemble (struct gdbarch *gdbarch,
       CORE_ADDR range_low, range_high;
       struct obj_section *s
 	= (struct obj_section *)map.find (pc, &range_low, &range_high);
-      if (!disassemble_section_p (map, s, range_low, range_high))
+      if (!disassemble_section_p (map, s, range_low, range_high, explicit_p))
 	{
 	  if (range_high == (CORE_ADDR)-1)
 	    break;
@@ -379,6 +379,8 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
 	/* If there are some problems while disassembling exit.  */
 	if (next_addr <= old_next_addr)
 	  return pc;
+	if (next_addr > pc)
+	  break;
 	gdb_assert (single_asm_line.size () == 1);
 	asm_lines[pos] = single_asm_line[0];
       } while (next_addr <= pc);
@@ -397,7 +399,8 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
 /* Function to set the disassembly window's content.  */
 bool
 tui_disasm_window::set_contents (struct gdbarch *arch,
-				 const struct symtab_and_line &sal)
+				 const struct symtab_and_line &sal,
+				 bool explicit_p)
 {
   int i;
   int max_lines;
@@ -421,7 +424,8 @@ tui_disasm_window::set_contents (struct gdbarch *arch,
   std::vector<tui_asm_line> asm_lines;
   std::unique_ptr<addrmap_mutable> map = section_addrmap ();
   size_t addr_size = 0;
-  tui_disassemble (m_gdbarch, asm_lines, *map, pc, max_lines, &addr_size);
+  tui_disassemble (m_gdbarch, asm_lines, *map, pc, max_lines, &addr_size,
+		   explicit_p);
 
   /* Align instructions to the same column.  */
   insn_pos = (1 + (addr_size / tab_len)) * tab_len;

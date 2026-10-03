@@ -104,7 +104,8 @@ protected:
   void do_erase_source_content (const char *string);
 
   virtual bool set_contents (struct gdbarch *gdbarch,
-			     const struct symtab_and_line &sal) = 0;
+			     const struct symtab_and_line &sal,
+			     bool explicit_p = false) = 0;
 
   /* Return the number of extra margin characters needed by this
      instance.  */
@@ -163,9 +164,11 @@ public:
   virtual void maybe_update (struct gdbarch *gdbarch, symtab_and_line sal) = 0;
 
   void update_source_window_as_is  (struct gdbarch *gdbarch,
-				    const struct symtab_and_line &sal);
+				    const struct symtab_and_line &sal,
+				    bool explicit_p = false);
   void update_source_window (struct gdbarch *gdbarch,
-			     const struct symtab_and_line &sal);
+			     const struct symtab_and_line &sal,
+			     bool explicit_p = false);
 
   /* Scan the source window and the breakpoints to update the
      break_mode information for each line.  Returns true if something
@@ -352,7 +355,8 @@ extern void tui_update_all_breakpoint_info (struct breakpoint *being_deleted);
 
 /* Function to display the "main" routine.  */
 extern void tui_display_main (void);
-extern void tui_update_source_windows_with_addr (struct gdbarch *, CORE_ADDR);
+extern void tui_update_source_windows_with_addr (struct gdbarch *, CORE_ADDR,
+						 bool = false);
 extern void tui_update_source_windows_with_line (struct symtab_and_line sal);
 
 /* Extract some source text from PTR.  Returns a string holding the

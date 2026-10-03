@@ -744,11 +744,11 @@ tui_disable_command (const char *args, int from_tty)
 }
 
 void
-tui_show_assembly (struct gdbarch *gdbarch, CORE_ADDR addr)
+tui_show_assembly (struct gdbarch *gdbarch, CORE_ADDR addr, bool explicit_p)
 {
   tui_batch_rendering suppress;
   tui_add_win_to_layout (DISASSEM_WIN);
-  tui_update_source_windows_with_addr (gdbarch, addr);
+  tui_update_source_windows_with_addr (gdbarch, addr, explicit_p);
 }
 
 bool

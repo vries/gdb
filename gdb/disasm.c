@@ -1188,7 +1188,7 @@ gdb_disassembly_1 (struct gdbarch *gdbarch, struct ui_out *uiout,
 bool
 disassemble_section_p (addrmap_mutable &map,
 		       struct obj_section *s, CORE_ADDR range_low,
-		       CORE_ADDR range_high)
+		       CORE_ADDR range_high, bool explicit_p)
 {
   if (s == nullptr)
     {
@@ -1211,6 +1211,13 @@ disassemble_section_p (addrmap_mutable &map,
       return true;
     }
 
+  if (!explicit_p)
+    {
+      /* When not explicitly required, skip over non-code sections.  */
+      return (s->the_bfd_section->flags & SEC_CODE) != 0;
+    }
+
+  /* Explicitly requested, allow any section.  */
   return true;
 }
 
@@ -1219,7 +1226,7 @@ disassemble_section_p (addrmap_mutable &map,
 int
 gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
 		 gdb_disassembly_flags flags, int how_many,
-		 CORE_ADDR low, CORE_ADDR high)
+		 CORE_ADDR low, CORE_ADDR high, bool explicit_p)
 {
   std::unique_ptr<addrmap_mutable> map = section_addrmap ();
   bool update_how_many = how_many != -1;
@@ -1231,7 +1238,7 @@ gdb_disassembly (struct gdbarch *gdbarch, struct ui_out *uiout,
       CORE_ADDR range_low, range_high;
       struct obj_section *s
 	= (obj_section *)map->find (low, &range_low, &range_high);
-      if (!disassemble_section_p (*map, s, range_low, range_high))
+      if (!disassemble_section_p (*map, s, range_low, range_high, explicit_p))
 	{
 	  if (range_high == (CORE_ADDR)-1)
 	    break;
