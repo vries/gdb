@@ -251,7 +251,10 @@ tui_find_disassembly_address (struct gdbarch *gdbarch, CORE_ADDR pc, int from)
       /* Disassemble forward.  */
       next_addr = tui_disassemble (gdbarch, asm_lines, new_low, max_lines);
       if (asm_lines.empty ())
-	break;
+	{
+	  new_low = prev_low;
+	  break;
+	}
       last_addr = asm_lines.back ().addr;
 
       /* If disassembling from the current value of NEW_LOW reached PC
