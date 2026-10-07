@@ -175,7 +175,12 @@ foreach_with_prefix appear_how {"run" "attach" "attach-nofile"} {
 	continue
     }
 
-    foreach_with_prefix extra_inferior {0 1} {
+    set eis {}
+    lappend eis 0
+    if {[shareable_connection_p]} {
+	lappend eis 1
+    }
+    foreach_with_prefix extra_inferior $eis {
 	set qhs {}
 	lappend qhs "quit"
 	foreach sig {"sigterm" "sighup"} {

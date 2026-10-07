@@ -12544,6 +12544,22 @@ proc kill_gdb { sig } {
     return [remote_kill_spawn_id host $::gdb_spawn_id $sig]
 }
 
+# Return 1 if connection can be shared.  Attempting to share a connection that
+# can't be shared results in a warning "can't share connection ... between
+# inferiors".
+
+proc shareable_connection_p {} {
+    if {[target_info gdb_protocol] == "remote"} {
+	return 0
+    }
+
+    if {[is_windows_based_target]} {
+	return 0;
+    }
+
+    return 1;
+}
+
 require {tcl_version_at_least 8 6 2}
 
 # Always load compatibility stuff.
