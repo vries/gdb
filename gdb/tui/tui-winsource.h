@@ -268,8 +268,6 @@ struct tui_source_window_iterator
 {
 public:
 
-  using inner_iterator = std::vector<tui_win_info *>::iterator;
-
   using self_type = tui_source_window_iterator;
   using value_type = struct tui_source_window_base *;
   using reference = struct tui_source_window_base *&;
@@ -277,17 +275,12 @@ public:
   using iterator_category = std::forward_iterator_tag;
   using difference_type = int;
 
-  explicit tui_source_window_iterator (const inner_iterator &it,
-				       const inner_iterator &end)
-    : m_iter (it),
-      m_end (end)
+  explicit tui_source_window_iterator (std::vector<tui_win_info *> &v,
+				       bool end_p = false)
+    : m_end (v.size ()), m_v (v)
   {
+    m_iter = (end_p ? m_end : 0);
     advance ();
-  }
-
-  explicit tui_source_window_iterator (const inner_iterator &it)
-    : m_iter (it)
-  {
   }
 
   bool operator!= (const self_type &other) const
@@ -297,11 +290,13 @@ public:
 
   value_type operator* () const
   {
-    return dynamic_cast<tui_source_window_base *> (*m_iter);
+    gdb_assert (m_iter < m_v.size ());
+    return dynamic_cast<tui_source_window_base *> (m_v[m_iter]);
   }
 
   self_type &operator++ ()
   {
+    check_valid ();
     ++m_iter;
     advance ();
     return *this;
@@ -312,12 +307,23 @@ private:
   void advance ()
   {
     while (m_iter != m_end
-	   && dynamic_cast<tui_source_window_base *> (*m_iter) == nullptr)
+	   && dynamic_cast<tui_source_window_base *> (m_v[m_iter]) == nullptr)
       ++m_iter;
   }
 
-  inner_iterator m_iter;
-  inner_iterator m_end;
+  void check_valid () const
+  {
+    /* The assumption is that while iterating, we keep the same elements in
+       the same place.  We check something weaker here.  */
+    gdb_assert (m_v.size () == m_end);
+  }
+
+  /* The vector m_v might be replaced by tui_apply_current_layout, which
+     would invalidate iterators, so we use this more basic setup using
+     indices.  */
+  size_t m_iter;
+  size_t m_end;
+  std::vector<tui_win_info *> &m_v;
 };
 
 /* A range adapter for source windows.  */
@@ -331,13 +337,12 @@ struct tui_source_windows
 
   tui_source_window_iterator begin () const
   {
-    return tui_source_window_iterator (tui_windows.begin (),
-				       tui_windows.end ());
+    return tui_source_window_iterator (tui_windows);
   }
 
   tui_source_window_iterator end () const
   {
-    return tui_source_window_iterator (tui_windows.end ());
+    return tui_source_window_iterator (tui_windows, true);
   }
 };
 

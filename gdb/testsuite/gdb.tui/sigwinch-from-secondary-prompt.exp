@@ -1,0 +1,86 @@
+# Copyright 2026 Free Software Foundation, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Trigger a debuginfod prompt, answer yes, and make it run into a pagination
+# prompt, then trigger a SIGWINCH, and check that GDB doesn't segfault.
+
+load_lib debuginfod-support.exp
+
+tuiterm_env
+
+require allow_tui_tests
+require allow_debuginfod_tests
+
+standard_testfile activate-from-secondary-prompt.c
+
+if {[build_executable "build executable" ${testfile} ${srcfile}] == -1} {
+    return
+}
+
+save_vars { env(DEBUGINFOD_URLS) } {
+    setenv DEBUGINFOD_URLS "foo"
+    Term::clean_restart 24 80
+    set dims {0 0 80 24}
+}
+
+# Make sure debuginfod prompt triggers.
+gdb_test_no_output "set directories"
+gdb_test_no_output "set substitute-path $::srcdir /dev/null" \
+    "set substitute-path"
+
+# Make sure pagination prompt triggers.
+gdb_test_no_output "set pagination on"
+gdb_test_no_output "set height 24"
+
+if {![Term::enter_tui]} {
+    unsupported "TUI not supported"
+    return
+}
+
+# Position the prompt at the bottom of the screen.
+Term::command {echo 0\n1\n2\n3\n4\n5\n6\n}
+
+# Load a file.  This should trigger the debuginfod prompt.
+send_gdb "file $binfile\n"
+if {![Term::wait_for_region_contents {*}$dims \
+	  [string_to_regexp {(y or [n]) }]]} {
+    fail "spot debuginfod prompt"
+    return
+}
+
+# Answer yes.  This should trigger a pagination prompt.
+send_gdb "y\n"
+if {![Term::wait_for_region_contents {*}$dims \
+	  [string_to_regexp $::pagination_prompt_str]]} {
+    fail "spot pagination prompt"
+    return
+}
+
+# Trigger a resize.  This should trigger a resize message.
+Term::resize 28 80 0
+set dims {0 0 80 28}
+if {![Term::wait_for_region_contents {*}$dims \
+	  "@@ resize done $decimal, size = ${decimal}x$decimal"]} {
+    fail "spot resize"
+    return
+}
+
+# Answer continue to the pagination prompt.  This should result in a gdb
+# prompt.  Regression test for PR34723.  This used to trigger a segfault.
+send_gdb "c\n"
+gdb_assert {[Term::wait_for ""]} "spot prompt"
+
+# Check that prompt is responsive.
+gdb_assert {[Term::command "print 1"]} "responsive prompt"
