@@ -734,6 +734,9 @@ proc Term::_csi_0x3f_l { args } {
 	    1006 {
 		_log "ignored: Disable SGR Mouse Mode"
 	    }
+	    1034 {
+		_log "ignored: Don't interpret meta key"
+	    }
 	    1049 {
 		_log "switch from alternate screen"
 		_set_alternate 0
