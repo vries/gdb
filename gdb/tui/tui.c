@@ -685,19 +685,20 @@ tui_enable (void)
   gdb::observers::tui_enabled.notify (true);
 }
 
-/* Leave the tui mode.
-   Remove the tui hooks and configure the gdb output and readline
-   back to their original state.  The curses mode is left so that
-   the terminal setting is restored to the point when we entered.  */
-void
-tui_disable (void)
+/* See tui.h.  */
+
+bool
+tui_disable_restore_cli ()
 {
-  TUI_SCOPED_DEBUG_ENTER_EXIT;
-
   if (!tui_active)
-    return;
+    return false;
 
-  require_tui_interpreter ();
+  const char *interp = top_level_interpreter ()->name ();
+  if (!streq (interp, INTERP_TUI))
+    {
+      /* TUI is active, but in another terminal.  Nothing to do.  */
+      return false;
+    }
 
   /* Restore initial readline keymap.  */
   rl_set_keymap (tui_readline_standard_keymap);
@@ -718,13 +719,42 @@ tui_disable (void)
      so that terminal management with the inferior works.  */
   tui_setup_io (0);
 
+  tui_active = false;
+  tui_update_gdb_sizes ();
+  return true;
+}
+
+/* See tui.h.  */
+
+void
+tui_disable_finalize ()
+{
+  const char *interp = top_level_interpreter ()->name ();
+  gdb_assert (streq (interp, INTERP_TUI));
+  gdb_assert (!tui_active);
+
   /* Update gdb's knowledge of its terminal.  */
   gdb_save_tty_state ();
 
-  tui_active = false;
-  tui_update_gdb_sizes ();
-
   gdb::observers::tui_enabled.notify (false);
+}
+
+/* Leave the tui mode.
+   Remove the tui hooks and configure the gdb output and readline
+   back to their original state.  The curses mode is left so that
+   the terminal setting is restored to the point when we entered.  */
+void
+tui_disable ()
+{
+  TUI_SCOPED_DEBUG_ENTER_EXIT;
+
+  if (!tui_active)
+    return;
+
+  require_tui_interpreter ();
+
+  if (tui_disable_restore_cli ())
+    tui_disable_finalize ();
 }
 
 /* Command wrapper for enabling tui mode.  */

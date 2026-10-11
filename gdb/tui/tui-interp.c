@@ -57,7 +57,7 @@ tui_exit (void)
 {
   /* Disable the tui.  Curses mode is left leaving the screen in a
      clean state (see endwin()).  */
-  tui_disable ();
+  tui_disable_restore_cli ();
 }
 
 /* These implement the TUI interpreter.  */

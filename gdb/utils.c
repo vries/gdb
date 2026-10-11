@@ -389,7 +389,8 @@ internal_vproblem (struct internal_problem *problem,
   }
 
 #ifdef TUI
-  tui_disable ();
+  if (tui_disable_restore_cli ())
+    tui_disable_finalize ();
 #endif
 
   /* Create a string containing the full error/warning message.  Need

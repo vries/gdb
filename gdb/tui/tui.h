@@ -73,7 +73,17 @@ extern void tui_ensure_readline_initialized ();
 extern void tui_enable (void);
 
 /* Leave the tui mode.  */
-extern void tui_disable (void);
+extern void tui_disable ();
+
+/* Disable TUI sufficiently to have a functioning CLI, such that we are able
+   to print error messages and exit.  Avoids malloc.  Return true if
+   finalization is needed.  */
+extern bool tui_disable_restore_cli ();
+
+/* Do the work for tui_disable that hasn't been done in
+   tui_disable_restore_cli: finalize disabling TUI, such that we can continue
+   the gdb session.  May call malloc.  */
+extern void tui_disable_finalize ();
 
 enum tui_key_mode
 {

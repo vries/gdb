@@ -971,7 +971,7 @@ init_str_handle_fatal_signal ()
 handle_fatal_signal (int sig)
 {
 #ifdef TUI
-  tui_disable ();
+  tui_disable_restore_cli ();
 #endif
 
 #ifdef GDB_PRINT_INTERNAL_BACKTRACE
