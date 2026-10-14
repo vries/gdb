@@ -1,0 +1,33 @@
+tuiterm_env
+
+require allow_tui_tests
+
+Term::clean_restart 24 80
+
+set cmd "echo "
+for { set i 0 } { $i < 100 } { incr i } {
+    set cmd "${cmd}${i}\\n"
+}
+
+send_gdb "$cmd\n"
+Term::wait_for ""
+Term::dump_screen
+Term::command "print 1"
+Term::dump_screen
+
+set str 012345789
+send_gdb $str
+send_gdb $str
+send_gdb $str
+send_gdb $str
+send_gdb $str
+send_gdb $str
+send_gdb $str
+
+Term::wait_for_region_contents 0 0 80 24 "$gdb_prompt $str$str$str$str$str$str$str"
+Term::dump_screen
+send_gdb $str
+Term::dump_screen
+Term::wait_for_region_contents 0 0 80 24 \
+    "$gdb_prompt $str$str$str$str$str$str${str}012\r\n3"
+Term::dump_screen
