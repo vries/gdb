@@ -66,6 +66,12 @@ public:
     return m_out->can_emit_style_escape ();
   }
 
+  int fd () const override
+  {
+    /* Defer to the wrapped file.  */
+    return m_out->fd ();
+  }
+
 private:
   /* A helper function that returns true if output should go to
      M_OUT.  */
