@@ -99,3 +99,35 @@ with_test_prefix main-ui {
 	"Check that UI is responsive"
     Term::dump_screen
 }
+
+with_test_prefix new-ui {
+    with_spawn_id $new_ui_spawn_id {
+	# Check handling of "maint internal-error" on new-ui while main-ui is
+	# in TUI mode.
+
+	# Don't quit, don't produce a core file.
+	gdb_test_no_output "maint set internal-error corefile no"
+	gdb_test_no_output "maint set internal-error quit no"
+
+	set cmd "maint internal-error"
+	send_gdb "$cmd\n"
+	set re \
+	    [multi_line \
+		 $re_cannot_enable_disable_tui \
+		 "$gdb_prompt $"]
+	gdb_expect {
+	    -re $re {
+		pass $cmd
+	    }
+	    -re "$gdb_prompt $" {
+		fail $cmd
+	    }
+	    timeout {
+		fail "$cmd (timeout)"
+	    }
+	    eof {
+		fail "$cmd (eof)"
+	    }
+	}
+    }
+}
