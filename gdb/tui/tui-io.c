@@ -925,9 +925,16 @@ tui_setup_io (int mode)
 
       /* Clean up color information.  */
       last_style = ui_file_style ();
-      color_map.clear ();
-      color_pair_map.clear ();
     }
+}
+
+/* See tui-io.h.  */
+
+void
+tui_free_color_maps ()
+{
+  color_map.clear ();
+  color_pair_map.clear ();
 }
 
 #ifdef SIGCONT

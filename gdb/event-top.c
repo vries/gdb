@@ -976,7 +976,7 @@ handle_fatal_signal (int sig)
     scoped_restore restore_current_ui
       = make_scoped_restore (&current_ui, main_ui);
 
-    tui_disable ();
+    tui_disable_restore_cli ();
   }
 #endif
 

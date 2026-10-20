@@ -28,7 +28,7 @@
 #endif /* HAVE_SYS_RESOURCE_H */
 
 #ifdef TUI
-/* For tui_get_command_dimension and tui_disable.  */
+/* For tui_get_command_dimension and tui_disable_*.  */
 #include "tui/tui.h"
 #endif
 
@@ -394,7 +394,8 @@ internal_vproblem (struct internal_problem *problem,
     scoped_restore restore_current_ui
       = make_scoped_restore (&current_ui, main_ui);
 
-    tui_disable ();
+    if (tui_disable_restore_cli ())
+      tui_disable_finalize ();
   }
 #endif
 

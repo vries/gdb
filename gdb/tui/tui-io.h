@@ -60,4 +60,7 @@ extern cli_ui_out *tui_old_uiout;
    next line.  */
 extern void tui_inject_newline_into_command_window ();
 
+/* Clean up color information.  */
+extern void tui_free_color_maps ();
+
 #endif /* GDB_TUI_TUI_IO_H */
