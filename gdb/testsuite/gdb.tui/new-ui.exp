@@ -113,7 +113,7 @@ with_test_prefix new-ui {
 	send_gdb "$cmd\n"
 	set re \
 	    [multi_line \
-		 $re_cannot_enable_disable_tui \
+		 [string_to_regexp "Command aborted."] \
 		 "$gdb_prompt $"]
 	gdb_expect {
 	    -re $re {
@@ -130,4 +130,14 @@ with_test_prefix new-ui {
 	    }
 	}
     }
+}
+
+with_test_prefix main-ui {
+    # Currently there's a missing newline after running this command:
+    #   (gdb) info winThe TUI is not active.
+    #   (gdb)
+    send_gdb "info win\n"
+    set re_no_tui [string_to_regexp "The TUI is not active."]
+    gdb_assert {[Term::wait_for $re_no_tui]} "TUI disabled"
+    Term::dump_screen
 }

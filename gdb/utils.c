@@ -389,7 +389,13 @@ internal_vproblem (struct internal_problem *problem,
   }
 
 #ifdef TUI
-  tui_disable ();
+  {
+    /* Switch to the main UI, otherwise TUI won't be disabled.  */
+    scoped_restore restore_current_ui
+      = make_scoped_restore (&current_ui, main_ui);
+
+    tui_disable ();
+  }
 #endif
 
   /* Create a string containing the full error/warning message.  Need

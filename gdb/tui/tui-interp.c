@@ -55,6 +55,10 @@ public:
 static void
 tui_exit (void)
 {
+  /* Switch to the main UI, otherwise TUI won't be disabled.  */
+  scoped_restore restore_current_ui
+    = make_scoped_restore (&current_ui, main_ui);
+
   /* Disable the tui.  Curses mode is left leaving the screen in a
      clean state (see endwin()).  */
   tui_disable ();

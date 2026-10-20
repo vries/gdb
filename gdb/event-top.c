@@ -971,7 +971,13 @@ init_str_handle_fatal_signal ()
 handle_fatal_signal (int sig)
 {
 #ifdef TUI
-  tui_disable ();
+  {
+    /* Switch to the main UI, otherwise TUI won't be disabled.  */
+    scoped_restore restore_current_ui
+      = make_scoped_restore (&current_ui, main_ui);
+
+    tui_disable ();
+  }
 #endif
 
 #ifdef GDB_PRINT_INTERNAL_BACKTRACE
