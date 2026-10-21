@@ -188,6 +188,20 @@ logging_file<T>::write_async_safe (const char *buf, long length_buf)
 /* See logging-file.h.  */
 
 template<typename T>
+bool
+logging_file<T>::for_each_fd (gdb::function_view<void (int)> f)
+{
+  bool handled = false;
+  if (log_file != nullptr)
+    handled = log_file->for_each_fd (f);
+  if (ordinary_output ())
+    handled = m_out->for_each_fd (f);
+  return handled;
+}
+
+/* See logging-file.h.  */
+
+template<typename T>
 void
 logging_file<T>::puts (const char *linebuffer)
 {

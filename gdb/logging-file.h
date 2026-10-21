@@ -47,6 +47,7 @@ public:
   bool can_page () const override;
   void emit_style_escape (const ui_file_style &style) override;
   void puts_unfiltered (const char *str) override;
+  bool for_each_fd (gdb::function_view<void (int)> f) override;
 
   bool isatty () override
   {

@@ -69,7 +69,7 @@ close $fd
 
 set test "Logged backtrace"
 if {$seen_bt} {
-    gdb_assert {[regexp $re_bt $data]} $test
+    gdb_assert {[regexp $re_bt.*$hex $data]} $test
 } else {
     unsupported $test
 }

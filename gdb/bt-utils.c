@@ -134,10 +134,14 @@ gdb_internal_backtrace_1 ()
   void *buffer[25];
   int frames = backtrace (buffer, ARRAY_SIZE (buffer));
 
-  int fd = ((gdb_stderr == nullptr || gdb_stderr->fd () == -1)
-	    ? 2
-	    : gdb_stderr->fd ());
-  backtrace_symbols_fd (buffer, frames, fd);
+  bool handled = (gdb_stderr != nullptr
+		  && gdb_stderr->for_each_fd ([&] (int fd)
+		  {
+		    backtrace_symbols_fd (buffer, frames, fd);
+		  }));
+  if (!handled)
+    backtrace_symbols_fd (buffer, frames, 2);
+
   if (frames == ARRAY_SIZE (buffer))
     sig_write (_("Backtrace might be incomplete.\n"));
 }

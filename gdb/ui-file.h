@@ -22,6 +22,7 @@
 #include <string>
 #include <tuple>
 #include "ui-style.h"
+#include "gdbsupport/function-view.h"
 
 /* The abstract ui_file base class.  */
 
@@ -116,6 +117,18 @@ public:
      Otherwise, return -1.  */
   virtual int fd () const
   { return -1; }
+
+  /* Use this function to write to a file descriptor, rather than using
+     write (fd (), ...).  In some cases, multiple descriptors need to be
+     written.  Return true if the write was handled.  */
+  virtual bool for_each_fd (gdb::function_view<void (int)> f)
+  {
+    int fd = this->fd ();
+    if (fd == -1)
+      return false;
+    f (fd);
+    return true;
+  }
 
   /* Return true if this object supports paging, false otherwise.  */
   virtual bool can_page () const
@@ -437,6 +450,9 @@ public:
 
   int fd () const override
   { return m_stream->fd (); }
+
+  bool for_each_fd (gdb::function_view<void (int)> f) override
+  { return m_stream->for_each_fd (f); }
 
   void puts_unfiltered (const char *str) override
   { m_stream->puts_unfiltered (str); }
