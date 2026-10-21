@@ -1016,14 +1016,6 @@ handle_fatal_signal (int sig)
 	  sig_write (".");
 	}
       sig_write ("\n\n");
-
-      if (gdb_stderr == nullptr || gdb_stderr->fd () == -1)
-	{
-	  /* Writing to file descriptor instead of stream, no flush
-	     required.  */
-	}
-      else
-	gdb_stderr->flush ();
     }
 #endif
 
