@@ -133,10 +133,16 @@ gdb_internal_backtrace_1 ()
   void *buffer[25];
   int frames = backtrace (buffer, ARRAY_SIZE (buffer));
 
-  int fd = ((gdb_stderr == nullptr || gdb_stderr->fd () == -1)
-	    ? 2
-	    : gdb_stderr->fd ());
-  backtrace_symbols_fd (buffer, frames, fd);
+  if (gdb_stderr == nullptr)
+    backtrace_symbols_fd (buffer, frames, 2);
+  else
+    {
+      std::function<void (int)> do_fd = [&] (int fd)
+      {
+	backtrace_symbols_fd (buffer, frames, fd);
+      };
+    gdb_stderr->for_each_fd (do_fd);
+    }
   if (frames == ARRAY_SIZE (buffer))
     sig_write (_("Backtrace might be incomplete.\n"));
 }

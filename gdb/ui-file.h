@@ -110,6 +110,13 @@ public:
   virtual int fd () const
   { return -1; }
 
+  virtual void for_each_fd (std::function<void (int)> &f) {
+    int tmp = fd ();
+    if (tmp == -1)
+      tmp = 2;
+    f (tmp);
+  }
+
   /* Return true if this object supports paging, false otherwise.  */
   virtual bool can_page () const
   {
@@ -430,6 +437,10 @@ public:
 
   int fd () const override
   { return m_stream->fd (); }
+
+  void for_each_fd (std::function<void (int)> &f) override {
+    m_stream->for_each_fd (f);
+  }
 
   void puts_unfiltered (const char *str) override
   { m_stream->puts_unfiltered (str); }

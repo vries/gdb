@@ -183,6 +183,16 @@ logging_file<T>::write_async_safe (const char *buf, long length_buf)
     m_out->write_async_safe (buf, length_buf);
 }
 
+template<typename T>
+void
+logging_file<T>::for_each_fd (std::function<void (int)> &f)
+{
+  if (log_file != nullptr)
+    log_file->for_each_fd (f);
+  if (ordinary_output ())
+    m_out->for_each_fd (f);
+}
+
 /* See logging-file.h.  */
 
 template<typename T>
