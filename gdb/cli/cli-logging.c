@@ -174,13 +174,15 @@ logging_file<T>::write (const char *buf, long length_buf)
 /* See logging-file.h.  */
 
 template<typename T>
-void
+bool
 logging_file<T>::write_async_safe (const char *buf, long length_buf)
 {
+  bool handled = false;
   if (log_file != nullptr)
-    log_file->write_async_safe (buf, length_buf);
+    handled = log_file->write_async_safe (buf, length_buf);
   if (ordinary_output ())
-    m_out->write_async_safe (buf, length_buf);
+    handled = m_out->write_async_safe (buf, length_buf);
+  return handled;
 }
 
 /* See logging-file.h.  */

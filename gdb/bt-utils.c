@@ -45,10 +45,11 @@ gdb_internal_backtrace_set_cmd (const char *args, int from_tty,
 void
 sig_write (const char *msg)
 {
-  if (gdb_stderr == nullptr || gdb_stderr->fd () == -1)
-    std::ignore = ::write (2, msg, strlen (msg));
-  else
-    gdb_stderr->write_async_safe (msg, strlen (msg));
+  size_t len = strlen (msg);
+
+  if (gdb_stderr == nullptr
+      || !gdb_stderr->write_async_safe (msg, len))
+    std::ignore = ::write (2, msg, len);
 }
 
 #ifdef GDB_PRINT_INTERNAL_BACKTRACE

@@ -157,10 +157,11 @@ null_file::puts (const char *)
   /* Discard the request.  */
 }
 
-void
+bool
 null_file::write_async_safe (const char *buf, long sizeof_buf)
 {
-  /* Discard the request.  */
+  /* Discard the request.  We consider it handled though.  */
+  return true;
 }
 
 
@@ -271,7 +272,7 @@ stdio_file::write (const char *buf, long length_buf)
     }
 }
 
-void
+bool
 stdio_file::write_async_safe (const char *buf, long length_buf)
 {
   /* This is written the way it is to avoid a warning from gcc about not using the
@@ -281,6 +282,7 @@ stdio_file::write_async_safe (const char *buf, long length_buf)
     {
       /* Nothing.  */
     }
+  return true;
 }
 
 void

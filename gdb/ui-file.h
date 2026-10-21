@@ -20,6 +20,7 @@
 #define GDB_UI_FILE_H
 
 #include <string>
+#include <tuple>
 #include "ui-style.h"
 
 /* The abstract ui_file base class.  */
@@ -67,9 +68,16 @@ public:
      first.  Implementations are also free to ignore some or all of
      the request.  puts_async is not provided as the async versions
      are rarely used, no point in having both for a rarely used
-     interface.  */
-  virtual void write_async_safe (const char *buf, long length_buf)
-  { gdb_assert_not_reached ("write_async_safe"); }
+     interface.  This default implementation writes to fd ().  Return true if
+     the write was handled.  */
+  virtual bool write_async_safe (const char *buf, long length_buf)
+  {
+    int fd = this->fd ();
+    if (fd == -1)
+      return false;
+    std::ignore = ::write (fd, buf, length_buf);
+    return true;
+  }
 
   /* Some ui_files override this to provide a efficient implementation
      that avoids a strlen.  */
@@ -163,7 +171,7 @@ class null_file : public ui_file
 {
 public:
   void write (const char *buf, long length_buf) override;
-  void write_async_safe (const char *buf, long sizeof_buf) override;
+  bool write_async_safe (const char *buf, long sizeof_buf) override;
   void puts (const char *str) override;
 };
 
@@ -267,7 +275,7 @@ public:
 
   void write (const char *buf, long length_buf) override;
 
-  void write_async_safe (const char *buf, long length_buf) override;
+  bool write_async_safe (const char *buf, long length_buf) override;
 
   void puts (const char *) override;
 
@@ -436,7 +444,7 @@ public:
   void write (const char *buf, long length_buf) override
   { return m_stream->write (buf, length_buf); }
 
-  void write_async_safe (const char *buf, long length_buf) override
+  bool write_async_safe (const char *buf, long length_buf) override
   { return m_stream->write_async_safe (buf, length_buf); }
 
   bool can_page () const override

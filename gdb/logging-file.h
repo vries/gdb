@@ -41,7 +41,7 @@ public:
   }
 
   void write (const char *buf, long length_buf) override;
-  void write_async_safe (const char *buf, long length_buf) override;
+  bool write_async_safe (const char *buf, long length_buf) override;
   void puts (const char *) override;
   void flush () override;
   bool can_page () const override;

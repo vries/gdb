@@ -47,10 +47,10 @@ mi_console_file::write (const char *buf, long length_buf)
     this->flush ();
 }
 
-void
+bool
 mi_console_file::write_async_safe (const char *buf, long length_buf)
 {
-  m_raw->write_async_safe (m_prefix, strlen (m_prefix));
+  bool handled = m_raw->write_async_safe (m_prefix, strlen (m_prefix));
   if (m_quote)
     {
       m_raw->write_async_safe (&m_quote, 1);
@@ -62,6 +62,7 @@ mi_console_file::write_async_safe (const char *buf, long length_buf)
 
   char nl = '\n';
   m_raw->write_async_safe (&nl, 1);
+  return handled;
 }
 
 void
