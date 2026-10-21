@@ -48,6 +48,11 @@ public:
   void emit_style_escape (const ui_file_style &style) override;
   void puts_unfiltered (const char *str) override;
 
+  bool can_write_async_safe () override
+  {
+    return true;
+  }
+
   bool isatty () override
   {
     /* Defer to the wrapped file.  */

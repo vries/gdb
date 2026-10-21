@@ -20,6 +20,7 @@
 #define GDB_UI_FILE_H
 
 #include <string>
+#include <tuple>
 #include "ui-style.h"
 
 /* The abstract ui_file base class.  */
@@ -62,14 +63,23 @@ public:
 
   virtual void write (const char *buf, long length_buf) = 0;
 
+  virtual bool can_write_async_safe ()
+  {
+    return fd () != -1;
+  }
+
   /* This version of "write" is safe for use in signal handlers.  It's
      not guaranteed that all existing output will have been flushed
      first.  Implementations are also free to ignore some or all of
      the request.  puts_async is not provided as the async versions
      are rarely used, no point in having both for a rarely used
-     interface.  */
+     interface.  The default implementation writes to fd ().  */
   virtual void write_async_safe (const char *buf, long length_buf)
-  { gdb_assert_not_reached ("write_async_safe"); }
+  {
+    int fd = this->fd ();
+    if (fd != -1)
+      std::ignore = ::write (fd, buf, length_buf);
+  }
 
   /* Some ui_files override this to provide a efficient implementation
      that avoids a strlen.  */
