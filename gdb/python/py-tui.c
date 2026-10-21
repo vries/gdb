@@ -181,7 +181,7 @@ private:
 bool
 gdbpy_tui_window::is_valid () const
 {
-  return window != nullptr && tui_active;
+  return window != nullptr && tui_active && !window->pending_delete;
 }
 
 tui_py_window::~tui_py_window ()

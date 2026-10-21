@@ -182,6 +182,9 @@ public:
   /* Is this window highlighted?  */
   bool is_highlighted = false;
 
+  /* True if this window is scheduled to be deleted.  */
+  bool pending_delete = false;
+
 protected:
 
   /* Scroll the contents vertically.  This is only called via
@@ -277,6 +280,9 @@ extern struct tui_win_info *tui_win_list[MAX_MAJOR_WINDOWS];
 /* All the windows that are currently instantiated, in layout
    order.  */
 extern std::vector<tui_win_info *> tui_windows;
+/* Windows that have become invisible, and should be deleted once it's safe to
+   do so.  */
+extern std::vector<tui_win_info *> tui_windows_to_delete;
 
 /* Return a range adapter for iterating over TUI windows.  */
 static inline std::vector<tui_win_info *> &

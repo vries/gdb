@@ -180,7 +180,8 @@ tui_before_prompt (const char *current_gdb_prompt)
       target_terminal::ours_for_output ();
 
       tui_defer_rerender = false;
-      for (tui_win_info *window : tui_windows)
+      auto tui_windows_copy = tui_windows;
+      for (tui_win_info *window : tui_windows_copy)
 	if (window->is_visible ())
 	  window->rerender ();
     }
@@ -189,6 +190,11 @@ tui_before_prompt (const char *current_gdb_prompt)
 
   from_stack = false;
   from_source_symtab = false;
+
+  auto tui_windows_to_delete_copy = std::move (tui_windows_to_delete);
+  tui_windows_to_delete.clear ();
+  for (auto w : tui_windows_to_delete_copy)
+    delete w;
 }
 
 /* Observer for the normal_stop notification.  */

@@ -54,6 +54,7 @@ static tui_layout_split *asm_regs_layout;
 
 /* See tui-data.h.  */
 std::vector<tui_win_info *> tui_windows;
+std::vector<tui_win_info *> tui_windows_to_delete;
 
 /* See tui-layout.h.  */
 
@@ -90,7 +91,8 @@ tui_apply_current_layout (bool preserve_cmd_win_size_p)
 	{
 	  if (focus == win_info)
 	    tui_set_win_focus_to (new_tui_windows[0]);
-	  delete win_info;
+	  win_info->pending_delete = true;
+	  tui_windows_to_delete.push_back (win_info);
 	}
     }
 
