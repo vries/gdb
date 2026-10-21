@@ -25,6 +25,7 @@
 #include "gdbsupport/observable.h"
 #include "tui/tui-data.h"
 #include "symtab.h"
+#include "gdbsupport/unordered_set.h"
 
 enum tui_line_or_address_kind
 {
@@ -268,8 +269,6 @@ struct tui_source_window_iterator
 {
 public:
 
-  using inner_iterator = std::vector<tui_win_info *>::iterator;
-
   using self_type = tui_source_window_iterator;
   using value_type = struct tui_source_window_base *;
   using reference = struct tui_source_window_base *&;
@@ -277,47 +276,100 @@ public:
   using iterator_category = std::forward_iterator_tag;
   using difference_type = int;
 
-  explicit tui_source_window_iterator (const inner_iterator &it,
-				       const inner_iterator &end)
-    : m_iter (it),
-      m_end (end)
+  explicit tui_source_window_iterator (std::vector<tui_win_info *> &v,
+				       bool end_p = false)
+    : m_v (v), m_iter (nullptr), m_end (end_p)
   {
-    advance ();
-  }
-
-  explicit tui_source_window_iterator (const inner_iterator &it)
-    : m_iter (it)
-  {
+    advance (m_iter, m_end);
   }
 
   bool operator!= (const self_type &other) const
   {
+    /* Check both are valid.  */
+    check_valid ();
+    other.check_valid ();
+
+    /* Check they are comparable.  */
+    gdb_assert (&m_v == &other.m_v);
+
+    /* Only one is end ().  */
+    if (m_end != other.m_end)
+      return true;
+
+    /* Both are end ().  */
+    if (m_end && other.m_end)
+      return false;
+
     return m_iter != other.m_iter;
   }
 
   value_type operator* () const
   {
-    return dynamic_cast<tui_source_window_base *> (*m_iter);
+    check_valid ();
+
+    /* Can't dereference end ().  */
+    gdb_assert (!m_end);
+
+    return m_iter;
   }
 
   self_type &operator++ ()
   {
-    ++m_iter;
-    advance ();
+    /* At this point, m_v may have changed, so we don't call check_valid.
+       Mark current item as handled, and advance to next unhandled item.  */
+    m_handled.insert (m_iter);
+    advance (m_iter, m_end);
     return *this;
   }
 
 private:
 
-  void advance ()
+  void advance (tui_source_window_base *&iter, bool &end) const
   {
-    while (m_iter != m_end
-	   && dynamic_cast<tui_source_window_base *> (*m_iter) == nullptr)
-      ++m_iter;
+    iter = nullptr;
+    if (end)
+      {
+	/* Can't advance past end ().  */
+	return;
+      }
+
+    for (auto w : m_v)
+      {
+	auto sw = dynamic_cast<tui_source_window_base *> (w);
+	if (sw == nullptr
+	    || m_handled.find (sw) != m_handled.end ())
+	  continue;
+
+	/* Found an unhandled source window.  */
+	iter = sw;
+	return;
+      }
+
+    end = true;
   }
 
-  inner_iterator m_iter;
-  inner_iterator m_end;
+  void check_valid () const
+  {
+    tui_source_window_base *check_iter = nullptr;
+    bool check_end = m_end;
+    advance (check_iter, check_end);
+
+    gdb_assert (m_iter == check_iter);
+    gdb_assert (m_end == check_end);
+  }
+
+  /* Vector that we're iterating over.  */
+  std::vector<tui_win_info *> &m_v;
+
+  /* Current element, or nullptr if m_end.  */
+  tui_source_window_base *m_iter;
+
+  /* True if this == end ().  */
+  bool m_end;
+
+  /* Keep track of handled items.  Note that because m_v may change, some of
+     these items may no longer be in m_v.  */
+  gdb::unordered_set<tui_source_window_base *> m_handled;
 };
 
 /* A range adapter for source windows.  */
@@ -331,13 +383,12 @@ struct tui_source_windows
 
   tui_source_window_iterator begin () const
   {
-    return tui_source_window_iterator (tui_windows.begin (),
-				       tui_windows.end ());
+    return tui_source_window_iterator (tui_windows);
   }
 
   tui_source_window_iterator end () const
   {
-    return tui_source_window_iterator (tui_windows.end ());
+    return tui_source_window_iterator (tui_windows, true);
   }
 };
 
