@@ -1164,23 +1164,27 @@ core_process_module_section (bfd *abfd, asection *sect, cpms_data &data)
   if (!startswith (sect->name, ".module"))
     return;
 
-  gdb::byte_vector buf (bfd_section_size (sect) + 1);
+  bfd_size_type section_size = bfd_section_size (sect);
+  gdb::byte_vector buf;
+  buf.reserve (section_size + 1);
+
+  buf.resize (section_size);
   if (!bfd_get_section_contents (abfd, sect,
-				 buf.data (), 0, bfd_section_size (sect)))
+				 buf.data (), 0, buf.size ()))
     return;
   /* We're going to treat part of the buffer as a string, so make sure
      it is NUL-terminated.  */
-  buf.back () = 0;
+  buf.push_back (0);
 
   /* A DWORD (data_type) followed by struct windows_core_module_info.  */
-  if (bfd_section_size (sect) < 4)
+  if (section_size < 4)
     return;
   data_type = extract_unsigned_integer (buf.data (), 4, byte_order);
 
   if (data_type == NOTE_INFO_MODULE)
     {
       module_name_offset = 12;
-      if (bfd_section_size (sect) < module_name_offset)
+      if (section_size < module_name_offset)
 	return;
       base_addr = extract_unsigned_integer (&buf[4], 4, byte_order);
       module_name_size = extract_unsigned_integer (&buf[8], 4, byte_order);
@@ -1188,7 +1192,7 @@ core_process_module_section (bfd *abfd, asection *sect, cpms_data &data)
   else if (data_type == NOTE_INFO_MODULE64)
     {
       module_name_offset = 16;
-      if (bfd_section_size (sect) < module_name_offset)
+      if (section_size < module_name_offset)
 	return;
       base_addr = extract_unsigned_integer (&buf[4], 8, byte_order);
       module_name_size = extract_unsigned_integer (&buf[12], 4, byte_order);
@@ -1196,7 +1200,7 @@ core_process_module_section (bfd *abfd, asection *sect, cpms_data &data)
   else
     return;
 
-  if (module_name_offset + module_name_size > bfd_section_size (sect))
+  if (module_name_offset + module_name_size > section_size)
     return;
   module_name = (char *) buf.data () + module_name_offset;
 
