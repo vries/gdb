@@ -141,7 +141,7 @@ tui_rl_switch_mode (int notused1, int notused2)
 
 	  /* If tui_enable throws, we'll re-prep below.  */
 	  rl_deprep_terminal ();
-	  tui_enable ();
+	  tui_enable (false);
 	}
     }
   catch (const gdb_exception_forced_quit &ex)
@@ -399,7 +399,7 @@ gdb_getenv_term (void)
    the gdb output, configures the readline to work in tui mode.
    When in curses mode, it does nothing.  */
 void
-tui_enable (void)
+tui_enable (bool queries_allowed)
 {
   TUI_SCOPED_DEBUG_ENTER_EXIT;
 
@@ -408,7 +408,8 @@ tui_enable (void)
 
   tui_batch_rendering defer;
 
-  if (debuginfod_enabled_ask_p ()
+  if (!queries_allowed
+      && debuginfod_enabled_ask_p ()
       && defaulted_query_auto_answers_p () != TRIBOOL_TRUE)
     error (_("Please set debuginfod enabled to on or off before enabling TUI"));
 

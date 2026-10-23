@@ -70,7 +70,7 @@ extern bool tui_get_command_dimension (unsigned int *width,
 extern void tui_ensure_readline_initialized ();
 
 /* Enter in the tui mode (curses).  */
-extern void tui_enable (void);
+extern void tui_enable (bool queries_allowed = true);
 
 /* Leave the tui mode.  */
 extern void tui_disable (void);
