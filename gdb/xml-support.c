@@ -985,7 +985,7 @@ xml_fetch_content_from_file (const char *filename, const char *dirname)
   len = ftell (file.get ());
   rewind (file.get ());
 
-  gdb::char_vector text (len + 1);
+  gdb::char_vector text (len);
 
   if (fread (text.data (), 1, len, file.get ()) != len
       || ferror (file.get ()))
@@ -995,7 +995,7 @@ xml_fetch_content_from_file (const char *filename, const char *dirname)
       return {};
     }
 
-  text.back () = '\0';
+  text.push_back ('\0');
   return text;
 }
 

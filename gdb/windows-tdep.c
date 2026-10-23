@@ -1164,13 +1164,13 @@ core_process_module_section (bfd *abfd, asection *sect, cpms_data &data)
   if (!startswith (sect->name, ".module"))
     return;
 
-  gdb::byte_vector buf (bfd_section_size (sect) + 1);
+  gdb::byte_vector buf (bfd_section_size (sect));
   if (!bfd_get_section_contents (abfd, sect,
 				 buf.data (), 0, bfd_section_size (sect)))
     return;
   /* We're going to treat part of the buffer as a string, so make sure
      it is NUL-terminated.  */
-  buf.back () = 0;
+  buf.push_back (0);
 
   /* A DWORD (data_type) followed by struct windows_core_module_info.  */
   if (bfd_section_size (sect) < 4)

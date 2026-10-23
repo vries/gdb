@@ -1724,13 +1724,13 @@ core_target::read_description ()
 	tdesc_note_size = bfd_section_size (tdesc_note_section);
       if (tdesc_note_size > 0)
 	{
-	  gdb::char_vector contents (tdesc_note_size + 1);
+	  gdb::char_vector contents (tdesc_note_size);
 	  if (bfd_get_section_contents (m_core_bfd.get (), tdesc_note_section,
 					contents.data (), (file_ptr) 0,
 					tdesc_note_size))
 	    {
 	      /* Ensure we have a null terminator.  */
-	      contents[tdesc_note_size] = '\0';
+	      contents.push_back ('\0');
 	      const struct target_desc *result
 		= string_read_description_xml (contents.data ());
 	      if (result != nullptr)
