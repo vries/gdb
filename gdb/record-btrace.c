@@ -47,6 +47,7 @@
 #include <forward_list>
 #include "objfiles.h"
 #include "interps.h"
+#include "gdbsupport/gdb-optional.h"
 
 static const target_info record_btrace_target_info = {
   "record-btrace",
@@ -803,8 +804,8 @@ btrace_insn_history (struct ui_out *uiout,
 
   ui_out_emit_list list_emitter (uiout, "asm_insns");
 
-  std::optional<ui_out_emit_tuple> src_and_asm_tuple;
-  std::optional<ui_out_emit_list> asm_list;
+  gdb::optional<ui_out_emit_tuple> src_and_asm_tuple;
+  gdb::optional<ui_out_emit_list> asm_list;
 
   gdb_pretty_print_disassembler disasm (gdbarch, uiout);
 

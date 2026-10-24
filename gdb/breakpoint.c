@@ -82,6 +82,7 @@
 #include "gdbsupport/array-view.h"
 #include <optional>
 #include "gdbsupport/common-utils.h"
+#include "gdbsupport/gdb-optional.h"
 
 /* Prototypes for local functions.  */
 
@@ -7224,7 +7225,7 @@ print_one_breakpoint (breakpoint *b, const bp_location **last_loc, int allflag)
     = (uiout->test_flags (fix_multi_location_breakpoint_output)
        || fix_multi_location_breakpoint_output_globally);
 
-  std::optional<ui_out_emit_tuple> bkpt_tuple_emitter (std::in_place, uiout,
+  gdb::optional<ui_out_emit_tuple> bkpt_tuple_emitter (std::in_place, uiout,
 						       "bkpt");
   bool printed = print_one_breakpoint_location (b, NULL, 0, last_loc,
 						allflag, false);
