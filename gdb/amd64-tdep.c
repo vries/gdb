@@ -3877,12 +3877,15 @@ amd64_target_description (uint64_t xstate_bv, bool segments)
 
 #if GDB_SELF_TEST
 
+/* We're using std::vector<gdb_byte> instead of gdb::byte_vector here to work
+   around Wstringop-overflow false positives (PR gcc/106093).  */
+
 namespace selftests {
 
 /* Recode a vex2 instruction into a vex3 instruction.  */
 
 static void
-vex2_to_vex3 (gdb::byte_vector &vex2, gdb::byte_vector &vex3)
+vex2_to_vex3 (std::vector<gdb_byte> &vex2, std::vector<gdb_byte> &vex3)
 {
   gdb_assert (vex2.size () >= 2);
   gdb_assert (vex2[0] == 0xc5);
@@ -3908,13 +3911,13 @@ static void
 test_vex2_to_vex3 (void)
 {
   /* INSN: vzeroall, vex2 prefix.  */
-  gdb::byte_vector vex2 = { 0xc5, 0xfc, 0x77 };
+  std::vector<gdb_byte> vex2 = { 0xc5, 0xfc, 0x77 };
 
-  gdb::byte_vector vex3;
+  std::vector<gdb_byte> vex3;
   vex2_to_vex3 (vex2, vex3);
 
   /* INSN: vzeroall, vex3 prefix.  */
-  gdb::byte_vector vex3_ref = { 0xc4, 0xe1, 0x7c, 0x77 };
+  std::vector<gdb_byte> vex3_ref = { 0xc4, 0xe1, 0x7c, 0x77 };
   SELF_CHECK (vex3 == vex3_ref);
 }
 
@@ -3924,7 +3927,7 @@ static void
 test_amd64_get_insn_details (void)
 {
   struct amd64_insn details;
-  gdb::byte_vector insn, tmp;
+  std::vector<gdb_byte> insn, tmp;
 
   /* INSN: add %eax,(%rcx).  */
   insn = { 0x01, 0x01 };
@@ -3961,11 +3964,12 @@ test_amd64_get_insn_details (void)
   SELF_CHECK (rip_relative_offset (&details) == 3);
 
   /* INSN: lea 0x1e(%ecx),%rdi, rex prefix.  */
-  gdb::byte_vector updated_insn = { 0x48, 0x8d, 0xb9, 0x1e, 0x00, 0x00, 0x00 };
+  std::vector<gdb_byte> updated_insn
+    = { 0x48, 0x8d, 0xb9, 0x1e, 0x00, 0x00, 0x00 };
   fixup_riprel (details, insn.data (), ECX_REG_NUM);
   SELF_CHECK (insn == updated_insn);
 
-  gdb::byte_vector vex2, vex3;
+  std::vector<gdb_byte> vex2, vex3;
 
   /* INSN: vzeroall, vex2 prefix.  */
   vex2 = { 0xc5, 0xfc, 0x77 };
@@ -4008,7 +4012,7 @@ test_amd64_get_insn_details (void)
   SELF_CHECK (details.modrm_offset == 3);
 
   /* INSN: vmovdqu 0x9(%rcx),%ymm3, vex2 prefix.  */
-  gdb::byte_vector updated_vex2
+  std::vector<gdb_byte> updated_vex2
     = { 0xc5, 0xfe, 0x6f, 0x99, 0x09, 0x00, 0x00, 0x00 };
   tmp = vex2;
   fixup_riprel (details, tmp.data (), ECX_REG_NUM);
@@ -4023,7 +4027,7 @@ test_amd64_get_insn_details (void)
   SELF_CHECK (details.modrm_offset == 4);
 
   /* INSN: vmovdqu 0x9(%rcx),%ymm3, vex3 prefix.  */
-  gdb::byte_vector updated_vex3;
+  std::vector<gdb_byte> updated_vex3;
   vex2_to_vex3 (updated_vex2, updated_vex3);
   tmp = vex3;
   fixup_riprel (details, tmp.data (), ECX_REG_NUM);
