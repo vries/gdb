@@ -31147,9 +31147,24 @@ if test "${ERROR_ON_WARNING}" = yes ; then
     WERROR_CFLAGS="-Werror"
 fi
 
-# The options we'll try to enable.
-build_warnings=" \
+# The options we'll try to enable.  Put options we want to override using
+# build_warnings_no here.  Sorted alphabetically.
+build_warnings_base=" \
 -Wall \
+"
+
+# The options we'll try to disable.  Sorted alphabetically.
+build_warnings_no=" \
+-Wno-char-subscripts \
+-Wno-mismatched-tags \
+-Wno-sign-compare \
+-Wno-switch \
+-Wno-unused \
+"
+
+# The options we'll try to enable.  Don't put options we want to override
+# using build_warnings_no here.  Sorted alphabetically.
+build_warnings=" \
 -Wdangling-reference \
 -Wdeprecated-copy \
 -Wdeprecated-copy-dtor \
@@ -31157,13 +31172,6 @@ build_warnings=" \
 -Wempty-body \
 -Wimplicit-fallthrough=5 \
 -Wmissing-declarations \
--Wno-char-subscripts \
--Wno-error=deprecated-register \
--Wno-error=maybe-uninitialized \
--Wno-mismatched-tags \
--Wno-sign-compare \
--Wno-switch \
--Wno-unused \
 -Wpointer-arith \
 -Wredundant-move \
 -Wshadow=local \
@@ -31184,6 +31192,14 @@ build_warnings=" \
 -Wvla \
 "
 
+# The warnings which, if enabled, we don't want to turn into errors if -Werror
+# is in effect.  Note that these neither enable nor disable any warnings.
+# Sorted alphabetically.
+build_warnings_no_error=" \
+-Wno-error=deprecated-register \
+-Wno-error=maybe-uninitialized \
+"
+
 # The -Wmissing-prototypes flag will be accepted by GCC, but results
 # in a warning being printed about the flag not being valid for C++,
 # this is something to do with using ccache, and argument ordering.
@@ -31191,6 +31207,30 @@ if test "$GDB_COMPILER_TYPE" != gcc; then
   build_warnings="$build_warnings -Wmissing-prototypes"
 fi
 
+# The order here is significant:
+# - some warnings are enabled by default
+# - build_warnings_base (contains -Wall) enables more warnings
+# - build_warnings_no switches some of those off
+# - build_warnings enables warnings that were:
+#   - enabled neither by default nor by build_warnings_base,
+#     for example -Wshadow=local
+#   - enabled by default or build_warnings_base but disabled by
+#     build_warnings_no, for example -Wno-unused and -Wunused-variable
+build_warnings=" \
+$build_warnings_base \
+$build_warnings_no \
+$build_warnings \
+"
+
+# Variable build_warnings_no_error doesn't enable or disable warnings, so the
+# concatenation order is not significant.
+build_warnings=" \
+$build_warnings \
+$build_warnings_no_error \
+"
+
+# Host-specific warning settings.  Apply these last to make sure they are
+# not overridden.
 case "${host}" in
   *-*-mingw32*)
     # Enable -Wno-format by default when using gcc on mingw since many
