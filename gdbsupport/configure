@@ -13880,9 +13880,26 @@ if test "${ERROR_ON_WARNING}" = yes ; then
     WERROR_CFLAGS="-Werror"
 fi
 
-# The options we'll try to enable.
-build_warnings=" \
+# For clang, warning order is significant.  Order the warnings using a number
+# of lists:
+# - build_warnings_base_enable	(broad enable)
+# - build_warnings_base_disable (broad disable)
+# - build_warnings_enable	(specific enable)
+# - build_warnings_disable	(specific disable)
+# - build_warnings_no_error	(no error)
+
+# Options that enable a group of warnings.  Sorted alphabetically.
+build_warnings_base_enable=" \
 -Wall \
+"
+
+# Options that disable a group of warnings.  Sorted alphabetically.
+build_warnings_base_disable=" \
+-Wno-unused \
+"
+
+# Options that enable warnings.  Sorted alphabetically.
+build_warnings_enable=" \
 -Wdangling-reference \
 -Wdeprecated-copy \
 -Wdeprecated-copy-dtor \
@@ -13890,14 +13907,6 @@ build_warnings=" \
 -Wempty-body \
 -Wimplicit-fallthrough=5 \
 -Wmissing-declarations \
--Wno-char-subscripts \
--Wno-error=deprecated-register \
--Wno-error=maybe-uninitialized \
--Wno-mismatched-tags \
--Wno-sign-compare \
--Wno-stringop-overflow \
--Wno-switch \
--Wno-unused \
 -Wpointer-arith \
 -Wredundant-move \
 -Wshadow=local \
@@ -13918,29 +13927,54 @@ build_warnings=" \
 -Wvla \
 "
 
+# Options that disable warnings.  Sorted alphabetically.
+build_warnings_disable=" \
+-Wno-char-subscripts \
+-Wno-mismatched-tags \
+-Wno-sign-compare \
+-Wno-stringop-overflow \
+-Wno-switch \
+"
+
+# The warnings which, if enabled, we don't want to turn into errors if -Werror
+# is in effect.  Note that these neither enable nor disable any warnings.
+# Sorted alphabetically.
+build_warnings_no_error=" \
+-Wno-error=deprecated-register \
+-Wno-error=maybe-uninitialized \
+"
+
 # The -Wmissing-prototypes flag will be accepted by GCC, but results
 # in a warning being printed about the flag not being valid for C++,
 # this is something to do with using ccache, and argument ordering.
 if test "$GDB_COMPILER_TYPE" != gcc; then
-  build_warnings="$build_warnings -Wmissing-prototypes"
+  build_warnings_enable="$build_warnings_enable -Wmissing-prototypes"
 fi
 
 case "${host}" in
   *-*-mingw32*)
     # Enable -Wno-format by default when using gcc on mingw since many
     # GCC versions complain about %I64.
-    build_warnings="$build_warnings -Wno-format" ;;
+    build_warnings_base_disable="$build_warnings_base_disable -Wno-format" ;;
   *-*-solaris*)
     # Solaris 11.4 <python2.7/ceval.h> uses #pragma no_inline that GCC
     # doesn't understand.
-    build_warnings="$build_warnings -Wno-unknown-pragmas"
+    build_warnings_disable="$build_warnings_disable -Wno-unknown-pragmas"
     # Solaris 11 <unistd.h> marks vfork deprecated.
-    build_warnings="$build_warnings -Wno-deprecated-declarations" ;;
+    build_warnings_disable="$build_warnings_disable -Wno-deprecated-declarations" ;;
   *)
     # Note that gcc requires -Wformat for -Wformat-nonliteral to work,
     # but there's a special case for this below.
-    build_warnings="$build_warnings -Wformat-nonliteral" ;;
+    build_warnings_enable="$build_warnings_enable -Wformat-nonliteral" ;;
 esac
+
+build_warnings=" \
+$build_warnings_base_enable \
+$build_warnings_base_disable \
+$build_warnings_enable \
+$build_warnings_disable \
+$build_warnings_no_error \
+"
 
 # Check whether --enable-build-warnings was given.
 if test "${enable_build_warnings+set}" = set; then :
