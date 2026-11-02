@@ -2,6 +2,11 @@
 
 set -e
 
+check=false
+if [ "$1" = "--check" ]; then
+    check=true
+fi
+
 f=gdb/NEWS
 
 gen_news ()
@@ -31,5 +36,21 @@ EOF
 	cat "gdb/doc/NEWS-$version"
     done
 }
+
+cleanup ()
+{
+    if [ "$tmp" != "" ]; then
+	rm -f "$tmp"
+    fi
+}
+
+if $check; then
+    tmp=""
+    trap cleanup EXIT
+    tmp=$(mktemp)
+    gen_news > "$tmp"
+    diff "$tmp" "$f"
+    exit 0
+fi
 
 gen_news > "$f"
