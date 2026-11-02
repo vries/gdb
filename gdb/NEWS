@@ -7677,7 +7677,7 @@ In addition to using $arg0..$arg9 for argument passing, it is now possible
 to use $argc to determine now many arguments have been passed.  See the
 section on user-defined commands in the user manual for more information.
 
-*** Changes in GDB 6.3:
+*** Changes in GDB 6.3
 
 * New command line option
 
@@ -7751,7 +7751,7 @@ ns32k-*-*
 sh64-*-*
 v850-*-*
 
-*** Changes in GDB 6.2.1:
+*** Changes in GDB 6.2.1
 
 * MIPS `break main; run' gave an heuristic-fence-post warning
 
@@ -7770,7 +7770,7 @@ IRIX long double values).
 A bug in the VAX stack code was causing problems with the "next"
 command.  This problem has been fixed.
 
-*** Changes in GDB 6.2:
+*** Changes in GDB 6.2
 
 * Fix for ``many threads''
 
@@ -7869,7 +7869,7 @@ riscos						mips-*-riscos* mips-*-sysv*
 sonymips					mips-sony-*
 sysv					mips*-*-sysv4* (IRIX 5/6 not included)
 
-*** Changes in GDB 6.1.1:
+*** Changes in GDB 6.1.1
 
 * TUI (Text-mode User Interface) built-in (also included in GDB 6.1)
 
@@ -7925,7 +7925,7 @@ When examining parameters in optimized shared library code generated
 by a mainline GCC, GDB would incorrectly report ``Variable "..." is
 not available''.  GDB now correctly displays the variable's value.
 
-*** Changes in GDB 6.1:
+*** Changes in GDB 6.1
 
 * Removed --with-mmalloc
 
@@ -8029,7 +8029,7 @@ SPARC running SunOS 4				sparc-*-sunos4*
 Tsqware Sparclet				sparclet-*-*
 Fujitsu SPARClite 			sparclite-fujitsu-none  or  sparclite
 
-*** Changes in GDB 6.0:
+*** Changes in GDB 6.0
 
 * Objective-C
 
@@ -8191,7 +8191,7 @@ context, $fp could refer to either $sp or the current frame's base
 address.  See ``8.10 Registers'' in the manual ``Debugging with GDB:
 The GNU Source-Level Debugger''.
 
-*** Changes in GDB 5.3:
+*** Changes in GDB 5.3
 
 * GNU/Linux shared library multi-threaded performance improved.
 
@@ -8302,7 +8302,7 @@ The previous single-step mechanism could cause unpredictable problems,
 including the random appearance of SIGSEGV or SIGTRAP signals. The use
 of a software single-step mechanism prevents this.
 
-*** Changes in GDB 5.2.1:
+*** Changes in GDB 5.2.1
 
 * New targets.
 
@@ -8326,7 +8326,7 @@ i386 hardware watchpoint support:
 avoid misses on second run for some targets.
 By Pierre Muller, imported from mainline.
 
-*** Changes in GDB 5.2:
+*** Changes in GDB 5.2
 
 * New command "set trust-readonly-sections on[off]".
 
@@ -8430,7 +8430,7 @@ Numerous documentation fixes.
 
 Numerous testsuite fixes.
 
-*** Changes in GDB 5.1:
+*** Changes in GDB 5.1
 
 * New native configurations
 
@@ -8629,7 +8629,7 @@ contents of this file.
 
 GUD support is now a standard part of the EMACS distribution.
 
-*** Changes in GDB 5.0:
+*** Changes in GDB 5.0
 
 * Improved support for debugging FP programs on x86 targets
 
@@ -8762,7 +8762,7 @@ enabled by configuring with:
 
 	.../configure --enable-gdbmi
 
-*** Changes in GDB-4.18:
+*** Changes in GDB 4.18
 
 * New native configurations
 
@@ -8918,8 +8918,7 @@ to achieve all of these rates.)
 The i960 configuration now includes an initial implementation of a
 builtin simulator, contributed by Jim Wilson.
 
-
-*** Changes in GDB-4.17:
+*** Changes in GDB 4.17
 
 * New native configurations
 
@@ -9035,7 +9034,7 @@ basic architecture (such as MIPS and SH), you may now set the
 architecture explicitly.  "set arch" sets, "info arch" lists
 the possible architectures.
 
-*** Changes in GDB-4.16:
+*** Changes in GDB 4.16
 
 * New native configurations
 
@@ -9138,7 +9137,7 @@ and more efficient S-record downloading.
 GDB now uses less memory and reports statistics about memory usage.
 Try the `maint print statistics' command, for example.
 
-*** Changes in GDB-4.15:
+*** Changes in GDB 4.15
 
 * Psymtabs for XCOFF
 
@@ -9193,7 +9192,7 @@ but does simplify configuration and building.
 
 GDB now supports hpux10.
 
-*** Changes in GDB-4.14:
+*** Changes in GDB 4.14
 
 * New native configurations
 
@@ -9292,7 +9291,7 @@ This version uses DPMI interrupts to handle buffered I/O, so you
 no longer need to run asynctsr when debugging boards connected to
 a PC's serial port.
 
-*** Changes in GDB-4.13:
+*** Changes in GDB 4.13
 
 * New "complete" command
 
@@ -9367,7 +9366,7 @@ This is available automatically when GDB is configured for the SH.
 As usual, a variety of small fixes and improvements, both generic
 and configuration-specific.  See the ChangeLog for more detail.
 
-*** Changes in GDB-4.12:
+*** Changes in GDB 4.12
 
 * Irix 5 is now supported
 
@@ -9379,8 +9378,7 @@ GAS (GCC 2.5.8 and GAS-2.2 or PAGAS-1.36).  Until the next major release
 of GCC and GAS, versions of these tools designed to work with GDB-4.12
 can be retrieved via anonymous ftp from jaguar.cs.utah.edu:/dist.
 
-
-*** Changes in GDB-4.11:
+*** Changes in GDB 4.11
 
 * User visible changes:
 
@@ -9415,7 +9413,7 @@ This release has much better g++ debugging, specifically in name
 mangling/demangling, virtual function calls, print virtual table,
 call methods, ...etc.
 
-*** Changes in GDB-4.10:
+*** Changes in GDB 4.10
 
  * User visible changes:
 
@@ -9441,8 +9439,7 @@ to be on the far side of a thin network line.
 This release contains support for using a DEC alpha as a GDB host for
 cross debugging.  Native alpha debugging is not supported yet.
 
-
-*** Changes in GDB-4.9:
+*** Changes in GDB 4.9
 
  * Testsuite
 
@@ -9486,8 +9483,7 @@ This version includes preliminary support for Chill, a Pascal like language
 used by telecommunications companies.  Chill support is also being integrated
 into the GNU compiler, but we don't know when it will be publicly available.
 
-
-*** Changes in GDB-4.8:
+*** Changes in GDB 4.8
 
  * HP Precision Architecture supported
 
@@ -9629,7 +9625,7 @@ We now accept --silent as an alias for --quiet.
 The memory-mapped-malloc library is now licensed under the GNU Library
 General Public License.
 
-*** Changes in GDB-4.7:
+*** Changes in GDB 4.7
 
  * Host/native/target split
 
@@ -9776,8 +9772,7 @@ bug-gdb@prep.ai.mit.edu).
 
 And, of course, many bugs have been fixed.
 
-
-*** Changes in GDB-4.6:
+*** Changes in GDB 4.6
 
  * Better support for C++ function names
 
@@ -9873,7 +9868,7 @@ There have been loads of fixes for the following things:
 
 See the ChangeLog for details.
 
-*** Changes in GDB-4.5:
+*** Changes in GDB 4.5
 
  * New machines supported (host and target)
 
@@ -9963,7 +9958,7 @@ As always, many many bug fixes.  The major areas were with g++, and mipsread.
 People using the MIPS-based platforms should experience fewer mysterious
 crashes and trashed symbol tables.
 
-*** Changes in GDB-4.4:
+*** Changes in GDB 4.4
 
  * New machines supported (host and target)
 
@@ -10025,8 +10020,7 @@ The `cleanup_undefined_types' bug that many of you noticed has been squashed.
 Many assorted bugs have been handled.  Many more remain to be handled.
 See the various ChangeLog files (primarily in gdb and bfd) for details.
 
-
-*** Changes in GDB-4.3:
+*** Changes in GDB 4.3
 
  * New machines supported (host and target)
 
@@ -10088,8 +10082,7 @@ We will eventually provide full debugging of g++ output on
 DECstations.  This will probably involve some kind of stabs-in-ecoff
 encapulation, but the details have not been worked out yet.
 
-
-*** Changes in GDB-4.2:
+*** Changes in GDB 4.2
 
  *  Improved configuration
 
@@ -10111,8 +10104,7 @@ Lots of small bugs fixed.  More remain.
 
 Intel 386 PC clone running Mach		i386-none-mach
 
-
-*** Changes in GDB-4.1:
+*** Changes in GDB 4.1
 
  *  Multiple source language support
 
@@ -10178,8 +10170,7 @@ Ultracomputer remote kernel debug	a29k-nyu-kern
 AMD 29000 Adapt
 AMD 29000 Minimon
 
-
-*** Changes in GDB-4.0:
+*** Changes in GDB 4.0
 
  *  New Facilities
 
