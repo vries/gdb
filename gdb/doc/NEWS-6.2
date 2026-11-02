@@ -1,0 +1,96 @@
+* Fix for ``many threads''
+
+On GNU/Linux systems that use the NPTL threads library, a program
+rapidly creating and deleting threads would confuse GDB leading to the
+error message:
+
+	ptrace: No such process.
+	thread_db_get_info: cannot get thread info: generic error
+
+This problem has been fixed.
+
+* "-async" and "-noasync" options removed.
+
+Support for the broken "-noasync" option has been removed (it caused
+GDB to dump core).
+
+* New ``start'' command.
+
+This command runs the program until the beginning of the main procedure.
+
+* New BSD Kernel Data Access Library (libkvm) interface
+
+Using ``target kvm'' it is now possible to debug kernel core dumps and
+live kernel memory images on various FreeBSD, NetBSD and OpenBSD
+platforms.  Currently supported (native-only) configurations are:
+
+FreeBSD/amd64			x86_64-*-freebsd*
+FreeBSD/i386			i?86-*-freebsd*
+NetBSD/i386			i?86-*-netbsd*
+NetBSD/m68k			m68*-*-netbsd*
+NetBSD/sparc			sparc-*-netbsd*
+OpenBSD/amd64			x86_64-*-openbsd*
+OpenBSD/i386			i?86-*-openbsd*
+OpenBSD/m68k			m68*-openbsd*
+OpenBSD/sparc			sparc-*-openbsd*
+
+* Signal trampoline code overhauled
+
+Many generic problems with GDB's signal handling code have been fixed.
+These include: backtraces through non-contiguous stacks; recognition
+of sa_sigaction signal trampolines; backtrace from a NULL pointer
+call; backtrace through a signal trampoline; step into and out of
+signal handlers; and single-stepping in the signal trampoline.
+
+Please note that kernel bugs are a limiting factor here.  These
+features have been shown to work on an s390 GNU/Linux system that
+include a 2.6.8-rc1 kernel.  Ref PR breakpoints/1702.
+
+* Cygwin support for DWARF 2 added.
+
+* New native configurations
+
+GNU/Linux/hppa					hppa*-*-linux*
+OpenBSD/hppa					hppa*-*-openbsd*
+OpenBSD/m68k					m68*-*-openbsd*
+OpenBSD/m88k					m88*-*-openbsd*
+OpenBSD/powerpc					powerpc-*-openbsd*
+NetBSD/vax					vax-*-netbsd*
+OpenBSD/vax					vax-*-openbsd*
+
+* END-OF-LIFE frame compatibility module
+
+GDB's internal frame infrastructure has been completely rewritten.
+The new infrastructure making it possible to support key new features
+including DWARF 2 Call Frame Information.  To aid in the task of
+migrating old configurations to this new infrastructure, a
+compatibility module, that allowed old configurations to continue to
+work, was also included.
+
+GDB 6.2 will be the last release to include this frame compatibility
+module.  This change directly impacts the following configurations:
+
+h8300-*-*
+mcore-*-*
+mn10300-*-*
+ns32k-*-*
+sh64-*-*
+v850-*-*
+xstormy16-*-*
+
+Unless there is activity to revive these configurations, they will be
+made OBSOLETE in GDB 6.3, and REMOVED from GDB 6.4.
+
+* REMOVED configurations and files
+
+Sun 3, running SunOS 3				m68*-*-sunos3*
+Sun 3, running SunOS 4				m68*-*-sunos4*
+Sun 2, running SunOS 3				m68000-*-sunos3*
+Sun 2, running SunOS 4				m68000-*-sunos4*
+Motorola 680x0 running LynxOS			m68*-*-lynxos*
+AT&T 3b1/Unix pc				m68*-att-*
+Bull DPX2 (68k, System V release 3)		m68*-bull-sysv*
+decstation					mips-dec-* mips-little-*
+riscos						mips-*-riscos* mips-*-sysv*
+sonymips					mips-sony-*
+sysv					mips*-*-sysv4* (IRIX 5/6 not included)

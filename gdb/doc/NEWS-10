@@ -1,0 +1,177 @@
+* There are new feature names for ARC targets: "org.gnu.gdb.arc.core"
+  and "org.gnu.gdb.arc.aux".  The old names are still supported but
+  must be considered obsolete.  They will be deprecated after some
+  grace period.
+
+* Help and apropos commands will now show the documentation of a
+  command only once, even if that command has one or more aliases.
+  These commands now show the command name, then all of its aliases,
+  and finally the description of the command.
+
+* 'help aliases' now shows only the user defined aliases.  GDB predefined
+  aliases are shown together with their aliased command.
+
+* GDB now supports debuginfod, an HTTP server for distributing ELF/DWARF
+  debugging information as well as source code.
+
+  When built with debuginfod, GDB can automatically query debuginfod
+  servers for the separate debug files and source code of the executable
+  being debugged.
+
+  To build GDB with debuginfod, pass --with-debuginfod to configure (this
+  requires libdebuginfod, the debuginfod client library).
+
+  debuginfod is distributed with elfutils, starting with version 0.178.
+
+  You can get the latest version from https://sourceware.org/elfutils.
+
+* Multi-target debugging support
+
+  GDB now supports debugging multiple target connections
+  simultaneously.  For example, you can now have each inferior
+  connected to different remote servers running in different machines,
+  or have one inferior debugging a local native process, an inferior
+  debugging a core dump, etc.
+
+  This support is experimental and comes with some limitations -- you
+  can only resume multiple targets simultaneously if all targets
+  support non-stop mode, and all remote stubs or servers must support
+  the same set of remote protocol features exactly.  See also "info
+  connections" and "add-inferior -no-connection" below, and "maint set
+  target-non-stop" in the user manual.
+
+* New features in the GDB remote stub, GDBserver
+
+  ** GDBserver is now supported on ARC GNU/Linux.
+
+  ** GDBserver is now supported on RISC-V GNU/Linux.
+
+  ** GDBserver no longer supports these host triplets:
+
+    i[34567]86-*-lynxos*
+    powerpc-*-lynxos*
+    i[34567]86-*-nto*
+    bfin-*-*linux*
+    crisv32-*-linux*
+    cris-*-linux*
+    m32r*-*-linux*
+    tilegx-*-linux*
+    arm*-*-mingw32ce*
+    i[34567]86-*-mingw32ce*
+
+* Debugging MS-Windows processes now sets $_exitsignal when the
+  inferior is terminated by a signal, instead of setting $_exitcode.
+
+* Multithreaded symbol loading has now been enabled by default on systems
+  that support it (see entry for GDB 9, below), providing faster
+  performance for programs with many symbols.
+
+* The $_siginfo convenience variable now also works on Windows targets,
+  and will display the EXCEPTION_RECORD of the last handled exception.
+
+* TUI windows can now be arranged horizontally.
+
+* The command history filename can now be set to the empty string
+  either using 'set history filename' or by setting 'GDBHISTFILE=' in
+  the environment.  The effect of setting this filename to the empty
+  string is that GDB will not try to load any previous command
+  history.
+
+* On Windows targets, it is now possible to debug 32-bit programs with a
+  64-bit GDB.
+
+* New commands
+
+set exec-file-mismatch -- Set exec-file-mismatch handling (ask|warn|off).
+show exec-file-mismatch -- Show exec-file-mismatch handling (ask|warn|off).
+  Set or show the option 'exec-file-mismatch'.  When GDB attaches to a
+  running process, this new option indicates whether to detect
+  a mismatch between the current executable file loaded by GDB and the
+  executable file used to start the process.  If 'ask', the default,
+  display a warning and ask the user whether to load the process
+  executable file; if 'warn', just display a warning; if 'off', don't
+  attempt to detect a mismatch.
+
+tui new-layout NAME WINDOW WEIGHT [WINDOW WEIGHT]...
+  Define a new TUI layout, specifying its name and the windows that
+  will be displayed.
+
+maintenance print xml-tdesc [FILE]
+  Prints the current target description as an XML document.  If the
+  optional FILE is provided (which is an XML target description) then
+  the target description is read from FILE into GDB, and then
+  reprinted.
+
+maintenance print core-file-backed-mappings
+  Prints file-backed mappings loaded from a core file's note section.
+  Output is expected to be similar to that of "info proc mappings".
+
+set debug fortran-array-slicing on|off
+show debug fortran-array-slicing
+  Print debugging when taking slices of Fortran arrays.
+
+set fortran repack-array-slices on|off
+show fortran repack-array-slices
+  When taking slices from Fortran arrays and strings, if the slice is
+  non-contiguous within the original value then, when this option is
+  on, the new value will be repacked into a single contiguous value.
+  When this option is off, then the value returned will consist of a
+  descriptor that describes the slice within the memory of the
+  original parent value.
+
+* Changed commands
+
+alias [-a] [--] ALIAS = COMMAND [DEFAULT-ARGS...]
+  The alias command can now specify default args for an alias.
+  GDB automatically prepends the alias default args to the argument list
+  provided explicitly by the user.
+  For example, to have a backtrace with full details, you can define
+  an alias 'bt_ALL' as
+  'alias bt_ALL = backtrace -entry-values both -frame-arg all
+     -past-main -past-entry -full'.
+  Alias default arguments can also use a set of nested 'with' commands,
+  e.g. 'alias pp10 = with print pretty -- with print elem 10 -- print'
+  defines the alias pp10 that will pretty print a maximum of 10 elements
+  of the given expression (if the expression is an array).
+
+* New targets
+
+GNU/Linux/RISC-V (gdbserver)	riscv*-*-linux*
+BPF				bpf-unknown-none
+Z80				z80-unknown-*
+
+* Python API
+
+  ** gdb.register_window_type can be used to implement new TUI windows
+     in Python.
+
+  ** Dynamic types can now be queried.  gdb.Type has a new attribute,
+     "dynamic", and gdb.Type.sizeof can be None for a dynamic type.  A
+     field of a dynamic type may have None for its "bitpos" attribute
+     as well.
+
+  ** Commands written in Python can be in the "TUI" help class by
+     registering with the new constant gdb.COMMAND_TUI.
+
+  ** New method gdb.PendingFrame.architecture () to retrieve the
+     architecture of the pending frame.
+
+  ** New gdb.Architecture.registers method that returns a
+     gdb.RegisterDescriptorIterator object, an iterator that returns
+     gdb.RegisterDescriptor objects.  The new RegisterDescriptor is a
+     way to query the registers available for an architecture.
+
+  ** New gdb.Architecture.register_groups method that returns a
+     gdb.RegisterGroupIterator object, an iterator that returns
+     gdb.RegisterGroup objects.  The new RegisterGroup is a way to
+     discover the available register groups.
+
+* Guile API
+
+  ** GDB can now be built with GNU Guile 3.0 and 2.2 in addition to 2.0.
+
+  ** Procedures 'memory-port-read-buffer-size',
+     'set-memory-port-read-buffer-size!', 'memory-port-write-buffer-size',
+     and 'set-memory-port-write-buffer-size!' are deprecated.  When
+     using Guile 2.2 and later, users who need to control the size of
+     a memory port's internal buffer can use the 'setvbuf' procedure.

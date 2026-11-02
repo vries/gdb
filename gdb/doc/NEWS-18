@@ -1,0 +1,366 @@
+* Support for the Common Trace Format (CTF) has been removed.  GDB now
+  saves trace information exclusively in its own "tfile" format.
+
+* Support for .gdb_index sections with version less than 7 has been
+  removed.
+
+* Support for DWP (DWARF Package File) version 1 has been removed.
+
+* Support for Guile 2.0 has been removed.  Guile 2.2 is now the minimum
+  supported Guile version.
+
+* GDB now accepts --no-escape-args as an alternative to --args on the
+  command line.  GDB will not escape special shell characters within
+  arguments after --no-escape-args.
+
+* gdbserver now accepts --no-escape-args as a command line flag.  When
+  this flag is used gdbserver will not escape special shell characters
+  within the inferior arguments.
+
+* The add-inferior, clone-inferior, and MI -add-inferior commands will
+  now give a warning, and create the new inferior without a
+  connection, when the current inferior's connection, at the time the
+  command is given, is unshareable.  For example, the core-file target
+  cannot be shared between inferiors, nor can the Windows native
+  target.  These targets could never really be shared.  Attempting to
+  share them would usually lead to GDB crashing.  GDB now prevents
+  this invalid sharing.
+
+* When connecting to a remote server, if the server supports the new
+  qExecAndArgs packet, then GDB will copy the argument string from the
+  server and update the 'args' setting, as if 'set args ...' had been
+  used.  This means that the arguments are visible from GDB using
+  'show args', and that, if using the extended-remote protocol,
+  subsequent runs of the inferior will use the same arguments as the
+  first run.
+
+* GDB now supports arbitrary (non-standard) baud rates for serial
+  connections to remote targets on systems where the host libc accepts
+  them via cfsetispeed/cfsetospeed, such as glibc 2.42 and later and
+  GNU Hurd.  On other systems, existing platform-specific mechanisms
+  are used.
+
+* Support for stabs debug information has been removed.
+
+* Support for mdebug debug information has been removed.
+
+* Support for the binary file format dbx has been removed.
+
+* The format for a saved execution record, created when the command
+  'record save' is used, has been updated, and previous formats are
+  no longer supported.
+
+* When connected to an extended-remote target GDB can now
+  automatically set the 'remote exec-file' in some cases.  GDB will
+  auto set the remote exec-file only if the remote wasn't started with
+  an executable, and the user hasn't used 'set remote exec-file' to
+  set an executable.  GDB will auto set the remote exec-file using the
+  current executable if the current executable has a 'target:' prefix,
+  or if the current executable is within the sysroot.
+
+* GDB now adds all type symbols to the .gdb_index section.  The index
+  version number has not increased as a consequence of this change.
+  This fixes an issue where GDB could fail to find a type when relying
+  on the index.  Any existing indexes should be regenerated.
+
+* Support for Floating Point Mode Register (FPMR) in AArch64.
+
+* When running on the Windows Terminal console, GDB now supports
+  true-color 24-bit colors.
+
+* When running on the Windows Terminal console whose output codepage
+  is 65001, GDB now supports emoji styling and display of UTF-8
+  encoded text in general.  The host charset in that case will be
+  automatically set to UTF-8.  (Users can use the Windows 'chcp'
+  command to change the output codepage of the console.)
+
+* The Windows native target now supports scheduler-locking.  E.g.,
+  "set scheduler-locking on" now works.  Previously it gave an error.
+
+* The Windows native target now supports non-stop mode.  This feature
+  requires Windows 10 or later.
+
+* Support for native Thread Local Storage (TLS) variables on Windows.
+
+* GDB now normalizes backslashes to forward slashes on Windows.
+
+  E.g., depending on compiler and build system used by your project,
+  previously GDB could show a mix of slash styles, like for example:
+
+     C:/proj/src\main.c
+
+  GDB will now consistently show forward slashes:
+
+     C:/proj/src/main.c
+
+  This impacts all interpreters, including the CLI, the TUI, the
+  GDB/MI interface, and the Debug Adapter Protocol, and affects
+  everywhere GDB shows a filename/dirname: source filenames,
+  executable filename, shared libraries, the cd/pwd commands, etc.
+
+* GDB now supports libipt v2.2 events originating from Event Tracing (set
+  record btrace pt event-tracing on) on a FRED-enabled system and from
+  Trigger Tracing.
+
+* The s390 32-bit target (s390-*) is deprecated and planned for
+  removal in a future release, along with the elf32-s390 target
+  format.  configure now emits an error for this target, which can be
+  overridden using --enable-obsolete.
+  Linux kernel 6.19 removed s390 32-bit compatibility support.
+  Glibc 2.43 and GCC 16.1 have deprecated s390 32-bit, both with the
+  intent to remove it in a future release.
+  The s390 64-bit target (s390x-*) remains supported.
+
+* GDB can now read OS-generated core files on systems with Intel AMX
+  support.  The AMX registers themselves are not yet readable, but
+  other xsave state can be read.
+
+* The gcore script now has a -g option that lets you specify the GDB
+  binary invoked by gcore.
+
+* The 'org.gnu.gdb.i386.linux' target description feature can now
+  contain three additional registers which provide access to the TLS
+  related GDT entries on i386 (and x86-64 when compiling with -m32).
+
+* The "catch syscall" command now works on riscv*-linux* targets.
+
+* Configure changes
+
+** --with-babeltrace has been removed.  The babeltrace library was
+   only used to help GDB parse Common Trace Format (CTF) data.  The
+   support for CTF has also been removed.
+
+* New targets
+
+GNU/Linux/MicroBlaze (gdbserver) microblazeel-*linux*
+
+AArch64 MinGW                   aarch64-*-mingw*
+
+* Deprecated targets
+
+GNU/Linux/S390 32-bit		s390-*-*
+
+* New commands
+
+set local-environment
+show local-environment
+unset local-environment
+  Analogs of the existing "environment" commands that affect GDB's own
+  environment.  The local environment is used by "shell", "pipe", and
+  other commands that launch a subprocess other than an inferior.
+
+save history FILENAME
+  Save the command history to the given file.
+
+save skip FILENAME
+  Save all current "skip"s to the given file.
+
+save user FILENAME
+  Save all user-defined commands to the given file.
+
+maintenance test-remote-args ARGS
+  Test splitting and joining of inferior arguments ARGS as they would
+  be split and joined when being passed to a remote target.
+
+set debug gnu-ifunc on|off
+show debug gnu-ifunc
+  Turn on or off debug messages related to GNU ifunc resolution.
+
+set debug ctf on|off
+show debug ctf
+  Turn on or off debug messages about Compact C Type Format (CTF)
+  reading.
+
+set progress-bars enabled on|off
+show progress-bars enabled
+  Allows the progress bars, used when debuginfod is downloading
+  content, to be disabled (the set command), or to see if
+  progress-bars are currently enabled or not (the show command).
+
+info proc environ
+  Print the initial environment variables of the specified process.
+  Supported on Linux.
+
+delete skip
+enable skip
+disable skip
+  These are new aliases for 'skip delete', 'skip enable', and 'skip
+  disable' respectively.
+
+set remote multiple-watchpoint-addresses-packet
+show remote multiple-watchpoint-addresses-packet
+  Set/show the support for receiving multiple watchpoint addresses in
+  the 'T' stop reply packet.
+
+* MI changes
+
+** The "-trace-save" command no longer supports the "-ctf" flag.
+
+** GDB now shows the "shadowed", "filename", "fullname" and "line"
+   fields in the output of '-stack-list-locals/variables' MI
+   commands for variables that are shadowed, or which are shadowing.
+
+* Changed commands
+
+tsave
+  This command no longer supports the "-ctf" flag.
+
+maintenance info program-spaces
+  This command no longer displays the core file name.
+
+info inferiors
+  If an inferior has a core file loaded, then this will be displayed
+  as an additional line under the inferior's table entry in the
+  output.
+
+New command class for help
+  The new command class "essential" has been added, which is a set of
+  commands that we, as developers, believe would be close to a minimal
+  set of commands for a new user of GDB.
+
+info locals
+  GDB now shows the "shadowed" annotation and the location information
+  for variables that are shadowed, or which are shadowing.
+
+set args
+run
+start
+starti
+  These commands now all allow for entering inferior arguments that
+  contain a newline character.  The newline must be contained within a
+  single or double quoted argument.
+
+* Removed commands
+
+target ctf
+  Support for the Common Trace Format (CTF) has been removed.
+
+maint check psymtabs
+maint info psymtabs
+maint print psymbols
+  These commands have been removed, as GDB no longer uses partial
+  symbol tables internally.
+
+* Debug Adapter Protocol changes
+
+  ** Unhandled Ada exceptions can now be caught using the "unhandled"
+     exception filter.
+
+  ** The launch and attach requests now accept the adaSourceCharset
+     parameter.
+
+  ** The attach request now accepts the coreFile parameter.
+
+  ** Constants are now returned in scopes.
+
+* Changed remote packets
+
+single-inf-arg in qSupported
+  The new single-inf-arg feature within the qSupported packet allows
+  GDB to inform the stub that it would like to send the inferior
+  arguments as a single string within the vRun packet.  The stub can
+  reply with the single-inf-arg feature to indicate that it is able to
+  accept arguments as a single string.
+
+T
+  The signal stop packet can now include multiple 'watch', 'rwatch',
+  and 'awatch' stop reason entries.  GDB will select between all of
+  the possible watchpoint addresses that are returned when presenting
+  the stop to the user.
+
+multi-wp-addr in qSupported
+  The qSupported packet allows GDB to inform the stub it supports
+  receiving multiple watchpoint stop reasons in a single 'T' stop
+  reply packet.  This improves support for targets with ambiguous
+  hardware watchpoint address reporting (e.g. AArch64).  GDB will
+  always accept multiple watchpoint addresses regardless of whether
+  the stub claims to support this feature or not.
+
+* New remote packets
+
+qExecAndArgs
+  This packet returns the executable filename and argument string with
+  which the server was started.  If no such information was given to
+  the server then this is reflected in the reply.
+
+* Python API
+
+  ** New class gdb.Style for representing styles, a collection of
+     foreground and background gdb.Color objects, and an intensity.
+
+  ** New constants gdb.INTENSITY_NORMAL, gdb.INTENSITY_BOLD, and
+     gdb.INTENSITY_DIM for use with gdb.Style when representing
+     intensities.
+
+  ** New gdb.StyleParameterSet for creating custom style settings.
+     Use gdb.StyleParameterSet(NAME) to create 'set style NAME ...'
+     and 'show style NAME ...' parameters.
+
+  ** The gdb.write() function now takes an additional, optional,
+     'style' argument, which can be used to style the output.
+
+  ** New gdb.Corefile class which represents a loaded core file.  This
+     has an attribute Corefile.filename, the file name of the loaded
+     core file, and a method Corefile.is_valid(), which returns False
+     when a Corefile object becomes invalid (e.g. when the core file
+     is unloaded).  There is also Corefile.mapped_files() which
+     returns a list of CorefileMappedFile objects, representing files
+     that were mapped into the core file when it was created.
+
+  ** New gdb.CorefileMappedFile type representing a file that was
+     mapped when the core file was created.  Has read-only attributes
+     filename (string), build_id (string), is_main_executable
+     (boolean), and regions (list of CorefileMappedFileRegion objects).
+
+  ** New gdb.CorefileMappedFileRegion type, which represents a mapped
+     region of a file (see gdb.CorefileMappedFile above).  Has
+     read-only attributes start, end, and file_offset.
+
+  ** New Inferior.corefile attribute.  This read-only attribute
+     contains the gdb.Corefile object if a core file is loaded into
+     the inferior, otherwise, this contains None.
+
+  ** New event registry gdb.events.selected_context that emits a
+     SelectedContextEvent event whenever the user changes the inferior
+     context.  The context consists of which inferior, thread, and
+     frame are currently selected.  The event object has 'inferior',
+     'thread' and 'frame' attributes containing gdb.Inferior,
+     gdb.InferiorThread, and gdb.Frame objects respectively.
+
+  ** New method gdb.Symtab.source_lines(first, last, unstyled).  This
+     returns a tuple of strings, each string represents a single
+     source line for the file associated with the symtab.  The 'first'
+     and 'last' are line numbers, and allow for only some lines to be
+     returned, these default to the first and last lines in the file
+     respectively.  If 'unstyled' is true then the returned lines will
+     have no styling applied, otherwise, styling will be applied if
+     the appropriate user setting is enabled, and GDB knows how to
+     style this source file.
+
+  ** The Architecture.disassemble method accepts a new 'styling'
+     argument, which defaults to False.  When set to True the 'asm'
+     strings in the disassembler output can contain ANSI escape
+     sequences to indicate styling.
+
+  ** New gdb.Block.ranges attribute.  This read-only attribute contains
+     a tuple of pairs, each representing a single range.  Contiguous blocks
+     have only one range.
+
+  ** New event registry gdb.events.corefile_changed, which emits a
+     CorefileChangedEvent whenever the core file associated with an
+     inferior changes.  The event has an 'inferior' attribute which is
+     the gdb.Inferior in which the core file has changed.
+
+* Guile API
+
+  ** Procedures 'memory-port-read-buffer-size',
+     'set-memory-port-read-buffer-size!', 'memory-port-write-buffer-size',
+     and 'set-memory-port-write-buffer-size!' have been removed.  They have
+     been deprecated since GDB 10.  Users who need to control the size of a
+     memory port's internal buffer can use the 'setvbuf' procedure.
+
+* Removed targets and native configurations
+
+  GDB no longer supports AIX 7.1.  The minimum supported
+  AIX version is now AIX 7.2 TL5.  GDB will only support
+  DWARF debugging on AIX, going forward.

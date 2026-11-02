@@ -1,0 +1,110 @@
+* New native configurations
+
+NetBSD/hppa			hppa*-*netbsd*
+Xtensa GNU/Linux		xtensa*-*-linux*
+
+* New targets
+
+NetBSD/hppa			hppa*-*-netbsd*
+Xtensa GNU/Linux		xtensa*-*-linux*
+
+* Change in command line behavior -- corefiles vs. process ids.
+
+  When the '-p NUMBER' or '--pid NUMBER' options are used, and
+  attaching to process NUMBER fails, GDB no longer attempts to open a
+  core file named NUMBER.  Attaching to a program using the -c option
+  is no longer supported.  Instead, use the '-p' or '--pid' options.
+
+* GDB can now be built as a native debugger for debugging Windows x86
+(mingw32) Portable Executable (PE) programs.
+
+* Pending breakpoints no longer change their number when their address
+is resolved.
+
+* GDB now supports breakpoints with multiple locations,
+including breakpoints on C++ constructors, inside C++ templates,
+and in inlined functions.
+
+* GDB's ability to debug optimized code has been improved.  GDB more
+accurately identifies function bodies and lexical blocks that occupy
+more than one contiguous range of addresses.
+
+* Target descriptions can now describe registers for PowerPC.
+
+* The GDB remote stub, gdbserver, now supports the AltiVec and SPE
+registers on PowerPC targets.
+
+* The GDB remote stub, gdbserver, now supports thread debugging on GNU/Linux
+targets even when the libthread_db library is not available.
+
+* The GDB remote stub, gdbserver, now supports the new file transfer
+commands (remote put, remote get, and remote delete).
+
+* The GDB remote stub, gdbserver, now supports run and attach in
+extended-remote mode.
+
+* hppa*64*-*-hpux11* target broken
+The debugger is unable to start a program and fails with the following
+error: "Error trying to get information about dynamic linker".
+The gdb-6.7 release is also affected.
+
+* GDB now supports the --enable-targets= configure option to allow
+building a single GDB executable that supports multiple remote
+target architectures.
+
+* GDB now supports debugging C and C++ programs which use the
+Decimal Floating Point extension.  In addition, the PowerPC target
+now has a set of pseudo-registers to inspect decimal float values
+stored in two consecutive float registers.
+
+* The -break-insert MI command can optionally create pending
+breakpoints now.
+
+* Improved support for debugging Ada
+Many improvements to the Ada language support have been made.  These
+include:
+    - Better support for Ada2005 interface types
+    - Improved handling of arrays and slices in general
+    - Better support for Taft-amendment types
+    - The '{type} ADDRESS' expression is now allowed on the left hand-side
+      of an assignment
+    - Improved command completion in Ada
+    - Several bug fixes
+
+* GDB on GNU/Linux and HP/UX can now debug through "exec" of a new
+process.
+
+* New commands
+
+set print frame-arguments (all|scalars|none)
+show print frame-arguments
+  The value of this variable can be changed to control which argument
+  values should be printed by the debugger when displaying a frame.
+
+remote put
+remote get
+remote delete
+  Transfer files to and from a remote target, and delete remote files.
+
+* New MI commands
+
+-target-file-put
+-target-file-get
+-target-file-delete
+  Transfer files to and from a remote target, and delete remote files.
+
+* New remote packets
+
+vFile:open:
+vFile:close:
+vFile:pread:
+vFile:pwrite:
+vFile:unlink:
+  Open, close, read, write, and delete files on the remote system.
+
+vAttach
+  Attach to an existing process on the remote system, in extended-remote
+  mode.
+
+vRun
+  Run a new process on the remote system, in extended-remote mode.

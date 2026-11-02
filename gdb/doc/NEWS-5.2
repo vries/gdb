@@ -1,0 +1,88 @@
+* New command "set trust-readonly-sections on[off]".
+
+This command is a hint that tells gdb that read-only sections
+really are read-only (ie. that their contents will not change).
+In this mode, gdb will go to the object file rather than the
+target to read memory from read-only sections (such as ".text").
+This can be a significant performance improvement on some
+(notably embedded) targets.
+
+* New command "generate-core-file" (or "gcore").
+
+This new gdb command allows the user to drop a core file of the child
+process state at any time.  So far it's been implemented only for
+GNU/Linux and Solaris, but should be relatively easily ported to other
+hosts.  Argument is core file name (defaults to core.<pid>).
+
+* New command line option
+
+GDB now accepts --pid or -p followed by a process id.
+
+* Change in command line behavior -- corefiles vs. process ids.
+
+There is a subtle behavior in the way in which GDB handles
+command line arguments.  The first non-flag argument is always
+a program to debug, but the second non-flag argument may either
+be a corefile or a process id.  Previously, GDB would attempt to
+open the second argument as a corefile, and if that failed, would
+issue a superfluous error message and then attempt to attach it as
+a process.  Now, if the second argument begins with a non-digit,
+it will be treated as a corefile.  If it begins with a digit,
+GDB will attempt to attach it as a process, and if no such process
+is found, will then attempt to open it as a corefile.
+
+* Changes in ARM configurations.
+
+Multi-arch support is enabled for all ARM configurations.  The ARM/NetBSD
+configuration is fully multi-arch.
+
+* New native configurations
+
+ARM NetBSD					arm*-*-netbsd*
+x86 OpenBSD					i[3456]86-*-openbsd*
+AMD x86-64 running GNU/Linux			x86_64-*-linux-*
+Sparc64 running FreeBSD				sparc64-*-freebsd*
+
+* New targets
+
+Sanyo XStormy16					xstormy16-elf
+
+* OBSOLETE configurations and files
+
+Configurations that have been declared obsolete in this release have
+been commented out.  Unless there is activity to revive these
+configurations, the next release of GDB will have their sources
+permanently REMOVED.
+
+AMD 29k family via UDI				a29k-amd-udi, udi29k
+A29K VxWorks					a29k-*-vxworks
+AMD 29000 embedded, using EBMON			a29k-none-none
+AMD 29000 embedded with COFF			a29k-none-coff
+AMD 29000 embedded with a.out			a29k-none-aout
+
+testsuite/gdb.hp/gdb.threads-hp/		directory
+
+* REMOVED configurations and files
+
+TI TMS320C80					tic80-*-*
+WDC 65816					w65-*-*
+PowerPC Solaris					powerpcle-*-solaris*
+PowerPC Windows NT				powerpcle-*-cygwin32
+PowerPC Netware					powerpc-*-netware*
+Harris/CXUX m88k				m88*-harris-cxux*
+Most ns32k hosts and targets			ns32k-*-mach3* ns32k-umax-*
+						ns32k-utek-sysv* ns32k-utek-*
+SunOS 4.0.Xi on i386				i[3456]86-*-sunos*
+Ultracomputer (29K) running Sym1		a29k-nyu-sym1 a29k-*-kern*
+Sony NEWS (68K) running NEWSOS 3.x		m68*-sony-sysv news
+ISI Optimum V (3.05) under 4.3bsd.		m68*-isi-*
+Apple Macintosh (MPW) host and target		N/A host, powerpc-*-macos*
+
+* Changes to command line processing
+
+The new `--args' feature can be used to specify command-line arguments
+for the inferior from gdb's command line.
+
+* Changes to key bindings
+
+There is a new `operate-and-get-next' function bound to `C-o'.
