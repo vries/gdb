@@ -180,6 +180,18 @@ repos:
         files: *gdb_files
         exclude: *testsuite_files
         require_serial: true
+      - id: &id8 check-news
+        name: *id8
+        language: unsupported_script
+        entry: gdb/doc/gen-news.sh
+        pass_filenames: false
+        files: |
+          (?x)^(
+            gdb/NEWS|
+            gdb/doc/NEWS-.*|
+            gdb/doc/NEWS\.lst|
+            gdb/doc/gen-news\.sh
+          )$
 
 # Local Variables:
 # indent-tabs-mode: nil
