@@ -7,6 +7,10 @@ f=gdb/NEWS
 gen_news ()
 {
     cat <<EOF
+# THIS FILE IS GENERATED -*- buffer-read-only: t -*-
+# vi:set ro:
+# The contents of this generated file are maintained at gdb/doc/NEWS-*.
+#
 		What has changed in GDB?
 	     (Organized release by release)
 EOF
