@@ -146,6 +146,7 @@ bool disable_packet_qfThreadInfo;
 bool disable_packet_T;
 
 static unsigned char *mem_buf;
+static gdb::array_view<unsigned char> mem_buf_view;
 
 /* A sub-class of 'struct notif_event' for stop, holding information
    relative to a single stop reply.  We keep a queue of these to
@@ -1184,10 +1185,14 @@ monitor_show_help (void)
    regions.  */
 
 static int
-gdb_read_memory (CORE_ADDR memaddr, unsigned char *myaddr, int len)
+gdb_read_memory (CORE_ADDR memaddr, gdb::array_view<unsigned char> buf,
+		 int len)
 {
   client_state &cs = get_client_state ();
   int res;
+
+  len = std::min (len, (int) buf.size ());
+  unsigned char *myaddr = buf.data ();
 
   if (cs.current_traceframe >= 0)
     {
@@ -1265,7 +1270,8 @@ handle_search_memory (char *own_buf, int packet_len)
 
   auto read_memory = [] (CORE_ADDR addr, gdb_byte *result, size_t len)
     {
-      return gdb_read_memory (addr, result, len) == len;
+      gdb::array_view<unsigned char> result_view (result, len);
+      return gdb_read_memory (addr, result_view, len) == len;
     };
 
   found = simple_search_memory (read_memory, start_addr, search_space_len,
@@ -4556,6 +4562,7 @@ captured_main (int argc, char *argv[])
     initialize_tracepoint ();
 
   mem_buf = (unsigned char *) xmalloc (PBUFSIZ);
+  mem_buf_view = gdb::array_view<unsigned char> (mem_buf, PBUFSIZ);
 
   if (selftest)
     {
@@ -4947,7 +4954,7 @@ process_serial_event (void)
       {
 	require_running_or_break (cs.own_buf);
 	decode_m_packet (&cs.own_buf[1], &mem_addr, &len);
-	int res = gdb_read_memory (mem_addr, mem_buf, len);
+	int res = gdb_read_memory (mem_addr, mem_buf_view, len);
 	if (res < 0)
 	  write_enn (cs.own_buf);
 	else
@@ -4966,7 +4973,7 @@ process_serial_event (void)
       {
 	require_running_or_break (cs.own_buf);
 	decode_x_packet (&cs.own_buf[1], &mem_addr, &len);
-	int res = gdb_read_memory (mem_addr, mem_buf, len);
+	int res = gdb_read_memory (mem_addr, mem_buf_view, len);
 	if (res < 0)
 	  write_enn (cs.own_buf);
 	else
