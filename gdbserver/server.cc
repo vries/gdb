@@ -4954,6 +4954,12 @@ process_serial_event (void)
       {
 	require_running_or_break (cs.own_buf);
 	decode_m_packet (&cs.own_buf[1], &mem_addr, &len);
+	/* Limit len to the amount of memory that can actually be used by the
+	   following code, to protect against converting a positive len
+	   argument to a negative len in gdb_read_memory.  */
+	len = std::min (len,
+			(unsigned int) ((cs.own_buf_view.size () - 1) / 2));
+
 	int res = gdb_read_memory (mem_addr, mem_buf_view, len);
 	if (res < 0)
 	  write_enn (cs.own_buf);
@@ -4973,6 +4979,11 @@ process_serial_event (void)
       {
 	require_running_or_break (cs.own_buf);
 	decode_x_packet (&cs.own_buf[1], &mem_addr, &len);
+	/* Limit len to the amount of memory that can actually be used by the
+	   following code, to protect against converting a positive len
+	   argument to a negative len in gdb_read_memory.  */
+	len = std::min (len, (unsigned int) (cs.own_buf_view.size () - 1));
+
 	int res = gdb_read_memory (mem_addr, mem_buf_view, len);
 	if (res < 0)
 	  write_enn (cs.own_buf);
