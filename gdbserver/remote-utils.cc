@@ -1472,8 +1472,9 @@ look_up_one_symbol (const char *name, CORE_ADDR *addrp, int may_ask_gdb)
 	{
 	  decode_m_packet (&cs.own_buf[1], &mem_addr, &mem_len);
 	  mem_buf = (unsigned char *) xmalloc (mem_len);
+	  gdb::array_view<unsigned char> mem_buf_view (mem_buf, mem_len);
 	  if (read_inferior_memory (mem_addr, mem_buf, mem_len) == 0)
-	    bin2hex (mem_buf, cs.own_buf, mem_len);
+	    bin2hex (mem_buf_view, cs.own_buf_view, mem_len);
 	  else
 	    write_enn (cs.own_buf);
 	  free (mem_buf);
@@ -1601,8 +1602,9 @@ relocate_instruction (CORE_ADDR *to, CORE_ADDR oldloc)
 	{
 	  decode_m_packet (&cs.own_buf[1], &mem_addr, &mem_len);
 	  mem_buf = (unsigned char *) xmalloc (mem_len);
+	  gdb::array_view<unsigned char> mem_buf_view (mem_buf, mem_len);
 	  if (read_inferior_memory (mem_addr, mem_buf, mem_len) == 0)
-	    bin2hex (mem_buf, cs.own_buf, mem_len);
+	    bin2hex (mem_buf_view, cs.own_buf_view, mem_len);
 	  else
 	    write_enn (cs.own_buf);
 	}

@@ -4958,7 +4958,7 @@ process_serial_event (void)
 	if (res < 0)
 	  write_enn (cs.own_buf);
 	else
-	  bin2hex (mem_buf, cs.own_buf, res);
+	  bin2hex (mem_buf_view, cs.own_buf_view, res);
       }
       break;
     case 'M':
