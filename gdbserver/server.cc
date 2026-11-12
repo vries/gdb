@@ -1192,6 +1192,8 @@ gdb_read_memory (CORE_ADDR memaddr, unsigned char *myaddr, int len)
   if (cs.current_traceframe >= 0)
     {
       ULONGEST nbytes;
+      if (len < 0)
+	return -1;
       ULONGEST length = len;
 
       if (traceframe_read_mem (cs.current_traceframe,
