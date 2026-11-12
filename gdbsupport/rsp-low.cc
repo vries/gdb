@@ -150,6 +150,26 @@ bin2hex (gdb::array_view<gdb_byte> bin, char *hex)
 
 /* See rsp-low.h.  */
 
+int
+bin2hex (gdb::array_view<gdb_byte> bin, gdb::array_view<char> hex, int count)
+{
+  /* Don't read past the end of bin.  */
+  int count_max = bin.size ();
+  count = std::min (count, count_max);
+
+  /* Even for count == 0, a terminating zero is written.  */
+  gdb_assert (hex.size () >= 1);
+
+  /* Don't write past the end of hex.  For every byte in bin, two are written
+     into hex, plus a terminating 0.  */
+  count_max = (hex.size () - 1) / 2;
+  count = std::min (count, count_max);
+
+  return bin2hex (bin.data (), hex.data (), count);
+}
+
+/* See rsp-low.h.  */
+
 std::string
 bin2hex (const gdb_byte *bin, int count)
 {
