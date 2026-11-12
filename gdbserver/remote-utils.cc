@@ -1471,6 +1471,12 @@ look_up_one_symbol (const char *name, CORE_ADDR *addrp, int may_ask_gdb)
       if (cs.own_buf[0] == 'm')
 	{
 	  decode_m_packet (&cs.own_buf[1], &mem_addr, &mem_len);
+	  /* Limit mem_len to the amount of memory that can actually be used
+	     by the following code, to protect against an exit in xmalloc, or
+	     an overly large allocation.  */
+	  mem_len
+	    = std::min (mem_len,
+			(unsigned int) ((cs.own_buf_view.size () - 1) / 2));
 	  mem_buf = (unsigned char *) xmalloc (mem_len);
 	  gdb::array_view<unsigned char> mem_buf_view (mem_buf, mem_len);
 	  if (read_inferior_memory (mem_addr, mem_buf, mem_len) == 0)
@@ -1484,6 +1490,12 @@ look_up_one_symbol (const char *name, CORE_ADDR *addrp, int may_ask_gdb)
       else if (cs.own_buf[0] == 'x')
 	{
 	  decode_x_packet (&cs.own_buf[1], &mem_addr, &mem_len);
+	  /* Limit mem_len to the amount of memory that can actually be used
+	     by the following code, to protect against an exit in xmalloc, or
+	     an overly large allocation.  */
+	  mem_len
+	    = std::min (mem_len,
+			(unsigned int) (cs.own_buf_view.size () - 1));
 	  mem_buf = (unsigned char *) xmalloc (mem_len);
 	  if (read_inferior_memory (mem_addr, mem_buf, mem_len) == 0)
 	    {
@@ -1601,6 +1613,12 @@ relocate_instruction (CORE_ADDR *to, CORE_ADDR oldloc)
       if (cs.own_buf[0] == 'm')
 	{
 	  decode_m_packet (&cs.own_buf[1], &mem_addr, &mem_len);
+	  /* Limit mem_len to the amount of memory that can actually be used
+	     by the following code, to protect against an exit in xmalloc, or
+	     an overly large allocation.  */
+	  mem_len
+	    = std::min (mem_len,
+			(unsigned int) ((cs.own_buf_view.size () - 1) / 2));
 	  mem_buf = (unsigned char *) xmalloc (mem_len);
 	  gdb::array_view<unsigned char> mem_buf_view (mem_buf, mem_len);
 	  if (read_inferior_memory (mem_addr, mem_buf, mem_len) == 0)
@@ -1611,6 +1629,12 @@ relocate_instruction (CORE_ADDR *to, CORE_ADDR oldloc)
       else if (cs.own_buf[0] == 'x')
 	{
 	  decode_x_packet (&cs.own_buf[1], &mem_addr, &mem_len);
+	  /* Limit mem_len to the amount of memory that can actually be used
+	     by the following code, to protect against an exit in xmalloc, or
+	     an overly large allocation.  */
+	  mem_len
+	    = std::min (mem_len,
+			(unsigned int) (cs.own_buf_view.size () - 1));
 	  mem_buf = (unsigned char *) xmalloc (mem_len);
 	  if (read_inferior_memory (mem_addr, mem_buf, mem_len) == 0)
 	    {
