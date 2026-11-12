@@ -1828,6 +1828,9 @@ validate_breakpoints (void)
 void
 check_mem_read (CORE_ADDR mem_addr, unsigned char *buf, int mem_len)
 {
+  if (mem_len <= 0)
+    return;
+
   struct process_info *proc = current_process ();
   struct raw_breakpoint *bp = proc->raw_breakpoints;
   struct fast_tracepoint_jump *jp = proc->fast_tracepoint_jumps;
