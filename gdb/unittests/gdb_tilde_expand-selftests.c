@@ -54,6 +54,10 @@ do_test ()
   SELF_CHECK (gdb_tilde_expand ("/some/abs/path") == "/some/abs/path");
   SELF_CHECK (gdb_tilde_expand ("relative/path") == "relative/path");
 
+  /* Skip ~$USER expansion test on MinGW.  The file gnulib/import/glob.c has a
+     comment documenting why ~$ANY_USER doesn't work, and consequently ~$USER
+     is left unsupported.  */
+#ifndef __MINGW32__
   /* If $USER is available in the env variables, check the '~user'
      expansion.  */
   const char *c_user = std::getenv ("USER");
@@ -64,6 +68,7 @@ do_test ()
       SELF_CHECK (gdb_tilde_expand (("~" + user + "/a/b").c_str ())
 		  == home + "/a/b");
     }
+#endif
 
   /* Check that an error is thrown when trying to expand home of a unknown
      user.  */
