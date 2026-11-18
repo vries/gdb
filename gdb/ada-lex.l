@@ -84,6 +84,26 @@ DIAGNOSTIC_IGNORE_REGISTER
       pstate->lexptr += 1;						\
     }
 
+/* Starting v2.5.1, flex supports:
+   - YY_FLEX_MAJOR_VERSION and YY_FLEX_MINOR_VERSION
+   - YY_NO_UNPUT (though this was broken from v2.5.31 - v2.5.34)
+   Starting v2.5.22, flex supports:
+   - YY_FLEX_SUBMINOR_VERSION
+   Starting v2.6.5, flex supports:
+   - YY_NO_YYUNPUT
+
+   The ada_flex_use workaround doesn't work for v2.6.5 - v2.6.11, and we can
+   use either YY_NO_UNPUT or YY_NO_YYUNPUT to fix this.  Use YY_NO_YYUNPUT
+   because the supported check is easier.  So, check for >= v2.6.5.  */
+#if defined (YY_FLEX_MAJOR_VERSION) && defined (YY_FLEX_MINOR_VERSION)	\
+  && defined (YY_FLEX_SUBMINOR_VERSION)
+#if (YY_FLEX_MAJOR_VERSION > 2)					\
+  || (YY_FLEX_MAJOR_VERSION == 2 && YY_FLEX_MINOR_VERSION > 6)	\
+  || (YY_FLEX_MAJOR_VERSION == 2 && YY_FLEX_MINOR_VERSION == 6	\
+      && YY_FLEX_SUBMINOR_VERSION >= 5)
+#define YY_NO_YYUNPUT
+#endif
+#endif
 %}
 
 %option case-insensitive interactive nodefault noyywrap
@@ -336,11 +356,13 @@ lexer_init (FILE *inp)
 
 } /* namespace ada_exp_parser */
 
+#ifndef YY_NO_YYUNPUT
 /* Dummy definition to suppress warnings about unused static definitions. */
 typedef void (*dummy_function) ();
 dummy_function ada_flex_use[] =
 {
   (dummy_function) yyunput
 };
+#endif
 
 DIAGNOSTIC_POP
