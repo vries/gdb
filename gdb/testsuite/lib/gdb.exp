@@ -7974,10 +7974,21 @@ proc_with_prefix gdb_spawn_attach_cmdline { testpid } {
 
 # Kill a process previously started with spawn_wait_for_attach, and
 # reap its wait status.  PROC_SPAWN_ID is the spawn id associated with
-# the process.
+# the process.  If GROUP, the entire process group is killed.  This relies on
+# the process being a group leader.
 
-proc kill_wait_spawned_process { proc_spawn_id } {
+proc kill_wait_spawned_process { proc_spawn_id {group 0}} {
     set pid [exp_pid -i $proc_spawn_id]
+
+    if {$group} {
+	if {[isbuild "*-*-mingw*"]} {
+	    # TODO: implement killing a process group on Windows using
+	    # taskkill /T /F /PID <winpid>.
+	    warning "todo: implement killing a process group on Windows"
+	} else {
+	    set pid -$pid
+	}
+    }
 
     verbose -log "killing ${pid}"
     remote_exec build "kill -9 ${pid}"

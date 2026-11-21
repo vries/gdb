@@ -70,7 +70,7 @@ proc do_test {} {
 		 [subst_vars {\[Inferior $::decimal \(.*\) detached\]}]]
     }
 
-    kill_wait_spawned_process $test_spawn_id
+    kill_wait_spawned_process $test_spawn_id 1
 }
 
 do_test
