@@ -69,7 +69,7 @@ proc do_test {} {
 	    "Detaching from program: .*process $child_pid\r\n\\\[Inferior $decimal \\(.*\\) detached\\\]"
     }
 
-    kill_wait_spawned_process $test_spawn_id
+    kill_wait_spawned_process $test_spawn_id 1
 }
 
 do_test
