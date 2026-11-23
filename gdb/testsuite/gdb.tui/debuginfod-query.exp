@@ -248,16 +248,17 @@ with_debuginfod_env $cache {
 		    unresolved "failed to start debuginfod server"
 		    continue
 		}
+		try {
+		    # Point the client to the server.
+		    setenv DEBUGINFOD_URLS $url
 
-		# Point the client to the server.
-		setenv DEBUGINFOD_URLS $url
-
-		foreach_with_prefix fill_screen { true false } {
-		    run_switch_with_prompt_test $how $answer $fill_screen
+		    foreach_with_prefix fill_screen { true false } {
+			run_switch_with_prompt_test $how $answer $fill_screen
+		    }
+		    run_switch_to_asm_test $how $answer
+		} finally {
+		    stop_debuginfod
 		}
-		run_switch_to_asm_test $how $answer
-
-		stop_debuginfod
 	    }
 	}
     }

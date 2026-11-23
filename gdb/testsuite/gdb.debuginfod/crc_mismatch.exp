@@ -97,15 +97,14 @@ prepare_for_debuginfod cache db
 
 # Start debuginfod server, test the correct debuginfo was fetched
 # from the server so there're not warnings anymore.
-proc_with_prefix local_debuginfod { } {
-    global binfile db debugdir cache
-    set escapedobjdirsubdir [string_to_regexp [standard_output_file {}]]
-
-    set url [start_debuginfod $db $debugdir]
+proc_with_prefix local_debuginfod { url } {
     if {$url eq ""} {
 	unresolved "failed to start debuginfod server"
 	return
     }
+
+    global binfile cache
+    set escapedobjdirsubdir [string_to_regexp [standard_output_file {}]]
 
     # Point the client to the server.
     setenv DEBUGINFOD_URLS $url
@@ -130,7 +129,10 @@ proc_with_prefix local_debuginfod { } {
 }
 
 with_debuginfod_env $cache {
-    local_debuginfod
+    set url [start_debuginfod $db $debugdir]
+    try {
+	local_debuginfod $url
+    } finally {
+	stop_debuginfod
+    }
 }
-
-stop_debuginfod

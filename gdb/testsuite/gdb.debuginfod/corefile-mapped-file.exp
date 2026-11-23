@@ -364,22 +364,23 @@ if { $url eq "" } {
     unresolved "failed to start debuginfod server"
     return
 }
+try {
+    with_debuginfod_env $cache {
+	setenv DEBUGINFOD_URLS $url
 
-with_debuginfod_env $cache {
-    setenv DEBUGINFOD_URLS $url
+	clean_restart
+	gdb_test_no_output "set debuginfod enabled on" \
+	    "enabled debuginfod for initial test"
+	gdb_test_no_output "set progress-bars enabled off"
+	gdb_load $binfile
 
-    clean_restart
-    gdb_test_no_output "set debuginfod enabled on" \
-	"enabled debuginfod for initial test"
-    gdb_test_no_output "set progress-bars enabled off"
-    gdb_load $binfile
+	load_core_file "load corefile, download library from debuginfod" \
+	    "Downloading\[^\r\n\]* file [string_to_regexp $library_filename]\\.\\.\\."
 
-    load_core_file "load corefile, download library from debuginfod" \
-	"Downloading\[^\r\n\]* file [string_to_regexp $library_filename]\\.\\.\\."
-
-    set ptr_value [read_ptr_value]
-    gdb_assert { $ptr_value == $ptr_expected_value } \
-	"check value of pointer variable after downloading library file"
+	set ptr_value [read_ptr_value]
+	gdb_assert { $ptr_value == $ptr_expected_value } \
+	    "check value of pointer variable after downloading library file"
+    }
+} finally {
+    stop_debuginfod
 }
-
-stop_debuginfod

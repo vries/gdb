@@ -199,19 +199,17 @@ proc test_urls {urls pattern_re test} {
 	$test
 }
 
-# Uses the global variables DEBUGDIR and DB which are setup elsewhere
-# in this script.
+# Uses the global variable DEBUGDIR which is setup elsewhere in this script.
 #
-# Start debuginfod server, and confirm that GDB can now find all the
+# Use the debuginfod server at URL, and confirm that GDB can now find all the
 # expected debug information.
-proc_with_prefix local_url { } {
-    global binfile outputdir debugdir db
-
-    set url [start_debuginfod $db $debugdir]
+proc_with_prefix local_url { url } {
     if { $url == "" } {
 	unresolved "failed to start debuginfod server"
 	return
     }
+
+    global binfile outputdir debugdir
 
     # Point the client to the server.
     setenv DEBUGINFOD_URLS $url
@@ -331,7 +329,11 @@ prepare_for_debuginfod cache db
 
 with_debuginfod_env $cache {
     no_url
-    local_url
-}
 
-stop_debuginfod
+    set url [start_debuginfod $db $debugdir]
+    try {
+	local_url $url
+    } finally {
+	stop_debuginfod
+    }
+}

@@ -182,22 +182,8 @@ proc check_cache_for_foo { cache } {
     return false
 }
 
-# Use DB and DEBUG_DIR to start debuginfod, then start GDB.  Configure GDB
-# so that it cannot find the test source code; we'll download this from
-# debuginfod.  Load the test executable and run until it crashes.  Move up
-# the stack until we're in libfoo.so, specifically, in the file
-# solib-with-dwz-foo.c, then use 'list', this displays source lines around
-# the current location, and sets the default symtab within GDB.  The source
-# will have been downloaded from debuginfod.
-#
-# Now use 'list LINENO', this should display LINENO within the default
-# symtab.
-proc run_test { cache db debug_dir use_filename } {
-    set url [start_debuginfod $db $debug_dir]
-    if { $url == "" } {
-	unresolved "start debuginfod server"
-	return
-    }
+# Helper function for run_test.
+proc run_test_1 { url cache use_filename } {
     drain_debuginfod
 
     # Point the client to the server.
@@ -362,6 +348,29 @@ proc run_test { cache db debug_dir use_filename } {
     }
 }
 
+# Use DB and DEBUG_DIR to start debuginfod, then start GDB.  Configure GDB
+# so that it cannot find the test source code; we'll download this from
+# debuginfod.  Load the test executable and run until it crashes.  Move up
+# the stack until we're in libfoo.so, specifically, in the file
+# solib-with-dwz-foo.c, then use 'list', this displays source lines around
+# the current location, and sets the default symtab within GDB.  The source
+# will have been downloaded from debuginfod.
+#
+# Now use 'list LINENO', this should display LINENO within the default
+# symtab.
+proc run_test { cache db debug_dir use_filename } {
+    set url [start_debuginfod $db $debug_dir]
+    if { $url == "" } {
+	unresolved "start debuginfod server"
+	return
+    }
+    try {
+	run_test_1 $url $cache $use_filename
+    } finally {
+	stop_debuginfod
+    }
+}
+
 # Create CACHE and DB directories ready for debuginfod to use.
 prepare_for_debuginfod cache db
 
@@ -377,6 +386,5 @@ with_debuginfod_env $cache {
 
 	# Now run the test.
 	run_test $cache $db $debug_dir $use_filename
-	stop_debuginfod
     }
 }

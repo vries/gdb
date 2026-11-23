@@ -273,21 +273,22 @@ if { $url eq "" } {
     unresolved "failed to start debuginfod server"
     return
 }
+try {
+    with_debuginfod_env $cache {
+	setenv DEBUGINFOD_URLS $url
 
-with_debuginfod_env $cache {
-    setenv DEBUGINFOD_URLS $url
+	save_vars { GDBFLAGS } {
+	    append GDBFLAGS " -ex \"set debuginfod enabled on\""
+	    append GDBFLAGS " -ex \"set progress-bars enabled off\""
 
-    save_vars { GDBFLAGS } {
-	append GDBFLAGS " -ex \"set debuginfod enabled on\""
-	append GDBFLAGS " -ex \"set progress-bars enabled off\""
-
-	# Reload the executable and core file.  GDB should download
-	# the file libfoo_1.so using debuginfod during the mapped file
-	# phase, but should then reuse that download during the shared
-	# library phase.
-	load_exec_and_core_file false true \
-	    "load core file, use debuginfod"
+	    # Reload the executable and core file.  GDB should download
+	    # the file libfoo_1.so using debuginfod during the mapped file
+	    # phase, but should then reuse that download during the shared
+	    # library phase.
+	    load_exec_and_core_file false true \
+		"load core file, use debuginfod"
+	}
     }
+} finally {
+    stop_debuginfod
 }
-
-stop_debuginfod

@@ -125,26 +125,29 @@ proc_with_prefix local_debuginfod { } {
 	unresolved "failed to start debuginfod server"
 	return
     }
+    try {
+	# Point the client to the server.
+	setenv DEBUGINFOD_URLS $url
 
-    # Point the client to the server.
-    setenv DEBUGINFOD_URLS $url
+	# GDB should now find the symbol and source files.
+	clean_restart
 
-    # GDB should now find the symbol and source files.
-    clean_restart
+	# Enable debuginfod and fetch the debuginfo.
+	gdb_test_no_output "set debuginfod enabled on"
+	gdb_test_no_output "set progress-bars enabled off"
 
-    # Enable debuginfod and fetch the debuginfo.
-    gdb_test_no_output "set debuginfod enabled on"
-    gdb_test_no_output "set progress-bars enabled off"
-
-    # "separate debug info file has no debug info" warning should not be
-    # reported now because the correct debuginfo should be fetched from
-    # debuginfod.
-    gdb_test "file ${build_id_debug_file}" \
-	[multi_line \
-	     "Reading symbols from ${build_id_debug_file}\\.\\.\\." \
-	     "Downloading\[^\r\n\]*separate debug info for ${build_id_debug_file}\\.\\.\\." \
-	     "Reading symbols from ${cache}/\[^\r\n\]+\\.\\.\\.(?:\r\nExpanding full symbols from \[^\r\n\]+)*"] \
-	"debuginfod running, info downloaded, no warnings"
+	# "separate debug info file has no debug info" warning should not be
+	# reported now because the correct debuginfo should be fetched from
+	# debuginfod.
+	gdb_test "file ${build_id_debug_file}" \
+	    [multi_line \
+		 "Reading symbols from ${build_id_debug_file}\\.\\.\\." \
+		 "Downloading\[^\r\n\]*separate debug info for ${build_id_debug_file}\\.\\.\\." \
+		 "Reading symbols from ${cache}/\[^\r\n\]+\\.\\.\\.(?:\r\nExpanding full symbols from \[^\r\n\]+)*"] \
+	    "debuginfod running, info downloaded, no warnings"
+    } finally {
+	stop_debuginfod
+    }
 }
 
 # Restart GDB, and load the file, this time we should correctly get
@@ -152,5 +155,3 @@ proc_with_prefix local_debuginfod { } {
 with_debuginfod_env $cache {
     local_debuginfod
 }
-
-stop_debuginfod
