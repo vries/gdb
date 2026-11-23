@@ -71,26 +71,28 @@ proc run_test { target_async target_non_stop to_disable } {
     gdb_test_no_output "set remote exec-file $target_exec" "set remote exec-file"
 
     set test_spawn_id [spawn_wait_for_attach $::binfile]
-    set testpid [spawn_id_get_pid $test_spawn_id]
+    try {
+	set testpid [spawn_id_get_pid $test_spawn_id]
 
-    gdb_test "attach $testpid" \
-	"Attaching to program: .*, process $testpid.*(in|at).*" \
-	"attach to remote program 1"
+	gdb_test "attach $testpid" \
+	    "Attaching to program: .*, process $testpid.*(in|at).*" \
+	    "attach to remote program 1"
 
-    gdb_test "backtrace" ".*main.*" "backtrace 1"
+	gdb_test "backtrace" ".*main.*" "backtrace 1"
 
-    gdb_test "detach" "Detaching from program.*process.*"
-    gdb_test "backtrace" "No stack\\." "backtrace with no program"
+	gdb_test "detach" "Detaching from program.*process.*"
+	gdb_test "backtrace" "No stack\\." "backtrace with no program"
 
-    gdb_test "attach $testpid" \
-	"Attaching to program: .*, process $testpid.*(in|at).*" \
-	"attach to remote program 2"
-    gdb_test "backtrace" ".*main.*" "backtrace 2"
+	gdb_test "attach $testpid" \
+	    "Attaching to program: .*, process $testpid.*(in|at).*" \
+	    "attach to remote program 2"
+	gdb_test "backtrace" ".*main.*" "backtrace 2"
 
-    gdb_test "kill" "" "kill" "Kill the program being debugged. .y or n. " "y"
-    gdb_test_no_output "monitor exit"
-
-    kill_wait_spawned_process $test_spawn_id
+	gdb_test "kill" "" "kill" "Kill the program being debugged. .y or n. " "y"
+	gdb_test_no_output "monitor exit"
+    } finally {
+	kill_wait_spawned_process $test_spawn_id
+    }
 }
 
 foreach_with_prefix target_async {"on" "off" } {

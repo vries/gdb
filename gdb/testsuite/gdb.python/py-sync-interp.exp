@@ -29,13 +29,15 @@ if { [prepare_for_testing "failed to prepare" ${testfile} ${srcfile}] } {
 }
 
 set test_spawn_id [spawn_wait_for_attach $binfile]
-set testpid [spawn_id_get_pid $test_spawn_id]
+try {
+    set testpid [spawn_id_get_pid $test_spawn_id]
 
-# Test command 'where' is executed when command 'attach' is done, otherwise
-# function 'sleep' may not show up in backtrace.
+    # Test command 'where' is executed when command 'attach' is done, otherwise
+    # function 'sleep' may not show up in backtrace.
 
-gdb_test "python gdb.execute(\"attach $testpid\"); gdb.execute(\"where\")" \
-    "in .*sleep \\(.*\\) .* in foo1 \\(\\) at .* in foo2 \\(\\) at .*" \
-    "attach and where"
-
-kill_wait_spawned_process $test_spawn_id
+    gdb_test "python gdb.execute(\"attach $testpid\"); gdb.execute(\"where\")" \
+	"in .*sleep \\(.*\\) .* in foo1 \\(\\) at .* in foo2 \\(\\) at .*" \
+	"attach and where"
+} finally {
+    kill_wait_spawned_process $test_spawn_id
+}

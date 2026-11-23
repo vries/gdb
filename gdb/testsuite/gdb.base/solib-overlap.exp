@@ -73,48 +73,49 @@ foreach prelink_lib1 {0x40000000 0x50000000} { with_test_prefix "$prelink_lib1" 
     }
 
     set test_spawn_id [spawn_wait_for_attach $binfile]
-    set testpid [spawn_id_get_pid $test_spawn_id]
+    try {
+	set testpid [spawn_id_get_pid $test_spawn_id]
 
-    remote_exec build "mv -f ${binfile_lib1} ${binfile_lib1}-running"
-    remote_exec build "mv -f ${binfile_lib2} ${binfile_lib2}-running"
+	remote_exec build "mv -f ${binfile_lib1} ${binfile_lib1}-running"
+	remote_exec build "mv -f ${binfile_lib2} ${binfile_lib2}-running"
 
-    # Provide another exported function name to cause different sizes of sections.
-    lappend lib_flags additional_flags=-DSYMB
+	# Provide another exported function name to cause different sizes of sections.
+	lappend lib_flags additional_flags=-DSYMB
 
-    if { [gdb_compile_shlib ${srcfile_lib} ${binfile_lib1} $lib_flags] != ""
-	 || [gdb_compile_shlib ${srcfile_lib} ${binfile_lib2} $lib_flags] != ""} {
-	untested "failed to compile shared library"
+	if { [gdb_compile_shlib ${srcfile_lib} ${binfile_lib1} $lib_flags] != ""
+	     || [gdb_compile_shlib ${srcfile_lib} ${binfile_lib2} $lib_flags] != ""} {
+	    untested "failed to compile shared library"
+	    return
+	}
+
+	clean_restart ${binfile_base}
+	# This testcase currently does not support remote targets.
+	# gdb_load_shlib ${binfile_lib1}
+	# gdb_load_shlib ${binfile_lib2}
+
+	# Here we should get:
+	# warning: .dynamic section for ".../solib-overlap-lib1.so" is not at the expected address (wrong library or version mismatch?)
+	# warning: .dynamic section for ".../solib-overlap-lib2.so" is not at the expected address (wrong library or version mismatch?)
+
+	set test attach
+	gdb_test_multiple "attach $testpid" $test {
+	    -re -wrap "Attaching to program: $escapedbinfile, process $testpid.*" {
+		pass $test
+	    }
+	    -re -wrap "[subst_vars {Attaching to program: $escapedbinfile\.exe, process $testpid.*\[Switching to thread $testpid\..*\].*}]" {
+		# Response expected on Cygwin
+		pass $test
+	    }
+	}
+
+	# Detach the process.
+
+	gdb_test "detach" "Detaching from program: .*$escapedbinfile, process $testpid\r\n\\\[Inferior $decimal \\(.*\\) detached\\\]"
+
+	# Wait a bit for gdb to finish detaching
+
+	sleep 5
+    } finally {
 	kill_wait_spawned_process $test_spawn_id
-	return
     }
-
-    clean_restart ${binfile_base}
-    # This testcase currently does not support remote targets.
-    # gdb_load_shlib ${binfile_lib1}
-    # gdb_load_shlib ${binfile_lib2}
-
-    # Here we should get:
-    # warning: .dynamic section for ".../solib-overlap-lib1.so" is not at the expected address (wrong library or version mismatch?)
-    # warning: .dynamic section for ".../solib-overlap-lib2.so" is not at the expected address (wrong library or version mismatch?)
-
-    set test attach
-    gdb_test_multiple "attach $testpid" $test {
-	-re -wrap "Attaching to program: $escapedbinfile, process $testpid.*" {
-	    pass $test
-	}
-	-re -wrap "[subst_vars {Attaching to program: $escapedbinfile\.exe, process $testpid.*\[Switching to thread $testpid\..*\].*}]" {
-	    # Response expected on Cygwin
-	    pass $test
-	}
-    }
-
-    # Detach the process.
-
-    gdb_test "detach" "Detaching from program: .*$escapedbinfile, process $testpid\r\n\\\[Inferior $decimal \\(.*\\) detached\\\]"
-
-    # Wait a bit for gdb to finish detaching
-
-    sleep 5
-
-    kill_wait_spawned_process $test_spawn_id
 }}

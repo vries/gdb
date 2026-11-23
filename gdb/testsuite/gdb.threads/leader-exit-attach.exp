@@ -26,54 +26,55 @@ if {[build_executable "failed to prepare" $testfile $srcfile {debug pthreads}] =
 set escapedbinfile [string_to_regexp ${binfile}]
 
 set test_spawn_id [spawn_wait_for_attach $binfile]
-set testpid [spawn_id_get_pid $test_spawn_id]
+try {
+    set testpid [spawn_id_get_pid $test_spawn_id]
 
-# Wait a bit for the leader thread to exit, before attaching.
-sleep 2
+    # Wait a bit for the leader thread to exit, before attaching.
+    sleep 2
 
-clean_restart ${::testfile}
+    clean_restart ${::testfile}
 
-# Save this early as we may not be able to talk with GDBserver anymore
-# when we need to check it.
-set is_gdbserver [target_is_gdbserver]
+    # Save this early as we may not be able to talk with GDBserver anymore
+    # when we need to check it.
+    set is_gdbserver [target_is_gdbserver]
 
-# True if successfully attached.
-set attached 0
+    # True if successfully attached.
+    set attached 0
 
-gdb_test_multiple "attach $testpid" "attach" {
-    -re -wrap "Attaching to process $testpid failed.*" {
-	# GNU/Linux gdbserver.  Linux ptrace does not let you attach
-	# to zombie threads.
-	setup_kfail "gdb/31555" *-*-linux*
-	fail $gdb_test_name
+    gdb_test_multiple "attach $testpid" "attach" {
+	-re -wrap "Attaching to process $testpid failed.*" {
+	    # GNU/Linux gdbserver.  Linux ptrace does not let you attach
+	    # to zombie threads.
+	    setup_kfail "gdb/31555" *-*-linux*
+	    fail $gdb_test_name
+	}
+	-re -wrap "warning: process $testpid is a zombie - the process has already terminated.*" {
+	    # Native GNU/Linux.  Linux ptrace does not let you attach to
+	    # zombie threads.
+	    setup_kfail "gdb/31555" *-*-linux*
+	    fail $gdb_test_name
+	}
+	-re -wrap "Attaching to program: $escapedbinfile, process $testpid.*" {
+	    pass $gdb_test_name
+	    set attached 1
+	}
     }
-    -re -wrap "warning: process $testpid is a zombie - the process has already terminated.*" {
-	# Native GNU/Linux.  Linux ptrace does not let you attach to
-	# zombie threads.
-	setup_kfail "gdb/31555" *-*-linux*
-	fail $gdb_test_name
-    }
-    -re -wrap "Attaching to program: $escapedbinfile, process $testpid.*" {
-	pass $gdb_test_name
-	set attached 1
-    }
-}
 
-set thread_count [get_valueof "" "\$_inferior_thread_count" -1]
+    set thread_count [get_valueof "" "\$_inferior_thread_count" -1]
 
-if {$thread_count == -1} {
+    if {$thread_count == -1} {
+	return
+    }
+
+    if {$attached} {
+	# Check that we have at least one thread.  We can't assume there
+	# will only be exactly one thread, because on some systems, like
+	# Cygwin, the runtime spawns extra threads.  Also, on Windows,
+	# attaching always injects one extra thread.
+	gdb_assert {$thread_count >= 1}
+    } else {
+	gdb_assert {$thread_count == 0}
+    }
+} finally {
     kill_wait_spawned_process $test_spawn_id
-    return
 }
-
-if {$attached} {
-    # Check that we have at least one thread.  We can't assume there
-    # will only be exactly one thread, because on some systems, like
-    # Cygwin, the runtime spawns extra threads.  Also, on Windows,
-    # attaching always injects one extra thread.
-    gdb_assert {$thread_count >= 1}
-} else {
-    gdb_assert {$thread_count == 0}
-}
-
-kill_wait_spawned_process $test_spawn_id

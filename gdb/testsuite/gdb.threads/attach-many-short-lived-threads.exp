@@ -61,131 +61,134 @@ proc test {} {
     global decimal
 
     set test_spawn_id [spawn_wait_for_attach $binfile]
-    set testpid [spawn_id_get_pid $test_spawn_id]
+    try {
+	set testpid [spawn_id_get_pid $test_spawn_id]
 
-    set attempts 10
-    for {set attempt 1} { $attempt <= $attempts } { incr attempt } {
-	with_test_prefix "iter $attempt" {
-	    set attached 0
-	    set eperm 0
-	    set test "attach"
-	    gdb_test_multiple "attach $testpid" $test {
-		-re "new threads in iteration" {
-		    # Seen when "set debug libthread_db" is on.
-		    exp_continue
-		}
-		-re "Cannot attach to lwp $decimal: Operation not permitted" {
-		    # On Linux, PTRACE_ATTACH sometimes fails with
-		    # EPERM, even though /proc/PID/status indicates
-		    # the thread is running.
-		    set eperm 1
-		    exp_continue
-		}
-		-re "debugger service failed.*$gdb_prompt $" {
-		    fail $test
-		}
-		-re "$gdb_prompt $" {
-		    if {$eperm} {
-			xfail "$test (EPERM)"
-		    } else {
+	set attempts 10
+	for {set attempt 1} { $attempt <= $attempts } { incr attempt } {
+	    with_test_prefix "iter $attempt" {
+		set attached 0
+		set eperm 0
+		set test "attach"
+		gdb_test_multiple "attach $testpid" $test {
+		    -re "new threads in iteration" {
+			# Seen when "set debug libthread_db" is on.
+			exp_continue
+		    }
+		    -re "Cannot attach to lwp $decimal: Operation not permitted" {
+			# On Linux, PTRACE_ATTACH sometimes fails with
+			# EPERM, even though /proc/PID/status indicates
+			# the thread is running.
+			set eperm 1
+			exp_continue
+		    }
+		    -re "debugger service failed.*$gdb_prompt $" {
+			fail $test
+		    }
+		    -re "$gdb_prompt $" {
+			if {$eperm} {
+			    xfail "$test (EPERM)"
+			} else {
+			    pass $test
+			}
+		    }
+		    -re "Attaching to program.*process $testpid.*$gdb_prompt $" {
 			pass $test
 		    }
 		}
-		-re "Attaching to program.*process $testpid.*$gdb_prompt $" {
-		    pass $test
+
+		if { $eperm } {
+		    continue
 		}
-	    }
 
-	    if { $eperm } {
-		continue
-	    }
+		# Sleep a bit and try updating the thread list.  We should
+		# know about all threads already at this point.  If we see
+		# "New Thread" or similar being output, then "attach" is
+		# failing to actually attach to all threads in the process,
+		# which would be a bug.
+		sleep 1
 
-	    # Sleep a bit and try updating the thread list.  We should
-	    # know about all threads already at this point.  If we see
-	    # "New Thread" or similar being output, then "attach" is
-	    # failing to actually attach to all threads in the process,
-	    # which would be a bug.
-	    sleep 1
-
-	    set test "no new threads"
-	    set status 1
-	    gdb_test_multiple "info threads" $test -lbl {
-		-re "\r\n\[^\r\n\]*New " {
-		    set status 0
-		    exp_continue
-		}
-		-re -wrap "" {
-		    if { $status == 1 } {
-			pass $gdb_test_name
-		    } else {
-			fail $gdb_test_name
+		set test "no new threads"
+		set status 1
+		gdb_test_multiple "info threads" $test -lbl {
+		    -re "\r\n\[^\r\n\]*New " {
+			set status 0
+			exp_continue
+		    }
+		    -re -wrap "" {
+			if { $status == 1 } {
+			    pass $gdb_test_name
+			} else {
+			    fail $gdb_test_name
+			}
 		    }
 		}
-	    }
 
-	    # Force breakpoints always inserted, so that threads we might
-	    # have failed to attach to hit them even when threads we do
-	    # know about are stopped.
-	    gdb_test_no_output "set breakpoint always-inserted on"
+		# Force breakpoints always inserted, so that threads we might
+		# have failed to attach to hit them even when threads we do
+		# know about are stopped.
+		gdb_test_no_output "set breakpoint always-inserted on"
 
-	    # Run to a breakpoint a few times.  A few threads should spawn
-	    # and die meanwhile.  This checks that thread creation/death
-	    # events carry on correctly after attaching.  Also, be
-	    # detaching from the program and reattaching, we check that
-	    # the program doesn't die due to gdb leaving a pending
-	    # breakpoint hit on a new thread unprocessed.
-	    gdb_test "break break_fn" "Breakpoint.*"
+		# Run to a breakpoint a few times.  A few threads should spawn
+		# and die meanwhile.  This checks that thread creation/death
+		# events carry on correctly after attaching.  Also, be
+		# detaching from the program and reattaching, we check that
+		# the program doesn't die due to gdb leaving a pending
+		# breakpoint hit on a new thread unprocessed.
+		gdb_test "break break_fn" "Breakpoint.*"
 
-	    # Wait a bit, to give time for most threads to hit the
-	    # breakpoint, including threads we might have failed to
-	    # attach.
-	    sleep 2
+		# Wait a bit, to give time for most threads to hit the
+		# breakpoint, including threads we might have failed to
+		# attach.
+		sleep 2
 
-	    set re_pr26286 \
-		[multi_line \
-		     [string_to_regexp \
-			  "Program terminated with signal SIGTRAP, Trace/breakpoint trap."] \
-		     [string_to_regexp \
-			  "The program no longer exists."]]
+		set re_pr26286 \
+		    [multi_line \
+			 [string_to_regexp \
+			      "Program terminated with signal SIGTRAP, Trace/breakpoint trap."] \
+			 [string_to_regexp \
+			      "The program no longer exists."]]
 
-	    set bps 3
-	    set exited 0
-	    for {set bp 1} { $bp <= $bps } { incr bp } {
-		gdb_test_multiple "continue" "break at break_fn: $bp" {
-		    -re -wrap "$re_pr26286" {
-			kfail threads/26286 $gdb_test_name
-			set exited 1
+		set bps 3
+		set exited 0
+		for {set bp 1} { $bp <= $bps } { incr bp } {
+		    gdb_test_multiple "continue" "break at break_fn: $bp" {
+			-re -wrap "$re_pr26286" {
+			    kfail threads/26286 $gdb_test_name
+			    set exited 1
+			}
+			-re -wrap "Breakpoint.*" {
+			    pass $gdb_test_name
+			}
 		    }
-		    -re -wrap "Breakpoint.*" {
-			pass $gdb_test_name
+		    if { $exited } {
+			break
 		    }
 		}
+
 		if { $exited } {
-		    break
+		    return
 		}
+
+		if {$attempt < $attempts} {
+		    # Kick the time out timer for another round.
+		    gdb_test "print again = 1" " = 1" "reset timer in the inferior"
+		    # Show the time we had left in the logs, in case
+		    # something goes wrong.
+		    gdb_test "print seconds_left" " = .*"
+
+		    gdb_test "detach" "Detaching from.*"
+		} else {
+		    gdb_test "kill" "" "kill process" "Kill the program being debugged.*y or n. $" "y"
+		}
+
+		gdb_test_no_output "set breakpoint always-inserted off"
+		delete_breakpoints
 	    }
-
-	    if { $exited } {
-		return
-	    }
-
-	    if {$attempt < $attempts} {
-		# Kick the time out timer for another round.
-		gdb_test "print again = 1" " = 1" "reset timer in the inferior"
-		# Show the time we had left in the logs, in case
-		# something goes wrong.
-		gdb_test "print seconds_left" " = .*"
-
-		gdb_test "detach" "Detaching from.*"
-	    } else {
-		gdb_test "kill" "" "kill process" "Kill the program being debugged.*y or n. $" "y"
-	    }
-
-	    gdb_test_no_output "set breakpoint always-inserted off"
-	    delete_breakpoints
 	}
+    } finally {
+	kill_wait_spawned_process $test_spawn_id
     }
-    kill_wait_spawned_process $test_spawn_id
 }
 
 # The test program exits after a while, in case GDB crashes.  Make it

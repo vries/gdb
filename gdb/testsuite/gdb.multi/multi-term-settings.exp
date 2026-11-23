@@ -33,18 +33,6 @@ if {[build_executable "failed to prepare" $testfile $srcfile {debug}]} {
     return
 }
 
-# Start the programs running and then wait for a bit, to be sure that
-# they can be attached to.  We start these processes upfront in order
-# to reuse them for the different iterations.  This makes the testcase
-# faster, compared to calling spawn_wait_for_attach for each iteration
-# in the testing matrix.
-
-set spawn_id_list [spawn_wait_for_attach [list $binfile $binfile]]
-set attach_spawn_id1 [lindex $spawn_id_list 0]
-set attach_spawn_id2 [lindex $spawn_id_list 1]
-set attach_pid1 [spawn_id_get_pid $attach_spawn_id1]
-set attach_pid2 [spawn_id_get_pid $attach_spawn_id2]
-
 # Create inferior WHICH_INF.  INF_HOW is how to create it.  This can
 # be one of:
 #
@@ -255,21 +243,36 @@ proc coretest {inf1_how inf2_how} {
     }
 }
 
-set how_modes {"run" "attach" "tty"}
+# Start the programs running and then wait for a bit, to be sure that
+# they can be attached to.  We start these processes upfront in order
+# to reuse them for the different iterations.  This makes the testcase
+# faster, compared to calling spawn_wait_for_attach for each iteration
+# in the testing matrix.
 
-foreach_with_prefix inf1_how $how_modes {
-    foreach_with_prefix inf2_how $how_modes {
-	if {($inf1_how == "tty" || $inf2_how == "tty")
-	    && [target_info gdb_protocol] == "extended-remote"} {
-	    # No way to specify the inferior's tty in the remote
-	    # protocol.
-	    unsupported "no support for \"tty\" in the RSP"
-	    continue
+set spawn_id_list [spawn_wait_for_attach [list $binfile $binfile]]
+try {
+    set attach_spawn_id1 [lindex $spawn_id_list 0]
+    set attach_spawn_id2 [lindex $spawn_id_list 1]
+    set attach_pid1 [spawn_id_get_pid $attach_spawn_id1]
+    set attach_pid2 [spawn_id_get_pid $attach_spawn_id2]
+
+    set how_modes {"run" "attach" "tty"}
+
+    foreach_with_prefix inf1_how $how_modes {
+	foreach_with_prefix inf2_how $how_modes {
+	    if {($inf1_how == "tty" || $inf2_how == "tty")
+		&& [target_info gdb_protocol] == "extended-remote"} {
+		# No way to specify the inferior's tty in the remote
+		# protocol.
+		unsupported "no support for \"tty\" in the RSP"
+		continue
+	    }
+
+	    coretest $inf1_how $inf2_how
 	}
-
-	coretest $inf1_how $inf2_how
+    }
+} finally {
+    foreach id $spawn_id_list {
+	kill_wait_spawned_process $id
     }
 }
-
-kill_wait_spawned_process $attach_spawn_id1
-kill_wait_spawned_process $attach_spawn_id2

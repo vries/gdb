@@ -193,113 +193,114 @@ proc prepare_test_iter {testpid non_stop attempt attempts tid_re} {
 # The test proper.  See the description at the top of the file.
 proc_with_prefix test_detach_command {condition_eval target_non_stop non_stop displaced} {
     set test_spawn_id [spawn_wait_for_attach $::binfile]
-    set testpid [spawn_id_get_pid $test_spawn_id]
+    try {
+	set testpid [spawn_id_get_pid $test_spawn_id]
 
-    start_gdb_for_test $condition_eval $target_non_stop $non_stop $displaced
+	start_gdb_for_test $condition_eval $target_non_stop $non_stop $displaced
 
-    gdb_test "add-inferior" "Added inferior 2.*"
-    gdb_test "inferior 2" "Switching to .*"
+	gdb_test "add-inferior" "Added inferior 2.*"
+	gdb_test "inferior 2" "Switching to .*"
 
-    gdb_load $::binfile
-    if {![runto setup_done]} {
-	fail "can't run to setup_done"
-	kill_wait_spawned_process $test_spawn_id
-	return
-    }
-
-    # Get the PID of the test process.
-    set pid_inf2 ""
-    gdb_test_multiple "p mypid" "get pid of inferior 2" {
-	-re " = ($::decimal)\r\n$::gdb_prompt $" {
-	    set pid_inf2 $expect_out(1,string)
-	    pass $gdb_test_name
+	gdb_load $::binfile
+	if {![runto setup_done]} {
+	    fail "can't run to setup_done"
+	    return
 	}
-    }
 
-    set attempts 3
-    for {set attempt 1} { $attempt <= $attempts } { incr attempt } {
-	with_test_prefix "iter $attempt" {
-	    gdb_test "inferior 1" "Switching to .*"
-
-	    if {![prepare_test_iter $testpid $non_stop \
-		      $attempt $attempts "$::decimal\.$::decimal"]} {
-		kill_wait_spawned_process $test_spawn_id
-		return
+	# Get the PID of the test process.
+	set pid_inf2 ""
+	gdb_test_multiple "p mypid" "get pid of inferior 2" {
+	    -re " = ($::decimal)\r\n$::gdb_prompt $" {
+		set pid_inf2 $expect_out(1,string)
+		pass $gdb_test_name
 	    }
+	}
 
-	    set running_count 0
-	    set interrupted 0
-	    set running_expected [expr {($::n_threads + 1) * 2}]
-	    gdb_test_multiple "info threads" "threads running" {
-		-re "\\(running\\)" {
-		    incr running_count
-		    exp_continue
+	set attempts 3
+	for {set attempt 1} { $attempt <= $attempts } { incr attempt } {
+	    with_test_prefix "iter $attempt" {
+		gdb_test "inferior 1" "Switching to .*"
+
+		if {![prepare_test_iter $testpid $non_stop \
+			  $attempt $attempts "$::decimal\.$::decimal"]} {
+		    return
 		}
-		-re "Cannot execute this command while the target is running.*$::gdb_prompt $" {
-		    # Testing against a remote server that doesn't do
-		    # non-stop mode.  Explicitly interrupt.  This
-		    # doesn't test the same code paths in GDB, but
-		    # it's still something.
-		    set interrupted 1
-		    gdb_test_multiple "interrupt" "" {
-			-re "$::gdb_prompt " {
-			    gdb_test_multiple "" $gdb_test_name {
-				-re "received signal SIGINT, Interrupt" {
-				    pass $gdb_test_name
+
+		set running_count 0
+		set interrupted 0
+		set running_expected [expr {($::n_threads + 1) * 2}]
+		gdb_test_multiple "info threads" "threads running" {
+		    -re "\\(running\\)" {
+			incr running_count
+			exp_continue
+		    }
+		    -re "Cannot execute this command while the target is running.*$::gdb_prompt $" {
+			# Testing against a remote server that doesn't do
+			# non-stop mode.  Explicitly interrupt.  This
+			# doesn't test the same code paths in GDB, but
+			# it's still something.
+			set interrupted 1
+			gdb_test_multiple "interrupt" "" {
+			    -re "$::gdb_prompt " {
+				gdb_test_multiple "" $gdb_test_name {
+				    -re "received signal SIGINT, Interrupt" {
+					pass $gdb_test_name
+				    }
 				}
 			    }
 			}
 		    }
+		    -re "$::gdb_prompt " {
+		    }
 		}
-		-re "$::gdb_prompt " {
-		}
-	    }
 
-	    if { !$interrupted } {
-		set iterations 0
-		set max_iterations 10
-		while { $running_count < $running_expected } {
-		    sleep 1
-		    set running_count 0
-		    gdb_test_multiple "info threads" "threads running" {
-			-re "\\(running\\)" {
-			    incr running_count
-			    exp_continue
+		if { !$interrupted } {
+		    set iterations 0
+		    set max_iterations 10
+		    while { $running_count < $running_expected } {
+			sleep 1
+			set running_count 0
+			gdb_test_multiple "info threads" "threads running" {
+			    -re "\\(running\\)" {
+				incr running_count
+				exp_continue
+			    }
+			    -re "$::gdb_prompt " {
+			    }
 			}
-			-re "$::gdb_prompt " {
+			incr iterations
+			if { $iterations == $max_iterations } {
+			    break
 			}
 		    }
-		    incr iterations
-		    if { $iterations == $max_iterations } {
-			break
+		    gdb_assert {$running_count == $running_expected} \
+			"all threads running"
+		}
+
+		gdb_test "detach" "Detaching from.*"
+
+		if {!$interrupted} {
+		    # Now test whether inferior 2's thread were really left
+		    # running.  Currently an inline step-over stops all
+		    # threads of all processes.  If detach aborts such a step
+		    # over, then threads of other inferiors should be
+		    # re-resumed.  Test for that by sending a signal to
+		    # inferior 2.
+		    remote_exec target "kill -USR1 ${pid_inf2}"
+
+		    gdb_test_multiple "" "stop with SIGUSR1" {
+			-re "received signal SIGUSR1" {
+			    pass $gdb_test_name
+			}
 		    }
 		}
-		gdb_assert {$running_count == $running_expected} \
-		    "all threads running"
+
+		delete_breakpoints
 	    }
-
-	    gdb_test "detach" "Detaching from.*"
-
-	    if {!$interrupted} {
-		# Now test whether inferior 2's thread were really left
-		# running.  Currently an inline step-over stops all
-		# threads of all processes.  If detach aborts such a step
-		# over, then threads of other inferiors should be
-		# re-resumed.  Test for that by sending a signal to
-		# inferior 2.
-		remote_exec target "kill -USR1 ${pid_inf2}"
-
-		gdb_test_multiple "" "stop with SIGUSR1" {
-		    -re "received signal SIGUSR1" {
-			pass $gdb_test_name
-		    }
-		}
-	    }
-
-	    delete_breakpoints
 	}
+    } finally {
+	kill_wait_spawned_process $test_spawn_id
     }
-    kill_wait_spawned_process $test_spawn_id
 }
 
 # Similar to the proc above, but this time, instead of detaching using
@@ -322,30 +323,31 @@ proc_with_prefix test_detach_quit {condition_eval target_non_stop \
     }
 
     set test_spawn_id [spawn_wait_for_attach $::binfile]
-    set testpid [spawn_id_get_pid $test_spawn_id]
+    try {
+	set testpid [spawn_id_get_pid $test_spawn_id]
 
-    set attempts 3
-    for {set attempt 1} { $attempt <= $attempts } { incr attempt } {
-	with_test_prefix "iter $attempt" {
+	set attempts 3
+	for {set attempt 1} { $attempt <= $attempts } { incr attempt } {
+	    with_test_prefix "iter $attempt" {
 
-	    start_gdb_for_test $condition_eval $target_non_stop \
-		$non_stop $displaced
+		start_gdb_for_test $condition_eval $target_non_stop \
+		    $non_stop $displaced
 
-	    if {![prepare_test_iter $testpid $non_stop \
-		      $attempt $attempts "$::decimal"]} {
-		kill_wait_spawned_process $test_spawn_id
-		return
-	    }
+		if {![prepare_test_iter $testpid $non_stop \
+			  $attempt $attempts "$::decimal"]} {
+		    return
+		}
 
-	    gdb_test_multiple "with confirm off -- quit" "" {
-		eof {
-		    pass $gdb_test_name
+		gdb_test_multiple "with confirm off -- quit" "" {
+		    eof {
+			pass $gdb_test_name
+		    }
 		}
 	    }
 	}
+    } finally {
+	kill_wait_spawned_process $test_spawn_id
     }
-
-    kill_wait_spawned_process $test_spawn_id
 }
 
 # The test program exits after a while, in case GDB crashes.  Make it

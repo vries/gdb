@@ -91,7 +91,10 @@ proc setup {how binfile} {
 
 proc teardown {how} {
     if {$how == "attach"} {
-	kill_wait_spawned_process $::test_spawn_id
+	if {[info exists ::test_spawn_id]} {
+	    kill_wait_spawned_process $::test_spawn_id
+	    unset ::test_spawn_id
+	}
     }
 }
 
@@ -102,73 +105,75 @@ proc test_signal {how exec binfile} {
     # so the core file ends up in the output directory.
     set_inferior_cwd_to_output_dir
 
-    setup $how $binfile
+    try {
+	setup $how $binfile
 
-    # Get the inferior's PID for later.
-    set pid [get_inferior_pid]
+	# Get the inferior's PID for later.
+	set pid [get_inferior_pid]
 
-    # Print $_exitsignal.  It should be void now, because nothing
-    # happened.
-    gdb_test "print \$_exitsignal" " = void" \
-	"\$_exitsignal is void before running"
+	# Print $_exitsignal.  It should be void now, because nothing
+	# happened.
+	gdb_test "print \$_exitsignal" " = void" \
+	    "\$_exitsignal is void before running"
 
-    # Just to guarantee, making sure that $_exitcode is also void.
-    gdb_test "print \$_exitcode" " = void" \
-	"\$_exitcode is void before running"
+	# Just to guarantee, making sure that $_exitcode is also void.
+	gdb_test "print \$_exitcode" " = void" \
+	    "\$_exitcode is void before running"
 
-    # Trigger SIGSEGV.
-    gdb_test "continue" "(Thread .*|Program) received signal SIGSEGV.*" \
-	"trigger SIGSEGV"
+	# Trigger SIGSEGV.
+	gdb_test "continue" "(Thread .*|Program) received signal SIGSEGV.*" \
+	    "trigger SIGSEGV"
 
-    if {[istarget "*-*-mingw*"]
-	|| ([istarget "*-*-cygwin*"] && $binfile == $::binfile3)} {
-	# We're debugging a pure Win32 program with no SEH handler.  The
-	# previous continue caught the first-chance exception.  Now we
-	# catch the second-chance one.
-	gdb_test "continue" "Thread .* received signal SIGSEGV.*" \
-	    "trigger SIGSEGV, second-chance"
-    } elseif {[istarget "*-*-cygwin*"]} {
-	# Cygwin calls DebugBreak before it lets the process exit.
-	gdb_test "continue" "Thread .* received signal SIGTRAP.*" \
-	    "trigger try_to_debug SIGTRAP"
-    }
-
-    # Continue until the end.
-    gdb_test "continue" "Program terminated with signal SIGSEGV.*" \
-	"program terminated with SIGSEGV"
-
-    # We don't need the core file, remove it.
-    remove_core $pid
-
-    # Now, print $_exitsignal again.  It should be 11 (SIGSEGV).
-    gdb_test "print \$_exitsignal" " = 11" \
-	"\$_exitsignal is 11 (SIGSEGV) after SIGSEGV."
-
-    # And $_exitcode should still be void, since the inferior died
-    # because of a signal, and did not return.
-    gdb_test "print \$_exitcode" " = void" \
-	"\$_exitcode is still void after SIGSEGV"
-
-    # Start over.
-    if {$how == "run"} {
-	rerun_to_main
-    } else {
-	with_test_prefix "reattach" {
-	    kill_wait_spawned_process $::test_spawn_id
-	    setup $how $binfile
+	if {[istarget "*-*-mingw*"]
+	    || ([istarget "*-*-cygwin*"] && $binfile == $::binfile3)} {
+	    # We're debugging a pure Win32 program with no SEH handler.  The
+	    # previous continue caught the first-chance exception.  Now we
+	    # catch the second-chance one.
+	    gdb_test "continue" "Thread .* received signal SIGSEGV.*" \
+		"trigger SIGSEGV, second-chance"
+	} elseif {[istarget "*-*-cygwin*"]} {
+	    # Cygwin calls DebugBreak before it lets the process exit.
+	    gdb_test "continue" "Thread .* received signal SIGTRAP.*" \
+		"trigger try_to_debug SIGTRAP"
 	}
+
+	# Continue until the end.
+	gdb_test "continue" "Program terminated with signal SIGSEGV.*" \
+	    "program terminated with SIGSEGV"
+
+	# We don't need the core file, remove it.
+	remove_core $pid
+
+	# Now, print $_exitsignal again.  It should be 11 (SIGSEGV).
+	gdb_test "print \$_exitsignal" " = 11" \
+	    "\$_exitsignal is 11 (SIGSEGV) after SIGSEGV."
+
+	# And $_exitcode should still be void, since the inferior died
+	# because of a signal, and did not return.
+	gdb_test "print \$_exitcode" " = void" \
+	    "\$_exitcode is still void after SIGSEGV"
+
+	# Start over.
+	if {$how == "run"} {
+	    rerun_to_main
+	} else {
+	    with_test_prefix "reattach" {
+		teardown $how
+		setup $how $binfile
+	    }
+	}
+
+	# Print the $_exitsignal again.  Even in this normal scenario, it
+	# should still contain the signal triggered in the other run.
+	gdb_test "print \$_exitsignal" " = 11" \
+	    "\$_exitsignal is 11 (SIGSEGV) after restarting the inferior"
+
+	# And, again, print $_exitcode.
+	gdb_test "print \$_exitcode" " = void" \
+	    "\$_exitcode is still void after restarting the inferior"
+    } finally {
+	teardown $how
     }
-
-    # Print the $_exitsignal again.  Even in this normal scenario, it
-    # should still contain the signal triggered in the other run.
-    gdb_test "print \$_exitsignal" " = 11" \
-	"\$_exitsignal is 11 (SIGSEGV) after restarting the inferior"
-
-    # And, again, print $_exitcode.
-    gdb_test "print \$_exitcode" " = void" \
-	"\$_exitcode is still void after restarting the inferior"
-
-    teardown $how
 }
 
 # Test the behavior of $_exit{code,signal} during a normal inferior
@@ -184,19 +189,21 @@ proc test_normal {how} {
 	"\$_exitcode is void before normal inferior is executed"
 
     # Run the inferior until the end.
-    setup $how $::binfile2
-    gdb_test "continue" " exited with code 01\\\].*" "continue to exit"
+    try {
+	setup $how $::binfile2
+	gdb_test "continue" " exited with code 01\\\].*" "continue to exit"
 
-    # Check $_exitcode.  It should be 1.
-    gdb_test "print \$_exitcode" " = 1" \
-	"\$_exitcode is one after normal inferior is executed"
+	# Check $_exitcode.  It should be 1.
+	gdb_test "print \$_exitcode" " = 1" \
+	    "\$_exitcode is one after normal inferior is executed"
 
-    # Check $_exitsignal.  It should still be void, since the inferior
-    # has not received any signal.
-    gdb_test "print \$_exitsignal" " = void" \
-	"\$_exitsignal is still void after normal inferior is executed"
-
-    teardown $how
+	# Check $_exitsignal.  It should still be void, since the inferior
+	# has not received any signal.
+	gdb_test "print \$_exitsignal" " = void" \
+	    "\$_exitsignal is still void after normal inferior is executed"
+    } finally {
+	teardown $how
+    }
 }
 
 foreach_with_prefix how {"run" "attach"} {

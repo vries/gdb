@@ -53,15 +53,20 @@ if {$arch == ""} {
 # that it can be attached to.
 
 set test_spawn_id [spawn_wait_for_attach $binfile]
-set testpid [spawn_id_get_pid $test_spawn_id]
+try {
+    set testpid [spawn_id_get_pid $test_spawn_id]
 
-gdb_start
-file delete -- $binfile
-if { ![gdb_attach $testpid] } {
+    gdb_start
+    file delete -- $binfile
+    if { ![gdb_attach $testpid] } {
+	return
+    }
+    gdb_test "set architecture $arch" \
+	[subst_vars {The target architecture is set to "$arch"[.]}]
+    gdb_test "info shared" \
+	[multi_line \
+	     {From[ \t]+To(\s+NS)?[ \t]+Syms Read[ \t]+Shared Object Library} \
+	     {0x.*}]
+} finally {
     kill_wait_spawned_process $test_spawn_id
-    return
 }
-gdb_test "set architecture $arch" "The target architecture is set to \"$arch\"\\."
-gdb_test "info shared" "From\[ \t\]+To(\\s+NS)?\[ \t\]+Syms Read\[ \t\]+Shared Object Library\r\n0x.*"
-
-kill_wait_spawned_process $test_spawn_id

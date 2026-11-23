@@ -67,26 +67,29 @@ proc test {target_non_stop} {
     # Start a program, then attach to it.
     set spawn_id_list [spawn_wait_for_attach [list $binfile]]
     set test_spawn_id [lindex $spawn_id_list 0]
-    set testpid [spawn_id_get_pid $test_spawn_id]
-    gdb_test_multiple "attach $testpid" "attach to the program via remote" {
-	-re "Attaching to Remote target.*\[\r\n\]+$gdb_prompt " {
-	    pass $gdb_test_name
+    try {
+	set testpid [spawn_id_get_pid $test_spawn_id]
+	gdb_test_multiple "attach $testpid" "attach to the program via remote" {
+	    -re "Attaching to Remote target.*\[\r\n\]+$gdb_prompt " {
+		pass $gdb_test_name
+	    }
 	}
+
+	# Check that we have two threads.  Bad GDB duplicated the
+	# thread coming from the remote when target-non-stop is off;
+	# or hanged during attach when target-non-stop is on.
+	gdb_test "info threads" \
+	    [multi_line \
+		 "  Id\[^\r\n\]+" \
+		 "  1\.1\[^\r\n\]+" \
+		 ". 2\.1\[^\r\n\]+"
+	    ]
+
+	# Clean the spawned process and gdbserver.
+	gdbserver_exit 0
+    } finally {
+	kill_wait_spawned_process $test_spawn_id
     }
-
-    # Check that we have two threads.  Bad GDB duplicated the
-    # thread coming from the remote when target-non-stop is off;
-    # or hanged during attach when target-non-stop is on.
-    gdb_test "info threads" \
-	[multi_line \
-	     "  Id\[^\r\n\]+" \
-	     "  1\.1\[^\r\n\]+" \
-	     ". 2\.1\[^\r\n\]+"
-	]
-
-    # Clean the spawned process and gdbserver.
-    gdbserver_exit 0
-    kill_wait_spawned_process $test_spawn_id
 }
 
 foreach_with_prefix target_non_stop {off on} {

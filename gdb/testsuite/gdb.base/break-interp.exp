@@ -337,59 +337,63 @@ proc test_attach {file displacement {relink_args ""}} {
 	fail $test
 	return
     }
-    set pid [spawn_id_get_pid $test_spawn_id]
-    gdb_expect {
-	-re "sleeping\r\n" {
-	    pass $test
-	}
-	eof {
-	    fail "$test (eof)"
-	    wait -i $test_spawn_id
-	    return
-	}
-	timeout {
-	    fail "$test (timeout)"
-	    kill_wait_spawned_process $test_spawn_id
-	    return
-	}
-    }
-
-    if {$relink_args == ""} {
-	test_attach_gdb $exec $pid $displacement "attach"
-    } else {
-	# These could be rather passed as arguments.
-	global interp_saved interp
-
-	foreach relink {YES NO} {
-	    # Formerly this test was testing only prelinking of $EXEC.  As the
-	    # prelink command automatically prelinks all of $EXEC's libraries,
-	    # even $INTERP got prelinked.  Therefore, we formerly had to
-	    # `[file_copy $interp_saved $interp]' to make $INTERP not affected
-	    # by this prelinking of $EXEC.
-	    #
-	    # But now we need to test even prelinking of $INTERP.  We could
-	    # create a separate test to test just the $INTERP prelinking.  For
-	    # test simplicity, we merged this test and the test above by not
-	    # restoring $INTERP after $EXEC prelink.  $INTERP gets restored
-	    # later below.
-	    #
-	    # `(wrong library or version mismatch?)' messages are printed for
-	    # $binfile_lib on platforms converting REL->RELA relocations by
-	    # prelink (such as on i386).  There is no reliable way to verify
-	    # the library file matches the running library in such case but
-	    # GDB at least attempts to set the right displacement.  We test
-	    # `libfunc' is present in the backtrace and therefore the
-	    # displacement has been guessed right.
-
-	    if {[prelink$relink $relink_args [file tail $exec]]} {
-		# /proc/PID/exe cannot be loaded as it is "EXECNAME (deleted)".
-		test_attach_gdb $exec $pid $displacement "attach-relink$relink"
+    try {
+	set pid [spawn_id_get_pid $test_spawn_id]
+	gdb_expect {
+	    -re "sleeping\r\n" {
+		pass $test
+	    }
+	    eof {
+		fail "$test (eof)"
+		wait -i $test_spawn_id
+		unset test_spawn_id
+		return
+	    }
+	    timeout {
+		fail "$test (timeout)"
+		return
 	    }
 	}
-	file_copy $interp_saved $interp
-    }
 
-    kill_wait_spawned_process $test_spawn_id
+	if {$relink_args == ""} {
+	    test_attach_gdb $exec $pid $displacement "attach"
+	} else {
+	    # These could be rather passed as arguments.
+	    global interp_saved interp
+
+	    foreach relink {YES NO} {
+		# Formerly this test was testing only prelinking of $EXEC.  As the
+		# prelink command automatically prelinks all of $EXEC's libraries,
+		# even $INTERP got prelinked.  Therefore, we formerly had to
+		# `[file_copy $interp_saved $interp]' to make $INTERP not affected
+		# by this prelinking of $EXEC.
+		#
+		# But now we need to test even prelinking of $INTERP.  We could
+		# create a separate test to test just the $INTERP prelinking.  For
+		# test simplicity, we merged this test and the test above by not
+		# restoring $INTERP after $EXEC prelink.  $INTERP gets restored
+		# later below.
+		#
+		# `(wrong library or version mismatch?)' messages are printed for
+		# $binfile_lib on platforms converting REL->RELA relocations by
+		# prelink (such as on i386).  There is no reliable way to verify
+		# the library file matches the running library in such case but
+		# GDB at least attempts to set the right displacement.  We test
+		# `libfunc' is present in the backtrace and therefore the
+		# displacement has been guessed right.
+
+		if {[prelink$relink $relink_args [file tail $exec]]} {
+		    # /proc/PID/exe cannot be loaded as it is "EXECNAME (deleted)".
+		    test_attach_gdb $exec $pid $displacement "attach-relink$relink"
+		}
+	    }
+	    file_copy $interp_saved $interp
+	}
+    } finally {
+	if {[info exists test_spawn_id]} {
+	    kill_wait_spawned_process $test_spawn_id
+	}
+    }
 }
 
 proc test_ld {file ifmain trynosym displacement} {

@@ -27,20 +27,22 @@ if { [build_executable ${testfile}.exp $executable $srcfile \
 # that it can be attached to.
 
 set test_spawn_id [spawn_wait_for_attach $binfile]
-set testpid [spawn_id_get_pid $test_spawn_id]
+try {
+    set testpid [spawn_id_get_pid $test_spawn_id]
 
-# gdb_load ("file" command) must not be executed for the bug reproducibility.
-# That includes prepare_for_testing or clean_restart.
-gdb_start
+    # gdb_load ("file" command) must not be executed for the bug reproducibility.
+    # That includes prepare_for_testing or clean_restart.
+    gdb_start
 
-set test "attach"
-gdb_test_multiple "attach $testpid" $test {
-    -re "Attaching to process $testpid\r\n.*Cannot insert breakpoint .*\r\n$gdb_prompt $" {
-	fail $test
+    set test "attach"
+    gdb_test_multiple "attach $testpid" $test {
+	-re "Attaching to process $testpid\r\n.*Cannot insert breakpoint .*\r\n$gdb_prompt $" {
+	    fail $test
+	}
+	-re "Attaching to process $testpid\r\n.*\r\n$gdb_prompt $" {
+	    pass $test
+	}
     }
-    -re "Attaching to process $testpid\r\n.*\r\n$gdb_prompt $" {
-	pass $test
-    }
+} finally {
+    kill_wait_spawned_process $test_spawn_id
 }
-
-kill_wait_spawned_process $test_spawn_id

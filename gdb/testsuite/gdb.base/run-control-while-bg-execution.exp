@@ -99,15 +99,17 @@ proc do_test { action1 action2 } {
 	gdb_test "run" "Breakpoint $::decimal\(?:\.$::decimal\)?, main .*"
     } elseif { $action2 == "attach" } {
 	set test_spawn_id [spawn_wait_for_attach $::binfile]
-	set test_pid [spawn_id_get_pid $test_spawn_id]
+	try {
+	    set test_pid [spawn_id_get_pid $test_spawn_id]
 
-	if { [gdb_attach $test_pid] } {
-	    gdb_test "detach" "Inferior $::decimal .* detached.*" \
-		"detach from second instance"
+	    if { [gdb_attach $test_pid] } {
+		gdb_test "detach" "Inferior $::decimal .* detached.*" \
+		    "detach from second instance"
+	    }
+	} finally {
+	    # Detach and kill this inferior so we don't leave it around.
+	    kill_wait_spawned_process $test_spawn_id
 	}
-
-	# Detach and kill this inferior so we don't leave it around.
-	kill_wait_spawned_process $test_spawn_id
     } else {
 	error "invalid action 2"
     }

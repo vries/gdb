@@ -49,47 +49,49 @@ proc test {} {
     }
 
     set test_spawn_id [spawn_wait_for_attach $binfile]
-    set testpid [spawn_id_get_pid $test_spawn_id]
+    try {
+	set testpid [spawn_id_get_pid $test_spawn_id]
 
-    set any "\[^\r\n\]*"
+	set any "\[^\r\n\]*"
 
-    # Iterate more than once so that we test re-attaching after
-    # detaching, in case GDB incorrectly detaches and the process
-    # crashes after the detach.
-    set n_iters 2
-    for {set iter 1} {$iter <= $n_iters} {incr iter} {
-	with_test_prefix "iter=$iter" {
-	    set attached 0
+	# Iterate more than once so that we test re-attaching after
+	# detaching, in case GDB incorrectly detaches and the process
+	# crashes after the detach.
+	set n_iters 2
+	for {set iter 1} {$iter <= $n_iters} {incr iter} {
+	    with_test_prefix "iter=$iter" {
+		set attached 0
 
-	    gdb_test_multiple "attach $testpid" "attach" {
-		-re "Attaching to program:${any}process $testpid\r\n.*$gdb_prompt " {
-		    pass $gdb_test_name
-		    set attached 1
+		gdb_test_multiple "attach $testpid" "attach" {
+		    -re "Attaching to program:${any}process $testpid\r\n.*$gdb_prompt " {
+			pass $gdb_test_name
+			set attached 1
+		    }
 		}
-	    }
 
-	    if {!$attached} {
-		break
-	    }
-
-	    gdb_test_multiple "continue &" "" {
-		-re "Continuing\.\r\n$::gdb_prompt " {
-		    pass $gdb_test_name
+		if {!$attached} {
+		    break
 		}
-	    }
 
-	    gdb_test "detach" "Detaching from.*"
+		gdb_test_multiple "continue &" "" {
+		    -re "Continuing\.\r\n$::gdb_prompt " {
+			pass $gdb_test_name
+		    }
+		}
 
-	    # Sleep a bit before reattaching to let the detached
-	    # process crash and exit if e.g., GDB managed to leave
-	    # breakpoint traps behind.
-	    if {$iter != $n_iters} {
-		sleep 1
+		gdb_test "detach" "Detaching from.*"
+
+		# Sleep a bit before reattaching to let the detached
+		# process crash and exit if e.g., GDB managed to leave
+		# breakpoint traps behind.
+		if {$iter != $n_iters} {
+		    sleep 1
+		}
 	    }
 	}
+    } finally {
+	kill_wait_spawned_process $test_spawn_id
     }
-
-    kill_wait_spawned_process $test_spawn_id
 }
 
 test

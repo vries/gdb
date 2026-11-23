@@ -92,16 +92,19 @@ proc_with_prefix test { non-stop threaded run-or-attach } {
     } elseif { ${run-or-attach} == "attach" } {
 	set binfile [standard_output_file $::testfile]
 	set test_spawn_id [spawn_wait_for_attach $binfile]
-	set test_pid [spawn_id_get_pid $test_spawn_id]
+	try {
+	    set test_pid [spawn_id_get_pid $test_spawn_id]
 
-	gdb_test_multiple "attach $test_pid" "attach to process" {
-	    -re "Attaching to program: .*$gdb_prompt " {
-		pass $gdb_test_name
+	    gdb_test_multiple "attach $test_pid" "attach to process" {
+		-re "Attaching to program: .*$gdb_prompt " {
+		    pass $gdb_test_name
+		}
 	    }
-	}
 
-	gdb_exit
-	kill_wait_spawned_process $test_spawn_id
+	    gdb_exit
+	} finally {
+	    kill_wait_spawned_process $test_spawn_id
+	}
     } else {
 	error "Invalid value for run-or-attach"
     }

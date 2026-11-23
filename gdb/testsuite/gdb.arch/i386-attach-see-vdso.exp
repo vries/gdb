@@ -36,20 +36,23 @@ clean_restart
 
 # Start the test program ready for GDB to attach to it.
 set test_spawn_id [spawn_wait_for_attach $binfile]
-set testpid [spawn_id_get_pid $test_spawn_id]
+try {
+    set testpid [spawn_id_get_pid $test_spawn_id]
 
-# Attach GDB to the process.
-gdb_test_multiple "attach $testpid" "attach to test process" {
-    -re -wrap "Attaching to process $testpid.*" {
-	pass $gdb_test_name
+    # Attach GDB to the process.
+    gdb_test_multiple "attach $testpid" "attach to test process" {
+	-re -wrap "Attaching to process $testpid.*" {
+	    pass $gdb_test_name
+	}
     }
+
+    # The inferior will be stopped within the vDSO, check we get symbols
+    # for this address.
+    gdb_test "bt" "#0 *0x\[0-9a-f\]* in \[^?\]+\r\n#1\\s+.*" \
+	"backtrace decodes VDSO"
+
+    # Exit GDB and the spawned process.
+    gdb_exit
+} finally {
+    kill_wait_spawned_process $test_spawn_id
 }
-
-# The inferior will be stopped within the vDSO, check we get symbols
-# for this address.
-gdb_test "bt" "#0 *0x\[0-9a-f\]* in \[^?\]+\r\n#1\\s+.*" \
-    "backtrace decodes VDSO"
-
-# Exit GDB and the spawned process.
-gdb_exit
-kill_wait_spawned_process $test_spawn_id

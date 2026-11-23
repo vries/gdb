@@ -91,21 +91,23 @@ proc gdb_spawn_with_ld_preload {lib} {
 
 # Run test program in the background.
 set test_spawn_id [spawn_wait_for_attach $binfile]
-set testpid [spawn_id_get_pid $test_spawn_id]
+try {
+    set testpid [spawn_id_get_pid $test_spawn_id]
 
-# Start GDB with preload library in place.
-if { [gdb_spawn_with_ld_preload $libobj] == -1 } {
-    # Make sure we get UNTESTED rather than UNRESOLVED.
-    set errcnt 0
-    untested "Couldn't start GDB with preloaded lib"
-    return
+    # Start GDB with preload library in place.
+    if { [gdb_spawn_with_ld_preload $libobj] == -1 } {
+	# Make sure we get UNTESTED rather than UNRESOLVED.
+	set errcnt 0
+	untested "Couldn't start GDB with preloaded lib"
+	return
+    }
+
+    # Load binary, and attach to running program.
+    gdb_load ${binfile}
+    gdb_test "attach $testpid" "Attaching to program.*" "attach to target"
+
+    gdb_exit
+} finally {
+    # Kill of test program.
+    kill_wait_spawned_process $test_spawn_id
 }
-
-# Load binary, and attach to running program.
-gdb_load ${binfile}
-gdb_test "attach $testpid" "Attaching to program.*" "attach to target"
-
-gdb_exit
-
-# Kill of test program.
-kill_wait_spawned_process $test_spawn_id

@@ -32,58 +32,60 @@ if {[prepare_for_testing "failed to prepare" $testfile $srcfile {debug}]} {
 }
 
 set test_spawn_id [spawn_wait_for_attach $binfile]
-set testpid [spawn_id_get_pid $test_spawn_id]
+try {
+    set testpid [spawn_id_get_pid $test_spawn_id]
 
-# Native/gdbserver.
-set thread_re "(LWP $decimal|Thread )"
+    # Native/gdbserver.
+    set thread_re "(LWP $decimal|Thread )"
 
-# Try attach / detach a few times, in case GDB ends up with stale
-# state after detaching.
+    # Try attach / detach a few times, in case GDB ends up with stale
+    # state after detaching.
 
-set attempts 3
-for {set attempt 1} {$attempt <= $attempts} {incr attempt} {
-    with_test_prefix "fg attach $attempt" {
+    set attempts 3
+    for {set attempt 1} {$attempt <= $attempts} {incr attempt} {
+	with_test_prefix "fg attach $attempt" {
 
-	gdb_test "attach $testpid" \
-	    "Attaching to program.*process $testpid.*" \
-	    "attach"
+	    gdb_test "attach $testpid" \
+		"Attaching to program.*process $testpid.*" \
+		"attach"
 
-	gdb_test "info threads" \
-	    "1.*${thread_re}.*\r\n.*2.*${thread_re}.*" \
-	    "info threads shows two LWPs"
+	    gdb_test "info threads" \
+		"1.*${thread_re}.*\r\n.*2.*${thread_re}.*" \
+		"info threads shows two LWPs"
 
-	gdb_test "detach" "Detaching from .*, process $testpid\r\n\\\[Inferior $decimal \\(.*\\) detached\\\]"
+	    gdb_test "detach" "Detaching from .*, process $testpid\r\n\\\[Inferior $decimal \\(.*\\) detached\\\]"
+	}
     }
-}
 
-# Same, but use async/background attach.
+    # Same, but use async/background attach.
 
-# If debugging with target remote, check whether the all-stop variant
-# of the RSP is being used.  If so, we can't run the background tests.
-if {[target_info exists gdb_protocol]
-    && ([target_info gdb_protocol] == "remote"
-	|| [target_info gdb_protocol] == "extended-remote")} {
+    # If debugging with target remote, check whether the all-stop variant
+    # of the RSP is being used.  If so, we can't run the background tests.
+    if {[target_info exists gdb_protocol]
+	&& ([target_info gdb_protocol] == "remote"
+	    || [target_info gdb_protocol] == "extended-remote")} {
 
-    if {![is_target_non_stop]} {
-	unsupported "bg attach: can't issue info threads while target is running"
-	return 0
+	if {![is_target_non_stop]} {
+	    unsupported "bg attach: can't issue info threads while target is running"
+	    return 0
+	}
     }
-}
 
-set attempts 3
-for {set attempt 1} {$attempt <= $attempts} {incr attempt} {
-    with_test_prefix "bg attach $attempt" {
+    set attempts 3
+    for {set attempt 1} {$attempt <= $attempts} {incr attempt} {
+	with_test_prefix "bg attach $attempt" {
 
-	gdb_test -no-prompt-anchor "attach $testpid &" \
-	    "Attaching to program.*process $testpid.*" \
-	    "attach"
+	    gdb_test -no-prompt-anchor "attach $testpid &" \
+		"Attaching to program.*process $testpid.*" \
+		"attach"
 
-	gdb_test "info threads" \
-	    "1.*${thread_re}.*\\(running\\)\r\n.*2.*${thread_re}.*\\(running\\)" \
-	    "info threads shows two LWPs"
+	    gdb_test "info threads" \
+		"1.*${thread_re}.*\\(running\\)\r\n.*2.*${thread_re}.*\\(running\\)" \
+		"info threads shows two LWPs"
 
-	gdb_test "detach" "Detaching from .*, process $testpid\r\n\\\[Inferior $decimal \\(.*\\) detached\\\]"
+	    gdb_test "detach" "Detaching from .*, process $testpid\r\n\\\[Inferior $decimal \\(.*\\) detached\\\]"
+	}
     }
+} finally {
+    kill_wait_spawned_process $test_spawn_id
 }
-
-kill_wait_spawned_process $test_spawn_id

@@ -26,35 +26,37 @@ if {[prepare_for_testing "failed to prepare" $executable]} {
 }
 
 set test_spawn_id [spawn_wait_for_attach $binfile]
-set test_pid [spawn_id_get_pid $test_spawn_id]
+try {
+    set test_pid [spawn_id_get_pid $test_spawn_id]
 
-set test "attach to process"
-gdb_test "attach $test_pid" "Attaching to program.*" $test
+    set test "attach to process"
+    gdb_test "attach $test_pid" "Attaching to program.*" $test
 
-set test "kill process"
-gdb_test "kill" "" $test \
-    "Kill the program being debugged.*y or n. $" "y"
+    set test "kill process"
+    gdb_test "kill" "" $test \
+	"Kill the program being debugged.*y or n. $" "y"
 
-set test "restart process"
-gdb_test "start" "Starting program.*Temporary breakpoint .*" $test
+    set test "restart process"
+    gdb_test "start" "Starting program.*Temporary breakpoint .*" $test
 
-set test "attempt kill via quit"
-# The quit prompt should warn about killing the process, not about detaching the
-# process, since this process was not attached to.
-set ok 0
-gdb_test_multiple "quit" $test {
-    -re "will be killed.*.y or n. $" {
-	set ok 1
-	send_gdb "n\n"
-	exp_continue
+    set test "attempt kill via quit"
+    # The quit prompt should warn about killing the process, not about detaching the
+    # process, since this process was not attached to.
+    set ok 0
+    gdb_test_multiple "quit" $test {
+	-re "will be killed.*.y or n. $" {
+	    set ok 1
+	    send_gdb "n\n"
+	    exp_continue
+	}
+	-re "will be detached.*.y or n. $" {
+	    send_gdb "n\n"
+	    exp_continue
+	}
+	-re "$gdb_prompt $" {
+	    gdb_assert $ok $test
+	}
     }
-    -re "will be detached.*.y or n. $" {
-	send_gdb "n\n"
-	exp_continue
-    }
-    -re "$gdb_prompt $" {
-	gdb_assert $ok $test
-    }
+} finally {
+    kill_wait_spawned_process $test_spawn_id
 }
-
-kill_wait_spawned_process $test_spawn_id

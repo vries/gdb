@@ -25,33 +25,35 @@ if { [prepare_for_testing "failed to prepare" $testfile] } {
 # that it can be attached to.
 
 set test_spawn_id [spawn_wait_for_attach $binfile]
-set testpid [spawn_id_get_pid $test_spawn_id]
+try {
+    set testpid [spawn_id_get_pid $test_spawn_id]
 
-set child_pid 0
+    set child_pid 0
 
-set re_pass \
-    [multi_line \
-	 [subst_vars {Attaching to program: [^\r\n]*, process $testpid}] \
-	 ".*warning: process $testpid is already traced by process ($decimal)" \
-	 {.*ptrace: Operation not permitted[.]}]
-set re_fail \
-    [multi_line \
-	 [subst_vars {Attaching to program: [^\r\n]*, process $testpid}] \
-	 {.*ptrace: Operation not permitted[.]}]
-gdb_test_multiple "attach $testpid" "attach" {
-    -re -wrap $re_pass {
-	set child_pid $expect_out(1,string)
-	pass $gdb_test_name
+    set re_pass \
+	[multi_line \
+	     [subst_vars {Attaching to program: [^\r\n]*, process $testpid}] \
+	     ".*warning: process $testpid is already traced by process ($decimal)" \
+	     {.*ptrace: Operation not permitted[.]}]
+    set re_fail \
+	[multi_line \
+	     [subst_vars {Attaching to program: [^\r\n]*, process $testpid}] \
+	     {.*ptrace: Operation not permitted[.]}]
+    gdb_test_multiple "attach $testpid" "attach" {
+	-re -wrap $re_pass {
+	    set child_pid $expect_out(1,string)
+	    pass $gdb_test_name
+	}
+	-re -wrap $re_fail {
+	    fail $gdb_test_name
+	}
+	-re -wrap "" {
+	    xfail $gdb_test_name
+	}
     }
-    -re -wrap $re_fail {
-	fail $gdb_test_name
+    if {$child_pid != 0} {
+	exec kill -9 $child_pid
     }
-    -re -wrap "" {
-	xfail $gdb_test_name
-    }
+} finally {
+    kill_wait_spawned_process $test_spawn_id
 }
-
-if {$child_pid != 0} {
-    exec kill -9 $child_pid
-}
-kill_wait_spawned_process $test_spawn_id

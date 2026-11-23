@@ -7874,28 +7874,30 @@ gdb_caching_proc can_spawn_for_attach {} {
     }
 
     set test_spawn_id [spawn_wait_for_attach_1 $obj]
-    remote_file build delete $obj
+    try {
+	remote_file build delete $obj
 
-    # In case GDB is already running.
-    gdb_exit
+	# In case GDB is already running.
+	gdb_exit
 
-    gdb_start
+	gdb_start
 
-    set test_pid [spawn_id_get_pid $test_spawn_id]
-    set attaching_re "Attaching to process $test_pid"
-    gdb_test_multiple "attach $test_pid" "can spawn for attach" {
-	-re -wrap "$attaching_re\r\n.*ptrace: Operation not permitted\\." {
-	    # Not permitted.
-	    set res 0
+	set test_pid [spawn_id_get_pid $test_spawn_id]
+	set attaching_re "Attaching to process $test_pid"
+	gdb_test_multiple "attach $test_pid" "can spawn for attach" {
+	    -re -wrap "$attaching_re\r\n.*ptrace: Operation not permitted\\." {
+		# Not permitted.
+		set res 0
+	    }
+	    -re -wrap "" {
+		# Don't know, keep assuming yes.
+	    }
 	}
-	-re -wrap "" {
-	    # Don't know, keep assuming yes.
-	}
+
+	gdb_exit
+    } finally {
+	kill_wait_spawned_process $test_spawn_id
     }
-
-    gdb_exit
-
-    kill_wait_spawned_process $test_spawn_id
 
     return $res
 }

@@ -48,19 +48,22 @@ proc run_one_test { non-stop target-non-stop } {
 
     set target_exec [gdbserver_download_current_prog]
     set test_spawn_id [spawn_wait_for_attach $::binfile]
-    set testpid [spawn_id_get_pid $test_spawn_id]
+    try {
+	set testpid [spawn_id_get_pid $test_spawn_id]
 
-    lassign [gdbserver_start "" "--attach $testpid"] unused gdbserver_address
+	lassign [gdbserver_start "" "--attach $testpid"] \
+	    unused gdbserver_address
 
-    gdb_test_no_output "set non-stop ${non-stop}"
-    gdb_test_no_output "maint set target-non-stop ${target-non-stop}"
-    gdb_target_cmd "remote" $gdbserver_address
+	gdb_test_no_output "set non-stop ${non-stop}"
+	gdb_test_no_output "maint set target-non-stop ${target-non-stop}"
+	gdb_target_cmd "remote" $gdbserver_address
 
-    # There should be 11 threads.
-    gdb_test "thread 11" "Switching to thread 11.*"
-
-    kill_wait_spawned_process $test_spawn_id
-    gdbserver_exit 0
+	# There should be 11 threads.
+	gdb_test "thread 11" "Switching to thread 11.*"
+    } finally {
+	kill_wait_spawned_process $test_spawn_id
+	gdbserver_exit 0
+    }
 }
 
 foreach_with_prefix non-stop {0 1} {

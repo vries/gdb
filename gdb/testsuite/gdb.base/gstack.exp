@@ -31,70 +31,72 @@ if { ![gdb_assert { ![expr {$res < 0 || $res == ""}] } "spawn inferior"] } {
 # The spawn id of the test inferior.
 set test_spawn_id $res
 
-# Wait for the spawned program to loop.
-set test "wait for inferior to loop"
-set re \
-    [multi_line_ttm \
-	 "looping" \
-	 ""]
-gdb_expect {
-    -re $re {
-	pass $test
+try {
+    # Wait for the spawned program to loop.
+    set test "wait for inferior to loop"
+    set re \
+	[multi_line_ttm \
+	     "looping" \
+	     ""]
+    gdb_expect {
+	-re $re {
+	    pass $test
+	}
+	eof {
+	    fail "$test (eof)"
+	    return
+	}
+	timeout {
+	    fail "$test (timeout)"
+	    return
+	}
     }
-    eof {
-	fail "$test (eof)"
+
+    # The test case uses a very simple notification not to get caught by attach on
+    # exiting the function.
+
+    set test "spawn gstack"
+    set pid [spawn_id_get_pid $test_spawn_id]
+    set gstack_cmd [findfile $base_dir/../../gdb/gstack]
+    set command "sh -c GDB=$GDB\\ GDBARGS=-data-directory\\\\\\ $GDB_DATA_DIRECTORY\\ $gstack_cmd\\ $pid\\;echo\\ GSTACK-END"
+    set res [remote_spawn host $command]
+    if { ![gdb_assert { ![expr {$res < 0 || $res == ""}] } $test] } {
 	return
     }
-    timeout {
-	fail "$test (timeout)"
-	return
+
+    set test "got backtrace"
+    set saw_backtrace false
+    set no_awk false
+    set location_re ${srcfile}:${decimal}
+
+    gdb_expect {
+	-i "$res" -re "#0 +(${::hex} in )?main \(\).*$location_re.*\r\nGSTACK-END\r\n\$" {
+	    set saw_backtrace true
+	    pass $test
+	    exp_continue
+	}
+
+	-i "$res" "could not find usable awk interpreter" {
+	    set no_awk true
+	    exp_continue
+	}
+
+	eof {
+	    set result [wait -i $res]
+	    verbose $result
+
+	    gdb_assert { [lindex $result 2] == 0 } "gstack exits with no error"
+	    gdb_assert { [lindex $result 3] == 0 } "gstack's exit status is 0"
+
+	    remote_close host
+	}
     }
-}
-
-# The test case uses a very simple notification not to get caught by attach on
-# exiting the function.
-
-set test "spawn gstack"
-set pid [spawn_id_get_pid $test_spawn_id]
-set gstack_cmd [findfile $base_dir/../../gdb/gstack]
-set command "sh -c GDB=$GDB\\ GDBARGS=-data-directory\\\\\\ $GDB_DATA_DIRECTORY\\ $gstack_cmd\\ $pid\\;echo\\ GSTACK-END"
-set res [remote_spawn host $command]
-if { ![gdb_assert { ![expr {$res < 0 || $res == ""}] } $test] } {
-    return
-}
-
-set test "got backtrace"
-set saw_backtrace false
-set no_awk false
-set location_re ${srcfile}:${decimal}
-
-gdb_expect {
-    -i "$res" -re "#0 +(${::hex} in )?main \(\).*$location_re.*\r\nGSTACK-END\r\n\$" {
-	set saw_backtrace true
-	pass $test
-	exp_continue
+    if {$no_awk} {
+	unsupported "no awk interpreter found"
+    } elseif {!$saw_backtrace} {
+	fail $test
     }
-
-    -i "$res" "could not find usable awk interpreter" {
-	set no_awk true
-	exp_continue
-    }
-
-    eof {
-	set result [wait -i $res]
-	verbose $result
-
-	gdb_assert { [lindex $result 2] == 0 } "gstack exits with no error"
-	gdb_assert { [lindex $result 3] == 0 } "gstack's exit status is 0"
-
-	remote_close host
-    }
+} finally {
+    # Kill the test inferior.
+    kill_wait_spawned_process $test_spawn_id
 }
-if {$no_awk} {
-    unsupported "no awk interpreter found"
-} elseif {!$saw_backtrace} {
-    fail $test
-}
-
-# Kill the test inferior.
-kill_wait_spawned_process $test_spawn_id

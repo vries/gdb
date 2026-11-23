@@ -69,30 +69,44 @@ gdb_test_multiple $cmd $test -prompt "$mi_gdb_prompt" {
     }
 }
 
-# List specific processes, make sure there are two entries.
-set spawn_id_1 [remote_spawn target $binfile]
-set pid_1 [spawn_id_get_pid $spawn_id_1]
-set id_re_1 "id=\"$pid_1\""
+set spawn_ids {}
+try {
+    # List specific processes, make sure there are two entries.
+    set spawn_id_1 [remote_spawn target $binfile]
+    lappend spawn_ids $spawn_id_1
+    set pid_1 [spawn_id_get_pid $spawn_id_1]
+    set id_re_1 "id=\"$pid_1\""
 
-set spawn_id_2 [remote_spawn target $binfile]
-set pid_2 [spawn_id_get_pid $spawn_id_2]
-set id_re_2 "id=\"$pid_2\""
+    set spawn_id_2 [remote_spawn target $binfile]
+    lappend spawn_ids $spawn_id_2
+    set pid_2 [spawn_id_get_pid $spawn_id_2]
+    set id_re_2 "id=\"$pid_2\""
 
-# Unlike the earlier CORES_RE this list must contain at least one
-# core.  Given that we know these processes will not exit while GDB is
-# reading their information from /proc we can expect at least one core
-# for each process.
-set cores_re "cores=\\\[\"$decimal\"(,\"$decimal\")*\\\]"
+    # Unlike the earlier CORES_RE this list must contain at least one
+    # core.  Given that we know these processes will not exit while GDB is
+    # reading their information from /proc we can expect at least one core
+    # for each process.
+    set cores_re "cores=\\\[\"$decimal\"(,\"$decimal\")*\\\]"
 
-set process_entry_re_1 "{${id_re_1},${type_re}(,$description_re)?(,$user_re)?(,$cores_re)?}"
-set process_entry_re_2 "{${id_re_2},${type_re}(,$description_re)?(,$user_re)?(,$cores_re)?}"
+    set process_entry_re_1 \
+	"{${id_re_1},${type_re}(,$description_re)?(,$user_re)?(,$cores_re)?}"
+    set process_entry_re_2 \
+	"{${id_re_2},${type_re}(,$description_re)?(,$user_re)?(,$cores_re)?}"
 
-set process_list_re "(${process_entry_re_1},${process_entry_re_2}|${process_entry_re_2},${process_entry_re_1})"
+    set process_list_re \
+	[string cat \
+	     "(" \
+	     "${process_entry_re_1},${process_entry_re_2}" \
+	     "|" \
+	     "${process_entry_re_2},${process_entry_re_1}" \
+	     ")"]
 
-mi_gdb_test \
-    "-list-thread-groups --available i${pid_1} i${pid_2}" \
-    "\\^done,groups=\\\[${process_list_re}\\\]" \
-    "list available thread groups with filter"
-
-kill_wait_spawned_process $spawn_id_1
-kill_wait_spawned_process $spawn_id_2
+    mi_gdb_test \
+	"-list-thread-groups --available i${pid_1} i${pid_2}" \
+	"\\^done,groups=\\\[${process_list_re}\\\]" \
+	"list available thread groups with filter"
+} finally {
+    foreach id $spawn_ids {
+	kill_wait_spawned_process $id
+    }
+}

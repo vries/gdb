@@ -27,29 +27,39 @@ if {[prepare_for_testing "failed to prepare" $testfile $srcfile debug]} {
 }
 
 set test_spawn_id [spawn_wait_for_attach $binfile]
-set testpid [spawn_id_get_pid $test_spawn_id]
+try {
+    set testpid [spawn_id_get_pid $test_spawn_id]
 
-gdb_test "attach $testpid" "Attaching to program: .*, process $testpid.*" "attach once"
+    gdb_test "attach $testpid" \
+	"Attaching to program: .*, process $testpid.*" \
+	"attach once"
 
-gdb_test "detach" "Detaching from program: .*, process $testpid\r\n\\\[Inferior $decimal \\(process $testpid\\) detached\\\]"
+    gdb_test "detach" \
+	[multi_line \
+	     "Detaching from program: .*, process $testpid" \
+	     [subst_vars \
+		  {\[Inferior $decimal \(process $testpid\) detached\]}]]
 
-# A clean restart is needed to force the hardware watchpoint setup
-# logic to run post attach rather than post inferior launch.
-clean_restart $testfile
+    # A clean restart is needed to force the hardware watchpoint setup
+    # logic to run post attach rather than post inferior launch.
+    clean_restart $testfile
 
-gdb_test "attach $testpid" "Attaching to program: .*, process $testpid.*" "attach twice"
+    gdb_test "attach $testpid" \
+	"Attaching to program: .*, process $testpid.*" \
+	"attach twice"
 
-# Ensure the test program is in the top frame so the required
-# variables are in scope.
-gdb_breakpoint $srcfile:[gdb_get_line_number "pidacquired"]
-gdb_continue_to_breakpoint "$srcfile:pidacquired"
+    # Ensure the test program is in the top frame so the required
+    # variables are in scope.
+    gdb_breakpoint $srcfile:[gdb_get_line_number "pidacquired"]
+    gdb_continue_to_breakpoint "$srcfile:pidacquired"
 
-gdb_test_no_output "set should_continue = 1"
+    gdb_test_no_output "set should_continue = 1"
 
-gdb_test "watch watched_variable" \
-	 "Hardware watchpoint $decimal: watched_variable"
+    gdb_test "watch watched_variable" \
+	"Hardware watchpoint $decimal: watched_variable"
 
-gdb_test "continue" \
-	 "continue.*Continuing.*\.Hardware watchpoint $decimal: watched_variable.*Old value = 0.*New value = 4.*watched_variable\\);"
-
-kill_wait_spawned_process $test_spawn_id
+    gdb_test "continue" \
+	"continue.*Continuing.*\.Hardware watchpoint $decimal: watched_variable.*Old value = 0.*New value = 4.*watched_variable\\);"
+} finally {
+    kill_wait_spawned_process $test_spawn_id
+}

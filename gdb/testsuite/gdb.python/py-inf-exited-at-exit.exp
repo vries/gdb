@@ -116,30 +116,31 @@ proc_with_prefix check_with_attach {} {
     }
 
     set test_spawn_id [spawn_wait_for_attach $::binfile]
-    set testpid [spawn_id_get_pid $test_spawn_id]
+    try {
+	set testpid [spawn_id_get_pid $test_spawn_id]
 
-    clean_restart $::testfile
+	clean_restart $::testfile
 
-    gdb_breakpoint [gdb_get_line_number "Break here."]
+	gdb_breakpoint [gdb_get_line_number "Break here."]
 
-    if { ![gdb_attach $testpid] } {
+	if { ![gdb_attach $testpid] } {
+	    return
+	}
+
+	gdb_continue_to_breakpoint "continue to b/p in foo"
+
+	check_backtrace "backtrace after attaching"
+
+	# When GDB detaches on exit, this should ensure the test program
+	# runs to completion.
+	gdb_test "set global_var = 1"
+
+	source_py_script_and_exit_checking_event
+    } finally {
+	# In case the test program doesn't self-terminate after detach,
+	# kill it.
 	kill_wait_spawned_process $test_spawn_id
-	return
     }
-
-    gdb_continue_to_breakpoint "continue to b/p in foo"
-
-    check_backtrace "backtrace after attaching"
-
-    # When GDB detaches on exit, this should ensure the test program
-    # runs to completion.
-    gdb_test "set global_var = 1"
-
-    source_py_script_and_exit_checking_event
-
-    # In case the test program doesn't self-terminate after detach,
-    # kill it.
-    kill_wait_spawned_process $test_spawn_id
 }
 
 # Start a running inferior.  Exit GDB.  Check that we see an 'exited'
