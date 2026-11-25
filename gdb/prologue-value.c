@@ -18,6 +18,7 @@
 
 #include "prologue-value.h"
 #include "regcache.h"
+#include <utility>
 
 
 /* Constructors.  */
@@ -69,11 +70,7 @@ constant_last (pv_t *a, pv_t *b)
 {
   if (a->kind == pvk_constant
       && b->kind != pvk_constant)
-    {
-      pv_t temp = *a;
-      *a = *b;
-      *b = temp;
-    }
+    std::swap (*a, *b);
 }
 
 

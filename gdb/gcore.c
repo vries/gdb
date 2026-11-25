@@ -38,6 +38,7 @@
 #include "gdbsupport/scope-exit.h"
 #include "auxv.h"
 #include "cli/cli-style.h"
+#include <utility>
 
 /* To generate sparse cores, we look at the data to write in chunks of
    this size when considering whether to skip the write.  Only if we
@@ -248,13 +249,7 @@ derive_stack_segment (bfd_vma *bottom, bfd_vma *top)
   /* Now canonicalize their order, so that BOTTOM is a lower address
      (as opposed to a lower stack frame).  */
   if (*bottom > *top)
-    {
-      bfd_vma tmp_vma;
-
-      tmp_vma = *top;
-      *top = *bottom;
-      *bottom = tmp_vma;
-    }
+    std::swap (*top, *bottom);
 
   return 1;
 }
