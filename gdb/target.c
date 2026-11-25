@@ -55,6 +55,7 @@
 #include "valprint.h"
 #include "cli/cli-decode.h"
 #include "cli/cli-style.h"
+#include <utility>
 
 [[noreturn]] static void generic_tls_error (void);
 
@@ -3849,9 +3850,8 @@ void
 target_stop_and_wait (ptid_t ptid)
 {
   struct target_waitstatus status;
-  bool was_non_stop = non_stop;
+  bool was_non_stop = std::exchange (non_stop, true);
 
-  non_stop = true;
   target_stop (ptid);
 
   target_wait (ptid, &status, 0);

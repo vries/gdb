@@ -24,6 +24,7 @@
 #include "source-cache.h"
 #include "observable.h"
 #include "charset.h"
+#include <utility>
 
 /* True if styling is enabled.  */
 
@@ -64,8 +65,7 @@ static bool scoped_disable_styling_p = false;
 
 scoped_disable_styling::scoped_disable_styling ()
 {
-  m_old_value = scoped_disable_styling_p;
-  scoped_disable_styling_p = true;
+  m_old_value = std::exchange (scoped_disable_styling_p, true);
 }
 
 /* See cli/cli-style.h.  */

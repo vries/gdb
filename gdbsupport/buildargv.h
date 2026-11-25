@@ -21,6 +21,7 @@
 #define GDBSUPPORT_BUILDARGV_H
 
 #include "libiberty.h"
+#include <utility>
 
 /* A wrapper for an array of char* that was allocated in the way that
    'buildargv' does, and should be freed with 'freeargv'.  */
@@ -57,15 +58,13 @@ public:
   gdb_argv &operator= (gdb_argv &&other)
   {
     freeargv (m_argv);
-    m_argv = other.m_argv;
-    other.m_argv = nullptr;
+    m_argv = std::exchange (other.m_argv, nullptr);
     return *this;
   }
 
   gdb_argv (gdb_argv &&other)
   {
-    m_argv = other.m_argv;
-    other.m_argv = nullptr;
+    m_argv = std::exchange (other.m_argv, nullptr);
   }
 
   ~gdb_argv ()
@@ -104,9 +103,7 @@ public:
 
   ATTRIBUTE_UNUSED_RESULT char **release ()
   {
-    char **result = m_argv;
-    m_argv = NULL;
-    return result;
+    return std::exchange (m_argv, nullptr);
   }
 
   /* Return the number of items in the array.  */

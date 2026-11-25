@@ -45,6 +45,7 @@
 #include "async-event.h"
 #include "bt-utils.h"
 #include "pager.h"
+#include <utility>
 
 /* readline include files.  */
 #include "readline/readline.h"
@@ -1605,8 +1606,7 @@ gdb_disable_readline (void)
 
 scoped_segv_handler_restore::scoped_segv_handler_restore (segv_handler_t new_handler)
 {
-  m_old_handler = thread_local_segv_handler;
-  thread_local_segv_handler = new_handler;
+  m_old_handler = std::exchange (thread_local_segv_handler, new_handler);
 }
 
 scoped_segv_handler_restore::~scoped_segv_handler_restore()

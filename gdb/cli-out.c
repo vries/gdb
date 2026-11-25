@@ -28,6 +28,7 @@
 #include "ui.h"
 #include "cli/cli-cmds.h"
 #include "buffered-streams.h"
+#include <utility>
 
 /* These are the CLI output functions */
 
@@ -464,12 +465,7 @@ cli_ui_out::~cli_ui_out ()
 ui_file *
 cli_ui_out::set_stream (struct ui_file *stream)
 {
-  ui_file *old;
-
-  old = m_streams.back ();
-  m_streams.back () = stream;
-
-  return old;
+  return std::exchange (m_streams.back (), stream);
 }
 
 bool

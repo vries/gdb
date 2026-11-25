@@ -32,6 +32,7 @@
 #include "cli/cli-decode.h"
 #include "gdbsupport/gdb_tilde_expand.h"
 #include "readline/readline.h"
+#include <utility>
 
 /* FIXME: This is needed because of lookup_cmd_1 ().  We should be
    calling a hook instead so we eliminate the CLI dependency.  */
@@ -2726,9 +2727,7 @@ completion_result::completion_result (completion_result &&rhs) noexcept
 char **
 completion_result::release_match_list ()
 {
-  char **ret = match_list;
-  match_list = NULL;
-  return ret;
+  return std::exchange (match_list, nullptr);
 }
 
 /* See completer.h  */

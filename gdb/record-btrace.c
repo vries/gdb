@@ -47,6 +47,7 @@
 #include <forward_list>
 #include "objfiles.h"
 #include "interps.h"
+#include <utility>
 
 static const target_info record_btrace_target_info = {
   "record-btrace",
@@ -1542,8 +1543,7 @@ record_btrace_target::insert_breakpoint (struct gdbarch *gdbarch,
 
   /* Inserting breakpoints requires accessing memory.  Allow it for the
      duration of this function.  */
-  old = replay_memory_access;
-  replay_memory_access = replay_memory_access_read_write;
+  old = std::exchange (replay_memory_access, replay_memory_access_read_write);
 
   ret = 0;
   try
@@ -1572,8 +1572,7 @@ record_btrace_target::remove_breakpoint (struct gdbarch *gdbarch,
 
   /* Removing breakpoints requires accessing memory.  Allow it for the
      duration of this function.  */
-  old = replay_memory_access;
-  replay_memory_access = replay_memory_access_read_write;
+  old = std::exchange (replay_memory_access, replay_memory_access_read_write);
 
   ret = 0;
   try

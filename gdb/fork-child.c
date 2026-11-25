@@ -28,6 +28,7 @@
 #include "gdbsupport/filestuff.h"
 #include "nat/fork-inferior.h"
 #include "gdbsupport/common-inferior.h"
+#include <utility>
 
 /* The exec-wrapper, if any, that will be used when starting the
    inferior.  */
@@ -80,8 +81,7 @@ postfork_hook (pid_t pid)
   inferior_appeared (inf, pid);
 
   gdb_assert (saved_ui != NULL);
-  current_ui = saved_ui;
-  saved_ui = NULL;
+  current_ui = std::exchange (saved_ui, nullptr);
 
   new_tty_postfork ();
 }

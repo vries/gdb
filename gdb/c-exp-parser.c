@@ -26,6 +26,7 @@
 #include "macroexp.h"
 #include "macroscope.h"
 #include "objc-lang.h"
+#include <utility>
 
 /* The entry point of the bison/yacc-generated parser, defined in
    c-exp-parser-gen.c.  Bison produces a declaration for c_yyparse in
@@ -680,9 +681,8 @@ lex_one_token (struct parser_state *par_state, bool *is_quoted_name)
   int c;
   int namelen;
   const char *tokstart;
-  bool saw_structop = last_was_structop;
+  bool saw_structop = std::exchange (last_was_structop, false);
 
-  last_was_structop = false;
   *is_quoted_name = false;
 
  retry:

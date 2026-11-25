@@ -45,6 +45,7 @@
 #include "c-exp-parser.h"
 #include <algorithm>
 #include "gdbarch.h"
+#include <utility>
 
 static void set_range_case (void);
 
@@ -94,8 +95,8 @@ get_current_language ()
     {
       /* Avoid recursive calls -- set_language refers to
 	 current_language.  */
-      lazily_set_language_ftype *call = lazy_language_setter;
-      lazy_language_setter = nullptr;
+      lazily_set_language_ftype *call
+	= std::exchange (lazy_language_setter, nullptr);
       call ();
     }
   return global_current_language;

@@ -23,6 +23,7 @@
 #include "ui-style.h"
 #include "gdb_curses.h"
 #include <signal.h>
+#include <utility>
 
 /* Wrapper for select.  Nothing special needed on POSIX platforms.  */
 
@@ -90,7 +91,5 @@ c_c_handler_ftype *
 install_sigint_handler (c_c_handler_ftype *fn)
 {
   signal (SIGINT, handler_wrapper);
-  c_c_handler_ftype *result = current_handler;
-  current_handler = fn;
-  return result;
+  return std::exchange (current_handler, fn);
 }

@@ -37,6 +37,7 @@
 #include "gdbarch.h"
 #include "f-array-walker.h"
 #include "event-top.h"
+#include <utility>
 
 static void f77_get_dynamic_length_of_aggregate (struct type *);
 
@@ -206,9 +207,8 @@ public:
       m_nrepeats++;
     if (!repeated || last_p)
       {
-	LONGEST nrepeats = m_nrepeats;
+	LONGEST nrepeats = std::exchange (m_nrepeats, 0);
 
-	m_nrepeats = 0;
 	if (nrepeats >= m_options.repeat_count_threshold)
 	  {
 	    annotate_elt_rep (nrepeats + 1);

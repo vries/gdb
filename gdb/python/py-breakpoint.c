@@ -34,6 +34,7 @@
 #include "py-event.h"
 #include "linespec.h"
 #include "gdbsupport/common-utils.h"
+#include <utility>
 
 extern PyTypeObject breakpoint_location_object_type;
 
@@ -1317,9 +1318,8 @@ gdbpy_breakpoint_created (struct breakpoint *bp)
 
   if (bppy_pending_object)
     {
-      newbp = bppy_pending_object;
+      newbp = std::exchange (bppy_pending_object, nullptr);
       Py_INCREF (newbp);
-      bppy_pending_object = NULL;
       pybp_debug_printf ("attaching existing breakpoint object");
     }
   else

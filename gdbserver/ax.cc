@@ -20,6 +20,7 @@
 #include "gdbsupport/format.h"
 #include "tracepoint.h"
 #include "gdbsupport/rsp-low.h"
+#include <utility>
 
 static void ax_vdebug (const char *, ...) ATTRIBUTE_PRINTF (1, 2);
 
@@ -1262,13 +1263,8 @@ gdb_eval_agent_expr (struct eval_agent_expr_context *ctx,
 	  break;
 
 	case gdb_agent_op_rot:
-	  {
-	    ULONGEST tem = stack[sp - 1];
-
-	    stack[sp - 1] = stack[sp - 2];
-	    stack[sp - 2] = top;
-	    top = tem;
-	  }
+	  top
+	    = std::exchange (stack[sp - 1], std::exchange (stack[sp - 2], top));
 	  break;
 
 	case gdb_agent_op_zero_ext:

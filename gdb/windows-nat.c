@@ -64,6 +64,7 @@
 #include "gdbsupport/pathstuff.h"
 #include "gdbsupport/symbol.h"
 #include "inf-loop.h"
+#include <utility>
 
 /* This comment documents high-level logic of this file.
 
@@ -1551,10 +1552,7 @@ windows_nat_target::get_windows_debug_event
 	  result_th->reply_later = 0;
 	}
       else
-	{
-	  continue_status = result_th->reply_later;
-	  result_th->reply_later = 0;
-	}
+	continue_status = std::exchange (result_th->reply_later, 0);
 
       /* Go back to waiting for the next event.  */
       continue_last_debug_event_main_thread
@@ -2317,8 +2315,7 @@ windows_nat_target::continue_status_for_event_detaching
      tracking thread creation events at this point.  */
   if (th != nullptr && th->reply_later != 0)
     {
-      DWORD res = th->reply_later;
-      th->reply_later = 0;
+      DWORD res = std::exchange (th->reply_later, 0);
       if (reply_later_events_left != nullptr)
 	(*reply_later_events_left)--;
       return res;
@@ -2986,8 +2983,7 @@ windows_nat_target::create_inferior (const char *exec_file,
       /* Reset all Win32 environment variables to avoid leftover on next run. */
       clear_win32_environment (environ);
       /* Prepare the environment vars for CreateProcess.  */
-      old_env = environ;
-      environ = in_env;
+      old_env = std::exchange (environ, in_env);
       cygwin_internal (CW_SYNC_WINENV);
       w32_env = NULL;
     }

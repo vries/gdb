@@ -84,6 +84,7 @@
 #include "cli/cli-style.h"
 #include "gdbsupport/remote-args.h"
 #include "finish-thread-state.h"
+#include <utility>
 
 /* The remote target.  */
 
@@ -13869,9 +13870,7 @@ public:
   /* Release ownership of the file descriptor, and return it.  */
   ATTRIBUTE_UNUSED_RESULT int release () noexcept
   {
-    int fd = m_fd;
-    m_fd = -1;
-    return fd;
+    return std::exchange (m_fd, -1);
   }
 
   /* Return the owned file descriptor.  */

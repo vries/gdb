@@ -71,6 +71,7 @@
 #include "gdbsupport/scoped_restore.h"
 #include "nat/fork-inferior.h"
 #include "gdbsupport/eintr.h"
+#include <utility>
 
 /* Quick overview.
    Darwin kernel is Mach + BSD derived kernel.  Note that they share the
@@ -1202,8 +1203,7 @@ darwin_nat_target::wait_1 (ptid_t ptid, struct target_waitstatus *status)
   /* Handle fake stop events at first.  */
   if (darwin_inf_fake_stop != NULL)
     {
-      inferior *inf = darwin_inf_fake_stop;
-      darwin_inf_fake_stop = NULL;
+      inferior *inf = std::exchange (darwin_inf_fake_stop, nullptr);
 
       darwin_inferior *priv = get_darwin_inferior (inf);
 

@@ -82,6 +82,7 @@
 #include "gdbsupport/span.h"
 #include <optional>
 #include "gdbsupport/common-utils.h"
+#include <utility>
 
 /* Prototypes for local functions.  */
 
@@ -1177,8 +1178,7 @@ breakpoint_enabled (struct breakpoint *b)
 static void
 set_breakpoint_count (int num)
 {
-  prev_breakpoint_count = breakpoint_count;
-  breakpoint_count = num;
+  prev_breakpoint_count = std::exchange (breakpoint_count, num);
   set_internalvar_integer (lookup_internalvar ("bpnum"), num);
 }
 
@@ -1898,9 +1898,7 @@ breakpoint_set_commands (struct breakpoint *b,
 void
 breakpoint_set_silent (struct breakpoint *b, int silent)
 {
-  int old_silent = b->silent;
-
-  b->silent = silent;
+  int old_silent = std::exchange (b->silent, silent);
   if (old_silent != silent)
     notify_breakpoint_modified (b);
 }
@@ -1918,8 +1916,7 @@ breakpoint_set_thread (struct breakpoint *b, int thread)
      already has task or inferior restriction.  */
   gdb_assert (thread == -1 || (b->task == -1 && b->inferior == -1));
 
-  int old_thread = b->thread;
-  b->thread = thread;
+  int old_thread = std::exchange (b->thread, thread);
   if (old_thread != thread)
     {
       /* If THREAD is in a different program_space than OLD_THREAD, or the
@@ -1976,8 +1973,7 @@ breakpoint_set_inferior (struct breakpoint *b, int inferior)
      already has a task or thread restriction.  */
   gdb_assert (inferior == -1 || (b->task == -1 && b->thread == -1));
 
-  int old_inferior = b->inferior;
-  b->inferior = inferior;
+  int old_inferior = std::exchange (b->inferior, inferior);
   if (old_inferior != inferior)
     {
       /* If INFERIOR is in a different program_space than OLD_INFERIOR, or
@@ -2033,8 +2029,7 @@ breakpoint_set_task (struct breakpoint *b, int task)
      already has a thread or inferior restriction.  */
   gdb_assert (task == -1 || (b->thread == -1 && b->inferior == -1));
 
-  int old_task = b->task;
-  b->task = task;
+  int old_task = std::exchange (b->task, task);
   if (old_task != task)
     notify_breakpoint_modified (b);
 }
@@ -5255,8 +5250,7 @@ bpstat_do_actions_1 (bpstat **bsp)
 	 commands are only executed once, we don't need to copy it; we
 	 can clear the pointer in the bpstat, and make sure we free
 	 the tree when we're done.  */
-      counted_command_line ccmd = bs->commands;
-      bs->commands = NULL;
+      counted_command_line ccmd = std::exchange (bs->commands, nullptr);
       if (ccmd != NULL)
 	cmd = ccmd.get ();
       if (command_line_is_silent (cmd))
@@ -14350,8 +14344,7 @@ enable_breakpoint_disp (struct breakpoint *bpt, enum bpdisp disposition,
 	{
 	  watchpoint *w = gdb::checked_static_cast<watchpoint *> (bpt);
 
-	  orig_enable_state = bpt->enable_state;
-	  bpt->enable_state = bp_enabled;
+	  orig_enable_state = std::exchange (bpt->enable_state, bp_enabled);
 	  update_watchpoint (w, true /* reparse */);
 	}
       catch (const gdb_exception_error &e)

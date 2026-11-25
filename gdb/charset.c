@@ -25,6 +25,7 @@
 #include "charset-list.h"
 #include "gdbsupport/environ.h"
 #include "arch-utils.h"
+#include <utility>
 
 #ifdef USE_WIN32API
 #include <windows.h>
@@ -672,8 +673,7 @@ wchar_iterator::iterate (enum wchar_iterate_result *out_result,
 		 to see EOF.  */
 	      *out_result = wchar_iterate_incomplete;
 	      *ptr = m_input;
-	      *len = m_bytes;
-	      m_bytes = 0;
+	      *len = std::exchange (m_bytes, 0);
 	      return 0;
 
 	    default:

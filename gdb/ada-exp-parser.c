@@ -27,6 +27,7 @@
 #include "gdbsupport/selftest.h"
 #include "parser-defs.h"
 #include "inferior.h"
+#include <utility>
 
 using namespace expr;
 
@@ -745,8 +746,7 @@ ada_parse_state::lex_single_quote ()
 {
   gdb_assert (*pstate->lexptr == '\'');
 
-  bool before_qual_quote = m_before_qual_quote;
-  m_before_qual_quote = false;
+  bool before_qual_quote = std::exchange (m_before_qual_quote, false);
 
   if (!before_qual_quote)
     {

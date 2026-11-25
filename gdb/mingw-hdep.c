@@ -31,6 +31,7 @@
 
 #include <windows.h>
 #include <signal.h>
+#include <utility>
 
 /* Return an absolute file name of the running GDB, if possible, or
    ARGV0 if not.  The return value is in malloc'ed storage.  */
@@ -518,9 +519,7 @@ install_sigint_handler (c_c_handler_ftype *fn)
   SetConsoleCtrlHandler (ctrl_c_handler, TRUE);
   installed = true;
 
-  c_c_handler_ftype *result = current_handler;
-  current_handler = fn;
-  return result;
+  return std::exchange (current_handler, fn);
 }
 
 /* See terminal.h.  */

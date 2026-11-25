@@ -22,6 +22,7 @@
 
 #include <cstddef>
 #include "gdbsupport/traits.h"
+#include <utility>
 
 namespace gdb
 {
@@ -185,10 +186,7 @@ public:
      the reference.  */
   ATTRIBUTE_UNUSED_RESULT T *release () noexcept
   {
-    T *result = m_obj;
-
-    m_obj = NULL;
-    return result;
+    return std::exchange (m_obj, nullptr);
   }
 
   /* Let users refer to members of the underlying pointer.  */

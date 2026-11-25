@@ -44,6 +44,7 @@
 #include "valprint.h"
 #include "cli/cli-option.h"
 #include "dwarf2/loc.h"
+#include <utility>
 
 /* Number of calls to reinit_frame_cache.  */
 static unsigned int frame_cache_generation = 0;
@@ -280,16 +281,14 @@ struct frame_info_stash_entry
   DISABLE_COPY_AND_ASSIGN (frame_info_stash_entry);
 
   frame_info_stash_entry (frame_info_stash_entry &&other)
-    : frame (other.frame)
+    : frame (std::exchange (other.frame, nullptr))
   {
-    other.frame = nullptr;
   }
 
   frame_info_stash_entry &operator= (frame_info_stash_entry &&other)
   {
     destroy ();
-    frame = other.frame;
-    other.frame = nullptr;
+    frame = std::exchange (other.frame, nullptr);
     return *this;
   }
 

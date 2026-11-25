@@ -23,6 +23,7 @@
 #ifdef HAVE_SYS_MMAN_H
 
 #include <sys/mman.h>
+#include <utility>
 
 /* A smart-pointer-like class to mmap() and automatically munmap() a memory
    mapping.  */
@@ -54,10 +55,8 @@ public:
 
   ATTRIBUTE_UNUSED_RESULT void *release () noexcept
   {
-    void *mem = m_mem;
-    m_mem = MAP_FAILED;
     m_length = 0;
-    return mem;
+    return std::exchange (m_mem, MAP_FAILED);
   }
 
   void reset (void *addr, size_t length, int prot, int flags, int fd,

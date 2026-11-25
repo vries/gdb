@@ -39,6 +39,7 @@
 #include "main.h"
 #include "gdbsupport/buildargv.h"
 #include "gdbsupport/scope-exit.h"
+#include <utility>
 
 /* The magic initialization routine for this module.  */
 
@@ -209,12 +210,10 @@ struct interp *
 scoped_restore_interp::set_interp (const char *name)
 {
   struct interp *interp = interp_lookup (current_ui, name);
-  struct interp *old_interp = current_ui->current_interpreter;
+  if (interp == nullptr)
+    return current_ui->current_interpreter;
 
-  if (interp)
-    current_ui->current_interpreter = interp;
-
-  return old_interp;
+  return std::exchange (current_ui->current_interpreter, interp);
 }
 
 /* Returns true if the current interp is the passed in name.  */

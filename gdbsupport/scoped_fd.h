@@ -22,6 +22,7 @@
 
 #include <unistd.h>
 #include "gdb_file.h"
+#include <utility>
 
 /* A smart-pointer-like class to automatically close a file descriptor.  */
 
@@ -31,9 +32,8 @@ public:
   explicit scoped_fd (int fd = -1) noexcept : m_fd (fd) {}
 
   scoped_fd (scoped_fd &&other) noexcept
-    : m_fd (other.m_fd)
+    : m_fd (std::exchange (other.m_fd, -1))
   {
-    other.m_fd = -1;
   }
 
   ~scoped_fd ()
@@ -48,8 +48,7 @@ public:
       {
 	if (m_fd >= 0)
 	  close (m_fd);
-	m_fd = other.m_fd;
-	other.m_fd = -1;
+	m_fd = std::exchange (other.m_fd, -1);
       }
     return *this;
   }
@@ -58,9 +57,7 @@ public:
 
   ATTRIBUTE_UNUSED_RESULT int release () noexcept
   {
-    int fd = m_fd;
-    m_fd = -1;
-    return fd;
+    return std::exchange (m_fd, -1);
   }
 
   /* Like release, but return a gdb_file_up that owns the file

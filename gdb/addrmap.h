@@ -23,6 +23,7 @@
 #include "gdbsupport/function-view.h"
 #include "gdbsupport/gdb_obstack.h"
 #include "splay-tree.h"
+#include <utility>
 
 /* An address map is essentially a table mapping CORE_ADDRs onto GDB
    data structures, like blocks, symtabs, partial symtabs, and so on.
@@ -132,9 +133,8 @@ public:
   DISABLE_COPY_AND_ASSIGN (addrmap_mutable);
 
   addrmap_mutable (addrmap_mutable &&other)
-    : tree (other.tree)
+    : tree (std::exchange (other.tree, nullptr))
   {
-    other.tree = nullptr;
   }
 
   addrmap_mutable &operator= (addrmap_mutable &&other)
@@ -143,8 +143,7 @@ public:
     if (this != &other)
       {
 	clear ();
-	tree = other.tree;
-	other.tree = nullptr;
+	tree = std::exchange (other.tree, nullptr);
       }
     return *this;
   }

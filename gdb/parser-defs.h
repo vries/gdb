@@ -26,6 +26,7 @@
 #include "expression.h"
 #include "symtab.h"
 #include "expop.h"
+#include <utility>
 
 struct block;
 struct language_defn;
@@ -177,8 +178,7 @@ struct parser_state : public expr_builder
 
   int end_arglist ()
   {
-    int val = arglist_len;
-    arglist_len = m_funcall_chain.back ();
+    int val = std::exchange (arglist_len, m_funcall_chain.back ());
     m_funcall_chain.pop_back ();
     return val;
   }

@@ -27,6 +27,7 @@
 #include "language.h"
 #include "parser-defs.h"
 #include "value.h"
+#include <utility>
 
 /* The entry point of the bison/yacc-generated parser, defined in
    go-exp-parser-gen.c.  Bison produces a declaration for go_yyparse in
@@ -380,9 +381,7 @@ lex_one_token (struct parser_state *par_state)
   int c;
   int namelen;
   const char *tokstart;
-  int saw_structop = last_was_structop;
-
-  last_was_structop = 0;
+  int saw_structop = std::exchange (last_was_structop, 0);
 
  retry:
 

@@ -22,6 +22,8 @@
 #ifndef GDBSUPPORT_BTRACE_COMMON_H
 #define GDBSUPPORT_BTRACE_COMMON_H
 
+#include <utility>
+
 /* Branch tracing (btrace) is a per-thread control-flow execution trace of the
    inferior.  For presentation purposes, the branch trace is represented as a
    list of sequential control-flow blocks, one such list per thread.  */
@@ -191,9 +193,8 @@ struct btrace_data
     if (this != &other)
       {
 	fini ();
-	format = other.format;
+	format = std::exchange (other.format, BTRACE_FORMAT_NONE);
 	variant = other.variant;
-	other.format = BTRACE_FORMAT_NONE;
       }
     return *this;
   }

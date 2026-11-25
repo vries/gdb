@@ -22,6 +22,7 @@
 
 /* Include this first, to pick up the <mach.h> 'thread_info' diversion.  */
 #include "gnu-nat.h"
+#include <utility>
 
 /* Mach/Hurd headers are not yet ready for C++ compilation.  */
 extern "C"
@@ -2755,9 +2756,7 @@ static void
 set_task_pause_cmd (int arg, int from_tty)
 {
   struct inf *inf = cur_inf ();
-  int old_sc = inf->pause_sc;
-
-  inf->pause_sc = arg;
+  int old_sc = std::exchange (inf->pause_sc, arg);
 
   if (old_sc == 0 && inf->pause_sc != 0)
     /* If the task is currently unsuspended, immediately suspend it,
@@ -3261,9 +3260,9 @@ static void
 set_thread_pause_cmd (const char *args, int from_tty)
 {
   struct proc *thread = cur_thread ();
-  int old_sc = thread->pause_sc;
+  int old_sc = std::exchange (thread->pause_sc,
+			      parse_bool_arg (args, "set thread pause"));
 
-  thread->pause_sc = parse_bool_arg (args, "set thread pause");
   if (old_sc == 0 && thread->pause_sc != 0 && thread->inf->pause_sc == 0)
     /* If the task is currently unsuspended, immediately suspend it,
        otherwise wait until the next time it gets control.  */

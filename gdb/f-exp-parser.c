@@ -26,6 +26,7 @@
 #include "parser-defs.h"
 #include "value.h"
 #include <string>
+#include <utility>
 
 /* The entry point of the bison/yacc-generated parser, defined in
    f-exp-parser-gen.c.  Bison produces a declaration for f_yyparse in
@@ -636,9 +637,7 @@ f_yylex (void)
   int namelen;
   unsigned int token;
   const char *tokstart;
-  bool saw_structop = last_was_structop;
-
-  last_was_structop = false;
+  bool saw_structop = std::exchange (last_was_structop, false);
 
  retry:
 

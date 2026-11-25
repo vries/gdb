@@ -61,6 +61,7 @@
 #include <elf.h>
 #endif
 #include "nat/linux-namespaces.h"
+#include <utility>
 
 #ifndef O_LARGEFILE
 #define O_LARGEFILE 0
@@ -2606,9 +2607,8 @@ linux_process_target::wait_for_event_filtered (ptid_t wait_ptid,
 			    event_thread->id.lwp (),
 			    event_child->status_pending);
 
-      *wstatp = event_child->status_pending;
+      *wstatp = std::exchange (event_child->status_pending, 0);
       event_child->status_pending_p = 0;
-      event_child->status_pending = 0;
       switch_to_thread (event_thread);
       return event_thread->id.lwp ();
     }
@@ -2682,9 +2682,8 @@ linux_process_target::wait_for_event_filtered (ptid_t wait_ptid,
       if (event_thread != NULL)
 	{
 	  event_child = get_thread_lwp (event_thread);
-	  *wstatp = event_child->status_pending;
+	  *wstatp = std::exchange (event_child->status_pending, 0);
 	  event_child->status_pending_p = 0;
-	  event_child->status_pending = 0;
 	  break;
 	}
 

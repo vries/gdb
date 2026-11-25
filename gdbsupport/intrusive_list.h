@@ -19,6 +19,8 @@
 #ifndef GDBSUPPORT_INTRUSIVE_LIST_H
 #define GDBSUPPORT_INTRUSIVE_LIST_H
 
+#include <utility>
+
 #define INTRUSIVE_LIST_UNLINKED_VALUE ((T *) -1)
 
 /* A list node.  The elements put in an intrusive_list either inherit
@@ -251,19 +253,15 @@ public:
   }
 
   intrusive_list (intrusive_list &&other) noexcept
-    : m_front (other.m_front),
-      m_back (other.m_back)
+    : m_front (std::exchange (other.m_front, nullptr)),
+      m_back (std::exchange (other.m_back, nullptr))
   {
-    other.m_front = nullptr;
-    other.m_back = nullptr;
   }
 
   intrusive_list &operator= (intrusive_list &&other) noexcept
   {
-    m_front = other.m_front;
-    m_back = other.m_back;
-    other.m_front = nullptr;
-    other.m_back = nullptr;
+    m_front = std::exchange (other.m_front, nullptr);
+    m_back = std::exchange (other.m_back, nullptr);
 
     return *this;
   }

@@ -74,6 +74,7 @@
 #include "cli-out.h"
 #include "tracepoint.h"
 #include "inf-loop.h"
+#include <utility>
 
 #if defined(TUI)
 # include "tui/tui.h"
@@ -789,10 +790,9 @@ void
 save_command_line (const char *cmd)
 {
   xfree (previous_saved_command_line);
-  previous_saved_command_line = saved_command_line;
-  previous_repeat_arguments = repeat_arguments;
-  saved_command_line = xstrdup (cmd);
-  repeat_arguments = NULL;
+  previous_saved_command_line
+    = std::exchange (saved_command_line, xstrdup (cmd));
+  previous_repeat_arguments = std::exchange (repeat_arguments, nullptr);
 }
 
 
@@ -994,8 +994,8 @@ gdb_readline_wrapper_line (gdb::unique_xmalloc_ptr<char> &&line)
   gdb_readline_wrapper_done = 1;
 
   /* Prevent operate-and-get-next from acting too early.  */
-  saved_after_char_processing_hook = after_char_processing_hook;
-  after_char_processing_hook = NULL;
+  saved_after_char_processing_hook
+    = std::exchange (after_char_processing_hook, nullptr);
 
 #if defined(TUI)
   if (tui_active)
@@ -1053,8 +1053,8 @@ public:
     ui->secondary_prompt_depth--;
     gdb_assert (ui->secondary_prompt_depth >= 0);
 
-    after_char_processing_hook = saved_after_char_processing_hook;
-    saved_after_char_processing_hook = NULL;
+    after_char_processing_hook
+      = std::exchange (saved_after_char_processing_hook, nullptr);
 
     if (m_target_is_async_orig)
       target_async (true);

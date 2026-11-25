@@ -64,6 +64,7 @@
 #include "gdbsupport/gdb-sigmask.h"
 #include "gdbsupport/common-debug.h"
 #include "cli/cli-style.h"
+#include <utility>
 
 /* This comment documents high-level logic of this file.
 
@@ -3415,8 +3416,7 @@ linux_nat_wait_1 (ptid_t ptid, struct target_waitstatus *ourstatus,
   gdb_assert (lp);
   gdb_assert (lp->stopped);
 
-  status = lp->status;
-  lp->status = 0;
+  status = std::exchange (lp->status, 0);
 
   if (!target_is_non_stop_p ())
     {

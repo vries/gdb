@@ -77,6 +77,7 @@
 #include "interps.h"
 #include "finish-thread-state.h"
 #include "buffered-streams.h"
+#include <utility>
 
 /* Prototypes for local functions */
 
@@ -1083,9 +1084,8 @@ handle_vfork_child_exec_or_exit (int exec)
 
       /* This exec or exit marks the end of the shared memory region
 	 between the parent and the child.  Break the bonds.  */
-      inferior *vfork_parent = inf->vfork_parent;
-      inf->vfork_parent->vfork_child = nullptr;
-      inf->vfork_parent = nullptr;
+      inferior *vfork_parent = std::exchange (inf->vfork_parent, nullptr);
+      vfork_parent->vfork_child = nullptr;
 
       /* If the user wanted to detach from the parent, now is the
 	 time.  */
@@ -1115,8 +1115,7 @@ handle_vfork_child_exec_or_exit (int exec)
 	     the spaces has the desired effect.  Yes, this is "sort
 	     of" a hack.  */
 
-	  pspace = inf->pspace;
-	  inf->pspace = nullptr;
+	  pspace = std::exchange (inf->pspace, nullptr);
 	  address_space_ref_ptr aspace = std::move (inf->aspace);
 
 	  if (print_inferior_events)
@@ -9930,9 +9929,7 @@ signal_cache_update (int signo)
 int
 signal_stop_update (int signo, int state)
 {
-  int ret = signal_stop[signo];
-
-  signal_stop[signo] = state;
+  int ret = std::exchange (signal_stop[signo], state);
   signal_cache_update (signo);
   return ret;
 }
@@ -9940,9 +9937,7 @@ signal_stop_update (int signo, int state)
 int
 signal_print_update (int signo, int state)
 {
-  int ret = signal_print[signo];
-
-  signal_print[signo] = state;
+  int ret = std::exchange (signal_print[signo], state);
   signal_cache_update (signo);
   return ret;
 }
@@ -9950,9 +9945,7 @@ signal_print_update (int signo, int state)
 int
 signal_pass_update (int signo, int state)
 {
-  int ret = signal_program[signo];
-
-  signal_program[signo] = state;
+  int ret = std::exchange (signal_program[signo], state);
   signal_cache_update (signo);
   return ret;
 }

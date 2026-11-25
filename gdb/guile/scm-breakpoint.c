@@ -31,6 +31,7 @@
 #include "language.h"
 #include "guile-internal.h"
 #include "location.h"
+#include <utility>
 
 /* The <gdb:breakpoint> smob.
    N.B.: The name of this struct is known to breakpoint.h.
@@ -1146,8 +1147,7 @@ bpscm_breakpoint_created (struct breakpoint *bp)
   /* Verify our caller error checked the user's request.  */
   gdb_assert (bpscm_want_scm_wrapper_p (bp, 1));
 
-  bp_scm = pending_breakpoint_scm;
-  pending_breakpoint_scm = SCM_BOOL_F;
+  bp_scm = std::exchange (pending_breakpoint_scm, SCM_BOOL_F);
 
   bpscm_attach_scm_to_breakpoint (bp, bp_scm);
 }
