@@ -114,21 +114,9 @@ proc with_debuginfod_env { cache body } {
     }
 }
 
-# Start a debuginfod server.  DB is the directory to use for the server's
-# database cache, while DEBUGDIR is a directory containing all the debug
-# information that the server should serve.
-#
-# This proc will try to find an available port to start the server on, will
-# start the server, and check that the server has started correctly.
-#
-# If the server starts correctly, then this proc will return the url that
-# should be used to communicate with the server.  If the server can't be
-# started, then an error will be printed, and an empty string returned.
-#
-# If the server is successfully started then the global variable
-# debuginfod_spawn_id will be set with the spawn_id of the debuginfod
-# process.
-proc start_debuginfod { db debugdir } {
+# Helper proc for start_debuginfod.
+
+proc start_debuginfod_1 { db debugdir } {
     global debuginfod_spawn_id spawn_id
 
     # Find an unused port.
@@ -160,7 +148,6 @@ proc start_debuginfod { db debugdir } {
 	    "started http server on IPv6 port=$port" {}
 	    "failed to bind to port" {}
 	    timeout {
-		stop_debuginfod
 		perror "find port timeout"
 		return ""
 	    }
@@ -192,13 +179,38 @@ proc start_debuginfod { db debugdir } {
 	}
 
 	if { $timelim == 0 } {
-	    stop_debuginfod
 	    perror "server init timeout"
 	    return ""
 	}
     }
 
     return $url
+}
+
+# Start a debuginfod server.  DB is the directory to use for the server's
+# database cache, while DEBUGDIR is a directory containing all the debug
+# information that the server should serve.
+#
+# This proc will try to find an available port to start the server on, will
+# start the server, and check that the server has started correctly.
+#
+# If the server starts correctly, then this proc will return the url that
+# should be used to communicate with the server.  If the server can't be
+# started, then an error will be printed, and an empty string returned.
+#
+# If the server is successfully started then the global variable
+# debuginfod_spawn_id will be set with the spawn_id of the debuginfod
+# process.
+
+proc start_debuginfod { db debugdir } {
+    set url ""
+    try {
+	set url [start_debuginfod_1 $db $debugdir]
+    } finally {
+	if {$url == ""} {
+	    stop_debuginfod
+	}
+    }
 }
 
 # Drain output from debuginfod.
