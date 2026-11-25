@@ -38,7 +38,8 @@ foreach_with_prefix rl_prompt_start_end_ignore { 0 1 } {
 
     # Set prompt with color.
     set prompt "${color_on}(gdb) $color_off"
-    Term::command "set prompt $prompt"
+    gdb_assert {[Term::command "set prompt $prompt"]} \
+	"set prompt"
 
     # Check the color.
     set line [Term::get_line_with_attrs $Term::_cur_row]
@@ -48,33 +49,41 @@ foreach_with_prefix rl_prompt_start_end_ignore { 0 1 } {
     # Type a string.
     set cmd "some long command"
     send_gdb $cmd
-    Term::wait_for_line ^[string_to_regexp "(gdb) $cmd"] 23
+    gdb_assert {[Term::wait_for_line ^[string_to_regexp "(gdb) $cmd"] 23]} \
+	$cmd
 
     # Send ^A, aka C-a, trigger beginning-of-line.
     send_gdb "\001"
+    set test "ctrl-a"
     if { $tui || $rl_prompt_start_end_ignore } {
-	Term::wait_for_line ^[string_to_regexp "(gdb) $cmd"] 6
+	gdb_assert \
+	    {[Term::wait_for_line ^[string_to_regexp "(gdb) $cmd"] 6]} \
+	    $test
     } else {
 	# Without the markers, readline may get the cursor position wrong, so
 	# match less strict.
-	Term::wait_for_line ^[string_to_regexp "(gdb) $cmd"]
+	gdb_assert {[Term::wait_for_line ^[string_to_regexp "(gdb) $cmd"]]} \
+	    $test
     }
     Term::dump_screen
 
     # Type something else to flush out the effect of the ^A.
     set prefix "A"
     send_gdb $prefix
+    set test "type A"
     if { $tui || $rl_prompt_start_end_ignore } {
-	Term::wait_for_line ^[string_to_regexp "(gdb) $prefix$cmd"] 7
+	gdb_assert \
+	    {[Term::wait_for_line ^[string_to_regexp "(gdb) $prefix$cmd"] 7]} \
+	    $test
     } else {
 	# Without the markers, readline may get the cursor position wrong, so
 	# match less strict.
-	Term::wait_for_line [string_to_regexp "$prefix"]
+	gdb_assert {[Term::wait_for_line [string_to_regexp "$prefix"]]} $test
     }
 
     # Abort command line editing, and regenerate prompt.
     send_gdb "\003"
 
     # Reset prompt to default prompt.
-    Term::command "set prompt (gdb) "
+    gdb_assert {[Term::command "set prompt (gdb) "]} "reset prompt"
 }
