@@ -34,6 +34,7 @@
 #include "inferior.h"
 #include "gdbsupport/unordered_map.h"
 #include "producer.h"
+#include "gdbsupport/selftest.h"
 #include <string>
 #include <string.h>
 
@@ -349,6 +350,60 @@ cp_lookup_symbol_in_namespace (const char *the_namespace, const char *name,
   return sym;
 }
 
+/* Return the length of the longest (double colon separated) component prefix
+   in S1 and S2.  For instance:
+   - for S1 == "A::B" and S2 == "A::C", return 1, indicating
+     prefix "A".
+   - for S1 == "A::B::C" and S2 == "A::B::D", return 4, indicating
+     prefix "A::B".  */
+
+static size_t
+common_components (const char *s1, const char *s2)
+{
+  size_t len = 0;
+
+  size_t double_colon_len = 0;
+  while (true)
+    {
+      size_t n1 = cp_find_first_component (s1);
+      size_t n2 = cp_find_first_component (s2);
+      if (n1 != n2 || strncmp (s1, s2, n1) != 0)
+	{
+	  /* Unequal components.  */
+	  break;
+	}
+
+      /* Equal components.  */
+      len += double_colon_len + n1;
+      double_colon_len = 0;
+
+      /* Skip past components.  */
+      s1 += n1;
+      s2 += n2;
+
+      if (!startswith (s1, "::") || !startswith (s2, "::"))
+	{
+	  /* No "::" to skip.  */
+	  break;
+	}
+
+      /* Both have "::".  */
+      double_colon_len = 2;
+
+      /* Skip past "::".  */
+      s1 += 2;
+      s2 += 2;
+
+      if (s1[0] == '\0' || s2[0] == '\0')
+	{
+	  /* Not enough components left.  */
+	  break;
+	}
+    }
+
+  return len;
+}
+
 /* Type used for collecting symbols.  Maps names to symbols.  */
 using symbol_map = gdb::unordered_string_map<block_symbol>;
 
@@ -359,6 +414,7 @@ enum search_parents
 {
   search_parents_no = 0,
   search_parents_yes = 1,
+  search_parents_effective_scope = 2,
 };
 
 /* This version of the function is internal, use the wrapper unless
@@ -389,6 +445,11 @@ enum search_parents
    namespaces X and Y will be considered.  If SEARCH_PARENTS is
    search_parents_no only the import of Y is considered.
 
+   If SEARCH_PARENTS is search_parents_effective_scope, only consider imports:
+   - that are visible from LOOKUP_SCOPE, and
+   - whose effective namespace (the nearest enclosing namespace which contains
+     both the using directive and the used namespace) is SCOPE.
+
    SEARCH_SCOPE_FIRST is an internal implementation detail: Callers must
    pass 0 for it.  Internally we pass 1 when recursing.  */
 
@@ -400,7 +461,8 @@ cp_lookup_symbol_via_imports (const char *scope,
 			      const int search_scope_first,
 			      const int declaration_only,
 			      const enum search_parents search_parents,
-			      symbol_map &found_symbols)
+			      symbol_map &found_symbols,
+			      const char *lookup_scope = nullptr)
 {
   struct block_symbol sym = {};
   int len;
@@ -470,6 +532,34 @@ cp_lookup_symbol_via_imports (const char *scope,
 	    directive_match = (startswith (scope, current->import_dest)
 			       && (scope[len] == ':'
 				   || scope[len] == '\0'));
+	}
+      else if (search_parents == search_parents_effective_scope)
+	{
+	  gdb_assert (lookup_scope != nullptr);
+
+	  const char *dest;
+	  if (len == 0)
+	    dest = (block->function_block () != nullptr
+		    ? block->scope ()
+		    : "");
+	  else
+	    dest = current->import_dest;
+
+	  /* The nearest enclosing namespace which contains both the using
+	     directive and used namespace.  */
+	  size_t effective_namespace_len
+	    = common_components (current->import_src, dest);
+
+	  /* Whether the using directive is visible from lookup_scope.  */
+	  bool visible
+	    = common_components (dest, lookup_scope) == strlen (dest);
+
+	  /* Imported names appear at the effective namespace.  */
+	  bool level_p
+	    = (strlen (scope) == effective_namespace_len
+	       && strncmp (scope, dest, effective_namespace_len) == 0);
+
+	  directive_match = visible && level_p;
 	}
       else
 	directive_match = streq (scope, current->import_dest);
@@ -772,14 +862,31 @@ lookup_namespace_scope (const struct language_defn *langdef,
      template symbol with "::" in the argument list) then
      cp_lookup_symbol_in_namespace will catch it.  */
 
-  if (scope_len == 0 && strchr (name, ':') == NULL)
-    return cp_lookup_bare_symbol (langdef, name, block, domain, 1);
-
+  struct block_symbol res;
   the_namespace = (char *) alloca (scope_len + 1);
-  strncpy (the_namespace, scope, scope_len);
-  the_namespace[scope_len] = '\0';
-  return cp_lookup_symbol_in_namespace (the_namespace, name,
-					block, domain, 1);
+  if (scope_len == 0 && strchr (name, ':') == NULL)
+    {
+      the_namespace[0] = '\0';
+      res = cp_lookup_bare_symbol (langdef, name, block, domain, 1);
+    }
+  else
+    {
+      strncpy (the_namespace, scope, scope_len);
+      the_namespace[scope_len] = '\0';
+      res = cp_lookup_symbol_in_namespace (the_namespace, name, block, domain,
+					   1);
+    }
+
+  symbol_map found_symbols;
+  if (res.symbol != nullptr)
+    found_symbols[res.symbol->m_name] = res;
+
+  for (const struct block *b = block; b != nullptr; b = b->superblock ())
+    cp_lookup_symbol_via_imports (the_namespace, name,
+				  b, domain, 0, 0, search_parents_effective_scope,
+				  found_symbols, scope);
+
+  return handle_found_symbols (found_symbols, name);
 }
 
 /* The C++-specific version of name lookup for static and global
@@ -802,13 +909,9 @@ cp_lookup_symbol_nonlocal (const struct language_defn *langdef,
      name, host_address_to_string (block), scope,
      domain_name (domain).c_str ());
 
-  /* First, try to find the symbol in the given namespace, and all
-     containing namespaces.  */
+  /* Try to find the symbol in the given namespace, and all containing
+     namespaces.  */
   sym = lookup_namespace_scope (langdef, name, block, domain, scope, 0);
-
-  /* Search for name in namespaces imported to this and parent blocks.  */
-  if (sym.symbol == NULL)
-    sym = cp_lookup_symbol_via_all_imports (scope, name, block, domain);
 
   symbol_lookup_debug_printf ("cp_lookup_symbol_nonlocal (...) = %s",
 			      (sym.symbol != NULL
@@ -1032,6 +1135,30 @@ maintenance_cplus_namespace (const char *args, int from_tty)
   gdb_printf (_("The \"maint namespace\" command was removed.\n"));
 }
 
+#if GDB_SELF_TEST
+namespace selftests {
+
+static void
+check_common_components (const char *s1, const char *s2, size_t len)
+{
+  SELF_CHECK (common_components (s1, s2) == len);
+  SELF_CHECK (common_components (s2, s1) == len);
+}
+
+static void
+test_cp_namespace ()
+{
+  check_common_components ("A::B", "A::B", 4);
+  check_common_components ("A::B", "A::C", 1);
+  check_common_components ("A::B::C", "A::B::D", 4);
+  check_common_components ("A", "", 0);
+  check_common_components ("", "", 0);
+  check_common_components ("A::BC", "A::B", 1);
+}
+
+} /* namespace selftests */
+#endif /* GDB_SELF_TEST */
+
 INIT_GDB_FILE (cp_namespace)
 {
   struct cmd_list_element *cmd;
@@ -1041,4 +1168,8 @@ INIT_GDB_FILE (cp_namespace)
 		 _("Deprecated placeholder for removed functionality."),
 		 &maint_cplus_cmd_list);
   deprecate_cmd (cmd, NULL);
+
+#if GDB_SELF_TEST
+  selftests::register_test ("cp-namespace", selftests::test_cp_namespace);
+#endif
 }
