@@ -352,6 +352,15 @@ cp_lookup_symbol_in_namespace (const char *the_namespace, const char *name,
 /* Type used for collecting symbols.  Maps names to symbols.  */
 using symbol_map = gdb::unordered_string_map<block_symbol>;
 
+/* Enum to represent the search_parent parameter to
+   cp_lookup_symbol_via_imports in a verbose way.  */
+
+enum search_parents
+{
+  search_parents_no = 0,
+  search_parents_yes = 1,
+};
+
 /* This version of the function is internal, use the wrapper unless
    the list of ambiguous symbols is needed.
 
@@ -365,8 +374,8 @@ using symbol_map = gdb::unordered_string_map<block_symbol>;
      }
      using A::x;
 
-   If SEARCH_PARENTS the search will include imports which are
-   applicable in parents of SCOPE.
+   If SEARCH_PARENTS is search_parents_yes, the search will include imports
+   which are applicable in parents of SCOPE.
    Example:
 
      namespace A {
@@ -376,9 +385,9 @@ using symbol_map = gdb::unordered_string_map<block_symbol>;
        }
      }
 
-   If SCOPE is "A::B" and SEARCH_PARENTS is true the imports of
-   namespaces X and Y will be considered.  If SEARCH_PARENTS is false
-   only the import of Y is considered.
+   If SCOPE is "A::B" and SEARCH_PARENTS is search_parents_yes the imports of
+   namespaces X and Y will be considered.  If SEARCH_PARENTS is
+   search_parents_no only the import of Y is considered.
 
    SEARCH_SCOPE_FIRST is an internal implementation detail: Callers must
    pass 0 for it.  Internally we pass 1 when recursing.  */
@@ -390,7 +399,7 @@ cp_lookup_symbol_via_imports (const char *scope,
 			      const domain_search_flags domain,
 			      const int search_scope_first,
 			      const int declaration_only,
-			      const int search_parents,
+			      const enum search_parents search_parents,
 			      symbol_map &found_symbols)
 {
   struct block_symbol sym = {};
@@ -446,7 +455,7 @@ cp_lookup_symbol_via_imports (const char *scope,
       len = strlen (current->import_dest);
 
       bool directive_match;
-      if (search_parents)
+      if (search_parents == search_parents_yes)
 	{
 	  if (len == 0)
 	    {
@@ -525,7 +534,8 @@ cp_lookup_symbol_via_imports (const char *scope,
 			? b->superblock ()
 			: b->static_block ()))
 		cp_lookup_symbol_via_imports (current->import_src, name,
-					      b, domain, 1, 0, 0,
+					      b, domain, 1, 0,
+					      search_parents_no,
 					      found_symbols);
 	    }
 
@@ -572,7 +582,7 @@ cp_lookup_symbol_via_imports (const char *scope,
 			      const struct block *block,
 			      const domain_search_flags domain,
 			      const int declaration_only,
-			      const int search_parents)
+			      const enum search_parents search_parents)
 {
   symbol_map found_symbols;
 
@@ -644,7 +654,8 @@ cp_lookup_symbol_imports (const char *scope,
     }
 
   struct block_symbol result
-    = cp_lookup_symbol_via_imports (scope, name, block, domain, 1, 1);
+    = cp_lookup_symbol_via_imports (scope, name, block, domain, 1,
+				    search_parents_yes);
   symbol_lookup_debug_printf ("cp_lookup_symbol_imports (...) = %s\n",
 		  result.symbol != nullptr
 		  ? host_address_to_string (result.symbol) : "NULL");
@@ -664,7 +675,8 @@ cp_lookup_symbol_via_all_imports (const char *scope, const char *name,
 
   while (block != NULL)
     {
-      sym = cp_lookup_symbol_via_imports (scope, name, block, domain, 0, 1);
+      sym = cp_lookup_symbol_via_imports (scope, name, block, domain, 0,
+					  search_parents_yes);
       if (sym.symbol != nullptr)
 	return sym;
 
