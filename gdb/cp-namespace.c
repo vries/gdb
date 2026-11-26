@@ -533,6 +533,37 @@ cp_lookup_symbol_via_imports (const char *scope,
     }
 }
 
+/* The search for NAME resulted in FOUND_SYMBOLS.  If FOUND_SYMBOLS contains:
+   - more than one symbol, throw an ambiguity error.
+   - one symbol, return it.
+   - no symbols, return {}.  */
+
+static struct block_symbol
+handle_found_symbols (const symbol_map &found_symbols, const char *name)
+{
+  if (found_symbols.empty ())
+    return {};
+
+  if (found_symbols.size () == 1)
+    return found_symbols.cbegin ()->second;
+
+  std::string possibilities_str;
+  bool first = true;
+  for (const auto &entry : found_symbols)
+    {
+      const block_symbol &bs = entry.second;
+
+      if (!first)
+	possibilities_str += " and ";
+      possibilities_str += bs.symbol->print_name ();
+
+      first = false;
+    }
+
+  error (_("Reference to \"%s\" is ambiguous, possibilities are: %s"),
+	 name, possibilities_str.c_str ());
+}
+
 /* Wrapper for the actual cp_lookup_symbol_via_imports.  This wrapper sets
    search_scope_first correctly and handles errors if needed.  */
 static struct block_symbol
@@ -549,25 +580,7 @@ cp_lookup_symbol_via_imports (const char *scope,
 			       declaration_only, search_parents,
 			       found_symbols);
 
-  if (found_symbols.size () > 1)
-    {
-      auto itr = found_symbols.cbegin ();
-      std::string error_str = "Reference to \"";
-      error_str += name;
-      error_str += "\" is ambiguous, possibilities are: ";
-      error_str += itr->second.symbol->print_name ();
-      for (itr++; itr != found_symbols.end (); itr++)
-	{
-	  error_str += " and ";
-	  error_str += itr->second.symbol->print_name ();
-	}
-      error (_("%s"), error_str.c_str ());
-    }
-
-  if (found_symbols.size() == 1)
-    return found_symbols.cbegin ()->second;
-  else
-    return {};
+  return handle_found_symbols (found_symbols, name);
 }
 
 /* Search for symbols whose name match NAME in the given SCOPE.  */
